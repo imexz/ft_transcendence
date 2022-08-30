@@ -1,0 +1,50 @@
+services:
+  frontend:
+    image: vuejs/ci:latest
+    container_name: vuejs
+    depends_on:
+      - backend
+      - database
+    restart: always
+    env_file: .env
+    ports:
+      - "8080:8080"
+    networks:
+      - front-tier
+      - back-tier
+
+  backend:
+    image: nestjs/cli:latest
+    container_name: nestjs
+    depends_on:
+      - database
+    restart: always
+    env_file: .env
+    ports: 
+      - "3000:3000"
+    networks:
+      - back-tier
+
+  database:
+    image: postgres:latest
+    container_name: postgres
+    # depends_on:
+    restart: always
+    env_file: .env
+    volumes:
+      - db-data:/etc/data
+    ports:
+      - "5432-5433:5432-5433"
+    networks:
+      - back-tier
+
+volumes:
+  db-data: {}
+
+networks:
+  front-tier: {}
+  back-tier: {}
+
+
+
+# expose Ports
