@@ -9,6 +9,4 @@ export class UsersController {
 	first(@Param() params: number){
 		return this.usersService.findOne(params)
 	}
-
-
 }
