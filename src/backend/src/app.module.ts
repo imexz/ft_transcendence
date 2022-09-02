@@ -5,10 +5,13 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UserHttpModule } from './users/users-http.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { AuthModule } from './aut/auth.module';
+import { User } from './users/user.entity'
 
 
 @Module({
   imports: [
+	AuthModule,
 	UserHttpModule,
 	ConfigModule.forRoot({
 		isGlobal: true
@@ -29,7 +32,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 		username: process.env.POSTGRES_USER,
 		password: process.env.POSTGRES_PASSWORD,
 		database: process.env.PGDATABASE,
-		entities: [],
+		entities: [User],
 		ssl: false,
 		synchronize: true //  shouldn't be used in production
 	}),

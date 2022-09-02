@@ -9,6 +9,7 @@ export class AuthService {
 		if(user) {
 			return user
 		}
+		console.log("validateUser");
 		return null;
 	}
 
@@ -17,6 +18,7 @@ export class AuthService {
 		if(user) {
 			return user
 		}
+		console.log("addUser");
 		return null
 	}
 
