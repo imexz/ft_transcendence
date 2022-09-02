@@ -5,8 +5,13 @@ import { UsersService } from './users.service';
 export class UsersController {
 	constructor(private readonly usersService: UsersService){}
 
-	@Get(':id')
+	@Get('find:id')
 	first(@Param() params: number){
 		return this.usersService.findOne(params)
+	}
+
+	@Get('all')
+	second(){
+		return this.usersService.findAll()
 	}
 }
