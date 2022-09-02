@@ -15,7 +15,12 @@ export class UsersService {
 	}
 
 	findOne(id: number): Promise<User> {
-		return this.usersRepository.findOneBy({id})
+		try {
+			const user = this.usersRepository.findOneByOrFail({id})
+			return user
+		} catch {
+			console.log("tests");
+		}
 	}
 
 	async remove(id: number): Promise<void> {
