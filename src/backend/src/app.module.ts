@@ -4,8 +4,6 @@ import { DataSource } from 'typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UserHttpModule } from './users/users-http.module';
-import { User } from './users/user.entity'
-import { AuthModule } from './auth/auth.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 
 
@@ -13,7 +11,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
   imports: [
 	UserHttpModule,
 	ConfigModule.forRoot({
-		envFilePath: '../../database/.env',
+		isGlobal: true
+		// envFilePath: '../database/.env',
 	}),
 	TypeOrmModule.forRootAsync({
 		imports: [ConfigModule],
@@ -24,9 +23,12 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 		// username: configService.get('POSTGRES_USER'),
 		// password: configService.get('POSTGRES_PASSWORD'),
 		// database: configService.get('PGDATABASE'),
-		username:'initdb',
-		password: 'thisisnotasafepasswordl0l',
-		database: 'initdb',
+		// username:'initdb',
+		// password: 'thisisnotasafepasswordl0l',
+		// database: 'initdb',
+		username: process.env.POSTGRES_USER,
+		password: process.env.POSTGRES_PASSWORD,
+		database: process.env.PGDATABASE,
 		entities: [],
 		ssl: false,
 		synchronize: true //  shouldn't be used in production
