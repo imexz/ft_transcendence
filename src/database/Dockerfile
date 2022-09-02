@@ -1,3 +1,3 @@
 FROM postgres:latest
 
-RUN apt-get install libpq-dev
+# RUN apt-get install libpq-dev
