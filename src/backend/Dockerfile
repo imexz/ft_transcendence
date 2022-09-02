@@ -2,6 +2,8 @@ FROM node:18
 
 WORKDIR /home/data
 
+COPY . .
+
 RUN npm install -g @nestjs/cli
 RUN npm install --save @nestjs/typeorm typeorm postgresql
 RUN npm install pg --save
