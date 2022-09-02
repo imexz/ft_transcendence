@@ -1,5 +1,11 @@
 FROM node:18
 
+# COPY package*.json ./
+# RUN npm install
+# COPY . .
+
+
+
 WORKDIR /home/data/
 
 RUN npm install @nestjs/cli
