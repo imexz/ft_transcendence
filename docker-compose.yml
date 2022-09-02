@@ -6,39 +6,46 @@ services:
       - backend
       - database
     restart: always
-    env_file: .env
     ports:
       - "8080:8080"
+    # env_file: .env
+
 
   backend:
-    # image: nestjs/cli:latest
     build: src/backend
     container_name: nestjs
     depends_on:
       - database
     restart: always
-    env_file: .env
     ports:
       - "3000:3000"
     networks:
       - back-tier
     volumes:
-      - ./src/backend/:/home/data
+      - ./src/backend/:/home/data/
+    # env_file: .env
+    # image: nestjs/cli:latest
     # stdin_open: true
     # tty: true
 
   database:
-    image: postgres:latest
+    build: src/database
     container_name: postgres
-    # depends_on:
     restart: always
-    env_file: .env
     volumes:
       - db-data:/etc/data
     ports:
       - "5432-5433:5432-5433"
     networks:
       - back-tier
+    env_file: ./src/database/.env
+
+    # env_file: .env
+    # depends_on:
+
+
+
+
 
 
 volumes:

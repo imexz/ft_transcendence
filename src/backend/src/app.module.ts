@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Inject, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { AppController } from './app.controller';
@@ -6,25 +6,34 @@ import { AppService } from './app.service';
 import { UserHttpModule } from './users/users-http.module';
 import { User } from './users/user.entity'
 import { AuthModule } from './auth/auth.module';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+
 
 @Module({
   imports: [
 	UserHttpModule,
 	ConfigModule.forRoot({
-		envFilePath: '../database/.env',
+		envFilePath: '../../database/.env',
 	}),
-	TypeOrmModule.forRoot({
-		type: 'postgres',
+	TypeOrmModule.forRootAsync({
+		imports: [ConfigModule],
+		useFactory: (configService: ConfigService) => ({
+		type:'postgres',
 		host: 'database',
 		port: 5432,
-		username: process.env.POSTGRES_USER,
-		password: process.env.POSTGRES_PASSWORD,
-		database: '',
-		entities: [User],
-		// synchronize: true //  shouldn't be used in production
+		// username: configService.get('POSTGRES_USER'),
+		// password: configService.get('POSTGRES_PASSWORD'),
+		// database: configService.get('PGDATABASE'),
+		username:'initdb',
+		password: 'thisisnotasafepasswordl0l',
+		database: 'initdb',
+		entities: [],
+		ssl: false,
+		synchronize: true //  shouldn't be used in production
 	}),
-	AuthModule,
+	inject: [ConfigService],
+}),
+
 ],
   controllers: [AppController],
   providers: [AppService],

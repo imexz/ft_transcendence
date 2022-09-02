@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "@nestjs/config": "^2.2.0",
     "@nestjs/passport": "^9.0.0",
     "passport-42": "^1.2.6"
   }
