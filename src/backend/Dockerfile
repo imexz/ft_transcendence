@@ -1,12 +1,13 @@
 FROM node:18
 
-WORKDIR /home/data
+WORKDIR /home/data/
 
-RUN npm install -g @nestjs/cli
+RUN npm install @nestjs/cli
 RUN npm install --save @nestjs/typeorm typeorm postgresql
 RUN npm install pg --save
 RUN npm install --save @nestjs/passport passport passport-42
-RUN npm i --save @nestjs/config
+RUN npm install --save @nestjs/config
+RUN npm install --save passport-oauth2
 
 CMD [ "npm", "run", "start:dev"]
 # CMD [ "bash" ]
