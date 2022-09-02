@@ -24,8 +24,8 @@ services:
       - back-tier
     volumes:
       - ./src/backend/:/home/data
-    stdin_open: true
-    tty: true
+    # stdin_open: true
+    # tty: true
 
   database:
     image: postgres:latest

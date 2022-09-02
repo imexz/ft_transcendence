@@ -15,6 +15,12 @@ export class AppController {
   @UseGuards(LocalAuthGuard)
   @Get('auth/login')
   async login(@Request() req) {
-	return req.user;
+	  return req.user;
+  }
+
+  @UseGuards(LocalAuthGuard)
+  @Get('auth/login/callback')
+  callback() {
+    return 'succes';
   }
 }
