@@ -21,4 +21,14 @@ export class UsersService {
 	async remove(id: number): Promise<void> {
 		await this.usersRepository.delete(id);
 	}
+
+	async add(id: number, name: string): Promise<User> {
+		const user = this.usersRepository.create()
+		if (user) {
+			user.id = id;
+			user.Name = name;
+			return user
+		}
+		return null
+	}
 }

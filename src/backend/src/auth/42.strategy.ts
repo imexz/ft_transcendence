@@ -1,25 +1,44 @@
-import { Injectable, UnauthorizedException } from "@nestjs/common";
+import { Injectable, Logger } from "@nestjs/common";
 import { PassportStrategy } from "@nestjs/passport";
 import { Strategy } from 'passport-42'
 import { AuthService } from "./auth.service";
+import { UnauthorizedException } from "@nestjs/common";
+import { User } from "src/users/user.entity";
 
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy) {
+	private readonly logger = new Logger(LocalStrategy.name)
 	constructor(private authService: AuthService) {
 		super({
-			clientID:'a05f304947e0209cad47e5e1d4cc54f7ddf69a4231ac8dafd4f7ad7ccb29c57b',
-			callbackURL:'https://next-auth.js.org/providers/42-school',
-
-
+			clientID: process.env.CLIENT_ID,
+			clientSecret: process.env.CLIENT_SECRET,
+			callbackURL: process.env.CALLBACK_URL,
+			profileFields: {
+				// 'name.familyName': 'last_name',
+				// 'id': 'id',
+			}
 		});
 	}
 
-	async validate(id: number): Promise<any> {
-		const user = await this.authService.validateUser(id);
+	async validate(accessToken, refreshToken, profile, cb): Promise<any> {
+
+		this.logger.log(profile)
+		this.logger.log("validate")
+		this.logger.log(cb)
+
+		const user = await this.authService.validateUser(profile.id);
 		if(!user) {
-			throw new UnauthorizedException();
+		this.logger.log("inside")
+
+			// return cb(err, user)
+			// throw new UnauthorizedException();
+			return this.authService.addUser(profile.id, profile.first_name)
 		}
+
 		return user;
+		
+
+		return cb
 	}
 }
 
