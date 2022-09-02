@@ -1,7 +1,10 @@
 services:
   frontend:
-    image: vuejs/ci:latest
-    container_name: vuejs
+    container_name: frontend
+    
+    build:
+      context: ./src/frontend/
+    # image: vuejs/ci:latest
     depends_on:
       - backend
       - database
