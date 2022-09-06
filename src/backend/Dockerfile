@@ -14,6 +14,7 @@ RUN npm install pg --save
 RUN npm install --save @nestjs/passport passport passport-42
 RUN npm install --save @nestjs/config
 RUN npm install --save passport-oauth2
+RUN npm isntall --save @nestjs/jwt passport-jwt
 
 CMD [ "npm", "run", "start:dev"]
 # CMD [ "bash" ]

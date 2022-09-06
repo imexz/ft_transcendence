@@ -36,12 +36,12 @@ services:
     container_name: postgres
     restart: always
     volumes:
-      - db-data:/etc/data
+      - db-data:/var/lib/postgresql/data
     ports:
       - "5432-5433:5432-5433"
     networks:
       - back-tier
-    env_file: ./src/database/.env
+    env_file: ./src/backend/.env
 
     # env_file: .env
     # depends_on:
@@ -52,7 +52,8 @@ services:
 
 
 volumes:
-  db-data: {}
+  db-data:
+    name: "db-data"
 
 networks:
   back-tier: {}
