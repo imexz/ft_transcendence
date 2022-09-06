@@ -10,9 +10,11 @@ export class UsersService {
 		private usersRepository: Repository<User>
 	){}
 
-	findAll(): Promise<User[]> {
+	async findAll(): Promise<User[]> {
 		console.log("findAll");
-		const user = this.usersRepository.find();
+		const user = await this.usersRepository.find();
+		console.log(user);
+		
 		return user
 	}
 
@@ -30,10 +32,13 @@ export class UsersService {
 	}
 
 	async add(id: number, name: string): Promise<User> {
-		const user = this.usersRepository.create()
+		const user = await this.usersRepository.create()
 		if (user) {
 			user.id = id;
 			user.Name = name;
+			console.log(user)
+			this.usersRepository.save(user)
+			 
 			return user
 		}
 		return null

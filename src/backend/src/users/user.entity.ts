@@ -11,6 +11,6 @@ export class User {
 	// @Column()
 	// picture: ImageBitmap;
 
-	@Column()
-	isActive: boolean;
+	// @Column()
+	// isActive: boolean;
 }

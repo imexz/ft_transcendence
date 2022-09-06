@@ -12,8 +12,8 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
 			clientSecret: process.env.CLIENT_SECRET,
 			callbackURL: process.env.CALLBACK_URL,
 			profileFields: {
-				// 'name.familyName': 'last_name',
-				// 'id': 'id',
+				'name.givenName': 'first_name',
+				'id': function (obj) { return String(obj.id); },
 			}
 		});
 	}
@@ -30,7 +30,11 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
 		}
 		catch {
 			this.logger.log("catch")
-			return this.authService.addUser(profile.id, profile.first_name)
+			this.logger.log(profile.id)
+			this.logger.log(profile.name.givenName)
+
+
+			return await this.authService.addUser(profile.id, profile.name.givenName)
 
 		}
 

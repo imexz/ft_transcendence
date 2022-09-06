@@ -2,7 +2,6 @@ import { Inject, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { UserHttpModule } from './users/users-http.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
@@ -13,10 +12,10 @@ import { User } from './users/user.entity'
   imports: [
 	AuthModule,
 	UserHttpModule,
-	ConfigModule.forRoot({
-		isGlobal: true
-		// envFilePath: '../database/.env',
-	}),
+	// ConfigModule.forRoot({
+	// 	isGlobal: true
+	// 	envFilePath: '../database/.env',
+	// }),
 	TypeOrmModule.forRootAsync({
 		imports: [ConfigModule],
 		useFactory: (configService: ConfigService) => ({
@@ -41,7 +40,6 @@ import { User } from './users/user.entity'
 
 ],
   controllers: [AppController],
-  providers: [AppService],
 })
 export class AppModule {
 	constructor(private dataSource: DataSource) {}
