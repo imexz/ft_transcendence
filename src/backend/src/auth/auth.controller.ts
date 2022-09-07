@@ -1,4 +1,4 @@
-import { Controller, Request, Get, Param, UseGuards } from '@nestjs/common';
+import { Controller, Request, Get, Param, UseGuards, Delete } from '@nestjs/common';
 import { LocalAuthGuard } from './local-auth.guard'
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './jwt-auth.guard';
@@ -16,7 +16,6 @@ export class AuthController{
 	@UseGuards(LocalAuthGuard)
 	@Get('login/callback')
 	callback(@Request() req) {
-		
 	  return this.authService.login(req.user);
 	}
 
@@ -33,6 +32,13 @@ export class AuthController{
 	getall(@Request() req) {
 		return this.authService.findAll();
 	}
+
+	@Delete(':id')
+	deleteUser(@Param('id') id: number) {
+		return this.authService.deleteUser(id);
+	}
+
+
 	@Get(':id')
 	@UseGuards(JwtAuthGuard)
 	addfriend(@Param('id') id: number, @Request() req) {

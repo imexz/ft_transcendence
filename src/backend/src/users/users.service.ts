@@ -24,25 +24,23 @@ export class UsersService {
 
 	findOne(id: number): Promise<User> {
 			console.log("test");
-
-			const user = this.usersRepository.findOneBy({id: id})
-			console.log("test1");
+			try{
+				const user = this.usersRepository.findOneByOrFail({id: id})
 			return user
-	
+			} catch (err) {
+				console.log("test1");
+				throw err;
+			}
 	}
 
 	async remove(id: number): Promise<void> {
 		await this.usersRepository.delete(id);
 	}
 
-	async addUser(user: User): Promise<User> {
-		const tmp = await this.usersRepository.create(user)
-		if (tmp) {
-			console.log(tmp)
-			this.usersRepository.save(tmp)
-			return tmp
-		}
-		return null
+	addUser(user: User): Promise<User> {
+		const tmp = this.usersRepository.create(user);
+		return this.usersRepository.save(tmp);
+
 	}
 
 	async addfriend(user_id: number, friend_id: number) {
