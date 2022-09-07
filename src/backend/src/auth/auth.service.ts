@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { User } from 'src/users/entitys/user.entity';
+import { timestamp } from 'rxjs';
 
 @Injectable()
 export class AuthService {
@@ -29,12 +30,9 @@ export class AuthService {
 		return await this.usersService.findAll();
 	}
 
-	async login(user: any) {
-		const payload = { name: user.Name, sub: user.id};
-
-		return {
-			access_token: this.jwtService.sign(payload),
-		}
+	login(user: any) {
+		const payload = { name: user.unique_name, sub: user.id};
+		return this.jwtService.sign(payload);
 	}
 
 	async addfriend(user_id: number, friend_id: number) {

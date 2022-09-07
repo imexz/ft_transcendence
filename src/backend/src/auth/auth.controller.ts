@@ -1,4 +1,4 @@
-import { Controller, Request, Get, Param, UseGuards, Delete } from '@nestjs/common';
+import {Redirect, Controller, Request, Get, Param, UseGuards, Delete, Res } from '@nestjs/common';
 import { LocalAuthGuard } from './local-auth.guard'
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './jwt-auth.guard';
@@ -15,15 +15,15 @@ export class AuthController{
 
 	@UseGuards(LocalAuthGuard)
 	@Get('login/callback')
-	callback(@Request() req) {
-	  return this.authService.login(req.user);
+	@Redirect("http://localhost:8080", 302)
+	callback(@Request() req, @Res({ passthrough: true }) res ) {
+		res.cookie("token", this.authService.login(req.user));
 	}
 
 	@Get('protected')
 	@UseGuards(JwtAuthGuard)
 	getusers(@Request() req): string {
 		console.log(req.user);
-		
 		return req.user
 	}
 
