@@ -6,26 +6,22 @@ import { User } from 'src/users/entitys/user.entity';
 @Injectable()
 export class AuthService {
 	constructor(private usersService: UsersService, private jwtService: JwtService) {}
-	async validateUser(id: number): Promise<any> {
+	validateUser(id: number): Promise<any> {
 		console.log("validateUser");
-		const user = await this.usersService.findOne(id)
-		if(user) {
-			return user
+		try {
+			const user = this.usersService.findOne(id);
+			console.log("all good");
+			return user;
+		} catch(err) {
+			console.log("hier");
+
+			console.log(err);
+			throw err;
 		}
-		return null;
 	}
 
-	async addUser(user: User) {
-		console.log("addUser");
-		const tmp = await this.usersService.addUser(user)
-		if(tmp) {
-			console.log("add Succesfull");
-			console.log(user);
-			return tmp
-		}
-		console.log("add goes wrong");
-
-		return null
+	addUser(user: User) {
+		return  this.usersService.addUser(user);
 	}
 
 
@@ -45,5 +41,9 @@ export class AuthService {
 		this.usersService.addfriend(user_id, friend_id)
 
 
+	}
+
+	async deleteUser(user_id: number) {
+		this.usersService.remove(user_id);
 	}
 }
