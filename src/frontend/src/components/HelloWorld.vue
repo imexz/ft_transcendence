@@ -3,6 +3,13 @@
     <h1>{{ msg }}</h1>
     <!-- <br/> -->
     <h1>{{ insult }}</h1>
+
+    <button @click=protectedContent>protected</button>
+    <br/>
+    <div>
+      {{ res }}
+    </div>
+
     <p>
       For a guide and recipes on how to configure / customize this project,<br>
       check out the
@@ -36,6 +43,7 @@
 
 <script lang="ts">
 import { Options, Vue } from 'vue-class-component';
+import VueAxios from 'axios';
 
 @Options({
   props: {
@@ -46,6 +54,14 @@ import { Options, Vue } from 'vue-class-component';
 export default class HelloWorld extends Vue {
   msg!: string
   insult!: string
+  res: any = "none"
+
+  protectedContent(): void {
+      VueAxios
+        .get('http://localhost:3000/protected')
+        .then(response => (this.res = response))
+        .catch(response => (this.res = 'error getting resource'))
+  }
 }
 </script>
 
