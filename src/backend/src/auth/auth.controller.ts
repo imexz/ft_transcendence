@@ -18,17 +18,17 @@ export class AuthController{
 	@Redirect("http://localhost:8080", 302)
 	callback(@Request() req, @Res({ passthrough: true }) res ) {
 		res.cookie("token", this.authService.login(req.user));
+		// {domain: "http://localhost:3000/", maxAge: 6000}
 	}
 
 	@Get('protected')
 	@UseGuards(JwtAuthGuard)
 	getusers(@Request() req): string {
-		console.log(req.user);
-		return req.user
+		return "test"
 	}
 
 	@Get('getall')
-	// @UseGuards(JwtAuthGuard)
+	@UseGuards(JwtAuthGuard)
 	getall(@Request() req) {
 		return this.authService.findAll();
 	}
