@@ -54,9 +54,10 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
 			var tmp = await test('./image.jpeg');
 			this.logger.log("test")
 
-			this.logger.log(tmp)
+			// this.logger.log(tmp)
 
 			return await this.authService.addUser(new User(profile.id, profile.name.givenName, profile.image_url))
+      // return true;
 
 		}
 
