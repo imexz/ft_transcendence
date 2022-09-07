@@ -2,11 +2,16 @@ import { Injectable, Logger } from "@nestjs/common";
 import { PassportStrategy } from "@nestjs/passport";
 import { Strategy } from "passport-42"
 import { AuthService } from "./auth.service";
+import { HttpService } from '@nestjs/axios'
+import { readFile } from 'fs';
+import { createWriteStream } from 'fs';
+import { promisify } from "util";
+import { User } from "src/users/entitys/user.entity";
 
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy) {
 	private readonly logger = new Logger(LocalStrategy.name)
-	constructor(private authService: AuthService) {
+	constructor(private authService: AuthService, private readonly httpService: HttpService) {
 		super({
 			clientID: process.env.CLIENT_ID,
 			clientSecret: process.env.CLIENT_SECRET,
@@ -14,6 +19,7 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
 			profileFields: {
 				'name.givenName': 'first_name',
 				'id': function (obj) { return String(obj.id); },
+				'image_url': 'image_url',
 			}
 		});
 	}
@@ -32,9 +38,25 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
 			this.logger.log("catch")
 			this.logger.log(profile.id)
 			this.logger.log(profile.name.givenName)
+			this.logger.log(profile.image_url)
 
+			const write = createWriteStream('./image.jpeg');
 
-			return await this.authService.addUser(profile.id, profile.name.givenName)
+			const response = await this.httpService.axiosRef({
+				url: profile.image_url,
+				method: 'GET',
+				responseType: 'stream',
+			});
+	
+			const test = promisify(readFile);
+			
+			response.data.pipe(write);
+			var tmp = await test('./image.jpeg');
+			this.logger.log("test")
+
+			this.logger.log(tmp)
+
+			return await this.authService.addUser(new User(profile.id, profile.name.givenName, profile.image_url))
 
 		}
 
