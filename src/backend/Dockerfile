@@ -15,6 +15,8 @@ RUN npm install --save @nestjs/passport passport passport-42
 RUN npm install --save @nestjs/config
 RUN npm install --save passport-oauth2
 RUN npm isntall --save @nestjs/jwt passport-jwt
+RUN npm install --save -D @types/multer
+RUN npm install --save @nestjs/axios
 
 CMD [ "npm", "run", "start:dev"]
 # CMD [ "bash" ]

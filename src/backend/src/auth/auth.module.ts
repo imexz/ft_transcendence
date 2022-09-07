@@ -8,12 +8,13 @@ import { LocalAuthGuard } from './local-auth.guard';
 import { AuthController } from './auth.controller'
 import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './jwt.strategy';
+import { HttpModule } from '@nestjs/axios';
 
 
 @Module({
-	imports: [UsersModule, PassportModule, ConfigModule.forRoot(), JwtModule.register({
+	imports: [HttpModule, UsersModule, PassportModule, ConfigModule.forRoot(), JwtModule.register({
     secret: process.env.SWT_PASSWORD,
-    signOptions: { expiresIn: '60s'}
+    signOptions: { expiresIn: '600s'}
   })],
   providers: [AuthService, LocalStrategy, LocalAuthGuard, JwtStrategy],
   controllers: [AuthController],

@@ -1,4 +1,4 @@
-import { Controller, Request, Get, Post, UseGuards } from '@nestjs/common';
+import { Controller, Request, Get, Param, UseGuards } from '@nestjs/common';
 import { LocalAuthGuard } from './local-auth.guard'
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './jwt-auth.guard';
@@ -31,7 +31,14 @@ export class AuthController{
 	@Get('getall')
 	// @UseGuards(JwtAuthGuard)
 	getall(@Request() req) {
-		
 		return this.authService.findAll();
+	}
+	@Get(':id')
+	@UseGuards(JwtAuthGuard)
+	addfriend(@Param('id') id: number, @Request() req) {
+		console.log(id);
+		// console.log(req);
+		
+		return	this.authService.addfriend(req.user.id, id);
 	}
 }
