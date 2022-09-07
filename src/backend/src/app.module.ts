@@ -5,17 +5,15 @@ import { AppController } from './app.controller';
 import { UserHttpModule } from './users/users-http.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
-import { User } from './users/user.entity'
+import { User } from './users/entitys/user.entity'
+import { DatabasFile } from './users/entitys/databaseFile.entitys'
+
 
 
 @Module({
   imports: [
 	AuthModule,
 	UserHttpModule,
-	// ConfigModule.forRoot({
-	// 	isGlobal: true
-	// 	envFilePath: '../database/.env',
-	// }),
 	TypeOrmModule.forRootAsync({
 		imports: [ConfigModule],
 		useFactory: (configService: ConfigService) => ({
@@ -31,7 +29,7 @@ import { User } from './users/user.entity'
 		username: process.env.POSTGRES_USER,
 		password: process.env.POSTGRES_PASSWORD,
 		database: process.env.PGDATABASE,
-		entities: [User],
+		entities: [User, DatabasFile],
 		ssl: false,
 		synchronize: true //  shouldn't be used in production
 	}),
