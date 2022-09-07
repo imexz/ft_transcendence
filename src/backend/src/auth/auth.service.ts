@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
+import { User } from 'src/users/entitys/user.entity';
 
 @Injectable()
 export class AuthService {
@@ -14,27 +15,19 @@ export class AuthService {
 		return null;
 	}
 
-	async addUser(id: number, name: string) {
+	async addUser(user: User) {
 		console.log("addUser");
-		const user = await this.usersService.add(id, name)
-		if(user) {
+		const tmp = await this.usersService.addUser(user)
+		if(tmp) {
 			console.log("add Succesfull");
 			console.log(user);
-			return user
+			return tmp
 		}
 		console.log("add goes wrong");
 
 		return null
 	}
 
-	async findOrCreate(id: number, name: string) {
-		const user = this.validateUser(id)
-		if (user) {
-			return user
-		} else {
-			return await this.addUser(id, name)
-		}
-	}
 
 	async findAll() {
 		return await this.usersService.findAll();
@@ -46,5 +39,11 @@ export class AuthService {
 		return {
 			access_token: this.jwtService.sign(payload),
 		}
+	}
+
+	async addfriend(user_id: number, friend_id: number) {
+		this.usersService.addfriend(user_id, friend_id)
+
+
 	}
 }
