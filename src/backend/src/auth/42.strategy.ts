@@ -28,35 +28,40 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
 
 		// this.logger.log(profile)
 		this.logger.log("validate")
-		this.logger.log(cb)
+		// this.logger.log(cb)
 
 		try {
 			const user = await this.authService.validateUser(profile.id);
+			this.logger.log("try")
+
 			return user;
 		}
-		catch {
+		catch (err){
 			this.logger.log("catch")
 			this.logger.log(profile.id)
 			this.logger.log(profile.name.givenName)
 			this.logger.log(profile.image_url)
 
-			const write = createWriteStream('./image.jpeg');
+			// const write = createWriteStream('./image.jpeg');
 
-			const response = await this.httpService.axiosRef({
-				url: profile.image_url,
-				method: 'GET',
-				responseType: 'stream',
-			});
+			// const response = await this.httpService.axiosRef({
+			// 	url: profile.image_url,
+			// 	method: 'GET',
+			// 	responseType: 'stream',
+			// });
 	
-			const test = promisify(readFile);
+			// const test = promisify(readFile);
 			
-			response.data.pipe(write);
-			var tmp = await test('./image.jpeg');
-			this.logger.log("test")
+			// response.data.pipe(write);
+			// var tmp = await test('./image.jpeg');
+			// this.logger.log("test")
 
-			this.logger.log(tmp)
+			// this.logger.log(tmp)
+			const user = await this.authService.addUser(new User(profile.id, profile.name.givenName, profile.image_url))
+			// cb(err, user, err.info)
+			this.logger.log("return validate")
 
-			return await this.authService.addUser(new User(profile.id, profile.name.givenName, profile.image_url))
+			return user 
 
 		}
 
