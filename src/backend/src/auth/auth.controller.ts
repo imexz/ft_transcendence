@@ -18,7 +18,7 @@ export class AuthController{
 	@Redirect("http://localhost:8080", 302)
 	callback(@Request() req, @Res({ passthrough: true }) res ) {
 		res.cookie("token", this.authService.login(req.user));
-		// {domain: "http://localhost:3000/", maxAge: 6000}
+		// {domain: "http://localhost:3000/", maxAge: 6000, sameSite: 'none'}
 	}
 
 	@Get('protected')

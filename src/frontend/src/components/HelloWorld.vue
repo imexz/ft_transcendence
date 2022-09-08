@@ -58,7 +58,7 @@ export default class HelloWorld extends Vue {
 
   protectedContent(): void {
       VueAxios
-        .get('http://localhost:3000/protected')
+        .get('http://localhost:3000/auth/protected')
         .then(response => (this.res = response))
         .catch(response => (this.res = 'error getting resource'))
   }
