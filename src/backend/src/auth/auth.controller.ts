@@ -17,8 +17,8 @@ export class AuthController{
 	@Get('login/callback')
 	@Redirect("http://localhost:8080", 302)
 	callback(@Request() req, @Res({ passthrough: true }) res ) {
-		res.cookie("token", this.authService.login(req.user), {sameSite: 'lax'});
-		// {domain: "http://localhost:3000/", maxAge: 6000}
+		res.cookie("token", this.authService.login(req.user));
+		// {domain: "http://localhost:3000/", maxAge: 6000 , sameSite: 'lax'}
 	}
 
 	@Get('protected')
@@ -26,6 +26,7 @@ export class AuthController{
 	getusers(@Request() req): string {
 		return "test"
 	}
+
 
 	@Get('getall')
 	@UseGuards(JwtAuthGuard)

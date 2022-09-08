@@ -6,7 +6,10 @@ import { UserHttpModule } from './users/users-http.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { User } from './users/entitys/user.entity'
-import { DatabasFile } from './users/entitys/databaseFile.entitys'
+import { file } from './avatar/file.entitys'
+import { AvatarController } from './avatar/avatar.controller';
+import { AvatarService } from './avatar/avatar.service';
+import { AvatarModule } from './avatar/avatar.module';
 
 
 
@@ -29,14 +32,16 @@ import { DatabasFile } from './users/entitys/databaseFile.entitys'
 		username: process.env.POSTGRES_USER,
 		password: process.env.POSTGRES_PASSWORD,
 		database: process.env.PGDATABASE,
-		entities: [User, DatabasFile],
+		entities: [User, file],
 		ssl: false,
 		synchronize: true //  shouldn't be used in production
 	}),
 	inject: [ConfigService],
 }),
+	AvatarModule,
 ],
-  controllers: [AppController],
+  controllers: [AppController, AvatarController],
+  providers: [AvatarService],
 })
 export class AppModule {
 	constructor(private dataSource: DataSource) {}

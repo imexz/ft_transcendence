@@ -20,6 +20,7 @@ RUN npm install -g --save @nestjs/axios
 RUN npm install -g --save cookie
 RUN npm install -g cookie-parser
 RUN npm install -g -D @types/cookie-parser
+RUN npm install -g -D @types/multer
 
 CMD [ "npm", "run", "start:dev"]
 # CMD [ "bash" ]
