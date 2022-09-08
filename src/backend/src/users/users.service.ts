@@ -1,17 +1,13 @@
-import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { User } from './entitys/user.entity';
+import { Injectable } from "@nestjs/common";
 import { Repository } from "typeorm";
-import { DatabasFile } from "./entitys/databaseFile.entitys";
-import e from "express";
 
 @Injectable()
 export class UsersService {
 	constructor(
 		@InjectRepository(User)
 		private usersRepository: Repository<User>,
-		@InjectRepository(DatabasFile)
-		private DatabasFileRepository: Repository<DatabasFile>,
 	){}
 
 	async findAll(): Promise<User[]> {
@@ -53,17 +49,40 @@ export class UsersService {
 			return null
 		}
 		try{
-			const user = this.findOne(user_id);
-			const user_friend = this.findOne(friend_id);
-			console.log(((await user).friends));
-			console.log((await user));
-			console.log((await user_friend));
+			const user = await this.usersRepository.findOne({
+				where: {
+				id: user_id
+				},
+				relations: {
+					friends: true,
+				}
+			});
+			const user_friend: User = await this.usersRepository.findOneBy({id: friend_id});
+			// console.log((user.friends));
+			// console.log((user));
+			// console.log((user_friend));
+
+			// var tmp: User[];
+			// tmp = [user_friend];
+			// if (user[0].friends != undefined) {
+			// 	console.log("has already friends");
+				
+			// 	user[0].friends.forEach(element => {
+			// 		tmp.push(element)
+			// 	});
+			// }
+			// user.friends.push(user_friend);
+			user.friends.push(user_friend);
+
+			const tmp1 = new User(user.id, user.unique_name, user.avatar_url, user.friends);
 
 			
-			(await user).friends.fill(await user_friend);
+			// tmp.push(user_friend);
 			// (await user).friends = user_friend;
 			// (await user).friends.fill(await user_friend)
-			this.usersRepository.update((await user).id, await user);
+			this.usersRepository.save(tmp1);
+			// this.usersRepository.update(user.id, user);
+
 		} catch(exception: unknown) {
 			console.log(exception)
 			console.log("freind or user null");

@@ -1,14 +1,15 @@
 import { Entity, Column, PrimaryGeneratedColumn, JoinColumn, OneToOne, PrimaryColumn, OneToMany, ManyToMany, JoinTable } from "typeorm";
-import { DatabasFile } from "./databaseFile.entitys";
+import { file } from "../../avatar/file.entitys";
 
 
 @Entity()
 export class User {
-	constructor(id: number, unique_name: string, avatar_url: string){
+	constructor(id: number, unique_name: string, avatar_url: string, friends: User[]){
 		this.id = id
 		this.unique_name = unique_name
 		this.avatar_url = avatar_url
-	}
+		this.friends = friends
+	} 
 	@PrimaryColumn({unique: true})
 	id: number;
 
@@ -17,18 +18,6 @@ export class User {
 
 	@Column()
 	avatar_url: string;
-
-	@JoinColumn({name: 'avatarId'})
-	@OneToOne(
-		() => DatabasFile,
-		{
-			nullable: true
-		}
-	)
-	public avatar?: DatabasFile;
-
-	@Column({nullable: true})
-	public avatarId?: number;
 
 	@ManyToMany(() => User)
 	@JoinTable({ joinColumn: { name: 'users_id_1' } })
