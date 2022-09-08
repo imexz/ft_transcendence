@@ -1,4 +1,4 @@
-import { Body, Controller, Post, UseInterceptors, UploadedFile, MaxFileSizeValidator, FileTypeValidator, ParseFilePipe, Get, UseGuards, Param, Res } from '@nestjs/common';
+import { Controller, Post, UseInterceptors, UploadedFile, MaxFileSizeValidator, FileTypeValidator, ParseFilePipe, Get, UseGuards, Param, Res, StreamableFile, Header } from '@nestjs/common';
 import { file } from './file.entitys';
 import { Express } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -10,14 +10,15 @@ import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 export class AvatarController {
     constructor(private readonly avatarService: AvatarService){}
 
-    @Post('new')
+    @Post('file')
+    @UseInterceptors(FileInterceptor('file'))
 	// @UseGuards(JwtAuthGuard)
     uploadFileAndPassValidation(
     //   @Body() body: SampleDto,
       @UploadedFile(
         new ParseFilePipe({
           validators: [
-            new MaxFileSizeValidator({ maxSize: 1000 }),
+            new MaxFileSizeValidator({ maxSize: 1000000000 }),
             new FileTypeValidator({ fileType: 'jpeg' }),
           ]
         })
@@ -25,19 +26,21 @@ export class AvatarController {
       file: Express.Multer.File,
     ) {
         this.avatarService.add(file)
-
-      return {
-        // body,
-        file: file.buffer.toString(),
-      };
     }
 
     @Get(':id')
+    @Header('Content-Type', 'image/jpeg')
 	// @UseGuards(JwtAuthGuard)
     async getAvatar(@Param('id') id: number) {
-        return await (await this.avatarService.getFile(id)).data
+      console.log(id);
+      
+        return new StreamableFile((await this.avatarService.getFile(id)).data, )
     }
 
 
 
 }
+function createReadStream(arg0: file) {
+  throw new Error('Function not implemented.');
+}
+
