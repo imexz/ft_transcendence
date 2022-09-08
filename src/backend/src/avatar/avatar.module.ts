@@ -6,5 +6,7 @@ import { AvatarService } from './avatar.service';
 @Module({
 	imports: [TypeOrmModule.forFeature([file])],
 	providers: [AvatarService],
+    exports: [TypeOrmModule]
 })
 export class AvatarModule {}
+

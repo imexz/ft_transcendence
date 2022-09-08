@@ -2,9 +2,6 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Injectable } from '@nestjs/common';
 import { file } from './file.entitys';
 import { Repository } from "typeorm";
-import { UsersService } from 'src/users/users.service';
-
-
 
 
 @Injectable()
@@ -19,7 +16,10 @@ export class AvatarService {
         
     }
 
-    add(file: Express.Multer.File) {
-        this.fileRepository.create({filename: file.filename, data: file.buffer})
+    async add(file: Express.Multer.File) {
+        console.log(file);
+        const tmp = this.fileRepository.create({filename: file.originalname, data: file.buffer});
+        console.log(tmp.filename);        
+        console.log(await (await this.fileRepository.save(tmp)).id);
     }
 }
