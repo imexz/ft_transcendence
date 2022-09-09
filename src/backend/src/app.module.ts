@@ -11,6 +11,12 @@ import { AvatarService } from './avatar/avatar.service';
 import { AvatarModule } from './avatar/avatar.module';
 import { UsersModule } from './users/users.module';
 import { ChatGateway } from './chat/chat.gateway';
+import { MessageService } from './message/message.service';
+import { ChatroomService } from './chatroom/chatroom.service';
+import { MessageModule } from './message/message.module';
+import { message } from './message/message.entity';
+import { chatroom } from './chatroom/chatroom.entity';
+import { ChatModule } from './chat/chat.module';
 
 
 
@@ -33,15 +39,17 @@ import { ChatGateway } from './chat/chat.gateway';
 		username: process.env.POSTGRES_USER,
 		password: process.env.POSTGRES_PASSWORD,
 		database: process.env.PGDATABASE,
-		entities: [User, fileEntity],
+		entities: [User, fileEntity, message, chatroom],
 		ssl: false,
 		synchronize: true //  shouldn't be used in production
 	}),
 	inject: [ConfigService],
 }),
 	AvatarModule,
+	MessageModule,
+	ChatModule,
 ],
-  providers: [ChatGateway],
+  providers: [ChatGateway, MessageService, ChatroomService],
 })
 export class AppModule {
 	constructor(private dataSource: DataSource) {}

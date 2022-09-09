@@ -6,6 +6,12 @@ import { fileEntity } from "../avatar/file.entitys"
 
 @Injectable()
 export class UsersService {
+    async addClientId(id: number, clientId: string) {
+		const user = await this.usersRepository.findOneBy({id: id})
+		user.clientId = clientId
+		this.usersRepository.update(id, user)
+		return user.unique_name;
+    }
 	constructor(
 		@InjectRepository(User)
 		private usersRepository: Repository<User>,
@@ -23,10 +29,10 @@ export class UsersService {
 		return user
 	}
 
-	findOne(id: number): Promise<User> {
+	async findOne(id: number): Promise<User> {
 			console.log("test");
 			try{
-				const user = this.usersRepository.findOneByOrFail({id: id})
+				const user = await this.usersRepository.findOneByOrFail({id: id})
 			return user
 			} catch (err) {
 				console.log("test1");
