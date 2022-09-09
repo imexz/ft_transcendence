@@ -1,43 +1,22 @@
 <template>
   <div>
-    <a href='http://localhost:3000/auth/login'>42 AUTH</a>
+    <FtAuth v-if="!this.$store.getters.isValidated"></FtAuth>
+    <LogoutButton v-else></LogoutButton>
   </div>
 </template>
 
 <script lang ="ts">
-  import { Vue } from 'vue-class-component';
-  import VueAxios from 'axios';
-  //import User from '../models/User';
+  import { Vue, Options } from 'vue-class-component';
+  import FtAuth from '@/components/FtAuth.vue';
+  import LogoutButton from '@/components/LogoutButton.vue';
 
-  export default class LoginView extends Vue {
-    checkTokenCookie(): boolean {
-      let cookies : string[] = document.cookie.split(" ")
-      for (let i = 0; i < cookies.length; i++) {
-        if (cookies[i].split("=")[0] == "token") {
-          return true
-        }
-      }
-      return false
-    }
-    async validateUser(): Promise<boolean> {
-      let status: number = 401
-      await VueAxios
-        .get('http://localhost:3000/auth/protected', { withCredentials: true})
-        .then(response => (status = response.status))
-        .catch(error => (status = error.response.status))
-      if (status == 401) {
-        return false;
-      }
-      return true;
-    }
 
-    async mounted() {
-      if (this.checkTokenCookie()) {
-        let state :boolean = await this.validateUser()
-        if (state) {
-          this.$router.push("/Profile")
-        }
-      }
+  @Options({
+    components: {
+      FtAuth,
+      LogoutButton,
     }
-  }
+  })
+
+  export default class LoginView extends Vue {}
 </script>
