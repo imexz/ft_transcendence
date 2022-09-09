@@ -12,14 +12,18 @@
 import { Options, Vue } from 'vue-class-component';
 import HelloWorld from '@/components/HelloWorld.vue'; // @ is an alias to /src
 
+
 @Options({
   components: {
     HelloWorld,
   },
+  computed: {
+  },
+  methodes: {
+    
+  }
 })
 export default class HomeView extends Vue {
-  mounted() {
-      this.$router.push('/login')
-  }
+  
 }
 </script>
