@@ -28,24 +28,24 @@ export class AuthController{
 	}
 
 
-	@Get('getall')
-	@UseGuards(JwtAuthGuard)
-	getall(@Request() req) {
-		return this.authService.findAll();
-	}
+	// @Get('getall')
+	// @UseGuards(JwtAuthGuard)
+	// getall(@Request() req) {
+	// 	return this.authService.findAll();
+	// }
 
-	@Delete(':id')
-	deleteUser(@Param('id') id: number) {
-		return this.authService.deleteUser(id);
-	}
+	// @Delete(':id')
+	// deleteUser(@Param('id') id: number) {
+	// 	return this.authService.deleteUser(id);
+	// }
 
 
-	@Get(':id')
-	@UseGuards(JwtAuthGuard)
-	addfriend(@Param('id') id: number, @Request() req) {
-		console.log(id);
-		// console.log(req);
+	// @Get(':id')
+	// @UseGuards(JwtAuthGuard)
+	// addfriend(@Param('id') id: number, @Request() req) {
+	// 	console.log(id);
+	// 	// console.log(req);
 		
-		return	this.authService.addfriend(req.user.id, id);
-	}
+	// 	return	this.authService.addfriend(req.user.id, id);
+	// }
 }

@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { User } from 'src/users/entitys/user.entity';
-import { timestamp } from 'rxjs';
 
 @Injectable()
 export class AuthService {

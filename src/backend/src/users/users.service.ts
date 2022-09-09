@@ -2,19 +2,24 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { User } from './entitys/user.entity';
 import { Injectable } from "@nestjs/common";
 import { Repository } from "typeorm";
+import { fileEntity } from "../avatar/file.entitys"
 
 @Injectable()
 export class UsersService {
 	constructor(
 		@InjectRepository(User)
 		private usersRepository: Repository<User>,
-	){}
+		){}
+
+	async getFriends(id: number) {
+		const user = await this.usersRepository.findOneBy({id: id})
+		return user.friends
+	}
 
 	async findAll(): Promise<User[]> {
 		console.log("findAll");
 		const user = await this.usersRepository.find();
 		console.log(user);
-		
 		return user
 	}
 
@@ -37,6 +42,33 @@ export class UsersService {
 		const tmp = this.usersRepository.create(user);
 		return this.usersRepository.save(tmp);
 
+	}
+
+	async updateAvatar(id: number, file: fileEntity) {
+		const user = await this.usersRepository.findOneBy({id: id})
+		if (user == null) {
+			return
+		}
+		if(fileEntity == undefined) {
+			user.avatar_url = user.avatar_url_42intra;
+			user.avatar = null;
+		}
+		else {
+			user.avatar = file
+			user.avatar_url = "http://localhost:3000/avatar"			
+		}
+		this.usersRepository.update(id, user)
+	}
+
+	async updateName(id: number, unique_name: string)
+	{
+		const user = await this.usersRepository.findOneBy({id: id})
+		if (user == null)
+		{
+			return
+		}
+		user.unique_name = unique_name
+		return this.usersRepository.save(user)
 	}
 
 	async addfriend(user_id: number, friend_id: number) {
@@ -74,7 +106,7 @@ export class UsersService {
 			// user.friends.push(user_friend);
 			user.friends.push(user_friend);
 
-			const tmp1 = new User(user.id, user.unique_name, user.avatar_url, user.friends);
+			const tmp1 = new User(user.id, user.unique_name, user.avatar_url, user.avatar, user.friends);
 
 			
 			// tmp.push(user_friend);

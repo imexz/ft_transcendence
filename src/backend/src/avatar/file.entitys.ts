@@ -1,8 +1,9 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { User } from "../users/entitys/user.entity";
+import { Column, Entity, OneToOne, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
-export class file {
-    @PrimaryGeneratedColumn()
+export class fileEntity {
+    @PrimaryColumn()
     public id: number;
 
     @Column()
@@ -12,4 +13,7 @@ export class file {
         type: 'bytea',
     })
     data: Uint8Array;
+
+    @OneToOne(() => User, (user) => user.avatar, { onDelete: "CASCADE" })
+    user: User;
 }
