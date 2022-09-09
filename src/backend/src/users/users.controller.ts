@@ -44,6 +44,13 @@ export class UsersController {
 		return this.usersService.getFriends(res.user.id)
 	}
 
+	@Get('validate')
+	@UseGuards(JwtAuthGuard)
+	validate(@Res() res) {
+		return this.usersService.findOne(res.user.id)
+	}
+
+
 	@Post('update_name')
 	@UseGuards(JwtAuthGuard)
 	update_name(@Body() name: string, @Res() res) {
