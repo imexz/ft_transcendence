@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
-import LoginView from '../views/LoginView.vue'
-import ProfileView from '../views/ProfileView.vue'
+
+import store from '../store/index'
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -20,18 +20,18 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/login',
     name: 'login',
-    component: LoginView //make lazy after
-  },
-  {
-    path: '/profile',
-    name: 'profile',
-    component: ProfileView
+    component: () => import('../views/LoginView.vue')
   }
 ]
-
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
   routes
+})
+
+router.beforeResolve((to,from) => {
+  if (to.name != 'login' && !store.getters.isValidated) {
+    return { name: 'login' };
+  }
 })
 
 export default router
