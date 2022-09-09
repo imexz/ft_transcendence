@@ -2,21 +2,22 @@ import { Inject, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { AppController } from './app.controller';
-import { UserHttpModule } from './users/users-http.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { User } from './users/entitys/user.entity'
-import { file } from './avatar/file.entitys'
+import { fileEntity } from './avatar/file.entitys'
 import { AvatarController } from './avatar/avatar.controller';
 import { AvatarService } from './avatar/avatar.service';
 import { AvatarModule } from './avatar/avatar.module';
+import { UsersModule } from './users/users.module';
+import { ChatGateway } from './chat/chat.gateway';
 
 
 
 @Module({
   imports: [
 	AuthModule,
-	UserHttpModule,
+	UsersModule,
 	TypeOrmModule.forRootAsync({
 		imports: [ConfigModule],
 		useFactory: (configService: ConfigService) => ({
@@ -32,7 +33,7 @@ import { AvatarModule } from './avatar/avatar.module';
 		username: process.env.POSTGRES_USER,
 		password: process.env.POSTGRES_PASSWORD,
 		database: process.env.PGDATABASE,
-		entities: [User, file],
+		entities: [User, fileEntity],
 		ssl: false,
 		synchronize: true //  shouldn't be used in production
 	}),
@@ -40,8 +41,7 @@ import { AvatarModule } from './avatar/avatar.module';
 }),
 	AvatarModule,
 ],
-  controllers: [AppController, AvatarController],
-  providers: [AvatarService],
+  providers: [ChatGateway],
 })
 export class AppModule {
 	constructor(private dataSource: DataSource) {}
