@@ -32,7 +32,12 @@ export class UsersService {
 	async findOne(id: number): Promise<User> {
 			console.log("test");
 			try{
-				const user = await this.usersRepository.findOneByOrFail({id: id})
+				const user = await this.usersRepository.findOneBy({id: id})
+				if(user == null) {
+					console.log("user == null");
+				}
+				// console.log(user);
+
 			return user
 			} catch (err) {
 				console.log("test1");
