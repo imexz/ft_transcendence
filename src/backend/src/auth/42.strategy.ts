@@ -58,7 +58,19 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
 
 			// this.logger.log(tmp)
 			var tmp: User[];
-			const user = await this.authService.addUser(new User(profile.id, profile.name.givenName, profile.image_url, null, tmp))
+			const user = await this.authService.addUser({
+				id: profile.id,
+				unique_name: profile.name.givenName,
+				avatar_url: profile.image_url,
+				avatar_url_42intra: profile.image_url,
+				avatar: null,
+				friends: null,
+				messeges: null,
+				chatrooms: null,
+				admin_of: null,
+				clientId: null,
+				current_status: null
+				})
 			// cb(err, user, err.info)
 			this.logger.log("return validate")
 
