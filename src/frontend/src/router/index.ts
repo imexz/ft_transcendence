@@ -21,14 +21,24 @@ const routes: Array<RouteRecordRaw> = [
     path: '/login',
     name: 'login',
     component: () => import('../views/LoginView.vue')
-  }
+  },
+  {
+    path: '/profile',
+    name: 'profile',
+    component: () => import('../views/ProfileView.vue')
+  },
+  {
+    path: '/play',
+    name: 'play',
+    component: () => import('../views/PlayView.vue')
+  }  
 ]
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
   routes
 })
 
-router.beforeResolve((to,from) => {
+router.beforeEach((to,from) => {
   if (to.name != 'login' && !store.getters.isValidated) {
     return { name: 'login' };
   }
