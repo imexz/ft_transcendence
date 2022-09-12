@@ -14,7 +14,7 @@
   }
   async validateUser() {
       await VueAxios
-        .get('http://localhost:3000/auth/protected', { withCredentials: true})
+        .get('http://localhost:3000/users/validate', { withCredentials: true})
         .then(response => (
           this.$store.state.validated = true,
           this.$store.state.user = response.data))
