@@ -36,7 +36,7 @@ export class UsersService {
 				if(user == null) {
 					console.log("user == null");
 				}
-				// console.log(user);
+				console.log(user);
 
 			return user
 			} catch (err) {
@@ -117,13 +117,26 @@ export class UsersService {
 			// user.friends.push(user_friend);
 			user.friends.push(user_friend);
 
-			const tmp1 = new User(user.id, user.unique_name, user.avatar_url, user.avatar, user.friends);
+			// const tmp1: User = ({
+			// 	id: user.id,
+			// 	unique_name: profile.name.givenName,
+			// 	avatar_url: user.avatar_url,
+			// 	avatar_url_42intra: profile.image_url,
+			// 	avatar: user.avatar,
+			// 	friends: user.friends,
+			// 	messeges: null,
+			// 	chatrooms: null,
+			// 	admin_of: null,
+			// 	clientId: null,
+			// 	current_status: null
+			// 	})
+			// 	new User(, user.unique_name, , , );
 
 			
 			// tmp.push(user_friend);
 			// (await user).friends = user_friend;
 			// (await user).friends.fill(await user_friend)
-			this.usersRepository.save(tmp1);
+			this.usersRepository.save(user);
 			// this.usersRepository.update(user.id, user);
 
 		} catch(exception: unknown) {

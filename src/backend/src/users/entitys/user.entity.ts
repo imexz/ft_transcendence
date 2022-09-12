@@ -2,18 +2,24 @@ import { chatroom } from "src/chatroom/chatroom.entity";
 import { message } from "src/message/message.entity";
 import { Entity, Column, PrimaryGeneratedColumn, JoinColumn, OneToOne, PrimaryColumn, OneToMany, ManyToMany, JoinTable } from "typeorm";
 import { fileEntity } from "../../avatar/file.entitys";
+import { Exclude } from 'class-transformer';
 
 
 @Entity()
 export class User {
-	constructor(id: number, unique_name: string, avatar_url_42intra: string, avatar: fileEntity, friends: User[]){
-		this.id = id
-		this.unique_name = unique_name
-		this.avatar_url = avatar_url_42intra
-		this.avatar_url_42intra = avatar_url_42intra
-		this.avatar = avatar
-		this.friends = friends
-	}
+	// constructor(id: number, unique_name: string, avatar_url_42intra: string, avatar: fileEntity, friends: User[]){
+	// 	this.id = id
+	// 	this.unique_name = unique_name
+	// 	this.avatar_url = avatar_url_42intra
+	// 	this.avatar_url_42intra = avatar_url_42intra
+	// 	this.avatar = avatar
+	// 	this.friends = friends
+	// }
+
+
+	constructor(partial: Partial<User>) {
+		Object.assign(this, partial);
+	  }
 	
 	@PrimaryColumn({unique: true})
 	id: number;
@@ -25,6 +31,7 @@ export class User {
 	avatar_url: string;
 
 	@Column()
+	@Exclude()
 	avatar_url_42intra: string;
 
 	@OneToOne(() => fileEntity, (avatar) => avatar.user) //{ onDelete: 'CASCADE' }
@@ -49,6 +56,7 @@ export class User {
 	@JoinTable()
 	admin_of: chatroom[];
 
+	@Exclude()
 	@Column({nullable: true})//maye wrong {unique: true}
 	clientId: string;
 
