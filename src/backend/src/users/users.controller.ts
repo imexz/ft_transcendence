@@ -47,7 +47,8 @@ export class UsersController {
 	@Get('validate')
 	@UseGuards(JwtAuthGuard)
 	validate(@Res() res) {
-		return this.usersService.findOne(res.user.id)
+		// return this.usersService.findOne(res.user.id)
+    return 'hello'
 	}
 
 
