@@ -17,6 +17,8 @@ import { MessageModule } from './message/message.module';
 import { message } from './message/message.entity';
 import { chatroom } from './chatroom/chatroom.entity';
 import { ChatModule } from './chat/chat.module';
+import { GameGateway } from './game.gateway';
+import { GameGateway } from './game/game.gateway';
 
 
 
@@ -49,7 +51,7 @@ import { ChatModule } from './chat/chat.module';
 	MessageModule,
 	ChatModule,
 ],
-  providers: [ChatGateway, MessageService, ChatroomService],
+  providers: [ChatGateway, MessageService, ChatroomService, GameGateway],
 })
 export class AppModule {
 	constructor(private dataSource: DataSource) {}

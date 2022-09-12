@@ -4,9 +4,56 @@ import { message } from '../message/message.entity';
 import { User } from '../users/entitys/user.entity';
 import { Repository } from 'typeorm';
 import { chatroom } from 'src/chatroom/chatroom.entity';
+import { MessageService } from 'src/message/message.service';
 
 @Injectable()
 export class ChatService {
+
+    async manageLeave(id: string, room_name: string) {
+
+    const user = await this.userRepository.findOne({
+        where: {
+            clientId: id
+        },
+        relations: {
+            chatrooms: true
+        }
+    })
+    if (user != null) {
+        const chatroom = await this.chatroomRepository.findOneBy({name: room_name})
+        if (chatroom != null) {
+            var i = user.chatrooms.indexOf(chatroom)
+            if (i != -1) {
+                user.chatrooms.splice(i)
+            }
+            i = user.admin_of.indexOf(chatroom)
+            if (i != -1) {
+                user.chatrooms.splice(i)
+            }
+            this.userRepository.save(user)
+        }
+
+    }
+
+
+
+  }
+
+
+  async createMessage(clientId: string, room_name:string, content: string) {
+        var new_message = this.messageRepository.create();
+
+        try {
+            new_message.user = await this.userRepository.findOneByOrFail({clientId: clientId})
+            new_message.chatroom = await this.chatroomRepository.findOneByOrFail({name: room_name})
+            new_message.content = content
+            return await this.messageRepository.save(new_message)
+        } catch {
+            console.log("creat message");
+        }
+    }
+
+
   async manageJoin(client_id: string, user_id: number, room_name: string) {
     const user = await this.userRepository.findOneBy({id: user_id})
     if(user != null) {
@@ -36,13 +83,22 @@ export class ChatService {
         private userRepository:  Repository<User>,
         @InjectRepository(chatroom)
         private chatroomRepository: Repository<chatroom>,
+        private readonly messageService: MessageService,
     ){}
 
     // create(createMessageDto: CreateMessageDto, id: string) {
     //     throw new Error('Method not implemented.');
     //   }
-      findAll() {
-        return this.messageRepository.find()
+      async findAll(room_name: string) {
+        const chatroom = await this.chatroomRepository.findOne({
+            where: {
+                name: room_name
+            },
+            relations: {
+                messages: true
+            }
+        })
+        return chatroom.messages
       }
   
       async getClientName(clientId: string) {

@@ -7,5 +7,13 @@ import { User } from 'src/users/entitys/user.entity';
 
 @Injectable()
 export class MessageService {
+    constructor(
+        @InjectRepository(message)
+        private messageRepository: Repository<message>
+    ) {}
+
+    addMessage(message: message) {
+
+    }
 
 }
