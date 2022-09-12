@@ -9,7 +9,7 @@
     props: {
       label: String,
       link: String,
-      type: String
+      type: String,
     }
   })
 
