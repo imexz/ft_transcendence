@@ -14,7 +14,6 @@ export class AuthService {
 			return user;
 		} catch(err) {
 			console.log("hier");
-
 			console.log(err);
 			throw err;
 		}

@@ -7,6 +7,6 @@ import { MessageService } from './message.service';
 @Module({
 	imports: [],
 	providers: [MessageService],
-	exports: [TypeOrmModule]
+	exports: []
 })
 export class MessageModule {}
