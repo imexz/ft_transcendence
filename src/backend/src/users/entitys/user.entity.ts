@@ -42,9 +42,16 @@ export class User {
 	messeges: message[];
 
 	@ManyToMany(() => chatroom, (chatroom) => chatroom.Users)
+	@JoinTable()
 	chatrooms: chatroom[];
 
-	@Column({unique: true})//maye wrong
+	@ManyToMany(() => chatroom, (chatroom) => chatroom.admins)
+	@JoinTable()
+	admin_of: chatroom[];
+
+	@Column({nullable: true})//maye wrong {unique: true}
 	clientId: string;
+
+
 
 }
