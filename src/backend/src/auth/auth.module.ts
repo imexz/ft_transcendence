@@ -18,6 +18,6 @@ import { HttpModule } from '@nestjs/axios';
   })],
   providers: [AuthService, LocalStrategy, LocalAuthGuard, JwtStrategy],
   controllers: [AuthController],
-  exports: [AuthService],
+  exports: [AuthService, JwtStrategy],
 })
 export class AuthModule {}
