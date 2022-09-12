@@ -57,6 +57,7 @@ export default class HelloWorld extends Vue {
   res: any = "none"
 
   protectedContent(): void {
+      VueAxios.defaults.headers.get['Access-Control-Allow-Origin'] = '*';
       VueAxios
         .get('http://localhost:3000/auth/protected', { withCredentials: true })
         .then(response => (this.res = response.data))
