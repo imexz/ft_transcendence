@@ -39,19 +39,6 @@ body {
   background-color: var(--ft_black);
 }
 
-nav {
-  padding: 30px;
-}
-
-nav a {
-  font-weight: bold;
-  color: var(--ft_pink);
-}
-
-nav a.router-link-exact-active {
-  color: var(--ft_blue);
-}
-
 button {
     background-color: var(--ft_black);
     color: var(--ft_white);
