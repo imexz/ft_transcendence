@@ -1,12 +1,27 @@
 <template>
-  <img src='this.$store.getters.user.avatar_url' alt='Profile Pic'>
+  <img :src=ProfilePicUrl alt='Profile Pic'>
   <MatchHistory></MatchHistory>
 </template>
 
 <script lang="ts">
 
-  import { Vue } from 'vue-class-component';
+  import { Options, Vue } from 'vue-class-component';
 
-  export default class ProileView extends Vue {}
+
+
+  export default class ProileView extends Vue {
+    ProfilePicUrl: string = ""
+    mounted() {
+      this.ProfilePicUrl = this.$store.getters.getUser.avatar_url;
+    }
+  }
+
 
 </script>
+
+<style>
+  img {
+    width: 300px;
+    height: auto;
+  }
+</style>
