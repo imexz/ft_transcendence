@@ -1,5 +1,6 @@
 <template>
   <NavBar></NavBar>
+  <img alt="Pong Logo" src="./assets/pong_logo.jpg">
   <router-view/>
 </template>
 
@@ -34,6 +35,10 @@
   color: var(--ft_blue);
 }
 
+img {
+  width: 400;
+  height: auto;
+}
 
 body {
   background-color: var(--ft_black);
