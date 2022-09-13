@@ -30,7 +30,7 @@ export class UsersService {
 	}
 
 	async findOne(id: number): Promise<User> {
-			console.log("test");
+			// console.log(id);
 			try{
 				const user = await this.usersRepository.findOneBy({id: id})
 				if(user == null) {
