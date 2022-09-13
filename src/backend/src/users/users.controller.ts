@@ -56,8 +56,8 @@ export class UsersController {
 
 	@Post('update_name')
 	@UseGuards(JwtAuthGuard)
-	update_name(@Body() body, @Request() req) {
-		this.usersService.updateName(req.user.id, body.name);
+	update_name(@Body("name") name, @Request() req) {
+		this.usersService.updateName(req.user.id, name);
 	}
 
 	@Delete()
