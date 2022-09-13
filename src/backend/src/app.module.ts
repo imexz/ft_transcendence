@@ -17,7 +17,6 @@ import { MessageModule } from './message/message.module';
 import { message } from './message/message.entity';
 import { chatroom } from './chatroom/chatroom.entity';
 import { ChatModule } from './chat/chat.module';
-import { GameGateway } from './game.gateway';
 import { GameGateway } from './game/game.gateway';
 
 
