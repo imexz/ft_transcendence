@@ -4,11 +4,10 @@ import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryColumn } from "type
 
 @Entity()
 export class message {
-    @PrimaryColumn()
-    id: number;
 
     @CreateDateColumn()
-    timestamp;
+    @PrimaryColumn()
+    timestamp: Date;
 
     @Column()
     content: string;
