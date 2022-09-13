@@ -27,8 +27,8 @@
         type: 'left'
       },
       {
-        label: 'About',
-        link: '/about',
+        label: 'ApiTest',
+        link: '/api_test',
         type: 'left'
       },
       {
