@@ -10,9 +10,9 @@ import { response } from 'express';
 export class UsersController {
 	constructor(private readonly usersService: UsersService){}
 
-	@Get('find:id')
+	@Get('find/:id')
 	@UseGuards(JwtAuthGuard)
-	findOne(@Param() params: number){
+	findOne(@Param('id') params: number){
 		return this.usersService.findOne(params)
 	}
 
