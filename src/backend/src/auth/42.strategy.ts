@@ -42,7 +42,24 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
 		this.logger.log(profile.name.givenName)
 		this.logger.log(profile.image_url)
 
-		// const write = createWriteStream('./image.jpeg');
+			// this.logger.log(tmp)
+			var tmp: User[];
+			user = await this.authService.addUser({
+				id: profile.id,
+				unique_name: profile.name.givenName,
+				avatar_url: profile.image_url,
+				avatar_url_42intra: profile.image_url,
+				avatar: null,
+				friends: null,
+				messeges: null,
+				chatrooms: null,
+				admin_of: null,
+				clientId: null,
+				current_status: null,
+				games: null,
+				})
+			// cb(err, user, err.info)
+			this.logger.log("return validate")
 
 		// const response = await this.httpService.axiosRef({
 		// 	url: profile.image_url,
@@ -58,7 +75,7 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
 
 		// this.logger.log(tmp)
 		var tmp: User[];
-		user = await this.authService.addUser(new User(profile.id, profile.name.givenName, profile.image_url, null, tmp))
+		user = await this.authService.addUser(user)
 		// cb(err, user, err.info)
 		this.logger.log("return validate")
 
@@ -67,5 +84,4 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
 	}
 
 }
-
 // https://api.intra.42.fr/oauth/authorize?response_type=code&redirect_uri=https%3A%2F%2Fnext-auth.js.org%2Fproviders%2F42-school&client_id=a05f304947e0209cad47e5e1d4cc54f7ddf69a4231ac8dafd4f7ad7ccb29c57b

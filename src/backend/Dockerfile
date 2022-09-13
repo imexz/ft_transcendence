@@ -22,6 +22,8 @@ RUN npm install cookie-parser
 RUN npm install -D @types/cookie-parser
 RUN npm install -D @types/multer
 RUN npm install  @nestjs/websockets @nestjs/platform-socket.io
+RUN npm install class-transformer --save
+RUN npm install reflect-metadata --save
 
 CMD [ "npm", "run", "start:dev"]
 # CMD [ "bash" ]

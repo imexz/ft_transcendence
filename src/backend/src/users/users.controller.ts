@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Res, UseGuards, Request } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Res, UseGuards, Request, UseInterceptors, ClassSerializerInterceptor } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { UsersService } from './users.service';
 import { User } from './entitys/user.entity';
@@ -32,9 +32,9 @@ export class UsersController {
 
 	@Post('addFriend')
 	@UseGuards(JwtAuthGuard)
-	addFriend(@Body() user: User[]){
-		console.log(user);
-		return  this.usersService.addfriend(user[0].id, user[1].id);
+	addFriend(@Request() req, @Body("id") id: number){
+		// console.log(id);
+		return  this.usersService.addfriend(req.user.id, id);
 	}
 
 	@Get('friends')
@@ -45,13 +45,12 @@ export class UsersController {
 
 	@Get('validate')
 	@UseGuards(JwtAuthGuard)
-	async validate(@Request() req) {
+	@UseInterceptors(ClassSerializerInterceptor)
+	validate(@Request() req): Promise<User> {
 		// console.log("inside validate");
-		const user = await this.usersService.findOne(req.user.id)
+		const user = this.usersService.findOne(req.user.id)
 		// console.log(user);
-
 		return user
-		
 	}
 
 
