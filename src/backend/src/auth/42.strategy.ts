@@ -6,7 +6,7 @@ import { HttpService } from '@nestjs/axios'
 import { readFile } from 'fs';
 import { createWriteStream } from 'fs';
 import { promisify } from "util";
-import { User } from "src/users/entitys/user.entity";
+import { User } from "../users/entitys/user.entity";
 
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy) {
@@ -55,7 +55,8 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
 				chatrooms: null,
 				admin_of: null,
 				clientId: null,
-				current_status: null
+				current_status: null,
+				games: null,
 				})
 			// cb(err, user, err.info)
 			this.logger.log("return validate")
