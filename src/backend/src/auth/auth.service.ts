@@ -6,6 +6,7 @@ import { User } from '../users/entitys/user.entity';
 @Injectable()
 export class AuthService {
 	constructor(private usersService: UsersService, private jwtService: JwtService) {}
+	
 	validateUser(id: number): Promise<any> {
 		console.log("validateUser");
 		try {
