@@ -3,6 +3,7 @@ import { message } from "src/message/message.entity";
 import { Entity, Column, PrimaryGeneratedColumn, JoinColumn, OneToOne, PrimaryColumn, OneToMany, ManyToMany, JoinTable } from "typeorm";
 import { fileEntity } from "../../avatar/file.entitys";
 import { Exclude } from 'class-transformer';
+import { game } from "src/game/game.entity";
 
 
 @Entity()
@@ -59,6 +60,9 @@ export class User {
 	@Exclude()
 	@Column({nullable: true})//maye wrong {unique: true}
 	clientId: string;
+
+	@OneToOne(() => game, (game) => game.palyer)
+	games: game[];
 
 
 
