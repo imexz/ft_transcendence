@@ -1,5 +1,5 @@
-import { chatroom } from "src/chatroom/chatroom.entity";
-import { message } from "src/message/message.entity";
+import { chatroom } from "../../chatroom/chatroom.entity";
+import { message } from "../../message/message.entity";
 import { Entity, Column, PrimaryGeneratedColumn, JoinColumn, OneToOne, PrimaryColumn, OneToMany, ManyToMany, JoinTable } from "typeorm";
 import { fileEntity } from "../../avatar/file.entitys";
 import { Exclude } from 'class-transformer';

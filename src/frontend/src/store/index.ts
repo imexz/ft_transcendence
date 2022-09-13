@@ -1,5 +1,7 @@
 import { Vue } from 'vue-class-component'
 import { createStore, storeKey } from 'vuex'
+import User from '../models/user';
+
 
 
 export default createStore({

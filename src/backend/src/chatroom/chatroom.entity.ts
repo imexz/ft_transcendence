@@ -1,6 +1,6 @@
 import { User } from "../users/entitys/user.entity";
 import { Column, Entity, ManyToMany, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
-import { message } from "src/message/message.entity";
+import { message } from "../message/message.entity";
 
 @Entity()
 export class chatroom{

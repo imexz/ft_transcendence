@@ -18,6 +18,7 @@ import { message } from './message/message.entity';
 import { chatroom } from './chatroom/chatroom.entity';
 import { ChatModule } from './chat/chat.module';
 import { GameGateway } from './game/game.gateway';
+import { game } from './game/game.entity';
 
 
 
@@ -40,7 +41,7 @@ import { GameGateway } from './game/game.gateway';
 		username: process.env.POSTGRES_USER,
 		password: process.env.POSTGRES_PASSWORD,
 		database: process.env.PGDATABASE,
-		entities: [User, fileEntity, message, chatroom],
+		entities: [User, fileEntity, message, chatroom, game],
 		ssl: false,
 		synchronize: true //  shouldn't be used in production
 	}),
