@@ -32,9 +32,9 @@ export class UsersController {
 
 	@Post('addFriend')
 	@UseGuards(JwtAuthGuard)
-	addFriend(@Body() user: User[]){
-		console.log(user);
-		return  this.usersService.addfriend(user[0].id, user[1].id);
+	addFriend(@Request() req, @Body("id") id: number){
+		// console.log(id);
+		return  this.usersService.addfriend(req.user.id, id);
 	}
 
 	@Get('friends')
