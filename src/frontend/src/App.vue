@@ -1,6 +1,6 @@
 <template>
   <NavBar></NavBar>
-  <img alt="Pong Logo" src="./assets/pong_logo.jpg">
+  <!-- <img alt="Pong Logo" src="./assets/pong_logo.jpg"> -->
   <router-view/>
 </template>
 
@@ -45,6 +45,24 @@ body {
 }
 
 button {
+    background-color: var(--ft_black);
+    color: var(--ft_white);
+    padding: 15px 32px;
+    font-size: 32px;
+    font-weight: bold;
+    margin: auto;
+    border-image: linear-gradient(var(--ft_pink), var(--ft_blue)) 30;
+  }
+select {
+    background-color: var(--ft_black);
+    color: var(--ft_white);
+    padding: 15px 32px;
+    font-size: 32px;
+    font-weight: bold;
+    margin: auto;
+    border-image: linear-gradient(var(--ft_pink), var(--ft_blue)) 30;
+  }
+input {
     background-color: var(--ft_black);
     color: var(--ft_white);
     padding: 15px 32px;
