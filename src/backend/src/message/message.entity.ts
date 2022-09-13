@@ -1,4 +1,4 @@
-import { chatroom } from "src/chatroom/chatroom.entity";
+import { chatroom } from "../chatroom/chatroom.entity";
 import { User } from "../users/entitys/user.entity";
 import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryColumn } from "typeorm";
 

@@ -1,53 +1,74 @@
 <template>
-  <nav>
-    <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link> |
-    <router-link to="/login">Login</router-link>
-  </nav>
+  <NavBar></NavBar>
+  <!-- <img alt="Pong Logo" src="./assets/pong_logo.jpg"> -->
   <router-view/>
 </template>
 
 <script lang="ts">
-  import { Vue } from 'vue-class-component';
+  import { Options, Vue } from 'vue-class-component';
+  import NavBar from './components/NavBar.vue';
+
+  @Options ({
+    components: {
+      NavBar,
+    }
+  })
 
   export default class App extends Vue {
   }
 </script>
 
 <style>
+
+:root {
+    --ft_black: #000000;
+    --ft_white: #FFFFFF;
+    --ft_pink: #FF0088;
+    --ft_blue: #0877E6;
+}
+
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
-  color: rgb(8, 119, 230);
+  color: var(--ft_blue);
+}
+
+img {
+  width: 400;
+  height: auto;
 }
 
 body {
-  background-color: #000000;
-}
-
-nav {
-  padding: 30px;
-}
-
-nav a {
-  font-weight: bold;
-  color: #c815cb;
-}
-
-nav a.router-link-exact-active {
-  color: rgb(8, 119, 230);
+  background-color: var(--ft_black);
 }
 
 button {
-    background-color: #000000;
-    color: #FFFFFF;
+    background-color: var(--ft_black);
+    color: var(--ft_white);
     padding: 15px 32px;
     font-size: 32px;
     font-weight: bold;
     margin: auto;
-    /* border: 5px solid linear-gradient(to left, red, yellow); */
-    border-image: linear-gradient(rgb(255, 0, 136), rgb(8, 119, 230)) 30;
+    border-image: linear-gradient(var(--ft_pink), var(--ft_blue)) 30;
+  }
+select {
+    background-color: var(--ft_black);
+    color: var(--ft_white);
+    padding: 15px 32px;
+    font-size: 32px;
+    font-weight: bold;
+    margin: auto;
+    border-image: linear-gradient(var(--ft_pink), var(--ft_blue)) 30;
+  }
+input {
+    background-color: var(--ft_black);
+    color: var(--ft_white);
+    padding: 15px 32px;
+    font-size: 32px;
+    font-weight: bold;
+    margin: auto;
+    border-image: linear-gradient(var(--ft_pink), var(--ft_blue)) 30;
   }
 </style>

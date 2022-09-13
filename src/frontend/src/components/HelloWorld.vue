@@ -57,6 +57,7 @@ export default class HelloWorld extends Vue {
   res: any = "none"
 
   protectedContent(): void {
+      console.log(this.$store.getters.getUser)
       VueAxios
         .get('http://localhost:3000/users/validate', { withCredentials: true })
         .then(response => (this.res = response.data))

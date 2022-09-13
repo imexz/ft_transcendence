@@ -10,25 +10,35 @@ const routes: Array<RouteRecordRaw> = [
     component: HomeView
   },
   {
-    path: '/about',
-    name: 'about',
+    path: '/api_test',
+    name: 'api_test',
     // route level code-splitting
     // this generates a separate chunk (about.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/AboutView.vue')
+    component: () => import(/* webpackChunkName: "about" */ '../views/ApiTestView.vue')
   },
   {
     path: '/login',
     name: 'login',
     component: () => import('../views/LoginView.vue')
-  }
+  },
+  {
+    path: '/profile',
+    name: 'profile',
+    component: () => import('../views/ProfileView.vue')
+  },
+  {
+    path: '/play',
+    name: 'play',
+    component: () => import('../views/PlayView.vue')
+  }  
 ]
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
   routes
 })
 
-router.beforeResolve((to,from) => {
+router.beforeEach((to,from) => {
   if (to.name != 'login' && !store.getters.isValidated) {
     return { name: 'login' };
   }

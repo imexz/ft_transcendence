@@ -3,8 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { message } from '../message/message.entity';
 import { User } from '../users/entitys/user.entity';
 import { Repository } from 'typeorm';
-import { chatroom } from 'src/chatroom/chatroom.entity';
-import { MessageService } from 'src/message/message.service';
+import { chatroom } from '../chatroom/chatroom.entity';
 
 @Injectable()
 export class ChatService {
@@ -83,7 +82,7 @@ export class ChatService {
         private userRepository:  Repository<User>,
         @InjectRepository(chatroom)
         private chatroomRepository: Repository<chatroom>,
-        private readonly messageService: MessageService,
+        // private readonly messageService: MessageService,
     ){}
 
     // create(createMessageDto: CreateMessageDto, id: string) {
