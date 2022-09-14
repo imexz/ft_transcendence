@@ -14,9 +14,21 @@ export class EventsGateway {
 
   constructor (private readonly gameService: GameService) {};
 
-  @SubscribeMessage('event')
-  handleEvent(): void {
-	console.log("handleMessage called");
-	// this.server.emit('events', this.gameService.getPosition());
+  @SubscribeMessage('moveLeftUp')
+  handleMoveLeftUp(): void {
+	this.gameService.movePaddleUp(true);
+  }
+  @SubscribeMessage('moveRightUp')
+  handleMoveRightUp(): void {
+	this.gameService.movePaddleUp(false);
+  }
+
+  @SubscribeMessage('moveLeftDown')
+  handleMoveLeftDown(): void {
+	this.gameService.movePaddleDown(true);
+  }
+  @SubscribeMessage('moveRightDown')
+  handleMoveRightDown(): void {
+	this.gameService.movePaddleDown(false);
   }
 }

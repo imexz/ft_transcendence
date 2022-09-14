@@ -23,7 +23,6 @@
 		},
 		data() {
 			return {
-				// componentKey: 0,
 				socket: {},
 				context: {},
 				eventSource: {},
@@ -36,6 +35,21 @@
 		created() {
 			this.socket = io("http://localhost:3000");
 			this.eventSource = new EventSource("http://localhost:3000/game/sse");
+			document.addEventListener('keydown', (event) => {
+				console.log(event.key);
+				if (event.key == 'w') {
+					this.paddleLeftUp();
+				}
+				else if (event.key == 's') {
+					this.paddleLeftDown();
+				}
+				else if (event.key == 'ArrowUp') {
+					this.paddleRightUp();
+				}
+				else if (event.key == 'ArrowDown') {
+					this.paddleRightDown();
+				}
+			}, false);
 		},
 		mounted() {
 			this.eventSource.onmessage = ({data}) => {
@@ -44,34 +58,31 @@
 				this.position.x = data.ball.position.x;
 				this.position.y = data.ball.position.y;
 				this.context.clearRect(0, 0, this.$refs.game.width, this.$refs.game.height);
-				// this.context.fillRect(this.position.x, this.position.y, data.ball.radius, data.ball.radius);
 				this.context.beginPath();
 				this.context.arc(this.position.x, this.position.y, data.ball.radius, 0, 2 * Math.PI);
 				this.context.fill();
+				this.drawPaddles(data);
 			};
-			// this.forceRenderer();
-			// using named server sent events
-			// this.eventSource.addEventListener('event', data => {
-			// this.context = this.$refs.game.getContext("2d");
-			// this.position = data.data;
-			// this.context.clearRect(0, 0, this.$refs.game.width, this.$refs.game.height);
-			// this.context.fillRect(this.position.x, this.position.y, 20, 20);
-			// });
 
-			// using socket
-			// this.context = this.$refs.game.getContext("2d");
-			// this.socket.on('events', data => {
-			// 	this.position = data;
-			// 	this.context.clearRect(0, 0, this.$refs.game.width, this.$refs.game.height);
-			// 	this.context.fillRect(this.position.x, this.position.y, 20, 20);
-			// } );
-			// this.socket.emit('event');
 		},
-		// methods: {
-		// 	forceRenderer() {
-		// 		this.componentKey += 1;
-		// 	}
-		// }
+		methods: {
+			drawPaddles(data) {
+				this.context.fillRect(data.paddleLeft.position.x, data.paddleLeft.position.y, data.paddleLeft.width, data.paddleLeft.height);
+				this.context.fillRect(data.paddleRight.position.x, data.paddleRight.position.y, data.paddleRight.width, data.paddleRight.height);
+			},
+			paddleLeftUp() {
+				this.socket.emit('moveLeftUp');
+			},
+			paddleLeftDown() {
+				this.socket.emit('moveLeftDown');
+			},
+			paddleRightUp() {
+				this.socket.emit('moveRightUp');
+			},
+			paddleRightDown() {
+				this.socket.emit('moveRightDown');
+			}
+		}
 	}
 </script>
 
