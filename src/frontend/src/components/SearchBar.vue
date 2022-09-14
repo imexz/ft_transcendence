@@ -1,15 +1,16 @@
 <template>
-  <div
+  <!-- <div
     @focusin="active = true" 
     @focusout.stopPropagation()="active = false"
     tabindex="0"
-  >
+  > -->
+  <div>
     <input 
     type="text"
     v-model="searchQuery" />
     <div>
       <UserSummary
-      v-if="active"
+      v-if="searchQuery != ''"
       v-for="user in filteredUsers()"
       :user = user />
     </div>
