@@ -32,6 +32,18 @@ export class ChatGateway {
 
   }
 
+  @SubscribeMessage('creat')
+  creatRoom(
+    @MessageBody('user_id') user_id: number,
+    @MessageBody('room_name') room_name: string,  
+    @ConnectedSocket() client:Socket,
+  ) {
+    console.log("join");
+    client.join(room_name)
+    this.chatService.manageJoin(client.id, user_id, room_name)
+
+  }
+
   @SubscribeMessage('leave')
   leaveRoom(
     @MessageBody('room_name') room_name: string,  
@@ -55,8 +67,13 @@ export class ChatGateway {
   }
 
   @SubscribeMessage('findAllMessages')
-  findAll(@MessageBody('room_name') room_name: string,) {
-    return this.chatService.findAll(room_name);
+  findAllMessages(@MessageBody('room_name') room_name: string,) {
+    return this.chatService.findAllMessages(room_name);
+  }
+
+  @SubscribeMessage('findAllRooms')
+  findAllRooms() {
+    return this.chatService.findAllRooms();
   }
 
   @SubscribeMessage('createMessage')
