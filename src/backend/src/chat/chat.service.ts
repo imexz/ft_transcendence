@@ -7,6 +7,9 @@ import { chatroom } from '../chatroom/chatroom.entity';
 
 @Injectable()
 export class ChatService {
+  findAllRooms() {
+    return this.chatroomRepository.find()
+  }
 
     async manageLeave(id: string, room_name: string) {
 
@@ -88,7 +91,7 @@ export class ChatService {
     // create(createMessageDto: CreateMessageDto, id: string) {
     //     throw new Error('Method not implemented.');
     //   }
-      async findAll(room_name: string) {
+      async findAllMessages(room_name: string) {
         const chatroom = await this.chatroomRepository.findOne({
             where: {
                 name: room_name

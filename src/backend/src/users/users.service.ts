@@ -18,7 +18,14 @@ export class UsersService {
 		){}
 
 	async getFriends(id: number) {
-		const user = await this.usersRepository.findOneBy({id: id})
+		const user = await this.usersRepository.findOne({
+			where: {
+				id: id
+			},
+			relations: {
+				friends: true,
+			}
+		})
 		return user.friends
 	}
 

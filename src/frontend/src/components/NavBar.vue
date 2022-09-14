@@ -50,6 +50,11 @@
         link: '/profile',
         type: 'right'
       },
+            {
+        label: 'Chats',
+        link: '/chats',
+        type: 'right'
+      },
     ]
   }
 </script>
