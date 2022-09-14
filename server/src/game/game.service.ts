@@ -123,14 +123,11 @@ export class GameService {
 	}
 
 	collisionControll() {
-		// console.log(this.ball.direction.x);
 		if (this.ball.direction.x > 0) {
 			if ((this.ball.position.x + this.ball.radius) >= this.paddleRight.position.x &&
 				this.ball.position.y >= this.paddleRight.position.y &&
 				this.ball.position.y <= (this.paddleRight.position.y + this.paddleRight.height)) {
-					// this.ball.direction.x *= -1;
 					this.calcAngle(this.paddleRight, false);
-					// console.log(this.ball.direction.angle);
 					this.ball.direction.x = this.ball.direction.speed * Math.cos(this.ball.direction.angle * (Math.PI / 180));
 					this.ball.direction.y = this.ball.direction.speed * Math.sin(this.ball.direction.angle * (Math.PI / 180));
 				}
@@ -139,9 +136,7 @@ export class GameService {
 			if (this.ball.position.x - this.ball.radius <= this.paddleLeft.position.x + this.paddleLeft.width &&
 				this.ball.position.y >= this.paddleLeft.position.y &&
 				this.ball.position.y <= this.paddleLeft.position.y + this.paddleLeft.height) {
-					// this.ball.direction.x *= -1;
 					this.calcAngle(this.paddleLeft, true);
-					// console.log(this.ball.direction.angle);
 					this.ball.direction.x = this.ball.direction.speed * Math.cos(this.ball.direction.angle * (Math.PI / 180));
 					this.ball.direction.y = this.ball.direction.speed * Math.sin(this.ball.direction.angle * (Math.PI / 180));
 				}
