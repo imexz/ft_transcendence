@@ -47,7 +47,7 @@
       },
       {
         label: 'Profile',
-        link: '/profile',
+        link: '/profile/3',
         type: 'right'
       },
     ]

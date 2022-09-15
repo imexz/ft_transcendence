@@ -22,9 +22,19 @@ const routes: Array<RouteRecordRaw> = [
     name: 'login',
     component: () => import('../views/LoginView.vue')
   },
+  // {
+  //   path: '/profile/:id',
+
+  //   redirect: to => {
+  //     return { path: '/profile', props: true }
+  //   },
+  //   // props: {id : 1},
+    
+  // },
   {
-    path: '/profile',
+    path: '/profile/:id',
     name: 'profile',
+    props: true,
     component: () => import('../views/ProfileView.vue')
   },
   {
