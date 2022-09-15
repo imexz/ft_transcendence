@@ -54,9 +54,14 @@
     }
 
 		mounted() {
-			this.eventSource.onmessage = ({raw_data} : {raw_data: any}) => {
-				let data = JSON.parse(raw_data);
-        this.$refs.game 
+			this.eventSource.onmessage = (raw_data:  any) => {
+        console.log(raw_data);
+        
+				// let data = JSON.parse(raw_data);
+        // let data = raw_data.data;
+				let data = JSON.parse( raw_data.data);
+        console.log(data);
+        // this.$refs.game 
 				this.context = (this.$refs.game as any).getContext("2d");
 				this.position.x = data.ball.position.x;
 				this.position.y = data.ball.position.y;
@@ -69,6 +74,7 @@
     }
 
     drawPaddles(data: any) {
+      this.context.fillStyle = "#FFFFFF";
 			this.context.fillRect(data.paddleLeft.position.x, data.paddleLeft.position.y, data.paddleLeft.width, data.paddleLeft.height);
 			this.context.fillRect(data.paddleRight.position.x, data.paddleRight.position.y, data.paddleRight.width, data.paddleRight.height);
 		}
