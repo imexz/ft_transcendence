@@ -29,7 +29,7 @@ export default class ChatsTest extends Vue {
   socket = io('http://localhost:3000')
   rooms = ref([])
   name = ref('')
-  id = ref('')
+  id = this.$store.getters.getUser.id;
 
 
   // setup() {
@@ -47,8 +47,10 @@ export default class ChatsTest extends Vue {
 
 
   onBeforeMount(){
+    console.log(this.$store.getters.getUser);
+    
     // this.id.value = this.$store.getters.getUser.id;
-    this.id.value = "88081"
+    // this.id.value = 88081
     this.socket.emit('findAllRooms', {}, (response) => {
       this.rooms.value = response;
     });
@@ -58,12 +60,17 @@ export default class ChatsTest extends Vue {
   
   mounted() {
     console.log(this.name);
+    // this.id = this.$store.getters.getUser.id;
+
   }
 
 
   creat()
   {
     console.log(this.name);
+    // this.id.value = 88081
+    // console.log(this.$store.getters.getUser.id);
+
 
     this.socket.emit('creat', { room_name: this.name, id: this.id }, () => {});
     // this.socket.emit('creat', { }, () => {});

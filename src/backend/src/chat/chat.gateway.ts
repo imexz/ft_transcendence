@@ -51,7 +51,7 @@ export class ChatGateway {
 
   @SubscribeMessage('creat')
   creatRoom(
-    @MessageBody('user_id') user_id: number,
+    @MessageBody('id') user_id: number,
     @MessageBody('room_name') room_name: string,  
     @ConnectedSocket() client:Socket,
   ) {
@@ -59,6 +59,7 @@ export class ChatGateway {
     console.log(room_name);
     console.log(user_id);
     client.join(room_name);
+    this.chatService.createRoom(client.id, user_id, room_name)
     this.chatService.manageJoin(client.id, user_id, room_name)
 
   }

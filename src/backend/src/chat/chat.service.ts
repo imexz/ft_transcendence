@@ -7,6 +7,13 @@ import { chatroom } from '../chatroom/chatroom.entity';
 
 @Injectable()
 export class ChatService {
+
+
+  createRoom(id: string, user_id: number, room_name: string) {
+    
+  }
+
+
   findAllRooms() {
     return this.chatroomRepository.find()
   }
