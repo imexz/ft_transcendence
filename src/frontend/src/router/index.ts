@@ -2,6 +2,7 @@ import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 
 import store from '../store/index'
+import { defineAsyncComponent } from 'vue'
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -22,15 +23,12 @@ const routes: Array<RouteRecordRaw> = [
     name: 'login',
     component: () => import('../views/LoginView.vue')
   },
-  // {
-  //   path: '/profile/:id',
-
-  //   redirect: to => {
-  //     return { path: '/profile', props: true }
-  //   },
-  //   // props: {id : 1},
-    
-  // },
+  {
+    path: '/profile/',
+    name: 'me',
+    props: {id : "0"},
+    component: () => import('../views/ProfileView.vue')
+  },
   {
     path: '/profile/:id',
     name: 'profile',

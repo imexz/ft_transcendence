@@ -6,7 +6,7 @@
 <script lang="ts">
 
  import { Vue, Options } from 'vue-class-component';
- import ChangeUserName from '@/components/ChangeUserName.vue';
+ import ChangeUserName from '@/components/Settings/ChangeUserName.vue';
 
   @Options ({
     components: {

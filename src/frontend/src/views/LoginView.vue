@@ -7,8 +7,8 @@
 
 <script lang ="ts">
   import { Vue, Options } from 'vue-class-component';
-  import FtAuth from '@/components/FtAuth.vue';
-  import LogoutButton from '@/components/LogoutButton.vue';
+  import FtAuth from '@/components/Auth/FtAuth.vue';
+  import LogoutButton from '@/components/Auth/LogoutButton.vue';
 
 
   @Options({
