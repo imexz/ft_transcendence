@@ -12,8 +12,8 @@
   authenticate() {
     location.href='http://localhost:3000/auth/login'
   }
-  async validateUser() {
-      await VueAxios
+  validateUser() {
+      VueAxios
         .get('http://localhost:3000/users/validate', { withCredentials: true})
         .then(response => (
           this.$store.state.validated = true,

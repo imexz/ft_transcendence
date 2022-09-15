@@ -64,6 +64,7 @@ export class ChatGateway {
 
   }
 
+
   @SubscribeMessage('leave')
   leaveRoom(
     @MessageBody('room_name') room_name: string,  
