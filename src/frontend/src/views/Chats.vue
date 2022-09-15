@@ -1,30 +1,3 @@
-<script lang="ts">
-// import { io } from 'socket.io-client';
-import * as io from 'socket.io-client';
-import { onBeforeMount, ref } from 'vue';
-import { Options, Vue } from 'vue-class-component';
-
-const socket = io('http://localhost:3000');
-const rooms = ref([]);
-const name = ref('');
-const id = ref('')
-
-
-onBeforeMount(() => {
-  this.id = this.$store.getters.getUser.id;
-  socket.emit('findAllRooms', {}, (rooms) => {
-    rooms.value = rooms;
-  });
-});
-
-
-const creat = () =>
-{
-  socket.emit('creat', { room_name: name.value, id }, () => {})
-}
-
-</script>
-
 <template>
   <div class="chat-container">
     <div class="room-container">
@@ -32,18 +5,75 @@ const creat = () =>
         [{{ room.name }}]: {{ room.text}}
       </div>
     </div>
-    <div class="test">
-    <form @submit.prevent="creat">
-      <label>Create Room</label>
-      <input v-model="name" />
-      <button type="submit">Send</button>
-    </form>
+    <div class="room-input">
+      <form @submit.prevent="creat">
+        <label>Create Room</label>
+        <input v-model="name" />
+        <button type="submit">Send</button>
+      </form>
     </div>
   </div>
-
 </template>
 
-<!-- @import '../assets/base.css'; -->
+
+<script lang="ts">
+// import * as io from 'socket.io-client';
+import { onBeforeMount, ref } from 'vue';
+import { Options, Vue } from 'vue-class-component';
+import { io } from 'socket.io-client';
+
+
+export default class ChatsTest extends Vue {
+
+    data() {
+    return {
+      socket: io('http://localhost:3000'),
+      rooms: ref([]),
+      name: ref('test'),
+      id: ref(''),
+    }
+  },
+
+  // setup() {
+  //   const count = ref(0)
+  //   const socket = io('http://localhost:3000');
+  //   const rooms = ref([]);
+  //   const name = ref('test');
+  //   const id = ref('');
+
+  //   // expose to template and other options API hooks
+  //   return {
+  //     count
+  //   }
+  // }
+
+
+  onBeforeMount(){
+    id.value = this.$store.getters.getUser.id;
+    this.socket.emit('findAllRooms', {}, (response) => {
+      rooms.value = response;
+    });
+
+  };
+
+  
+  mounted() {
+    console.log(this.name);
+  }
+
+
+  creat()
+  {
+    console.log(this.name);
+
+    this.socket.emit('creat', { room_name: this.name.value, id: this.id.value }, () => {});
+    // this.socket.emit('creat', { }, () => {});
+  }
+}
+
+</script>
+
+// @import '../assets/base.css';
 
 <style>
 

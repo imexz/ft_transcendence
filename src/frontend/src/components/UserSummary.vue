@@ -9,6 +9,7 @@
 <script lang="ts">
   import { Options, Vue } from 'vue-class-component';
   import VueAxios from 'axios';
+  import User from '../models/user';
 
   @Options ({
     props : {
@@ -18,6 +19,7 @@
 
   export default class UserSummary extends Vue {
     addFriend(): void {
+      user:! User;
       VueAxios({
         url: '/users/addFriend',
         baseURL: 'http://localhost:3000',
