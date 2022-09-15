@@ -2,6 +2,7 @@ import {Redirect, Controller, Request, Get, Param, UseGuards, Delete, Res } from
 import { LocalAuthGuard } from './local-auth.guard'
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './jwt-auth.guard';
+import { hostURL } from '../hostURL';
 
 @Controller('auth')
 export class AuthController{
@@ -15,7 +16,7 @@ export class AuthController{
 
 	@UseGuards(LocalAuthGuard)
 	@Get('login/callback')
-	@Redirect("http://localhost:8080/login", 302)
+	@Redirect(hostURL + ":8080/login", 302)
 	callback(@Request() req, @Res({ passthrough: true }) res ) {
 		res.cookie("token", this.authService.login(req.user));
 		// {domain: "http://localhost:3000/", maxAge: 6000 , sameSite: 'lax'}
