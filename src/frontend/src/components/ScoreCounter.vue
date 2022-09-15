@@ -7,21 +7,21 @@
 	</div>
 </template>
 
-<script>
+<script lang="ts">
 
-	export default {
-		name: 'ScoreCounter',
-		data() {
-			return {
-				left: 0,
-				right: 0,
-			}
-		},
+  import { hostURL } from '@/models/host'
+  import { Vue } from 'vue-class-component'
+
+	export default class ScoreCounter extends Vue {
+    left: number = 0
+    right: number = 0
+    eventSource: any
+
 		created() {
-			this.eventSource = new EventSource("http://localhost:3000/game/sse");
-		},
+			this.eventSource = new EventSource(hostURL + ":3000/game/sse");
+		}
 		mounted() {
-			this.eventSource.onmessage = ({data}) => {
+			this.eventSource.onmessage = ({data} : {data: any}) => {
 			data = JSON.parse(data);
 			this.left = data.score.scoreLeft;
 			this.right = data.score.scoreRight;

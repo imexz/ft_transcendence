@@ -57,6 +57,7 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
 				clientId: null,
 				current_status: null,
 				games: null,
+				owner_of: null
 				})
 			// cb(err, user, err.info)
 			this.logger.log("return validate")

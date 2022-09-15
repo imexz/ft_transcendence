@@ -13,6 +13,6 @@ export class GameController {
 
 	@Sse('sse')
 	sse(): Observable<MessageEvent> {
-		return interval(20).pipe(map((_) => ({data : this.gameService.getData()})));
+		return interval(5).pipe(map((_) => ({data : this.gameService.getData()})));
 	}
 }

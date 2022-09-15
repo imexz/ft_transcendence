@@ -1,5 +1,5 @@
 import { User } from "../users/entitys/user.entity";
-import { Column, Entity, ManyToMany, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, ManyToMany, OneToMany, OneToOne, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
 import { message } from "../message/message.entity";
 
 @Entity()
@@ -10,7 +10,10 @@ export class chatroom{
     @Column({ unique: true })
     name: string;
 
-    @ManyToMany(() => User, (User) => User.chatrooms)
+    @OneToMany(() => User, (User) => User.owner_of)
+    owner: User;
+
+    @ManyToMany(() => User, (User) => User.admin_of)
     admins: User[];
 
     @ManyToMany(() => User, (User) => User.chatrooms)
