@@ -51,7 +51,7 @@ import { game } from './game/game.entity';
 	MessageModule,
 	ChatModule,
 ],
-  providers: [ChatGateway, MessageService, ChatroomService, GameGateway],
+  providers: [MessageService, ChatroomService],
 })
 export class AppModule {
 	constructor(private dataSource: DataSource) {}
