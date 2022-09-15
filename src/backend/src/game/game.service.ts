@@ -47,16 +47,8 @@ export class GameService {
 		this.updateData();
 		this.collisionControll();
 		if (this.checkScore()){
-
-			console.log(this.paddleLeft.position.y);
 			this.resetBall();
-			this.movePaddleDown(true)
-			console.log(this.paddleLeft.position.y);
 		}
-		// console.log(this.ball.position);
-		// console.log(this.paddleLeft.position.x);
-		// console.log(this.paddleRight.position.y);
-		// console.log(this.paddleRight.position.x);
 		return {ball: this.ball, paddleLeft: this.paddleLeft, paddleRight: this.paddleRight, score: this.score};
 	}
 
@@ -194,8 +186,6 @@ export class GameService {
 	}
 
 	movePaddleDown(b: boolean) {
-		console.log(this.paddleLeft.position.y);
-		
 		if (b) {
 			if (this.paddleLeft.position.y < (480 - this.paddleLeft.height))
 			this.paddleLeft.position.y += this.paddleLeft.speed;
@@ -204,6 +194,5 @@ export class GameService {
 			if (this.paddleRight.position.y < (480 - this.paddleRight.height))
 			this.paddleRight.position.y += this.paddleRight.speed;
 		}
-		console.log(this.paddleLeft.position.y);
 	}
 }
