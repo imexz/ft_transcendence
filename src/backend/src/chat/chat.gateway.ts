@@ -50,7 +50,7 @@ export class ChatGateway {
   }
 
   @SubscribeMessage('creat')
-  creatRoom(
+  async creatRoom(
     @MessageBody('id') user_id: number,
     @MessageBody('room_name') room_name: string,  
     @ConnectedSocket() client:Socket,
@@ -59,9 +59,9 @@ export class ChatGateway {
     console.log(room_name);
     console.log(user_id);
     client.join(room_name);
-    this.chatService.createRoom(client.id, user_id, room_name)
-    this.chatService.manageJoin(client.id, user_id, room_name)
-
+    await this.chatService.createRoom(client.id, user_id, room_name)
+    return await this.chatService.findAllRooms()
+    // this.chatService.manageJoin(client.id, user_id, room_name)
   }
 
 
@@ -93,9 +93,10 @@ export class ChatGateway {
   }
 
   @SubscribeMessage('findAllRooms')
-  findAllRooms() {
-    // return this.chatService.findAllRooms();
-      return "test";
+  async findAllRooms() {
+    console.log("findAllRooms");
+    return await this.chatService.findAllRooms();
+      // return "test";
   }
 
   @SubscribeMessage('createMessage')

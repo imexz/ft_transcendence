@@ -1,8 +1,8 @@
 <template>
-  <div class="chat-container">
+  <div>
     <div class="room-container">
       <div v-for="room in rooms">
-        [{{ room.name }}]: {{ room.text}}
+        [{{ room.id }}]: {{ room.name}}
       </div>
     </div>
     <div class="room-input">
@@ -29,7 +29,7 @@ export default class ChatsTest extends Vue {
   socket = io('http://localhost:3000')
   rooms = ref([])
   name = ref('')
-  id: nummber
+  id: number = 0
 
 
   // setup() {
@@ -46,13 +46,15 @@ export default class ChatsTest extends Vue {
   // }
 
 
-  onBeforeMount(){
+  beforeMount(){
     // console.log(this.$store.getters.getUser);
     
     // this.id.value = this.$store.getters.getUser.id;
     // this.id.value = 88081
-    this.socket.emit('findAllRooms', {}, (response) => {
-      this.rooms.value = response;
+      this.socket.emit('findAllRooms', {}, (response) => {
+      this.rooms = response;
+      console.log(response);
+      console.log(this.rooms.value);
     });
 
   };
@@ -72,8 +74,10 @@ export default class ChatsTest extends Vue {
     // console.log(this.$store.getters.getUser.id);
 
 
-    this.socket.emit('creat', { room_name: this.name, id: this.id }, () => {});
-    // this.socket.emit('creat', { }, () => {});
+    this.socket.emit('creat', { room_name: this.name, id: this.id }, (response) => {
+      this.rooms = response;
+      console.log(response);
+    });
   }
 }
 

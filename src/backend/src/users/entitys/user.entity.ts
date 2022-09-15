@@ -35,7 +35,8 @@ export class User {
 	@Exclude()
 	avatar_url_42intra: string;
 
-	@ManyToOne(() => chatroom, (chatroom) => chatroom.owner)
+	@OneToMany(() => chatroom, (chatroom) => chatroom.owner)
+	@JoinColumn()
     owner_of: chatroom[];
 
 	@OneToOne(() => fileEntity, (avatar) => avatar.user) //{ onDelete: 'CASCADE' }
