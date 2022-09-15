@@ -3,13 +3,19 @@
     <img :src="user.avatar_url" alt="Avatar">
     <span>{{ user.unique_name }}</span>
     <button @click="addFriend" >AddFriend</button>
+    <button>View Profile</button>
+    <button>Send Dm</button>
   </div>
 </template>
 
 <script lang="ts">
   import { Options, Vue } from 'vue-class-component';
   import VueAxios from 'axios';
+<<<<<<< HEAD
   import User from '../models/user';
+=======
+  import User from '../models/user'
+>>>>>>> 4c8485dfcaa8d95cc1cbdd6b9d00f5984b0f01e2
 
   @Options ({
     props : {
@@ -18,6 +24,7 @@
   })
 
   export default class UserSummary extends Vue {
+    user!: User;
     addFriend(): void {
       user:! User;
       VueAxios({
@@ -48,7 +55,7 @@
     /* padding: 50px; */
     display: inline-block;
     font-size: 30px;
-    width: 300px;
+    width: 200px;
   }
   div {
     text-align: left;
