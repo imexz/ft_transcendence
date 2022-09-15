@@ -25,33 +25,32 @@ import { io } from 'socket.io-client';
 
 export default class ChatsTest extends Vue {
 
-    data() {
-    return {
-      socket: io('http://localhost:3000'),
-      rooms: ref([]),
-      name: ref('test'),
-      id: ref(''),
-    }
-  },
+
+  socket = io('http://localhost:3000')
+  rooms = ref([])
+  name = ref('')
+  id = ref('')
+
 
   // setup() {
   //   const count = ref(0)
   //   const socket = io('http://localhost:3000');
   //   const rooms = ref([]);
-  //   const name = ref('test');
+  //   const name = ref('');
   //   const id = ref('');
 
-  //   // expose to template and other options API hooks
-  //   return {
-  //     count
-  //   }
+  // //   // expose to template and other options API hooks
+  // //   return {
+  // //     count
+  // //   }
   // }
 
 
   onBeforeMount(){
-    id.value = this.$store.getters.getUser.id;
+    // this.id.value = this.$store.getters.getUser.id;
+    this.id.value = "88081"
     this.socket.emit('findAllRooms', {}, (response) => {
-      rooms.value = response;
+      this.rooms.value = response;
     });
 
   };
@@ -66,7 +65,7 @@ export default class ChatsTest extends Vue {
   {
     console.log(this.name);
 
-    this.socket.emit('creat', { room_name: this.name.value, id: this.id.value }, () => {});
+    this.socket.emit('creat', { room_name: this.name, id: this.id }, () => {});
     // this.socket.emit('creat', { }, () => {});
   }
 }

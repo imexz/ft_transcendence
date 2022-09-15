@@ -56,8 +56,8 @@ export class ChatGateway {
     @ConnectedSocket() client:Socket,
   ) {
     console.log("creat");
-    console.log("room_name");
-    console.log("user_id");
+    console.log(room_name);
+    console.log(user_id);
     client.join(room_name);
     this.chatService.manageJoin(client.id, user_id, room_name)
 
