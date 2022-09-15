@@ -11,15 +11,9 @@
 <script lang="ts">
   import { Options, Vue } from 'vue-class-component';
   import VueAxios from 'axios';
-<<<<<<< HEAD
   import User from '../models/user';
-=======
-  import User from '../models/user'
-<<<<<<< HEAD
->>>>>>> 4c8485dfcaa8d95cc1cbdd6b9d00f5984b0f01e2
-=======
   import { hostURL } from '@/models/host';
->>>>>>> 2e081ecc3d473cc7b232ffdd0f664797ad0b8910
+
 
   @Options ({
     props : {

@@ -14,20 +14,23 @@ export class ChatService {
     if(user_id == null)
         return
     user.clientId = id;
-    this.userRepository.update(user.id, user);
+    await this.userRepository.update(user.id, user);
     var room = await this.chatroomRepository.findOneBy({name: room_name})
-    if(room != null)
-        return
-    room = this.chatroomRepository.create()
-    room.owner = user;
-    room.admins = [user]
-    room.Users = [user]
-
+    if(room == null){
+        room = this.chatroomRepository.create()
+        room.name = room_name
+        room.owner = user;
+        room.admins = [user]
+        room.Users = [user]
+        await this.chatroomRepository.save(room)
+    }
   }
 
 
-  findAllRooms() {
-    return this.chatroomRepository.find()
+  async findAllRooms(): Promise<chatroom[]> {
+    const rooms =  await this.chatroomRepository.find()
+    console.log(rooms);
+    return rooms
   }
 
     async manageLeave(id: string, room_name: string) {
