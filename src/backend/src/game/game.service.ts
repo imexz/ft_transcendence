@@ -8,14 +8,14 @@ import { ScoreObj } from './game.interfaces/scoreobj.interface';
 @Injectable()
 export class GameService {
 	ball: BallObj = {
-		radius: 10,
+		radius: 40,
 		position: {
 			x: 340,
 			y: 240,
 		},
 		direction: {
 			angle: Math.random() * 2 * Math.PI,
-			speed: 2,
+			speed: 1,
 			x: 1,
 			y: 1,
 		}
@@ -163,7 +163,7 @@ export class GameService {
 
 		this.ball.direction.angle = Math.random() * 2 * Math.PI;
 		this.ball.direction.x = this.ball.direction.speed * Math.cos(this.ball.direction.angle);
-		this.ball.direction.y = this.ball.direction.speed * Math.sin(this.ball.direction.angle);
+		this.ball.direction.y = this.ball.direction.speed * Math.sin(this.ball.direction.angle) * 0.1;
 	}
 
 	increaseScoreLeft() {
