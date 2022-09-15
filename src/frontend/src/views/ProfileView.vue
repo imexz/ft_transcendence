@@ -1,9 +1,5 @@
 <template>
-  <div>
-    <h1>{{ id }}</h1>
-    <img :src='this.$store.getters.getUser.avatar_url' alt='Profile Pic'>
-    <h1>Welcome {{ this.$store.getters.getUser.unique_name }}</h1>
-  </div>
+  <Profile :pid=parseInt(id) />
   <div>
     <SearchBar/>
   </div>
@@ -11,23 +7,31 @@
 
 <script lang="ts">
   import { Options, Vue } from 'vue-class-component';
-  import UserSummary from '../components/UserSummary.vue';
-  import SearchBar from '@/components/SearchBar.vue';
+  import UserSummary from '../components/Profile/UserSummary.vue';
+  import SearchBar from '@/components/Profile/SearchBar.vue';
+  import Profile from '@/components/Profile/Profile.vue';
+import { computed } from '@vue/reactivity';
 
   @Options ({
     props: {
-      id: String
+      id: String,
     },
     components : {
       UserSummary,
       SearchBar,
+      Profile,
     }
   })
 
   export default class ProileView extends Vue {
-    ProfilePicUrl: string = ""
     id!:string
-  }
+
+    mounted(): void {
+      this.$forceUpdate()
+      console.log(this.id)
+    }
+
+    }
 </script>
 
 <style scoped>

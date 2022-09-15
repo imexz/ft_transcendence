@@ -16,7 +16,7 @@
 
 <script lang="ts">
   import { Vue, Options } from 'vue-class-component';
-  import ScoreCounter from '../components/ScoreCounter.vue'
+  import ScoreCounter from '@/components/Game/ScoreCounter.vue'
   import io from "socket.io-client";
   import { hostURL } from '@/models/host';
 

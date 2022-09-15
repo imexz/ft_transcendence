@@ -1,9 +1,4 @@
 <template>
-  <!-- <div
-    @focusin="active = true" 
-    @focusout.stopPropagation()="active = false"
-    tabindex="0"
-  > -->
   <div>
     <input 
     type="text"
@@ -19,7 +14,7 @@
 
 <script lang="ts">
   import { Options, Vue } from 'vue-class-component';
-  import User from '../models/user';
+  import User from '@/models/user';
   import UserSummary from './UserSummary.vue';
   import VueAxios from 'axios';
   import { hostURL } from '@/models/host';
