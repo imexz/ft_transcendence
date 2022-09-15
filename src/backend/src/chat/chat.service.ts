@@ -9,8 +9,20 @@ import { chatroom } from '../chatroom/chatroom.entity';
 export class ChatService {
 
 
-  createRoom(id: string, user_id: number, room_name: string) {
-    
+  async createRoom(id: string, user_id: number, room_name: string) {
+    const user = await this.userRepository.findOneBy({id: user_id})
+    if(user_id == null)
+        return
+    user.clientId = id;
+    this.userRepository.update(user.id, user);
+    var room = await this.chatroomRepository.findOneBy({name: room_name})
+    if(room != null)
+        return
+    room = this.chatroomRepository.create()
+    room.owner = user;
+    room.admins = [user]
+    room.Users = [user]
+
   }
 
 

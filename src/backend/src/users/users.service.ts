@@ -73,7 +73,7 @@ export class UsersService {
 		}
 		else {
 			user.avatar = file
-			user.avatar_url = "http://localhost:3000/avatar"			
+			user.avatar_url = "http://10.11.5.5:3000/avatar"			
 		}
 		this.usersRepository.update(id, user)
 	}

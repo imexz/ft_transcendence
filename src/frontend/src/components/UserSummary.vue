@@ -15,7 +15,11 @@
   import User from '../models/user';
 =======
   import User from '../models/user'
+<<<<<<< HEAD
 >>>>>>> 4c8485dfcaa8d95cc1cbdd6b9d00f5984b0f01e2
+=======
+  import { hostURL } from '@/models/host';
+>>>>>>> 2e081ecc3d473cc7b232ffdd0f664797ad0b8910
 
   @Options ({
     props : {
@@ -29,7 +33,7 @@
       user:! User;
       VueAxios({
         url: '/users/addFriend',
-        baseURL: 'http://localhost:3000',
+        baseURL: hostURL +':3000',
         method: 'POST',
         withCredentials: true,
         data: {"id" : this.user.id},

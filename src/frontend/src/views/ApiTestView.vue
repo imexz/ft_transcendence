@@ -21,6 +21,7 @@
 <script lang="ts">
   import { Options, Vue } from 'vue-class-component';
   import VueAxios from 'axios';
+  import { hostURL } from '@/models/host';
 
   export default class ApiTest extends Vue {
     value = 'empty'
@@ -32,7 +33,7 @@
         console.log(this.body)
         VueAxios({
           url: this.text,
-          baseURL: 'http://localhost:3000',
+          baseURL: hostURL +':3000',
           method: this.method,
           withCredentials: true,
           // data : JSON.parse(this.body)
@@ -44,7 +45,7 @@
       else {
         VueAxios({
           url: this.text,
-          baseURL: 'http://localhost:3000',
+          baseURL: hostURL + ':3000',
           method: this.method,
           withCredentials: true,
           data : JSON.parse(this.body)

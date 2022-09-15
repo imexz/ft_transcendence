@@ -18,6 +18,7 @@
   import { Vue, Options } from 'vue-class-component';
   import ScoreCounter from '../components/ScoreCounter.vue'
   import io from "socket.io-client";
+  import { hostURL } from '@/models/host';
 
   @Options({
     components: {
@@ -34,8 +35,8 @@
       y: 0
     }
     created() {
-      this.socket = io("http://localhost:3000");
-      this.eventSource = new EventSource("http://localhost:3000/game/sse");
+      this.socket = io(hostURL + ":3000");
+      this.eventSource = new EventSource(hostURL + ":3000/game/sse");
       document.addEventListener('keydown', (event) => {
         console.log(event.key);
         if (event.key == 'w') {
@@ -63,6 +64,7 @@
         console.log(data);
         // this.$refs.game 
 				this.context = (this.$refs.game as any).getContext("2d");
+        this.context.fillStyle = "#FFFFFF";
 				this.position.x = data.ball.position.x;
 				this.position.y = data.ball.position.y;
 				this.context.clearRect(0, 0, (this.$refs.game as any).width, (this.$refs.game as any).height);
