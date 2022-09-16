@@ -1,6 +1,6 @@
 import { chatroom } from "../../chatroom/chatroom.entity";
 import { message } from "../../message/message.entity";
-import { Entity, Column, PrimaryGeneratedColumn, JoinColumn, OneToOne, PrimaryColumn, OneToMany, ManyToMany, JoinTable } from "typeorm";
+import { Entity, Column, PrimaryGeneratedColumn, JoinColumn, OneToOne, PrimaryColumn, OneToMany, ManyToMany, JoinTable, ManyToOne } from "typeorm";
 import { fileEntity } from "../../avatar/file.entitys";
 import { Exclude } from 'class-transformer';
 import { game } from "src/game/game.entity";
@@ -34,6 +34,10 @@ export class User {
 	@Column()
 	@Exclude()
 	avatar_url_42intra: string;
+
+	@OneToMany(() => chatroom, (chatroom) => chatroom.owner)
+	@JoinColumn()
+    owner_of: chatroom[];
 
 	@OneToOne(() => fileEntity, (avatar) => avatar.user) //{ onDelete: 'CASCADE' }
 	@JoinColumn()

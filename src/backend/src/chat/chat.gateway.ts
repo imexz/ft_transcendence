@@ -3,18 +3,35 @@ import { Socket, Server } from 'socket.io';
 import { message } from '../message/message.entity';
 import { ChatService } from './chat.service';
 
+// const io = require('socket.io')(server, {
+//   cors: {
+//       origin: "http://localhost:8100",
+//       methods: ["GET", "POST"],
+//       transports: ['websocket', 'polling'],
+//       credentials: true
+//   },
+//   allowEIO3: true
+// });
 
 @WebSocketGateway({
   cors: {
-    origin: '*',
-  }, namespace: 'chat' 
+    origin: "*",
+    // origin: ['http://localhost:8080', 'http://localhost:3000'],
+    // credentials: true
+  },
 }) //not shure
 export class ChatGateway {
 
-  @WebSocketServer()
-  server: Server;
+  // @WebSocketServer()
+  // server = new Server({allowEIO3: true});
+  // server = require("socket.io")(httpServer, {
+  //   allowEIO2: true // false by default
+  // });
+
+  // server: Server;
 
   constructor(private readonly chatService: ChatService) {}
+
   @SubscribeMessage('message')
   handleMessage(client: any, payload: any): string {
     return 'Hello world!';
@@ -31,6 +48,22 @@ export class ChatGateway {
     this.chatService.manageJoin(client.id, user_id, room_name)
 
   }
+
+  @SubscribeMessage('creat')
+  async creatRoom(
+    @MessageBody('id') user_id: number,
+    @MessageBody('room_name') room_name: string,  
+    @ConnectedSocket() client:Socket,
+  ) {
+    console.log("creat");
+    console.log(room_name);
+    console.log(user_id);
+    client.join(room_name);
+    await this.chatService.createRoom(client.id, user_id, room_name)
+    return await this.chatService.findAllRooms()
+    // this.chatService.manageJoin(client.id, user_id, room_name)
+  }
+
 
   @SubscribeMessage('leave')
   leaveRoom(
@@ -55,8 +88,15 @@ export class ChatGateway {
   }
 
   @SubscribeMessage('findAllMessages')
-  findAll(@MessageBody('room_name') room_name: string,) {
-    return this.chatService.findAll(room_name);
+  findAllMessages(@MessageBody('room_name') room_name: string,) {
+    return this.chatService.findAllMessages(room_name);
+  }
+
+  @SubscribeMessage('findAllRooms')
+  async findAllRooms() {
+    console.log("findAllRooms");
+    return await this.chatService.findAllRooms();
+      // return "test";
   }
 
   @SubscribeMessage('createMessage')

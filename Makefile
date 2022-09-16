@@ -14,6 +14,7 @@ re: down build up
 entry:
 	docker exec -d postgres /bin/bash ./test_entris.sh 
 
-	
+backend:
+	docker compose up backend
 
 

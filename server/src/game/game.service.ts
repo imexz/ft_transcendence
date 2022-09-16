@@ -48,6 +48,11 @@ export class GameService {
 		this.collisionControl();
 		if (this.checkScore())
 			this.resetBall();
+		console.log(this.paddleLeft.position.y);
+		// console.log(this.paddleLeft.position.x);
+		console.log(this.paddleRight.position.y);
+		// console.log(this.paddleRight.position.x);
+		
 		return {ball: this.ball, paddleLeft: this.paddleLeft, paddleRight: this.paddleRight, score: this.score};
 	}
 

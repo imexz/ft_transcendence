@@ -18,7 +18,14 @@ export class UsersService {
 		){}
 
 	async getFriends(id: number) {
-		const user = await this.usersRepository.findOneBy({id: id})
+		const user = await this.usersRepository.findOne({
+			where: {
+				id: id
+			},
+			relations: {
+				friends: true,
+			}
+		})
 		return user.friends
 	}
 
@@ -30,7 +37,7 @@ export class UsersService {
 	}
 
 	async findOne(id: number): Promise<User> {
-			console.log("test");
+			// console.log(id);
 			try{
 				const user = await this.usersRepository.findOneBy({id: id})
 				if(user == null) {
@@ -66,7 +73,7 @@ export class UsersService {
 		}
 		else {
 			user.avatar = file
-			user.avatar_url = "http://localhost:3000/avatar"			
+			user.avatar_url = "http://10.11.5.5:3000/avatar"			
 		}
 		this.usersRepository.update(id, user)
 	}

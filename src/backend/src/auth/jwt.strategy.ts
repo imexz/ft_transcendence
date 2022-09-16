@@ -32,11 +32,11 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
           'token' in req.cookies
         //  && req.cookies.l > 0
         ) {
-        console.log("extractJWT jwt sucess")
+        // console.log("extractJWT jwt sucess")
 
           return req.cookies.token;
         }
-        console.log("extractJWT jwt null")
+        // console.log("extractJWT jwt null")
 
         return null;
       }
