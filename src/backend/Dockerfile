@@ -7,7 +7,7 @@ COPY package*.json ./
 
 RUN npm install
 
-COPY . /home/data/
+# COPY . /home/data/
 
 WORKDIR /home/data/
 
