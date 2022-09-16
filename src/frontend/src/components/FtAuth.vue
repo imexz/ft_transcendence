@@ -7,18 +7,23 @@
 <script lang="ts">
   import { Vue } from 'vue-class-component';
   import VueAxios from 'axios';
+  import { hostURL } from '@/models/host';
 
   export default class FtAuth extends Vue {
   authenticate() {
-    location.href='http://localhost:3000/auth/login'
+    location.href=hostURL + ':3000/auth/login'
   }
-  async validateUser() {
-      await VueAxios
-        .get('http://localhost:3000/users/validate', { withCredentials: true})
-        .then(response => (
-          this.$store.state.validated = true,
-          this.$store.state.user = response.data))
-        .catch(error => (this.$store.state.validated = false))
+  validateUser() {
+      VueAxios({
+        url: '/users/validate',
+        baseURL: hostURL + ':3000',
+        method: 'GET',
+        withCredentials: true,
+      })
+      .then(response => (
+        this.$store.state.validated = true,
+        this.$store.state.user = response.data))
+      .catch(error => (this.$store.state.validated = false))
     }
   mounted() {
     this.validateUser()

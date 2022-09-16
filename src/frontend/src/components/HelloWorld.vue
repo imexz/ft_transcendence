@@ -44,6 +44,7 @@
 <script lang="ts">
 import { Options, Vue } from 'vue-class-component';
 import VueAxios from 'axios';
+import { hostURL } from '@/models/host';
 
 @Options({
   props: {
@@ -58,8 +59,12 @@ export default class HelloWorld extends Vue {
 
   protectedContent(): void {
       console.log(this.$store.getters.getUser)
-      VueAxios
-        .get('http://localhost:3000/users/validate', { withCredentials: true })
+      VueAxios({
+        url: '/users/validate',
+        baseURL: hostURL + ':3000',
+        method: 'GET',
+        withCredentials: true,
+      })
         .then(response => (this.res = response.data))
         .catch(error => (this.res = error.response))
   }
