@@ -15,10 +15,14 @@ export class AuthController{
 
 	@UseGuards(LocalAuthGuard)
 	@Get('login/callback')
-	@Redirect("http://10.11.5.5:8080/login", 302)
+	@Redirect("", 302)
 	callback(@Request() req, @Res({ passthrough: true }) res ) {
 		res.cookie("token", this.authService.login(req.user));
+		// res.Redirect = process.env.HOME + ":8080/login"
 		// {domain: "http://localhost:3000/", maxAge: 6000 , sameSite: 'lax'}
+		return {
+			url: process.env.HOST + ":8080/login"
+		}
 	}
 
 	@Get('protected')
