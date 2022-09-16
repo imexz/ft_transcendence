@@ -9,6 +9,9 @@ RUN npm install
 
 COPY . /home/data/
 
+WORKDIR /home/data/
+
+
 
 # RUN npm install -g @nestjs/cli
 # RUN npm install -g --save @nestjs/typeorm typeorm postgresql
