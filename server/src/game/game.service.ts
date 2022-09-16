@@ -2,9 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { GameObj } from './game.interfaces/gameobj.interface';
 import { BallObj } from './game.interfaces/ballobj.interface';
 import { PaddleObj } from './game.interfaces/paddleobj.interface';
-import { PosXY } from './game.interfaces/pos.interface';
 import { ScoreObj } from './game.interfaces/scoreobj.interface';
 
+//TODO: change values according to canvas size
 @Injectable()
 export class GameService {
 	ball: BallObj = {
@@ -45,7 +45,7 @@ export class GameService {
 
 	getData(): GameObj {
 		this.updateData();
-		this.collisionControll();
+		this.collisionControl();
 		if (this.checkScore())
 			this.resetBall();
 		return {ball: this.ball, paddleLeft: this.paddleLeft, paddleRight: this.paddleRight, score: this.score};
@@ -122,7 +122,7 @@ export class GameService {
 			}
 	}
 
-	collisionControll() {
+	collisionControl() {
 		if (this.ball.direction.x > 0) {
 			if ((this.ball.position.x + this.ball.radius) >= this.paddleRight.position.x &&
 				this.ball.position.y >= this.paddleRight.position.y &&
