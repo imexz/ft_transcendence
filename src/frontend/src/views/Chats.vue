@@ -31,7 +31,6 @@ import { Options, Vue } from 'vue-class-component';
 import { io } from 'socket.io-client';
 import { hostURL } from '@/models/host';
 import RoomSummary from '../components/RoomSummary.vue'
-import RoomSummary from '../components/RoomSummary.vue'
 
 @Options({
   components : {
