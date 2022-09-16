@@ -1,5 +1,5 @@
 <template>
-<div class="chat-container" v-else>
+<div class="chat-container">
       <div class="messages-container">
         <div v-for="message in messages">
           [{{ message.name }}]: {{ message.text}}
@@ -24,34 +24,43 @@
 </template>
 
 
-<script setup>
-
-export default {
-  props: ['room_name'],
-  props: ['socket'],
-  props: ['user_id']
-}
-
-const typingDiplay = ref('');
-const messageText = ref('');
-const messages = ref([]);
+<script lang="ts">
+import { onBeforeMount, ref } from 'vue';
+import { Options, Vue } from 'vue-class-component';
+import { io } from 'socket.io-client';
 
 
+@Options ({
+  props: {
+    socket: Object,
+    room_name: Object,
+  }
+})
 
-onBeforeMount(() => {
-    socket.emit('join', { room_name: room_name, user_id: user_id}, () => {
+
+export default class Chat extends Vue {
+  socket!: io;
+  room_name!: string;
+  typingDiplay = ref('');
+  messageText = ref('');
+  messages = ref([]);
+
+
+
+onBeforeMount(){
+    this.socket.emit('join', { room_name: this.room_name, user_id: this.user_id}, () => {
         // joined.value = true;
     })
 
-    socket.emit('findAllMessages', {room_name}, (response) => {
+    this.socket.emit('findAllMessages', {room_name}, (response) => {
         messages.value = response;
     });
 
-    socket.on('message', (message) => {
+    this.socket.on('message', (message) => {
         messages.value.push(message);
     });
 
-    socket.on('typing', ({name, isTyping}) => {
+    this.socket.on('typing', ({name, isTyping}) => {
         if(isTyping){
             typingDiplay.value = "${name} is typing...";
         } else {
@@ -73,7 +82,7 @@ const emitTyping = () => {
   timeout = setTimeout(() => {
     socket.emit('typing', { isTyping: false});
   }, 2000);
-};
+};}
 
 
 
