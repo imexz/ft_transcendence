@@ -9,10 +9,13 @@ build:
 down:
 	docker compose down
 
-re: down build up
+clean:
+	docker system prune -f --volumes --filter label=dangling=true
+
+re: down clean build up
 
 entry:
-	docker exec -d postgres /bin/bash ./test_entris.sh 
+	docker exec -d postgres /bin/bash ./test_entris.sh
 
 backend:
 	docker compose up backend

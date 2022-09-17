@@ -15,7 +15,7 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
 		super({
 			clientID: process.env.CLIENT_ID,
 			clientSecret: process.env.CLIENT_SECRET,
-			callbackURL: process.env.CALLBACK_URL,
+			callbackURL: process.env.HOST + ":3000/auth/login/callback",
 			profileFields: {
 				'name.givenName': 'first_name',
 				'id': function (obj) { return String(obj.id); },
