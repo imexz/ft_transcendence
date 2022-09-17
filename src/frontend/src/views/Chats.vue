@@ -1,10 +1,5 @@
 <template>
   <div>
-    <div class="room-container">
-      <div v-for="room in rooms">
-        [{{ room.id }}]: {{ room.name}}
-      </div>
-    </div>
     <div class="room-input">
       <form @submit.prevent="creat">
         <label>Create Room</label>
@@ -12,6 +7,19 @@
         <button type="submit">Send</button>
       </form>
     </div>
+    <div class="room-container">
+      <RoomSummary
+      v-for="room in rooms"
+        :room = room />
+        <!-- [{{ room.id }}]: {{ room.name}} -->
+    </div>
+    <div class="room-container">
+      <RoomSummary
+      v-for="room in rooms"
+        :room = room />
+        <!-- [{{ room.id }}]: {{ room.name}} -->
+    </div>
+
   </div>
 </template>
 
@@ -21,12 +29,20 @@
 import { onBeforeMount, ref } from 'vue';
 import { Options, Vue } from 'vue-class-component';
 import { io } from 'socket.io-client';
+import { hostURL } from '@/models/host';
+import RoomSummary from '../components/RoomSummary.vue'
+
+@Options({
+  components : {
+    RoomSummary,
+  }
+})
 
 
 export default class ChatsTest extends Vue {
 
 
-  socket = io('http://localhost:3000')
+  socket = io(hostURL + ":3000")
   rooms = ref([])
   name = ref('')
   id: number = 0
@@ -63,7 +79,6 @@ export default class ChatsTest extends Vue {
   mounted() {
     // console.log(this.name);
     this.id = this.$store.getters.getUser.id;
-
   }
 
 
@@ -72,7 +87,6 @@ export default class ChatsTest extends Vue {
     console.log(this.name);
     // this.id.value = 88081
     // console.log(this.$store.getters.getUser.id);
-
 
     this.socket.emit('creat', { room_name: this.name, id: this.id }, (response) => {
       this.rooms = response;
