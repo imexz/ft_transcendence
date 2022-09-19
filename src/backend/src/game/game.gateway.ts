@@ -1,6 +1,6 @@
 import { SubscribeMessage, WebSocketGateway } from '@nestjs/websockets';
 import { WebSocketServer } from '@nestjs/websockets';
-import { GameService } from '../game/game.service';
+import { GameService } from './game.service';
 import { Server } from 'socket.io';
 
 @WebSocketGateway({
@@ -8,7 +8,7 @@ import { Server } from 'socket.io';
 		origin: '*',
 	},
 })
-export class EventsGateway {
+export class GameGateway {
   @WebSocketServer()
   server: Server;
 
@@ -22,7 +22,7 @@ export class EventsGateway {
   handleMoveRightUp(): void {
 	this.gameService.movePaddleUp(false);
   }
-  
+
 
   @SubscribeMessage('moveLeftDown')
   handleMoveLeftDown(): void {
