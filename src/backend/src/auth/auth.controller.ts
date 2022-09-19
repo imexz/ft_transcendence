@@ -2,6 +2,7 @@ import {Redirect, Controller, Request, Get, Param, UseGuards, Delete, Res } from
 import { LocalAuthGuard } from './local-auth.guard'
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './jwt-auth.guard';
+import { hostURL } from '../hostURL';
 
 @Controller('auth')
 export class AuthController{
