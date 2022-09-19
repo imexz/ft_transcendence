@@ -73,7 +73,7 @@ export class UsersService {
 		}
 		else {
 			user.avatar = file
-			user.avatar_url = "http://10.11.5.5:3000/avatar"			
+			user.avatar_url = process.env.HOST + "/avatar"
 		}
 		this.usersRepository.update(id, user)
 	}
@@ -92,10 +92,10 @@ export class UsersService {
 	async addfriend(user_id: number, friend_id: number) {
 		console.log(user_id);
 		console.log(friend_id);
-		
+
 		if(!user_id || !friend_id) {
 			console.log("freind or user null");
-			
+
 			return null
 		}
 		try{
@@ -116,7 +116,7 @@ export class UsersService {
 			// tmp = [user_friend];
 			// if (user[0].friends != undefined) {
 			// 	console.log("has already friends");
-				
+
 			// 	user[0].friends.forEach(element => {
 			// 		tmp.push(element)
 			// 	});
@@ -139,7 +139,7 @@ export class UsersService {
 			// 	})
 			// 	new User(, user.unique_name, , , );
 
-			
+
 			// tmp.push(user_friend);
 			// (await user).friends = user_friend;
 			// (await user).friends.fill(await user_friend)
