@@ -63,20 +63,14 @@ export default class ChatsTest extends Vue {
   mounted() {
     // console.log(this.name);
     this.id = this.$store.getters.getUser.id;
-
   }
 
 
   creat()
   {
-    console.log(this.name);
-    // this.id.value = 88081
-    // console.log(this.$store.getters.getUser.id);
-
-
     this.socket.emit('creat', { room_name: this.name, id: this.id }, (response) => {
       this.rooms = response;
-      console.log(response);
+      // console.log(response);
     });
   }
 }
