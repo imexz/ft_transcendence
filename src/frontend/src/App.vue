@@ -1,5 +1,6 @@
 <template>
   <NavBar></NavBar>
+  <hr/>
   <!-- <img alt="Pong Logo" src="./assets/pong_logo.jpg"> -->
   <router-view/>
 </template>

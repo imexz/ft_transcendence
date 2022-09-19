@@ -5,16 +5,22 @@
       :link="site.link"
       :label="site.label"
       :type="site.type"></NavButton>
+      <FtAuth/>
   </nav>
 </template>
 
 <script lang="ts">
   import { Vue, Options } from 'vue-class-component';
   import NavButton from './NavButton.vue';
+  import FtAuth from '../Auth/FtAuth.vue';
+
+import LogoutButton from '../Auth/LogoutButton.vue';
 
   @Options({
     components: {
-      NavButton
+      NavButton,
+      FtAuth,
+      LogoutButton,
     }
   })
 

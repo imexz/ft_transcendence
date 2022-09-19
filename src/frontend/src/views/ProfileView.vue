@@ -24,12 +24,7 @@
 
   export default class ProileView extends Vue {
     id!:string
-
-    beforCreate(): void {
-      if (!this.$store.getters.isLogged) {
-        this.$router.push({ name: 'login'})
-      }
-    }
+    
     }
 </script>
 

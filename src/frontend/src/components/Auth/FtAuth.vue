@@ -1,6 +1,13 @@
 <template>
   <div>
-    <button @click="authenticate">42 AUTH</button>
+    <button 
+      v-if="!this.$store.getters.isLogged"
+      class="authButton"
+      @click="authenticate">42 AUTH</button>
+    <button
+      v-else
+      class="authButton"
+      @click="logout">Logout</button>
   </div>
 </template>
 
@@ -11,6 +18,10 @@
   export default class FtAuth extends Vue {
     created(): void {
       
+  }
+  logout(): void {
+      this.$store.dispatch('logOut');
+      this.$router.push('/login');
   }
   authenticate() {
     location.href= API_URL + '/auth/login'
@@ -32,3 +43,9 @@
   }
   }
 </script>
+
+<style>
+  .authButton{
+    float: right;
+  }
+</style>

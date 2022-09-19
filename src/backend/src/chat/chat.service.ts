@@ -8,6 +8,31 @@ import { chatroom } from '../chatroom/chatroom.entity';
 @Injectable()
 export class ChatService {
 
+
+  async createRoom(id: string, user_id: number, room_name: string) {
+    const user = await this.userRepository.findOneBy({id: user_id})
+    if(user_id == null)
+        return
+    user.clientId = id;
+    await this.userRepository.update(user.id, user);
+    var room = await this.chatroomRepository.findOneBy({name: room_name})
+    if(room == null){
+        room = this.chatroomRepository.create()
+        room.name = room_name
+        room.owner = user;
+        room.admins = [user]
+        room.Users = [user]
+        await this.chatroomRepository.save(room)
+    }
+  }
+
+
+  async findAllRooms(): Promise<chatroom[]> {
+    const rooms =  await this.chatroomRepository.find()
+    console.log(rooms);
+    return rooms
+  }
+
     async manageLeave(id: string, room_name: string) {
 
     const user = await this.userRepository.findOne({
@@ -88,7 +113,7 @@ export class ChatService {
     // create(createMessageDto: CreateMessageDto, id: string) {
     //     throw new Error('Method not implemented.');
     //   }
-      async findAll(room_name: string) {
+      async findAllMessages(room_name: string) {
         const chatroom = await this.chatroomRepository.findOne({
             where: {
                 name: room_name

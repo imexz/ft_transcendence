@@ -1,22 +1,12 @@
 <template>
   <div>
-    <FtAuth v-if="!this.$store.getters.isLogged"></FtAuth>
-    <LogoutButton v-else></LogoutButton>
+    <h1 v-if="!this.$store.getters.isLogged">Please login</h1>
+    <h1 v-else>Already logged in</h1>
   </div>
 </template>
 
 <script lang ="ts">
-  import { Vue, Options } from 'vue-class-component';
-  import FtAuth from '@/components/Auth/FtAuth.vue';
-  import LogoutButton from '@/components/Auth/LogoutButton.vue';
-
-
-  @Options({
-    components: {
-      FtAuth,
-      LogoutButton,
-    }
-  })
+  import { Vue } from 'vue-class-component';
 
   export default class LoginView extends Vue {
   }
