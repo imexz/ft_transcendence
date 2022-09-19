@@ -12,7 +12,7 @@
   import { Options, Vue } from 'vue-class-component';
   import VueAxios from 'axios';
   import User from '@/models/user'
-  import { hostURL } from '@/models/host';
+  import { host_URL } from '@/models/host';
 
   @Options ({
     props : {
@@ -26,7 +26,7 @@
     addFriend(): void {
       VueAxios({
         url: '/users/addFriend',
-        baseURL: hostURL +':3000',
+        baseURL: host_URL,
         method: 'POST',
         withCredentials: true,
         data: {"id" : this.user.id},

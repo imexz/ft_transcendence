@@ -1,6 +1,6 @@
 <template>
   <div>
-    <FtAuth v-if="!this.$store.getters.isValidated"></FtAuth>
+    <FtAuth v-if="!this.$store.getters.isLogged"></FtAuth>
     <LogoutButton v-else></LogoutButton>
   </div>
 </template>
@@ -18,5 +18,6 @@
     }
   })
 
-  export default class LoginView extends Vue {}
+  export default class LoginView extends Vue {
+  }
 </script>

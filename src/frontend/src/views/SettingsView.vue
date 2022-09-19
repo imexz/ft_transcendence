@@ -15,7 +15,11 @@
   })
 
  export default class SettingsVue extends Vue {
-
+  beforCreate(): void {
+      if (!this.$store.getters.isLogged) {
+        this.$router.push({ name: 'login'})
+      }
+    }
  }
 
 </script>

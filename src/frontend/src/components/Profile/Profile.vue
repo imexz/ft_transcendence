@@ -8,7 +8,7 @@
 <script lang="ts">
   import { Vue, Options } from 'vue-class-component';
   import User from '@/models/user';
-  import { hostURL } from '@/models/host';
+  import { API_URL } from '@/models/host';
   import VueAxios from 'axios';
 
   @Options ({
@@ -28,7 +28,7 @@
         else{
           VueAxios({
             url: '/users/find/' + this.pid.toString(),
-            baseURL: hostURL + ':3000',
+            baseURL: API_URL,
             method: 'GET',
             withCredentials: true,
           })
@@ -43,7 +43,7 @@
       else{
         VueAxios({
           url: '/users/find/' + this.pid.toString(),
-          baseURL: hostURL + ':3000',
+          baseURL: API_URL,
           method: 'GET',
           withCredentials: true,
         })

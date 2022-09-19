@@ -18,7 +18,7 @@
   import { Vue, Options } from 'vue-class-component';
   import ScoreCounter from '@/components/Game/ScoreCounter.vue'
   import io from "socket.io-client";
-  import { hostURL } from '@/models/host';
+  import { API_URL } from '@/models/host';
 
   @Options({
     components: {
@@ -35,8 +35,8 @@
       y: 0
     }
     created() {
-      this.socket = io(hostURL + ":3000");
-      this.eventSource = new EventSource(hostURL + ":3000/game/sse");
+      this.socket = io(API_URL);
+      this.eventSource = new EventSource(API_URL + "/game/sse");
       document.addEventListener('keydown', (event) => {
         console.log(event.key);
         if (event.key == 'w') {
