@@ -37,6 +37,11 @@ export class ChatGateway {
     return 'Hello world!';
   }
 
+  handleConnection() {
+    console.log('connected')
+  }
+
+
   @SubscribeMessage('join')
   joinRoom(
     @MessageBody('user_id') user_id: number,
@@ -44,6 +49,7 @@ export class ChatGateway {
     @ConnectedSocket() client:Socket,
   ) {
     console.log("join");
+    console.log(user_id);
     client.join(room_name)
     this.chatService.manageJoin(client.id, user_id, room_name)
 
@@ -81,6 +87,9 @@ export class ChatGateway {
     @MessageBody('room_name') room_name: string,  
     @ConnectedSocket() client:Socket,
   ) {
+    console.log("recive typing");
+    console.log(client.id)
+    
     const name = await this.chatService.getClientName(client.id);
 
     client.to(room_name).emit('typing', {name, isTyping});
@@ -89,12 +98,22 @@ export class ChatGateway {
 
   @SubscribeMessage('findAllMessages')
   findAllMessages(@MessageBody('room_name') room_name: string,) {
+    console.log('findAllMessages');
+    console.log(room_name);
+    
     return this.chatService.findAllMessages(room_name);
+    // return {test};
   }
 
   @SubscribeMessage('findAllRooms')
-  async findAllRooms() {
+  async findAllRooms(
+    @MessageBody('id') id: number,
+    @ConnectedSocket() client: Socket,
+  ) {
     console.log("findAllRooms");
+    console.log(id);
+    console.log(client.id)
+    await this.chatService.addClientIdToUser(client.id, id);
     return await this.chatService.findAllRooms();
       // return "test";
   }
@@ -106,14 +125,16 @@ export class ChatGateway {
   @ConnectedSocket() client: Socket,
   ) {
     console.log("createMessage");
+    console.log(room_name);
+    console.log(content);
     
-  const message = await this.chatService.createMessage(client.id, room_name, content);
+    const message = await this.chatService.createMessage(client.id, room_name, content);
 
     console.log("emit mesage");
     client.to(room_name).emit('message', message);
 
-  return message;
-}
+    return message;
+  }
 }
 
 

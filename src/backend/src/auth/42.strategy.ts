@@ -75,8 +75,8 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
 		// this.logger.log("test")
 
 		// this.logger.log(tmp)
-		var tmp: User[];
-		user = await this.authService.addUser(user)
+		// var tmp: User[];
+		// user = await this.authService.addUser(user)
 		// cb(err, user, err.info)
 		this.logger.log("return validate")
 
