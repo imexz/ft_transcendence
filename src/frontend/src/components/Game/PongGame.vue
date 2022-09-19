@@ -26,7 +26,6 @@
     }
   })
 
-<<<<<<< HEAD:src/frontend/src/components/Game/PongGame.vue
   export default class PongGame extends Vue {
     socket:any = {}
     context:any = {}
@@ -54,35 +53,6 @@
         }
       }, false);
     }
-=======
-export default class PongGame extends Vue {
-	socket:any = {}
-	context:any = {}
-	eventSource:any = {}
-	position:any = {
-		x: 0,
-		y: 0
-	}
-	created() {
-		this.socket = io(hostURL + ":3000");
-		this.eventSource = new EventSource(hostURL + ":3000/game/sse");
-		document.addEventListener('keydown', (event) => {
-			console.log(event.key);
-			if (event.key == 'w') {
-				this.paddleLeftUp();
-			}
-			else if (event.key == 's') {
-				this.paddleLeftDown();
-			}
-			else if (event.key == 'ArrowUp') {
-				this.paddleRightUp();
-			}
-			else if (event.key == 'ArrowDown') {
-				this.paddleRightDown();
-			}
-		}, false);
-	}
->>>>>>> b00b9ddccc62d3d1132324455305f5efd5a6c45b:src/frontend/src/components/PongGame.vue
 
 	mounted() {
 		this.eventSource.onmessage = (raw_data:  any) => {
