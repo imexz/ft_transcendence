@@ -45,11 +45,11 @@ const routes: Array<RouteRecordRaw> = [
     name: 'play',
     component: () => import('../views/PlayView.vue')
   },
-  {
-    path: '/chats',
-    name: 'Chats',
-    component: () => import('../views/Chats.vue')
-  }    
+  // {
+  //   path: '/chats',
+  //   name: 'Chats',
+  //   component: () => import('../views/Chats.vue')
+  // }    
 ]
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
