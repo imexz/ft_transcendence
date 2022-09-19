@@ -12,7 +12,7 @@ COPY . /app/
 
 WORKDIR /app/
 
-RUN npm run build
+# RUN npm run build
 
 
 #exposing the port and run the server

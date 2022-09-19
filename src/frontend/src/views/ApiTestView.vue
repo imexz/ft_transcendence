@@ -24,11 +24,6 @@
   import { API_URL } from '@/models/host';
 
   export default class ApiTest extends Vue {
-    beforCreate(): void {
-      if (!this.$store.getters.isLogged) {
-        this.$router.push({ name: 'login'})
-      }
-    }
     value = 'empty'
     body = ''
     method !: string 

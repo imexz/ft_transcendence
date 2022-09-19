@@ -35,7 +35,7 @@
         .catch()
     }
     viewProfile(id: number){
-      this.$router.push('/profile/' + id)
+      this.$router.push('/profile/' + id.toString());
     }
   }
 </script>

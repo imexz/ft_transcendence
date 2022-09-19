@@ -19,9 +19,8 @@ import { chatroom } from './chatroom/chatroom.entity';
 import { ChatModule } from './chat/chat.module';
 import { game } from './game/game.entity';
 import { GameModule } from './game/game.module';
-import { EventsModule } from './events/events.module';
 import { GameController } from './game/game.controller';
-import { EventsGateway } from './events/events.gateway';
+import { GameGateway } from './game/game.gateway';
 import { GameService } from './game/game.service';
 
 
@@ -55,10 +54,9 @@ import { GameService } from './game/game.service';
 	MessageModule,
 	ChatModule,
 	GameModule,
-	EventsModule,
 ],
-	controllers: [GameController],	
-	providers: [ChatGateway, MessageService, ChatroomService, GameService, EventsGateway],
+	controllers: [GameController],
+	providers: [ChatGateway, MessageService, ChatroomService, GameService, GameGateway, MessageService, ChatroomService],
 })
 export class AppModule {
 	constructor(private dataSource: DataSource) {}

@@ -47,12 +47,13 @@ export class UsersController {
 	@UseGuards(JwtAuthGuard)
 	@UseInterceptors(ClassSerializerInterceptor)
 	validate(@Request() req): Promise<User> {
-		// console.log("inside validate");
+		console.log("inside validate");
+		console.log(req.user);
+
 		const user = this.usersService.findOne(req.user.id)
 		// console.log(user);
 		return user
 	}
-
 
 	@Post('update_name')
 	@UseGuards(JwtAuthGuard)
@@ -64,6 +65,5 @@ export class UsersController {
 	delete(@Request() req) {
 		this.usersService.remove(req.user.id)
 	}
-
 
 }

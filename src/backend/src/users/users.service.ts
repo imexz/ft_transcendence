@@ -19,7 +19,14 @@ export class UsersService {
 		){}
 
 	async getFriends(id: number) {
-		const user = await this.usersRepository.findOneBy({id: id})
+		const user = await this.usersRepository.findOne({
+			where: {
+				id: id
+			},
+			relations: {
+				friends: true,
+			}
+		})
 		return user.friends
 	}
 
@@ -31,7 +38,7 @@ export class UsersService {
 	}
 
 	async findOne(id: number): Promise<User> {
-			console.log("test");
+			// console.log(id);
 			try{
 				const user = await this.usersRepository.findOneBy({id: id})
 				if(user == null) {
@@ -86,10 +93,10 @@ export class UsersService {
 	async addfriend(user_id: number, friend_id: number) {
 		console.log(user_id);
 		console.log(friend_id);
-		
+
 		if(!user_id || !friend_id) {
 			console.log("freind or user null");
-			
+
 			return null
 		}
 		try{
@@ -110,7 +117,7 @@ export class UsersService {
 			// tmp = [user_friend];
 			// if (user[0].friends != undefined) {
 			// 	console.log("has already friends");
-				
+
 			// 	user[0].friends.forEach(element => {
 			// 		tmp.push(element)
 			// 	});
@@ -133,7 +140,7 @@ export class UsersService {
 			// 	})
 			// 	new User(, user.unique_name, , , );
 
-			
+
 			// tmp.push(user_friend);
 			// (await user).friends = user_friend;
 			// (await user).friends.fill(await user_friend)
