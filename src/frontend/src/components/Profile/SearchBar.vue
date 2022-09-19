@@ -17,7 +17,7 @@
   import User from '@/models/user';
   import UserSummary from './UserSummary.vue';
   import VueAxios from 'axios';
-  import { hostURL } from '@/models/host';
+  import { API_URL } from '@/models/host';
 
 
   @Options ({
@@ -43,7 +43,7 @@
     mounted() {
       VueAxios({
         url: '/users/allUser',
-        baseURL: hostURL + ':3000',
+        baseURL: API_URL,
         method: 'GET',
         withCredentials: true,
       })

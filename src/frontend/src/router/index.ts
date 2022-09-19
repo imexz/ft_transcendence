@@ -1,14 +1,14 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
+
 
 import store from '../store/index'
-import { defineAsyncComponent } from 'vue'
+
 
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
     name: 'home',
-    component: HomeView
+    component: () => import('../views/HomeView.vue')
   },
   {
     path: '/api_test',
@@ -51,9 +51,12 @@ const router = createRouter({
   routes
 })
 
-router.beforeEach((to,from) => {
-  if (to.name != 'login' && !store.getters.isValidated) {
-    return { name: 'login' };
+router.beforeEach(async (to) => {
+  const publicPages = ['/login'];
+  const authRequired = !publicPages.includes(to.path);
+
+  if (authRequired && !store.getters.isLogged) {
+    return 'login';
   }
 })
 

@@ -10,7 +10,6 @@
   import UserSummary from '../components/Profile/UserSummary.vue';
   import SearchBar from '@/components/Profile/SearchBar.vue';
   import Profile from '@/components/Profile/Profile.vue';
-import { computed } from '@vue/reactivity';
 
   @Options ({
     props: {
@@ -26,11 +25,11 @@ import { computed } from '@vue/reactivity';
   export default class ProileView extends Vue {
     id!:string
 
-    mounted(): void {
-      this.$forceUpdate()
-      console.log(this.id)
+    beforCreate(): void {
+      if (!this.$store.getters.isLogged) {
+        this.$router.push({ name: 'login'})
+      }
     }
-
     }
 </script>
 
