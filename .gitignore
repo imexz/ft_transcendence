@@ -1,2 +1,2 @@
 # uncomment before submitting project!
-# .env
+*.env
