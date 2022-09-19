@@ -9,6 +9,7 @@
   "dependencies": {
     "axios": "^0.27.2",
     "core-js": "^3.8.3",
+    "fortawesome": "^0.0.1-security",
     "socket.io": "^4.5.2",
     "socket.io-client": "^4.5.2",
     "vue": "^3.2.13",

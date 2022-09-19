@@ -25,64 +25,64 @@
 
 
 <script lang="ts">
-import { onBeforeMount, ref } from 'vue';
-import { Options, Vue } from 'vue-class-component';
-import { io } from 'socket.io-client';
+// import { onBeforeMount, ref } from 'vue';
+// import { Options, Vue } from 'vue-class-component';
+// import { io } from 'socket.io-client';
 
 
-@Options ({
-  props: {
-    socket: Object,
-    room_name: Object,
-  }
-})
+// @Options ({
+//   props: {
+//     socket: Object,
+//     room_name: Object,
+//   }
+// })
 
 
-export default class Chat extends Vue {
-  socket!: io;
-  room_name!: string;
-  typingDiplay = ref('');
-  messageText = ref('');
-  messages = ref([]);
+// export default class Chat extends Vue {
+//   socket: any
+//   room_name!: string;
+//   typingDiplay = ref('');
+//   messageText = ref('');
+//   messages = ref([]);
 
 
 
-onBeforeMount(){
-    this.socket.emit('join', { room_name: this.room_name, user_id: this.user_id}, () => {
-        // joined.value = true;
-    })
+// onBeforeMount(){
+//     this.socket.emit('join', { room_name: this.room_name, user_id: user_id}, () => {
+//         // joined.value = true;
+//     })
 
-    this.socket.emit('findAllMessages', {room_name}, (response) => {
-        messages.value = response;
-    });
+//     this.socket.emit('findAllMessages', {this.room_name}, (response) => {
+//         messages.value = response;
+//     });
 
-    this.socket.on('message', (message) => {
-        messages.value.push(message);
-    });
+//     this.socket.on('message', (message) => {
+//         messages.value.push(message);
+//     });
 
-    this.socket.on('typing', ({name, isTyping}) => {
-        if(isTyping){
-            typingDiplay.value = "${name} is typing...";
-        } else {
-            typingDiplay.value = '';
-        }
-    });
-}
+//     this.socket.on('typing', ({name, isTyping}) => {
+//         if(isTyping){
+//             typingDiplay.value = "${name} is typing...";
+//         } else {
+//             typingDiplay.value = '';
+//         }
+//     });
+// }
 
 
-const sendMessage = () => {
-  socket.emit('createMessage', { text: messageText.value}, () => {
-    messageText.value = '';
-  })
-}
+// const sendMessage = () => {
+//   socket.emit('createMessage', { text: messageText.value}, () => {
+//     messageText.value = '';
+//   })
+// }
 
-let timeout;
-const emitTyping = () => {
-  socket.emit('typing', {isTyping: true});
-  timeout = setTimeout(() => {
-    socket.emit('typing', { isTyping: false});
-  }, 2000);
-};}
+// let timeout;
+// const emitTyping = () => {
+//   socket.emit('typing', {isTyping: true});
+//   timeout = setTimeout(() => {
+//     socket.emit('typing', { isTyping: false});
+//   }, 2000);
+// };}
 
 
 

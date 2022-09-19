@@ -16,7 +16,7 @@
   import VueAxios from 'axios';
   import { API_URL } from '@/models/host';
   export default class FtAuth extends Vue {
-    created(): void {
+  created(): void {
       
   }
   logout(): void {

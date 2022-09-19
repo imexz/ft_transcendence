@@ -14,13 +14,10 @@
   import NavButton from './NavButton.vue';
   import FtAuth from '../Auth/FtAuth.vue';
 
-import LogoutButton from '../Auth/LogoutButton.vue';
-
   @Options({
     components: {
       NavButton,
       FtAuth,
-      LogoutButton,
     }
   })
 
