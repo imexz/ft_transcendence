@@ -1,1 +1,1 @@
-export const hostURL = "http://localhoat";
+export const hostURL = "http://localhost";

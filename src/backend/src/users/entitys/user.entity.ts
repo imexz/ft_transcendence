@@ -46,7 +46,7 @@ export class User {
 	@ManyToMany(() => User)
 	@JoinTable({ joinColumn: { name: 'users_id_1' } })
 	friends: User[];
-
+	
 	@Column({nullable: true})
 	current_status: number;
 
@@ -68,6 +68,11 @@ export class User {
 	@OneToOne(() => game, (game) => game.palyer)
 	games: game[];
 
+	//   @ManyToMany(() => User, user => user.receivedRequests)
+	//   @JoinTable({joinColumn: {name: 'senderId'}})
+	//   sendRequest: User[]
 
+	//   @ManyToMany(() => User, user => user.sendRequest)
+	//   receivedRequests: User[]
 
 }

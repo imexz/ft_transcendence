@@ -1,3 +1,4 @@
+
 <template>
   <div>
     <div class="room-input">
@@ -8,19 +9,25 @@
       </form>
     </div>
     <div class="room-container">
-      <RoomSummary
-      v-for="room in rooms"
-        :room = room />
-        <!-- [{{ room.id }}]: {{ room.name}} -->
+      <SocketContext1.Provider value={socket}>
+        <RoomSummary
+        v-for="room in rooms"
+          :room = room
+          :socket = socket1 />
+      </SocketContext1.Provider>
     </div>
-    <div class="room-container">
-      <RoomSummary
-      v-for="room in rooms"
-        :room = room />
-        <!-- [{{ room.id }}]: {{ room.name}} -->
-    </div>
+      <!-- [{{ room.id }}]: {{ room.name}} -->
+    <!-- <div v-if=room_name class="test">
+      <Chat
+        :socket = socket
+        :room_name = room_name.value />     
+    </div> -->
+    <h1>
+      "geht das heir"
+    </h1>
 
   </div>
+
 </template>
 
 
@@ -31,6 +38,8 @@ import { Options, Vue } from 'vue-class-component';
 import { io } from 'socket.io-client';
 import { hostURL } from '@/models/host';
 import RoomSummary from '../components/RoomSummary.vue'
+import {SocketContext, socket} from '../context/socket';
+
 
 @Options({
   components : {
@@ -41,11 +50,13 @@ import RoomSummary from '../components/RoomSummary.vue'
 
 export default class ChatsTest extends Vue {
 
-
-  socket = io(hostURL + ":3000")
+  // socket = io(hostURL + ":3000")
   rooms = ref([])
+  room_name = ref('')
   name = ref('')
   id: number = 0
+  SocketContext1 = SocketContext;
+  socket1 = socket;
 
 
   // setup() {
@@ -65,26 +76,26 @@ export default class ChatsTest extends Vue {
   beforeMount(){
     // console.log(this.$store.getters.getUser);
     
-    // this.id.value = this.$store.getters.getUser.id;
-    // this.id.value = 88081
-      this.socket.emit('findAllRooms', {}, (response) => {
-      this.rooms = response;
-      console.log(response);
-      console.log(this.rooms.value);
-    });
 
+
+    // this.id = this.$store.getters.getUser.id;
   };
 
-  
   mounted() {
     // console.log(this.name);
     this.id = this.$store.getters.getUser.id;
+    // this.id.value = 88081
+      this.socket.emit('findAllRooms', {id: this.id}, (response) => {
+        this.rooms = response;
+        console.log(response);
+        console.log(this.rooms.value);
+    });
   }
 
 
   creat()
   {
-    console.log(this.name);
+    // console.log(this.name);
     // this.id.value = 88081
     // console.log(this.$store.getters.getUser.id);
 
@@ -97,7 +108,7 @@ export default class ChatsTest extends Vue {
 
 </script>
 
-// @import '../assets/base.css';
+<!-- // @import '../assets/base.css'; -->
 
 <style>
 
