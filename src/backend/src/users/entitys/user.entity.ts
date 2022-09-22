@@ -40,7 +40,7 @@ export class User {
 	@JoinColumn()
     owner_of: chatroom[];
 
-	@OneToOne(() => fileEntity, (avatar) => avatar.user) //{ onDelete: 'CASCADE' }
+	@OneToOne(() => fileEntity, (avatar) => avatar.user, {onDelete: 'SET NULL'}) //{ onDelete: 'CASCADE' }
 	@JoinColumn()
 	avatar :fileEntity;
 
@@ -70,6 +70,11 @@ export class User {
 	@JoinTable()
 	games: game[];
 
+	@Column({ nullable: true })
+  	twoFactorAuthenticationSecret?: string;
+
+	  @Column({ default: false })
+	  public isTwoFactorAuthenticationEnabled: boolean;
 	//   @ManyToMany(() => User, user => user.receivedRequests)
 	//   @JoinTable({joinColumn: {name: 'senderId'}})
 	//   sendRequest: User[]

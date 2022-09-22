@@ -16,16 +16,23 @@ export class AvatarService {
     ){}
         
     getFile(id: number) {
-        return this.fileRepository.findOneBy({id: id})
+        return await this.fileRepository.findOneBy({id: id})
     }
 
     async add(id: number, file: Express.Multer.File) {
-        const tmp = this.fileRepository.create({id: id, filename: file.originalname, data: file.buffer});
-        this.usersService.updateAvatar(id, await this.fileRepository.save(tmp))
+        var avatar = await this.fileRepository.findOneBy({id: id})
+        if(avatar == undefined) {
+            avatar = this.fileRepository.create({id: id, filename: file.originalname, data: file.buffer});
+        } else {
+            avatar.filename = file.originalname
+            avatar.data = file.buffer
+        }
+
+        await this.usersService.updateAvatar(id, await this.fileRepository.save(avatar))
     }
 
     async delete(id: number) {
-        this.usersService.updateAvatar(id, null)
-        this.fileRepository.delete({id: id})
+        await this.fileRepository.delete({id: id})
+        await this.usersService.updateAvatar(id, null)
     }
 }

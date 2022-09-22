@@ -1,8 +1,17 @@
 <template>
-      <div>
+      <!-- <div>
         <input type="file" @change="uploadFile">
         <button @click="ChangeUserAvatar">Upload!</button>
+      </div> -->
+      <div>
+        <form @submit.prevent="ChangeUserAvatar">
+          <input type="file" @change="uploadFile">
+          <button>Submit</button>
+        </form>
+        <button @click="deleteFile">Delete</button>
       </div>
+
+
 </template>
   
   <script lang="ts">
@@ -16,30 +25,56 @@
     newName : string = '';
     selectedFile: any = null;
     ChangeUserAvatar(): void {
-      // VueAxios({
-      //   url: '/avatar',
-      //   baseURL: hostURL + ':3000',
-      //   method: 'POST',
-      //   withCredentials: true,
-      //   data : { 'name' : this.newName}
-      // })
       const fd = new FormData()
+      console.log(this.selectedFile.name);
       fd.append('image', this.selectedFile, this.selectedFile.name)
-      axios.post(hostURL + ':3000' + '/avatar', fd, 
-      {
-        onUploadProgress: uploadEvent => {
-          console.log('Uplad Progress: ' + Math.round(uploadEvent.loaded / uploadEvent.total * 100) + "%")
-        }
-      }
-      )
-      .then(res => {
-        console.log(res)
+      VueAxios({
+        url: '/avatar',
+        baseURL: hostURL + ':3000',
+        method: 'POST',
+        withCredentials: true,
+        data: fd
       })
+      .then(response => {
+        console.log(response),
+        VueAxios({
+          url: '/users/validate',
+          baseURL: hostURL + ':3000',
+          method: 'GET',
+          withCredentials: true,
+        })
+        .then(response => (
+          this.$store.state.validated = true,
+          this.$store.state.user = response.data))
+        .catch(error => (this.$store.state.validated = false))})
+      .catch(error => { console.log(error)})
     }
-    uploadFile(event ) {
+    
+    uploadFile(event) {
         console.log(event);
         this.selectedFile = event.target.files[0]
-        
+    }
+
+    deleteFile() {
+      VueAxios({
+        url: '/avatar',
+        baseURL: hostURL + ':3000',
+        method: 'DELETE',
+        withCredentials: true,
+      })
+      .then(response => {
+        console.log(response),
+        VueAxios({
+          url: '/users/validate',
+          baseURL: hostURL + ':3000',
+          method: 'GET',
+          withCredentials: true,
+        })
+        .then(response => (
+          this.$store.state.validated = true,
+          this.$store.state.user = response.data))
+        .catch(error => (this.$store.state.validated = false))})
+      .catch(error => { console.log(error)})
     }
 
   }

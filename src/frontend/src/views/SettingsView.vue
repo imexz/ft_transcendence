@@ -1,5 +1,5 @@
 <template>
-  <h1>ChangeUserName</h1>
+  <h1>Settings</h1>
   <ChangeUserName/>
   <ChangeUserAvatar/>
 </template>
