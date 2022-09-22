@@ -1,6 +1,5 @@
-import { PosXY } from "./pos.interface";
-
-export interface PaddleObj {
+import { PosXY } from "../game.interfaces/pos.interface";
+export class Paddle {
 	width: number;
 	height: number;
 	position: PosXY;
