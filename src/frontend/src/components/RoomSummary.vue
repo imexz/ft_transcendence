@@ -5,7 +5,6 @@
         <!-- <span>{{joined}}</span> -->
         <div v-if=joined class="test">
           <Chat
-          :socket = socket
           :room_name = room.name />     
         </div>
       </div>
@@ -17,11 +16,9 @@
 import Room from '@/models/room';
 import Chat from '@/components/Chat.vue';
 import { Options, Vue } from 'vue-class-component';
-import { Socket } from 'socket.io-client';
+// import { Socket } from 'socket.io-client';
 import room from '@/models/room';
 import { DefaultEventsMap } from '@socket.io/component-emitter';
-import React, {useState, useContext, useCallback, useEffect} from 'react';
-import { SocketContext } from '../context/socket';
 
     @Options ({
       components: {
@@ -39,7 +36,7 @@ import { SocketContext } from '../context/socket';
         button_text = "join";  
         room!: Room;
         // socket!: Socket<DefaultEventsMap, DefaultEventsMap>;
-        socket = useContext(SocketContext);
+        // socket = socket;
 
 
         // mounted() {

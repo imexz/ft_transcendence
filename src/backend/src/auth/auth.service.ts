@@ -14,7 +14,7 @@ export class AuthService {
 			console.log("all good");
 			return user;
 		} catch(err) {
-			console.log("hier");
+			console.log("validateUser error");
 			console.log(err);
 			throw err;
 		}

@@ -48,7 +48,8 @@ export class ChatService {
             clientId: id
         },
         relations: {
-            chatrooms: true
+            chatrooms: true,
+            admin_of: true
         }
     })
     if (user != null) {
@@ -63,7 +64,11 @@ export class ChatService {
                 user.chatrooms.splice(i)
             }
             await this.userRepository.save(user)
+
+
         }
+
+        // user.chatrooms.
 
     }
 
@@ -122,32 +127,47 @@ export class ChatService {
         private messageRepository: Repository<message>,
         @InjectRepository(User)
         private userRepository:  Repository<User>,
+        // private readonly messageService: MessageService,
         @InjectRepository(chatroom)
         private chatroomRepository: Repository<chatroom>,
-        // private readonly messageService: MessageService,
     ){}
 
     // create(createMessageDto: CreateMessageDto, id: string) {
     //     throw new Error('Method not implemented.');
     //   }
       async findAllMessages(room_name: string) {
-        var chatroom: chatroom;
-        try{
-            chatroom = await this.chatroomRepository.findOne({
+        // var chatroom: chatroom;
+        // try{
+        //     chatroom = await this.chatroomRepository.findOne({
+        //         where: {
+        //             name: room_name
+        //         },
+        //         relations: {
+        //             messages: true
+        //         }
+        //     })
+        // } catch (e) {
+        //     console.log("findAllMessages error")
+        //     console.log(e);
+            
+        // }
+
+        const messages = await this.messageRepository.find(
+            {
                 where: {
-                    name: room_name
+                    chatroom: {
+                        name: room_name
+                    }
+
                 },
                 relations: {
-                    messages: true
+                    user: true
                 }
-            })
-        } catch (e) {
-            console.log("findAllMessages error")
-            console.log(e);
-            
-        }
+            }
+        )
 
-        return chatroom.messages
+        // return chatroom.messages
+        return messages
       }
   
       async getClientName(clientId: string) {

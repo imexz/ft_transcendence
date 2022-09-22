@@ -15,11 +15,13 @@ import { ChatService } from './chat.service';
 
 @WebSocketGateway({
   cors: {
-    origin: "*",
-    // origin: ['http://localhost:8080', 'http://localhost:3000'],
-    // credentials: true
+    // origin: "*",
+    origin: ['http://localhost:8080', 'http://localhost:3000'],
+    credentials: true
   },
+  // namespace: 'chat'
 }) //not shure
+
 export class ChatGateway {
 
   // @WebSocketServer()
@@ -37,20 +39,34 @@ export class ChatGateway {
     return 'Hello world!';
   }
 
-  handleConnection() {
-    console.log('connected')
+
+  afterInit(socket) {
+    console.log("afterInit chat ");
+    
   }
+
+  handleConnection(socket) {
+
+    console.log(socket.id );
+    
+    console.log('connected chat')
+
+    // socket.emit('successfullConnected');
+  }
+
+
 
 
   @SubscribeMessage('join')
   joinRoom(
     @MessageBody('user_id') user_id: number,
     @MessageBody('room_name') room_name: string,  
-    @ConnectedSocket() client:Socket,
+    @ConnectedSocket() client: Socket,
   ) {
     console.log("join");
     console.log(user_id);
     client.join(room_name)
+    
     this.chatService.manageJoin(client.id, user_id, room_name)
 
   }
@@ -87,19 +103,21 @@ export class ChatGateway {
     @MessageBody('room_name') room_name: string,  
     @ConnectedSocket() client:Socket,
   ) {
-    console.log("recive typing");
     console.log(client.id)
     
     const name = await this.chatService.getClientName(client.id);
+    // const name = client.id
 
-    client.to(room_name).emit('typing', {name, isTyping});
+    client.to(room_name).emit('typing', { name , isTyping});
+    console.log("recive and emit typing");
     
   }
 
   @SubscribeMessage('findAllMessages')
-  findAllMessages(@MessageBody('room_name') room_name: string,) {
+  findAllMessages(@MessageBody('room_name') room_name: string, @ConnectedSocket() client:Socket,) {
     console.log('findAllMessages');
     console.log(room_name);
+    console.log(client.handshake);
     
     return this.chatService.findAllMessages(room_name);
     // return {test};
@@ -130,9 +148,14 @@ export class ChatGateway {
     
     const message = await this.chatService.createMessage(client.id, room_name, content);
 
-    console.log("emit mesage");
     client.to(room_name).emit('message', message);
 
+    
+    // console.log(client.);
+     
+    console.log("emit mesage");
+    // console.log(message);
+    
     return message;
   }
 }

@@ -22,7 +22,8 @@
       })
       .then(response => (
         this.$store.state.validated = true,
-        this.$store.state.user = response.data))
+        this.$store.state.user = response.data,
+        this.$socketio.auth.token = response.data.user_id))
       .catch(error => (this.$store.state.validated = false))
     }
   mounted() {
