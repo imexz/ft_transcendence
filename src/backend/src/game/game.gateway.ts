@@ -16,9 +16,7 @@ export class GameGateway {
 
   @SubscribeMessage('joinQueue')
   async handleJoinQueue(@ConnectedSocket() client: Socket): Promise<void> {
-	console.log("%s joined queue" , client.id);
 	this.gameService.addClientIdToQueue(client);
-	console.log("Queue length is: %d", this.gameService.queue.length);
 	if (this.gameService.gameIds.has(client.id) == false) {
 		console.log("client id %s is not in gamesIds Array", client.id);
 		while (this.gameService.queue.length > 1) {

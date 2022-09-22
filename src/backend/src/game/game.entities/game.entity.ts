@@ -1,7 +1,4 @@
 import { Ball } from "./ball.entity";
-import { PaddleObj } from "../game.interfaces/paddleobj.interface";
-import { ScoreObj } from "../game.interfaces/scoreobj.interface";
-import { SetupObj } from "../game.interfaces/setupobj.interface";
 import { Column, Entity, ManyToMany } from "typeorm";
 import { PrimaryGeneratedColumn } from "typeorm";
 import { User } from "src/users/entitys/user.entity";
@@ -33,17 +30,17 @@ export class Game {
 	scoreRight: number = 0;
 
 	constructor(gameid: number, p1: string, p2: string, gsetup: GameSetup) {
+		console.log("in Game constructor");
 		this.id = gameid;
 		this.playerLeft = p1;
 		this.playerRight = p2;
 
 		if (gsetup == undefined) {
-			console.log("setup undefined");
+			console.log("gsetup undefined");
 		}
 		else {
 
 		console.log(gsetup);
-
 		this.ball.radius = gsetup.ballRadius;
 		this.ball.position = gsetup.ballPos;
 		this.ball.direction = gsetup.ballDir;
@@ -69,5 +66,6 @@ export class Game {
 		this.score.increaseLeft = gsetup.scoreIncrease;
 		this.score.increaseRight = gsetup.scoreIncrease;
 		}
+	console.log("leaving Game constructor");
 	}
 }
