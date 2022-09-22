@@ -1,5 +1,5 @@
 import { User } from "../users/entitys/user.entity";
-import { Column, Entity, ManyToMany, ManyToOne, OneToMany, OneToOne, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinTable, ManyToMany, ManyToOne, OneToMany, OneToOne, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
 import { message } from "../message/message.entity";
 
 @Entity()
@@ -19,7 +19,8 @@ export class chatroom{
     @ManyToMany(() => User, (User) => User.chatrooms)
     Users: User[];
 
-    @ManyToMany(() => message, (message) => message.chatroom)
+    @OneToMany(() => message, (message) => message.chatroom)
+    @JoinTable()
     messages: message[];
 
 

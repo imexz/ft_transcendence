@@ -57,6 +57,15 @@ export class UsersService {
 	}
 
 	addUser(user: User): Promise<User> {
+		
+		if(user.avatar_url == null)
+		{
+			user.avatar_url = "https://cdn.intra.42.fr/users/juan.jpg"
+		}
+		if(user.avatar_url_42intra == null)
+		{
+			user.avatar_url_42intra = "https://cdn.intra.42.fr/users/juan.jpg"
+		}
 		const tmp = this.usersRepository.create(user);
 		return this.usersRepository.save(tmp);
 

@@ -9,12 +9,11 @@ import { chatroom } from '../chatroom/chatroom.entity';
 export class ChatService {
 
 
-  async createRoom(id: string, user_id: number, room_name: string) {
-    const user = await this.userRepository.findOneBy({id: user_id})
-    if(user_id == null)
-        return
-    user.clientId = id;
-    await this.userRepository.update(user.id, user);
+  async createRoom(client_id: string, user_id: number, room_name: string) {
+
+    const user = await this.matchUserWithClient(user_id, client_id)
+    if(user == null)
+        return null  
     var room = await this.chatroomRepository.findOneBy({name: room_name})
     if(room == null){
         room = this.chatroomRepository.create()
@@ -24,6 +23,15 @@ export class ChatService {
         room.Users = [user]
         await this.chatroomRepository.save(room)
     }
+  }
+
+  async matchUserWithClient(user_id: number, client_id: string) {
+    const user = await this.userRepository.findOneBy({id: user_id})
+    if(user == null)
+        return null
+    user.clientId = client_id;
+    await this.userRepository.update(user.id, user);
+    return user
   }
 
 
@@ -40,7 +48,8 @@ export class ChatService {
             clientId: id
         },
         relations: {
-            chatrooms: true
+            chatrooms: true,
+            admin_of: true
         }
     })
     if (user != null) {
@@ -54,8 +63,12 @@ export class ChatService {
             if (i != -1) {
                 user.chatrooms.splice(i)
             }
-            this.userRepository.save(user)
+            await this.userRepository.save(user)
+
+
         }
+
+        // user.chatrooms.
 
     }
 
@@ -71,15 +84,24 @@ export class ChatService {
             new_message.user = await this.userRepository.findOneByOrFail({clientId: clientId})
             new_message.chatroom = await this.chatroomRepository.findOneByOrFail({name: room_name})
             new_message.content = content
+
             return await this.messageRepository.save(new_message)
-        } catch {
-            console.log("creat message");
+        } catch (e){
+            console.log(e)
+            console.log("creat message goes wrong");
         }
     }
 
 
   async manageJoin(client_id: string, user_id: number, room_name: string) {
-    const user = await this.userRepository.findOneBy({id: user_id})
+    var user : User;
+    if(user_id != undefined && client_id != undefined) {
+        user = await this.matchUserWithClient(user_id, client_id);       
+    } else if (client_id != undefined) {
+        user = await this.userRepository.findOneBy({id: user_id})
+    } else {
+        user = await this.userRepository.findOneBy({clientId: client_id})
+    }
     if(user != null) {
         var chatroom = await this.chatroomRepository.findOne({
             where: {
@@ -95,7 +117,7 @@ export class ChatService {
             chatroom = await this.chatroomRepository.save(chatroom)
         } else {
             chatroom.Users.push(user)
-            this.chatroomRepository.save(chatroom)
+            await this.chatroomRepository.save(chatroom)
         }
     }
   }
@@ -105,32 +127,59 @@ export class ChatService {
         private messageRepository: Repository<message>,
         @InjectRepository(User)
         private userRepository:  Repository<User>,
+        // private readonly messageService: MessageService,
         @InjectRepository(chatroom)
         private chatroomRepository: Repository<chatroom>,
-        // private readonly messageService: MessageService,
     ){}
 
     // create(createMessageDto: CreateMessageDto, id: string) {
     //     throw new Error('Method not implemented.');
     //   }
       async findAllMessages(room_name: string) {
-        const chatroom = await this.chatroomRepository.findOne({
-            where: {
-                name: room_name
-            },
-            relations: {
-                messages: true
+        // var chatroom: chatroom;
+        // try{
+        //     chatroom = await this.chatroomRepository.findOne({
+        //         where: {
+        //             name: room_name
+        //         },
+        //         relations: {
+        //             messages: true
+        //         }
+        //     })
+        // } catch (e) {
+        //     console.log("findAllMessages error")
+        //     console.log(e);
+            
+        // }
+
+        const messages = await this.messageRepository.find(
+            {
+                where: {
+                    chatroom: {
+                        name: room_name
+                    }
+
+                },
+                relations: {
+                    user: true
+                }
             }
-        })
-        return chatroom.messages
+        )
+
+        // return chatroom.messages
+        return messages
       }
   
       async getClientName(clientId: string) {
-          return (await this.userRepository.findOneBy({clientId: clientId})).unique_name
-      }
+        const user = await this.userRepository.findOneBy({clientId: clientId})
+        console.log("getClientName");
+        console.log(clientId);
+        console.log(user);
+            return user.unique_name
+        }
   
-      addClientIdToUser(clientId: string, user_id: number) {
-          this.userRepository.update(user_id, {clientId: clientId})
+      async addClientIdToUser(clientId: string, user_id: number) {
+          await this.userRepository.update(user_id, {clientId: clientId})
       }
       
 }

@@ -17,7 +17,7 @@
 <script lang="ts">
   import { Vue, Options } from 'vue-class-component';
   import ScoreCounter from '../components/ScoreCounter.vue'
-  import io from "socket.io-client";
+//   import io from "socket.io-client";
   import { hostURL } from '@/models/host';
 
   @Options({
@@ -28,7 +28,8 @@
 
 export default class PongGame extends Vue {
 	gameId: string = ""
-	socket:any = {}
+	//socket:any = {}
+
 	context:any = {}
 	eventSource:any = {}
 	position:any = {
@@ -36,13 +37,15 @@ export default class PongGame extends Vue {
 		y: 0
 	}
 	created() {
-		this.socket = io(hostURL + ":3000");
-		this.socket.on('GameId', (gameid: string) => {
+		console.log(this.$socketio.id);
+		console.log(this.$socketgame.id);
+		// this.socket = io(hostURL + ":3000");
+		this.$socketgame.on('GameId', (gameid: string) => {
 			this.gameId = gameid;
 			this.eventSource = new EventSource(hostURL + ":3000/game/sse/" + this.gameId);
 		})
-		this.socket.emit('joinQueue');
-		// this.eventSource = new EventSource(hostURL + ":3000/game/sse");
+		this.$socketgame.emit('joinQueue');
+
 		document.addEventListener('keydown', (event) => {
 			console.log(event.key);
 			if (event.key == 'w') {
@@ -83,16 +86,16 @@ export default class PongGame extends Vue {
 		this.context.fillRect(data.paddleRight.position.x, data.paddleRight.position.y, data.paddleRight.width, data.paddleRight.height);
 	}
 	paddleLeftUp() {
-		this.socket.emit('moveLeftUp');
+		this.$socketgame.emit('moveLeftUp');
 	}
 	paddleLeftDown() {
-		this.socket.emit('moveLeftDown');
+		this.$socketgame.emit('moveLeftDown');
 	}
 	paddleRightUp() {
-		this.socket.emit('moveRightUp');
+		this.$socketgame.emit('moveRightUp');
 	}
 	paddleRightDown() {
-		this.socket.emit('moveRightDown');
+		this.$socketgame.emit('moveRightDown');
 	}
 }
 </script>

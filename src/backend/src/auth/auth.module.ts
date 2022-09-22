@@ -13,7 +13,8 @@ import { HttpModule } from '@nestjs/axios';
 
 @Module({
 	imports: [HttpModule, UsersModule, PassportModule, ConfigModule.forRoot(), JwtModule.register({
-    secret: process.env.SWT_PASSWORD,
+	// imports: [HttpModule, UsersModule, PassportModule, JwtModule.register({
+    secret: process.env.JWT_PASSWORD,
     signOptions: { expiresIn: '600s'}
   })],
   providers: [AuthService, LocalStrategy, LocalAuthGuard, JwtStrategy],
