@@ -6,6 +6,7 @@ import { fileEntity } from "../avatar/file.entitys"
 
 @Injectable()
 export class UsersService {
+
     async addClientId(id: number, clientId: string) {
 		const user = await this.usersRepository.findOneBy({id: id})
 		user.clientId = clientId
@@ -36,7 +37,7 @@ export class UsersService {
 		return user
 	}
 
-	async findOne(id: number): Promise<User> {
+	async getUser(id: number): Promise<User> {
 			// console.log(id);
 			try{
 				const user = await this.usersRepository.findOneBy({id: id})
@@ -76,13 +77,13 @@ export class UsersService {
 		if (user == null) {
 			return
 		}
-		if(fileEntity == undefined) {
+		if(file == undefined) {
 			user.avatar_url = user.avatar_url_42intra;
-			user.avatar = null;
+			// user.avatar = null;
 		}
 		else {
 			user.avatar = file
-			user.avatar_url = process.env.HOST + "/avatar"
+			user.avatar_url = process.env.HOST + ":3000" + "/avatar"
 		}
 		this.usersRepository.update(id, user)
 	}
@@ -166,5 +167,17 @@ export class UsersService {
 
 		// }
 
+	}
+
+	async setTwoFactorAuthenticationSecret(secret: string, userId: number) {
+		return this.usersRepository.update(userId, {
+		  twoFactorAuthenticationSecret: secret
+		});
+	  }
+
+	async turnOnTwoFactorAuthentication(userId: number) {
+	return this.usersRepository.update(userId, {
+		isTwoFactorAuthenticationEnabled: true
+	});
 	}
 }

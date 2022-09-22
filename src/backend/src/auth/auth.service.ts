@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { User } from '../users/entitys/user.entity';
+import TokenPayload from './tokenPayload.interface';
 
 @Injectable()
 export class AuthService {
@@ -10,7 +11,7 @@ export class AuthService {
 	validateUser(id: number): Promise<any> {
 		console.log("validateUser");
 		try {
-			const user = this.usersService.findOne(id);
+			const user = this.usersService.getUser(id);
 			console.log("all good");
 			return user;
 		} catch(err) {
@@ -42,5 +43,14 @@ export class AuthService {
 
 	async deleteUser(user_id: number) {
 		this.usersService.remove(user_id);
+	}
+
+	public getCookieWithJwtAccessToken(userId: number, isSecondFactorAuthenticated = false) {
+		const payload: TokenPayload = { userId, isSecondFactorAuthenticated };
+		const token = this.jwtService.sign(payload, {
+		  secret: "test",
+		  expiresIn: `2000s`
+		});
+		return `Authentication=${token}; HttpOnly; Path=/; Max-Age=2000}`;
 	}
 }

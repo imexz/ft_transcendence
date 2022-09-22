@@ -1,19 +1,21 @@
-import { Body, Controller, Delete, Get, Param, Post, Res, UseGuards, Request, UseInterceptors, ClassSerializerInterceptor } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Res, UseGuards, Request, UseInterceptors, ClassSerializerInterceptor, HttpCode, Req, UnauthorizedException } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { UsersService } from './users.service';
 import { User } from './entitys/user.entity';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { JwtAuthGuard } from '../auth/jwt/jwt-auth.guard';
 import { response } from 'express';
+import { TwofaService } from '../twofa/twofa.service'
 
 
 @Controller('users')
 export class UsersController {
-	constructor(private readonly usersService: UsersService){}
+	constructor(private readonly usersService: UsersService,
+				private readonly twofaService: TwofaService ){}
 
 	@Get('find/:id')
 	@UseGuards(JwtAuthGuard)
 	findOne(@Param('id') params: number){
-		return this.usersService.findOne(params)
+		return this.usersService.getUser(params)
 	}
 
 	@Get('allUser')
@@ -50,7 +52,7 @@ export class UsersController {
 		console.log("inside validate");
 		console.log(req.user);
 
-		const user = this.usersService.findOne(req.user.id)
+		const user = this.usersService.getUser(req.user.id)
 		// console.log(user);
 		return user
 	}
@@ -64,6 +66,22 @@ export class UsersController {
 	@Delete()
 	delete(@Request() req) {
 		this.usersService.remove(req.user.id)
+	}
+
+	@Post('turn-on')
+	@HttpCode(200)
+	@UseGuards(JwtAuthGuard)
+	async turnOnTwoFactorAuthentication(
+	  @Req() request,
+	  @Body() { twoFactorAuthenticationCode } : TwoFactorAuthenticationCodeDto
+	) {
+	  const isCodeValid = this.twofaService.isTwoFactorAuthenticationCodeValid(
+		twoFactorAuthenticationCode, request.user
+	  );
+	  if (!isCodeValid) {
+		throw new UnauthorizedException('Wrong authentication code');
+	  }
+	  await this.usersService.turnOnTwoFactorAuthentication(request.user.id);
 	}
 
 }
