@@ -26,37 +26,39 @@ import { Game } from './game/game.entities/game.entity';
 
 
 @Module({
-	imports: [
-		AuthModule,
-		UsersModule,
-		TypeOrmModule.forRootAsync({
-			imports: [ConfigModule],
-			useFactory: (configService: ConfigService) => ({
-				type:'postgres',
-				host: 'database',
-				port: 5432,
-				// username: configService.get('POSTGRES_USER'),
-				// password: configService.get('POSTGRES_PASSWORD'),
-				// database: configService.get('PGDATABASE'),
-				// username:'initdb',
-				// password: 'thisisnotasafepasswordl0l',
-				// database: 'initdb',
-				username: process.env.POSTGRES_USER,
-				password: process.env.POSTGRES_PASSWORD,
-				database: process.env.PGDATABASE,
-				entities: [User, fileEntity, message, chatroom, Game],
-				ssl: false,
-				synchronize: true //  shouldn't be used in production
-			}),
-			inject: [ConfigService],
-		}),
-		AvatarModule,
-		MessageModule,
-		ChatModule,
-		GameModule,
-	],
-	controllers: [GameController],
-	providers: [ChatGateway, MessageService, ChatroomService, GameService, GameGateway, MessageService, ChatroomService],
+  imports: [
+	AuthModule,
+	UsersModule,
+	TypeOrmModule.forRootAsync({
+		imports: [ConfigModule],
+		useFactory: (configService: ConfigService) => ({
+		type:'postgres',
+		host: 'database',
+		port: 5432,
+		// username: configService.get('POSTGRES_USER'),
+		// password: configService.get('POSTGRES_PASSWORD'),
+		// database: configService.get('PGDATABASE'),
+		// username:'initdb',
+		// password: 'thisisnotasafepasswordl0l',
+		// database: 'initdb',
+		username: process.env.POSTGRES_USER,
+		password: process.env.POSTGRES_PASSWORD,
+		database: process.env.PGDATABASE,
+		entities: [User, fileEntity, message, chatroom, Game],
+		ssl: false,
+		synchronize: true //  shouldn't be used in production
+	}),
+	inject: [ConfigService],
+}),
+	AvatarModule,
+	MessageModule,
+	ChatModule,
+	GameModule,
+],
+	// controllers: [GameController],
+	// providers: [ChatGateway, MessageService, ChatroomService, GameService, GameGateway, ChatGateway, MessageService, ChatroomService],
+	// providers: [ChatGateway, MessageService, ChatroomService, GameService, MessageService, ChatroomService],
+	// providers: [ChatGateway],
 })
 export class AppModule {
 	constructor(private dataSource: DataSource) {}

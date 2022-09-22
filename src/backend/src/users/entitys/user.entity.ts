@@ -25,7 +25,8 @@ export class User {
 	@PrimaryColumn({unique: true})
 	id: number;
 
-	@Column({unique: true})
+	// @Column({unique: true}) //finall
+	@Column()
 	unique_name: string;
 
 	@Column()
@@ -65,9 +66,16 @@ export class User {
 	@Column({nullable: true})//maye wrong {unique: true}
 	clientId: string;
 
-	@OneToOne(() => Game, (game) => game.player)
+	@ManyToMany(() => Game, (game) => game.player)
+	@JoinTable()
 	games: Game[];
 
 
+	//   @ManyToMany(() => User, user => user.receivedRequests)
+	//   @JoinTable({joinColumn: {name: 'senderId'}})
+	//   sendRequest: User[]
+
+	//   @ManyToMany(() => User, user => user.sendRequest)
+	//   receivedRequests: User[]
 
 }
