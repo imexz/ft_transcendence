@@ -1,10 +1,6 @@
-import { ConsoleLogger, Injectable } from '@nestjs/common';
-import { GameObj } from './game.interfaces/gameobj.interface';
-import { BallObj } from './game.interfaces/ballobj.interface';
-import { PaddleObj } from './game.interfaces/paddleobj.interface';
-import { ScoreObj } from './game.interfaces/scoreobj.interface';
-import { SetupObj } from './game.interfaces/setupobj.interface';
+import { Injectable } from '@nestjs/common';
 import { Game } from './game.entities/game.entity';
+import { Paddle } from './game.entities/paddle.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Socket } from 'socket.io';
@@ -12,24 +8,7 @@ import { GameSetup } from './game.entities/setup.entity';
 
 @Injectable()
 export class GameService {
-	// setup: SetupObj = {
-	// 	ballPos: {
-	// 		x: 340,
-	// 		y: 240,
-	// 	},
-	// 	ballRadius: 40,
-	// 	ballSpeed: 1,
-	// 	ballDir: {
-	// 		angle: Math.random() * 2 * Math.PI,
-	// 		speed: 1,
-	// 		x: 1,
-	// 		y: 1,
-	// 	},
-	// 	paddleWidth: 20,
-	// 	paddleHeight: 100,
-	// 	paddleSpeed: 10,
-	// 	scoreIncrease: 1,
-	// }
+
 	setup = new GameSetup;
 
 	@InjectRepository(Game)
@@ -37,49 +16,7 @@ export class GameService {
 
 	queue: Array<Socket> = [];
 	gameIds = new Map<string, number>();
-	games = new Map<number, GameObj>();
-
-	// ball: BallObj = {
-	// 	radius: this.setup.ballRadius,
-	// 	position: {
-	// 		x: this.setup.ballPos.x,
-	// 		y: this.setup.ballPos.y,
-	// 	},
-	// 	direction: {
-	// 		angle: Math.random() * 2 * Math.PI,
-	// 		speed: this.setup.ballDir.speed,
-	// 		x: this.setup.ballDir.x,
-	// 		y: this.setup.ballDir.y,
-	// 	}
-	// }
-	// paddleLeft: PaddleObj = {
-	// 	width: this.setup.paddleWidth,
-	// 	height: this.setup.paddleHeight,
-	// 	position: {
-	// 		x: 10,
-	// 		y: 210,
-	// 	},
-	// 	speed: this.setup.paddleSpeed,
-	// 	reboundAngles:  [-45, -30, -15, 0, 0, 15, 30, 45],
-	// 	id: "left",
-	// }
-	// paddleRight: PaddleObj = {
-	// 	width: this.setup.paddleWidth,
-	// 	height: this.setup.paddleHeight,
-	// 	position: {
-	// 		x: 610,
-	// 		y: 210,
-	// 	},
-	// 	speed: this.setup.paddleSpeed,
-	// 	reboundAngles: [-135, -150, -165, 180, 180, 165, 150, 135],
-	// 	id: "right",
-	// }
-	// score: ScoreObj = {
-	// 	scoreLeft: 0,
-	// 	scoreRight: 0,
-	// 	increaseLeft: this.setup.scoreIncrease,
-	// 	increaseRight: this.setup.scoreIncrease,
-	// }
+	games = new Map<number, Game>();
 
 	checkQueue(id) {
 		return (id === this);
@@ -109,23 +46,22 @@ export class GameService {
 		p1.emit('gameId', gamerepo.id);
 		p2.emit('gameId', gamerepo.id);
 		console.log('leaving createGame()');
-		
+
 	}
 
-	getData(id: number): GameObj {
+	getData(id: number): Game {
 		this.updateData(id);
 		this.collisionControl(id);
 		if (this.scored(id)){
 			this.reset(id);
 		}
-		return {
-			ball: this.games.get(id).ball,
-			paddleLeft: this.games.get(id).paddleLeft,
-			paddleRight: this.games.get(id).paddleRight,
-			score: this.games.get(id).score,
-			scoreLeft: this.games.get(id).scoreLeft,
-			scoreRight: this.games.get(id).scoreRight,
-		};
+		return this.games.get(id);
+			// ball: this.games.get(id).ball,
+			// paddleLeft: this.games.get(id).paddleLeft,
+			// paddleRight: this.games.get(id).paddleRight,
+			// score: this.games.get(id).score,
+			// scoreLeft: this.games.get(id).scoreLeft,
+			// scoreRight: this.games.get(id).scoreRight,
 	}
 
 	updateData(id: number) {
@@ -158,12 +94,12 @@ export class GameService {
 		}
 	}
 
-	isBallWithinPaddleRange(id: number, paddle: PaddleObj): boolean {
+	isBallWithinPaddleRange(id: number, paddle: Paddle): boolean {
 		return (this.games.get(id).ball.position.y >= paddle.position.y &&
 			this.games.get(id).ball.position.y <= paddle.position.y + paddle.height)
 	}
 
-	isBallAtPaddle(id: number, paddle: PaddleObj): boolean {
+	isBallAtPaddle(id: number, paddle: Paddle): boolean {
 		let ret: boolean = false;
 		if (paddle.id == "left") {
 			ret = this.games.get(id).ball.position.x - this.games.get(id).ball.radius <= paddle.position.x + paddle.width;
@@ -173,7 +109,7 @@ export class GameService {
 		return ret;
 	}
 
-	calcAngle(id: number, paddle: PaddleObj) {
+	calcAngle(id: number, paddle: Paddle) {
 		var section: number;
 
 		section = paddle.height / 8;
@@ -186,7 +122,7 @@ export class GameService {
 		}
 	}
 
-	updateBallDirection(id: number, paddle: PaddleObj) {
+	updateBallDirection(id: number, paddle: Paddle) {
 		this.calcAngle(id, paddle);
 		this.games.get(id).ball.direction.x = this.games.get(id).ball.direction.speed * Math.cos(this.games.get(id).ball.direction.angle * (Math.PI / 180));
 		this.games.get(id).ball.direction.y = this.games.get(id).ball.direction.speed * Math.sin(this.games.get(id).ball.direction.angle * (Math.PI / 180));
