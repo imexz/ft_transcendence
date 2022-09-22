@@ -2,18 +2,21 @@
 <div class="chat-container">
       <div class="messages-container">
         <div v-for="message in messages">
-          [{{ message.name }}]: {{ message.content}}
+          [{{ message.user.unique_name }}]: {{ message.content}}
         </div>
       </div>
 
-      
-      <!-- <div v-if="typingDiplay">{{ typingDiplay }}</div> -->
+      <div>
+        test==========
+        <div v-if="typingDiplay">{{ typingDiplay }}</div>
+        <hr />
+      </div>
  
       <div class="message-input">
         <form @submit.prevent="sendMessage">
           <label>Message:</label>
           <input v-model="messageText" @input="emitTyping" />
-
+          <!-- <input v-model="messageText" /> -->
           <button type="submit">Send</button>
         </form>
       </div>
@@ -30,51 +33,82 @@ import Message from '@/models/message';
 import { DefaultEventsMap } from '@socket.io/component-emitter';
 
 
+
 @Options ({
   props: {
-    socket: Object,
+    // socket: Object,
     room_name: Object,
   }
 })
 
 
 export default class Chat extends Vue {
-  socket!: Socket<DefaultEventsMap, DefaultEventsMap>;
+  // socket!: Socket<DefaultEventsMap, DefaultEventsMap>;
+  // socket = socket
   // socket = io(hostURL + ":3000")
   room_name!: string;
-  typingDiplay = ref('');
+  typingDiplay = '';
   messageText: string = '';
   messages: Message[] = [];
   timeout: number = 0;
 
-
-    mounted(){
+  
+  mounted(){
     console.log("tests");
+    console.log(this.$socketio.id);     
+    console.log(this.$socketchat.id);
     
-    // this.socket.emit('join', { room_name: this.room_name, user_id: this.user_id}, () => {
-    //     // joined.value = true;
-    // })
-    console.log(this.socket);
+    this.$socketchat.emit('join', { room_name: this.room_name, user_id: this.user_id}, () => {
+        // joined.value = true;
+    })
+    // console.log(this.socket);
     
 
     // this.socket.emit('findAllMessages', {}, (response) => {
-      this.socket.emit('findAllMessages', {room_name: this.room_name}, (response) => {
+    this.$socketchat.emit('findAllMessages', {room_name: this.room_name}, (response) => {
       console.log(response);
       this.messages = response;
     });
 
-    this.socket.on('message',(message) => {
-        this.messages;
+    this.$socketchat.on('message',(message) => {
+      console.log('message');
+      console.log(message);
+      this.messages.push(message);
     });
 
-    this.socket.on('typing', ({name, isTyping}) => {
+
+
+
+    this.$socketchat.on('typing', ({name, isTyping}) => {
+      console.log("recive typing");
+      console.log(name);
+      console.log(isTyping);
+      
+      
+      
         if(isTyping){
-            this.typingDiplay.value = "#${name} is typing...";
+            this.typingDiplay = name + " is typing...";
         } else {
-            this.typingDiplay.value = '';
+            this.typingDiplay = '';
         }
     });
-}
+
+    this.$socketchat.on('successfullConnected', () => {
+        console.log("recive successfullConnected");
+        
+    });
+  }
+  
+  unmounted() {
+    console.log("unmounted");
+    
+    this.$socketchat.emit('leave', () => {
+        console.log("leave");
+        
+    });
+  }
+
+
 
 // emitMessage() {
 //   this.$emit('userSentMessage', this.messageText);
@@ -83,17 +117,23 @@ export default class Chat extends Vue {
 
 sendMessage() {
   console.log("sendMessage");
-  
-  this.socket.emit('createMessage', { room_name: this.room_name, content: this.messageText}, () => {
-    this.messageText.value = '';
+  this.$socketchat.emit('createMessage', { room_name: this.room_name, content: this.messageText}, (response) =>
+  {
+    console.log(response);
+    this.messages.push(response)
+    
+    this.messageText = '';
   })
 }
 
 emitTyping() {
-  this.socket.emit('typing', {isTyping: true, room_name: this.room_name});
+  this.$socketchat.emit('typing', {isTyping: true, room_name: this.room_name});
   this.timeout = setTimeout(() => {
-    this.socket.emit('typing', { isTyping: false});
+    this.$socketchat.emit('typing', { isTyping: false, room_name: this.room_name});
   }, 2000);
+  console.log("emit typing ");
+  console.log(this.room_name);
+  
 };}
 
 

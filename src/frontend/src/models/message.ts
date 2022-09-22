@@ -1,9 +1,14 @@
+import User from "./user";
+
 export default class Message {
-    constructor(content: string,name: string) {
+    constructor(content: string, user: User) {
+
+        console.log("construct messig");
+        
         this.content = content
-        this.name = name
+        this.user = user
     }
 
     content: string;
-    name: string;
+    user: User ;
 }

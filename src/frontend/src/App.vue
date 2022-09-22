@@ -7,7 +7,7 @@
 <script lang="ts">
   import { Options, Vue } from 'vue-class-component';
   import NavBar from './components/NavBar.vue';
-  import {SocketContext, socket} from './context/socket';
+  // import {SocketContext, socket} from './context/socket';
 
   @Options ({
     components: {

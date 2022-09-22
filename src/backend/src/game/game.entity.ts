@@ -7,10 +7,10 @@ export class game{
     id: number;
 
     @ManyToMany(() => User, (User) => User.games)
-    palyer: User[];
+    player: User[];
 
-    @OneToOne(() => User, {onDelete: "SET NULL"})
-    winner: User;
+    // @OneToOne(() => User, {onDelete: "SET NULL"})
+    // winner: User;
 
     @Column()
     score1: number;

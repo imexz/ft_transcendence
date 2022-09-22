@@ -9,12 +9,9 @@
       </form>
     </div>
     <div class="room-container">
-      <SocketContext1.Provider value={socket}>
         <RoomSummary
         v-for="room in rooms"
-          :room = room
-          :socket = socket1 />
-      </SocketContext1.Provider>
+          :room = room />
     </div>
       <!-- [{{ room.id }}]: {{ room.name}} -->
     <!-- <div v-if=room_name class="test">
@@ -36,9 +33,8 @@
 import { onBeforeMount, ref } from 'vue';
 import { Options, Vue } from 'vue-class-component';
 import { io } from 'socket.io-client';
-import { hostURL } from '@/models/host';
+// import { hostURL } from '@/models/host';
 import RoomSummary from '../components/RoomSummary.vue'
-import {SocketContext, socket} from '../context/socket';
 
 
 @Options({
@@ -50,13 +46,12 @@ import {SocketContext, socket} from '../context/socket';
 
 export default class ChatsTest extends Vue {
 
-  // socket = io(hostURL + ":3000")
+  // socket = socket
   rooms = ref([])
   room_name = ref('')
   name = ref('')
   id: number = 0
-  SocketContext1 = SocketContext;
-  socket1 = socket;
+
 
 
   // setup() {
@@ -80,16 +75,16 @@ export default class ChatsTest extends Vue {
 
     // this.id = this.$store.getters.getUser.id;
   };
-
+  
   mounted() {
-    // console.log(this.name);
     this.id = this.$store.getters.getUser.id;
     // this.id.value = 88081
-      this.socket.emit('findAllRooms', {id: this.id}, (response) => {
+      this.$socketchat.emit('findAllRooms', {id: this.id}, (response) => {
         this.rooms = response;
         console.log(response);
         console.log(this.rooms.value);
     });
+    // console.log(this.name);
   }
 
 
@@ -99,7 +94,7 @@ export default class ChatsTest extends Vue {
     // this.id.value = 88081
     // console.log(this.$store.getters.getUser.id);
 
-    this.socket.emit('creat', { room_name: this.name, id: this.id }, (response) => {
+    this.$socketchat.emit('creat', { room_name: this.name, id: this.id }, (response) => {
       this.rooms = response;
       // console.log(response);
     });

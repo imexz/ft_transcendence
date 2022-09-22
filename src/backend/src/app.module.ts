@@ -44,7 +44,7 @@ import { GameService } from './game/game.service';
 		username: process.env.POSTGRES_USER,
 		password: process.env.POSTGRES_PASSWORD,
 		database: process.env.PGDATABASE,
-		entities: [User, fileEntity, message, chatroom, game],
+		entities: [User, fileEntity, message, chatroom, game,],
 		ssl: false,
 		synchronize: true //  shouldn't be used in production
 	}),
@@ -55,8 +55,10 @@ import { GameService } from './game/game.service';
 	ChatModule,
 	GameModule,
 ],
-	controllers: [GameController],
-	providers: [ChatGateway, MessageService, ChatroomService, GameService, GameGateway, MessageService, ChatroomService],
+	// controllers: [GameController],
+	// providers: [ChatGateway, MessageService, ChatroomService, GameService, GameGateway, ChatGateway, MessageService, ChatroomService],
+	// providers: [ChatGateway, MessageService, ChatroomService, GameService, MessageService, ChatroomService],
+	// providers: [ChatGateway],
 })
 export class AppModule {
 	constructor(private dataSource: DataSource) {}
