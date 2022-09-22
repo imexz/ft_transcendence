@@ -27,7 +27,9 @@
   })
 
 export default class PongGame extends Vue {
-	// socket:any = {}
+	gameId: string = ""
+	//socket:any = {}
+
 	context:any = {}
 	eventSource:any = {}
 	position:any = {
@@ -35,10 +37,15 @@ export default class PongGame extends Vue {
 		y: 0
 	}
 	created() {
-		console.log(this.$socketio.id);     
-		console.log(this.$socketgame.id);     
+		console.log(this.$socketio.id);
+		console.log(this.$socketgame.id);
 		// this.socket = io(hostURL + ":3000");
-		this.eventSource = new EventSource(hostURL + ":3000/game/sse");
+		this.$socketgame.on('GameId', (gameid: string) => {
+			this.gameId = gameid;
+			this.eventSource = new EventSource(hostURL + ":3000/game/sse/" + this.gameId);
+		})
+		this.$socketgame.emit('joinQueue');
+
 		document.addEventListener('keydown', (event) => {
 			console.log(event.key);
 			if (event.key == 'w') {
