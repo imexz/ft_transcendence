@@ -7,4 +7,6 @@ export interface GameObj {
 	paddleLeft: PaddleObj;
 	paddleRight: PaddleObj;
 	score: ScoreObj;
+	scoreLeft: number;
+	scoreRight: number;
 }

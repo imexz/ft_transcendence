@@ -3,7 +3,7 @@ import { message } from "../../message/message.entity";
 import { Entity, Column, PrimaryGeneratedColumn, JoinColumn, OneToOne, PrimaryColumn, OneToMany, ManyToMany, JoinTable, ManyToOne } from "typeorm";
 import { fileEntity } from "../../avatar/file.entitys";
 import { Exclude } from 'class-transformer';
-import { game } from "src/game/game.entity";
+import { Game } from '../../game/game.entities/game.entity';
 
 
 @Entity()
@@ -21,7 +21,7 @@ export class User {
 	constructor(partial: Partial<User>) {
 		Object.assign(this, partial);
 	  }
-	
+
 	@PrimaryColumn({unique: true})
 	id: number;
 
@@ -47,7 +47,7 @@ export class User {
 	@ManyToMany(() => User)
 	@JoinTable({ joinColumn: { name: 'users_id_1' } })
 	friends: User[];
-	
+
 	@Column({nullable: true})
 	current_status: number;
 
@@ -66,9 +66,10 @@ export class User {
 	@Column({nullable: true})//maye wrong {unique: true}
 	clientId: string;
 
-	@ManyToMany(() => game, (game) => game.player)
+	@ManyToMany(() => Game, (game) => game.player)
 	@JoinTable()
-	games: game[];
+	games: Game[];
+
 
 	//   @ManyToMany(() => User, user => user.receivedRequests)
 	//   @JoinTable({joinColumn: {name: 'senderId'}})

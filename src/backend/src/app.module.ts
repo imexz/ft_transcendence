@@ -17,11 +17,11 @@ import { MessageModule } from './message/message.module';
 import { message } from './message/message.entity';
 import { chatroom } from './chatroom/chatroom.entity';
 import { ChatModule } from './chat/chat.module';
-import { game } from './game/game.entity';
 import { GameModule } from './game/game.module';
 import { GameController } from './game/game.controller';
 import { GameGateway } from './game/game.gateway';
 import { GameService } from './game/game.service';
+import { Game } from './game/game.entities/game.entity';
 
 
 
@@ -44,7 +44,7 @@ import { GameService } from './game/game.service';
 		username: process.env.POSTGRES_USER,
 		password: process.env.POSTGRES_PASSWORD,
 		database: process.env.PGDATABASE,
-		entities: [User, fileEntity, message, chatroom, game,],
+		entities: [User, fileEntity, message, chatroom, Game],
 		ssl: false,
 		synchronize: true //  shouldn't be used in production
 	}),
