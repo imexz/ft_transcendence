@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { User } from '../users/entitys/user.entity';
-import TokenPayload from './tokenPayload.interface';
+import {TokenPayload} from './tokenPayload.interface';
 
 @Injectable()
 export class AuthService {
@@ -31,7 +31,7 @@ export class AuthService {
 	}
 
 	login(user: any) {
-		const payload = { name: user.unique_name, sub: user.id};
+		const payload = {sub: user.id};
 		return this.jwtService.sign(payload);
 	}
 
@@ -46,11 +46,8 @@ export class AuthService {
 	}
 
 	public getCookieWithJwtAccessToken(userId: number, isSecondFactorAuthenticated = false) {
-		const payload: TokenPayload = { userId, isSecondFactorAuthenticated };
-		const token = this.jwtService.sign(payload, {
-		  secret: "test",
-		  expiresIn: `2000s`
-		});
-		return `Authentication=${token}; HttpOnly; Path=/; Max-Age=2000}`;
+		const payload: TokenPayload = {userId, isSecondFactorAuthenticated };
+		const token = this.jwtService.sign(payload);
+		return `token=${token}; HttpOnly; Path=/; Max-Age=2000}`;
 	}
 }
