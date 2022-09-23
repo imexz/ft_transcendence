@@ -16,9 +16,9 @@
 
 <script lang="ts">
   import { Vue, Options } from 'vue-class-component';
-  import ScoreCounter from '../components/ScoreCounter.vue'
+  import ScoreCounter from '@/components/Game/ScoreCounter.vue'
   import io from "socket.io-client";
-  import { hostURL } from '@/models/host';
+  import { API_URL } from '@/models/host';
 
   @Options({
     components: {
@@ -26,33 +26,33 @@
     }
   })
 
-export default class PongGame extends Vue {
-	socket:any = {}
-	context:any = {}
-	eventSource:any = {}
-	position:any = {
-		x: 0,
-		y: 0
-	}
-	created() {
-		this.socket = io(hostURL + ":3000");
-		this.eventSource = new EventSource(hostURL + ":3000/game/sse");
-		document.addEventListener('keydown', (event) => {
-			console.log(event.key);
-			if (event.key == 'w') {
-				this.paddleLeftUp();
-			}
-			else if (event.key == 's') {
-				this.paddleLeftDown();
-			}
-			else if (event.key == 'ArrowUp') {
-				this.paddleRightUp();
-			}
-			else if (event.key == 'ArrowDown') {
-				this.paddleRightDown();
-			}
-		}, false);
-	}
+  export default class PongGame extends Vue {
+    socket:any = {}
+    context:any = {}
+    eventSource:any = {}
+    position:any = {
+      x: 0,
+      y: 0
+    }
+    created() {
+      this.socket = io(API_URL);
+      this.eventSource = new EventSource(API_URL + "/game/sse");
+      document.addEventListener('keydown', (event) => {
+        console.log(event.key);
+        if (event.key == 'w') {
+          this.paddleLeftUp();
+        }
+        else if (event.key == 's') {
+          this.paddleLeftDown();
+        }
+        else if (event.key == 'ArrowUp') {
+          this.paddleRightUp();
+        }
+        else if (event.key == 'ArrowDown') {
+          this.paddleRightDown();
+        }
+      }, false);
+    }
 
 	mounted() {
 		this.eventSource.onmessage = (raw_data:  any) => {

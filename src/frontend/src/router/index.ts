@@ -1,13 +1,14 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
+
 
 import store from '../store/index'
+
 
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
     name: 'home',
-    component: HomeView
+    component: () => import('../views/HomeView.vue')
   },
   {
     path: '/api_test',
@@ -23,8 +24,15 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import('../views/LoginView.vue')
   },
   {
-    path: '/profile',
+    path: '/profile/',
+    name: 'me',
+    props: {id : "0"},
+    component: () => import('../views/ProfileView.vue')
+  },
+  {
+    path: '/profile/:id',
     name: 'profile',
+    props: true,
     component: () => import('../views/ProfileView.vue')
   },
   {
@@ -37,20 +45,23 @@ const routes: Array<RouteRecordRaw> = [
     name: 'play',
     component: () => import('../views/PlayView.vue')
   },
-  {
-    path: '/chats',
-    name: 'Chats',
-    component: () => import('../views/Chats.vue')
-  }    
+  // {
+  //   path: '/chats',
+  //   name: 'Chats',
+  //   component: () => import('../views/Chats.vue')
+  // }    
 ]
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
   routes
 })
 
-router.beforeEach((to,from) => {
-  if (to.name != 'login' && !store.getters.isValidated) {
-    return { name: 'login' };
+router.beforeEach(async (to) => {
+  const publicPages = ['/login'];
+  const authRequired = !publicPages.includes(to.path);
+
+  if (authRequired && !store.getters.isLogged) {
+    return 'login';
   }
 })
 

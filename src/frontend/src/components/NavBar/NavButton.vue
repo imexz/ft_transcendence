@@ -1,5 +1,7 @@
 <template>
-  <router-link :to="link" :class="type">{{ label }}</router-link>
+  <div>
+    <router-link :to="link" :class="type">{{ label }}</router-link>
+  </div>
 </template>
 
 <script lang="ts">

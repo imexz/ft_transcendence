@@ -26,54 +26,52 @@
 
 <script lang="ts">
 // import * as io from 'socket.io-client';
-import { onBeforeMount, ref } from 'vue';
-import { Options, Vue } from 'vue-class-component';
-import { io } from 'socket.io-client';
-import { hostURL } from '@/models/host';
-import RoomSummary from '../components/RoomSummary.vue'
+// import { onBeforeMount, ref } from 'vue';
+// import { Options, Vue } from 'vue-class-component';
+// import { io } from 'socket.io-client';
+// import { API_URL } from '@/models/host';
+// import RoomSummary from '../components/RoomSummary.vue'
 
-@Options({
-  components : {
-    RoomSummary,
-  }
-})
-
-
-export default class ChatsTest extends Vue {
+// @Options({
+//   components : {
+//     RoomSummary,
+//   }
+// })
 
 
-  socket = io(hostURL + ":3000")
-  rooms = ref([])
-  name = ref('')
-  id: number = 0
+// export default class ChatsTest extends Vue {
+//   socket = io(API_URL)
+//   rooms = ref([])
+//   name = ref('')
+//   id: number = 0
 
 
-  // setup() {
-  //   const count = ref(0)
-  //   const socket = io('http://localhost:3000');
-  //   const rooms = ref([]);
-  //   const name = ref('');
-  //   const id = ref('');
+//   // setup() {
+//   //   const count = ref(0)
+//   //   const socket = io('http://localhost:3000');
+//   //   const rooms = ref([]);
+//   //   const name = ref('');
+//   //   const id = ref('');
 
-  // //   // expose to template and other options API hooks
-  // //   return {
-  // //     count
-  // //   }
-  // }
+//   // //   // expose to template and other options API hooks
+//   // //   return {
+//   // //     count
+//   // //   }
+//   // }
 
 
-  beforeMount(){
-    // console.log(this.$store.getters.getUser);
+//   beforeMount(){
+//     // console.log(this.$store.getters.getUser);
     
-    // this.id.value = this.$store.getters.getUser.id;
-    // this.id.value = 88081
-      this.socket.emit('findAllRooms', {}, (response) => {
-      this.rooms = response;
-      console.log(response);
-      console.log(this.rooms.value);
-    });
+//     // this.id.value = this.$store.getters.getUser.id;
+//     // this.id.value = 88081
+//       this.socket.emit('findAllRooms', {}, (response: any) => {
+//       this.rooms = response;
+//       console.log(response);
+//       console.log(this.rooms.value);
+//     });
 
-  };
+//   };
 
   
   mounted() {
