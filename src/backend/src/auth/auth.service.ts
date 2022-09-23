@@ -48,6 +48,6 @@ export class AuthService {
 	public getCookieWithJwtAccessToken(userId: number, isSecondFactorAuthenticated = false) {
 		const payload: TokenPayload = {userId, isSecondFactorAuthenticated };
 		const token = this.jwtService.sign(payload);
-		return `token=${token}; HttpOnly; Path=/; Max-Age=2000}`;
+		return token;
 	}
 }

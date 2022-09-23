@@ -18,8 +18,15 @@ export class AuthController{
 	@Redirect("", 302)
 	callback(@Request() req, @Res({ passthrough: true }) res ) { 
 		console.log('login/callback');
+
+		// res.cookie("token", this.authService.login(req.user));
+
 		
-		res.setHeader('Set-Cookie', [this.authService.getCookieWithJwtAccessToken(
+		// res.setHeader('Set-Cookie', [this.authService.getCookieWithJwtAccessToken(
+		// 	req.user.id,
+		// 	req.user.isTwoFactorAuthenticationEnabled,
+		// )]);
+		res.cookie("token", [this.authService.getCookieWithJwtAccessToken(
 			req.user.id,
 			req.user.isTwoFactorAuthenticationEnabled,
 		)]);
