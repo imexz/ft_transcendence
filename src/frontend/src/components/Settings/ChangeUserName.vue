@@ -9,14 +9,14 @@
 
 import { Options, Vue } from 'vue-class-component';
 import VueAxios from 'axios';
-import { hostURL } from '@/models/host';
+import { API_URL } from '@/models/host';
 
 export default class ChangeUserName extends Vue {
   newName : string = '';
   changeUserName(): void {
     VueAxios({
       url: '/users/update_name',
-      baseURL: hostURL + ':3000',
+      baseURL: API_URL + ':3000',
       method: 'POST',
       withCredentials: true,
       data : { 'name' : this.newName}
@@ -25,7 +25,7 @@ export default class ChangeUserName extends Vue {
         console.log(response),
         VueAxios({
           url: '/users/validate',
-          baseURL: hostURL + ':3000',
+          baseURL: API_URL + ':3000',
           method: 'GET',
           withCredentials: true,
         })

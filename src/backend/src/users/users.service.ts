@@ -3,6 +3,7 @@ import { User } from './entitys/user.entity';
 import { Injectable } from "@nestjs/common";
 import { Repository } from "typeorm";
 import { fileEntity } from "../avatar/file.entitys"
+import { hostURL } from "../hostURL";
 
 @Injectable()
 export class UsersService {
@@ -73,7 +74,7 @@ export class UsersService {
 		}
 		else {
 			user.avatar = file
-			user.avatar_url = process.env.HOST + "/avatar"
+			user.avatar_url = hostURL + ":3000/avatar"			
 		}
 		this.usersRepository.update(id, user)
 	}

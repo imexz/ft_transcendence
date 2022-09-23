@@ -3,7 +3,7 @@
     <img :src="user.avatar_url" alt="Avatar">
     <span>{{ user.unique_name }}</span>
     <button @click="addFriend" >AddFriend</button>
-    <button>View Profile</button>
+    <button @click="viewProfile(user.id)">View Profile</button>
     <button>Send Dm</button>
   </div>
 </template>
@@ -11,29 +11,31 @@
 <script lang="ts">
   import { Options, Vue } from 'vue-class-component';
   import VueAxios from 'axios';
-  import User from '../models/user';
-  import { hostURL } from '@/models/host';
-
+  import User from '@/models/user'
+  import { host_URL } from '@/models/host';
 
   @Options ({
     props : {
-      user: Object
+      user: Object,
+      id: Number
     }
   })
 
   export default class UserSummary extends Vue {
     user!: User;
     addFriend(): void {
-      user:! User;
       VueAxios({
         url: '/users/addFriend',
-        baseURL: hostURL +':3000',
+        baseURL: host_URL,
         method: 'POST',
         withCredentials: true,
         data: {"id" : this.user.id},
       })
         .then()
         .catch()
+    }
+    viewProfile(id: number){
+      this.$router.push('/profile/' + id.toString());
     }
   }
 </script>
