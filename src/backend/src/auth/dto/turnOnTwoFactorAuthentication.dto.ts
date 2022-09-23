@@ -3,7 +3,7 @@ import { IsEmail, IsString, IsNotEmpty, MinLength } from 'class-validator';
 export class TwoFactorAuthenticationCodeDto { 
   @IsString()
   @IsNotEmpty()
-  @MinLength(7)
+  @MinLength(6)
   twoFactorAuthenticationCode: string;
 }
  

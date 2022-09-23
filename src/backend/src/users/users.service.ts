@@ -7,6 +7,7 @@ import { fileEntity } from "../avatar/file.entitys"
 @Injectable()
 export class UsersService {
 
+
     async addClientId(id: number, clientId: string) {
 		const user = await this.usersRepository.findOneBy({id: id})
 		user.clientId = clientId

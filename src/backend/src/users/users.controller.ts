@@ -49,13 +49,13 @@ export class UsersController {
 	@Get('validate')
 	@UseGuards(JwtAuthGuard)
 	@UseInterceptors(ClassSerializerInterceptor)
-	validate(@Request() req): Promise<User> {
+	validate(@Request() req): User {
 		console.log("inside validate");
 		console.log(req.user);
 
-		const user = this.usersService.getUser(req.user.id)
+		// const user = this.usersService.getUser(req.user.id)
 		// console.log(user);
-		return user
+		return req.user
 	}
 
 	@Post('update_name')
