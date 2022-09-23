@@ -10,7 +10,7 @@ import { UsersService } from "src/users/users.service";
 
     constructor(private readonly usersService: UsersService) {}
 
-    public async genaatetwofaSecret(user: User) {
+    public async genaretwofaSecret(user: User) {
 
         const secret = authenticator.generateSecret();
 
@@ -28,11 +28,16 @@ import { UsersService } from "src/users/users.service";
         return toFileStream(stream, otpauthUrl);
     }
 
-    public isTwoFactorAuthenticationCodeValid(twoFactorAuthenticationCode: string, user: User) {
+    async isTwoFactorAuthenticationCodeValid(twoFactorAuthenticationCode: string, user: User) {
+        console.log('isTwoFactorAuthenticationCodeValid');
+        // const tmp_user  = await this.usersService.getUser(user.id)
+        
+        console.log(twoFactorAuthenticationCode);
         return authenticator.verify({
             token: twoFactorAuthenticationCode,
             secret: user.twoFactorAuthenticationSecret
         })
+
     }   
 
 }

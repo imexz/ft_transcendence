@@ -13,6 +13,7 @@
   authenticate() {
     location.href=hostURL + ':3000/auth/login'
   }
+
   validateUser() {
       VueAxios({
         url: '/users/validate',
@@ -26,8 +27,8 @@
         this.$socketio.auth.token = response.data.user_id))
       .catch(error => (this.$store.state.validated = false))
     }
-  mounted() {
-    this.validateUser()
-  }
+    mounted() {
+      this.validateUser()
+    }
   }
 </script>

@@ -2,9 +2,15 @@ import { PassportStrategy } from "@nestjs/passport";
 import { Passport } from "passport";
 import { ExtractJwt, Strategy } from "passport-jwt";
 import { Request as RequestType} from "express"
+import { TokenPayload } from "../tokenPayload.interface";
+import { UsersService } from "../../users/users.service";
+import { Injectable } from "@nestjs/common";
 
+@Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
-    constructor() {
+    constructor(
+      private readonly userService: UsersService,
+    ) {
         super({
             jwtFromRequest: ExtractJwt.fromExtractors([
                 JwtStrategy.extractJWT,
@@ -15,13 +21,26 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         })
     }
 
-    async validate(payload: any) {
+    async validate(payload: TokenPayload) {
         console.log(payload);
         console.log("validate jwt")
-         return {
-            id: payload.sub,
-            Name: payload.name,
-         };
+        const user = await this.userService.getUser(payload.Id)
+        console.log(user);
+        
+        if(user.isTwoFactorAuthenticationEnabled == false) {
+          console.log("user1");
+          return user
+        } else {
+          if (payload.isSecondFactorAuthenticated) {
+            console.log("user");
+            return user;
+          } else {
+            console.log("return null");
+             
+            return user
+          }
+
+        }
     }
 
     private static extractJWT(req: RequestType): string | null {
@@ -37,7 +56,8 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
           return req.cookies.token;
         }
         console.log("extractJWT jwt null")
-
-        return null;
+          console.log(req);
+          
+        return;
       }
 }

@@ -77,7 +77,7 @@ export class User {
   	twoFactorAuthenticationSecret?: string;
 
 	@Column({ default: false })
-	public isTwoFactorAuthenticationEnabled: boolean;
+	isTwoFactorAuthenticationEnabled: boolean;
 
 	@ManyToMany(() => User, user => user.receivedRequests)
 	@JoinTable({joinColumn: {name: 'senderId'}})

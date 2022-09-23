@@ -21,6 +21,7 @@
   import { hostURL } from '@/models/host';
   import axios from 'axios';
   
+  
   export default class ChangeUserAvatar extends Vue {
     newName : string = '';
     selectedFile: any = null;
@@ -36,17 +37,7 @@
         data: fd
       })
       .then(response => {
-        console.log(response),
-        VueAxios({
-          url: '/users/validate',
-          baseURL: hostURL + ':3000',
-          method: 'GET',
-          withCredentials: true,
-        })
-        .then(response => (
-          this.$store.state.validated = true,
-          this.$store.state.user = response.data))
-        .catch(error => (this.$store.state.validated = false))})
+        this.$store.dispatch('getUser')})
       .catch(error => { console.log(error)})
     }
     
@@ -63,17 +54,7 @@
         withCredentials: true,
       })
       .then(response => {
-        console.log(response),
-        VueAxios({
-          url: '/users/validate',
-          baseURL: hostURL + ':3000',
-          method: 'GET',
-          withCredentials: true,
-        })
-        .then(response => (
-          this.$store.state.validated = true,
-          this.$store.state.user = response.data))
-        .catch(error => (this.$store.state.validated = false))})
+        this.$store.dispatch('getUser')})
       .catch(error => { console.log(error)})
     }
 

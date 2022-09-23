@@ -45,8 +45,8 @@ export class AuthService {
 		this.usersService.remove(user_id);
 	}
 
-	public getCookieWithJwtAccessToken(userId: number, isSecondFactorAuthenticated = false) {
-		const payload: TokenPayload = {userId, isSecondFactorAuthenticated };
+	public getCookieWithJwtAccessToken(Id: number, isSecondFactorAuthenticated = false) {
+		const payload: TokenPayload = {Id, isSecondFactorAuthenticated };
 		const token = this.jwtService.sign(payload);
 		return token;
 	}

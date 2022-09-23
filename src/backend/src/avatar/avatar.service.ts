@@ -32,7 +32,15 @@ export class AvatarService {
     }
 
     async delete(id: number) {
-        await this.fileRepository.delete({id: id})
+        const avatar = await this.fileRepository.findOne({
+            where: {
+                user: {
+                    id: id
+                }
+            }
+        }
+        )
+        this.fileRepository.delete({id: avatar.id})
         await this.usersService.updateAvatar(id, null)
     }
 }
