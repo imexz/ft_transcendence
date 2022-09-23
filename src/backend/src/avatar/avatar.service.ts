@@ -15,7 +15,7 @@ export class AvatarService {
         private usersService: UsersService
     ){}
         
-    getFile(id: number) {
+    async getFile(id: number) {
         return await this.fileRepository.findOneBy({id: id})
     }
 

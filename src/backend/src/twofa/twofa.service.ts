@@ -33,10 +33,7 @@ import { UsersService } from "src/users/users.service";
             token: twoFactorAuthenticationCode,
             secret: user.twoFactorAuthenticationSecret
         })
-    }
-
-    
-    
+    }   
 
 }
 

@@ -5,6 +5,7 @@ import { User } from './entitys/user.entity';
 import { JwtAuthGuard } from '../auth/jwt/jwt-auth.guard';
 import { response } from 'express';
 import { TwofaService } from '../twofa/twofa.service'
+import TwoFactorAuthenticationCodeDto from 'src/auth/dto/turnOnTwoFactorAuthentication.dto';
 
 
 @Controller('users')

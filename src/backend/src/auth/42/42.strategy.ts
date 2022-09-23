@@ -27,61 +27,33 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
 	async validate(accessToken, refreshToken, profile, cb): Promise<any> {
 
 		this.logger.log(profile.id)
-		// this.logger.log("validate")
+		this.logger.log("validate")
 		// this.logger.log(cb)
-
 
 		var user = await this.authService.validateUser(profile.id);
 		// this.logger.log("try")
 		if(user != null)
 			return user;
 
-
 		// this.logger.log("catch")
 		this.logger.log(profile.id)
 		this.logger.log(profile.name.givenName)
 		this.logger.log(profile.image_url)
 
-			// this.logger.log(tmp)
-			var tmp: User[];
-			user = await this.authService.addUser({
-				id: profile.id,
-				unique_name: profile.name.givenName,
-				avatar_url: profile.image_url,
-				avatar_url_42intra: profile.image_url,
-				avatar: null,
-				friends: null,
-				messeges: null,
-				chatrooms: null,
-				admin_of: null,
-				clientId: null,
-				current_status: null,
-				games: null,
-				owner_of: null
-				})
-			// cb(err, user, err.info)
-			this.logger.log("return validate")
-
-		// const response = await this.httpService.axiosRef({
-		// 	url: profile.image_url,
-		// 	method: 'GET',
-		// 	responseType: 'stream',
-		// });
-
-		// const test = promisify(readFile);
-		
-		// response.data.pipe(write);
-		// var tmp = await test('./image.jpeg');
-		// this.logger.log("test")
-
 		// this.logger.log(tmp)
-		// var tmp: User[];
-		// user = await this.authService.addUser(user)
+		var tmp: User[];
+		user = await this.authService.addUser({
+			id: profile.id,
+			unique_name: profile.name.givenName,
+			avatar_url: profile.image_url,
+			avatar_url_42intra: profile.image_url,
+			current_status: null,
+			isTwoFactorAuthenticationEnabled: false,
+			})
 		// cb(err, user, err.info)
 		this.logger.log("return validate")
 
 		return user 
-
 	}
 
 }
