@@ -7,7 +7,7 @@ import { UsersService } from "../../users/users.service";
 import { Injectable } from "@nestjs/common";
 
 @Injectable()
-export class JwtStrategy extends PassportStrategy(Strategy) {
+export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     constructor(
       private readonly userService: UsersService,
     ) {
@@ -24,7 +24,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         })
     }
 
-    async validate(payload: any) {
+    async validate(payload: TokenPayload) {
         console.log(payload);
         console.log("validate jwt")
         const user = await this.userService.getUser(payload.Id)
@@ -48,16 +48,17 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
     private static extractJWT(req: Request): string | null {
         console.log("extractJWT jwt")
-        console.log(req.body)
+        console.log(req.header)
         if (
             req.cookies &&
           'Authentication' in req.cookies
         //  && req.cookies.l > 0
         ) {
         console.log("extractJWT jwt sucess")
-        console.log(req.cookies);
+        console.log(req.cookies.Authentication);
 
-          return req.cookies.token;
+          // return req.cookies.token;
+          return req.cookies.Authentication;
         }
         console.log("extractJWT jwt null")
           console.log(req);
