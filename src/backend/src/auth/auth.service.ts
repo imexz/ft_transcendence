@@ -47,7 +47,8 @@ export class AuthService {
 
 	public getCookieWithJwtAccessToken(Id: number, isSecondFactorAuthenticated = false) {
 		const payload: TokenPayload = {Id, isSecondFactorAuthenticated };
-		const token = this.jwtService.sign(payload);
-		return token;
+		const token = this.jwtService.sign(payload, { secret: process.env.JWT_PASSWORD, expiresIn: '600s' });
+		// return token;
+		return `Authentication=${token}; HttpOnly; Path=/; Max-Age=600`;
 	}
 }

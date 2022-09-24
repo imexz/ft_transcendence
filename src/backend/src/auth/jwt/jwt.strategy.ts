@@ -1,7 +1,7 @@
 import { PassportStrategy } from "@nestjs/passport";
 import { Passport } from "passport";
 import { ExtractJwt, Strategy } from "passport-jwt";
-import { Request as RequestType} from "express"
+import { Request } from "express"
 import { TokenPayload } from "../tokenPayload.interface";
 import { UsersService } from "../../users/users.service";
 import { Injectable } from "@nestjs/common";
@@ -16,12 +16,15 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
                 JwtStrategy.extractJWT,
                 ExtractJwt.fromAuthHeaderAsBearerToken(),
             ]),
+            // jwtFromRequest: ExtractJwt.fromExtractors([(request: Request) => {
+            //   return request?.cookies?.Authentication;
+            // }]),
             ignoreExpiration: true, // need to be false
-            secretOrKey: process.env.JWT_PASSWORD,
+            secretOrKey: process.env.JWT_PASSWORD
         })
     }
 
-    async validate(payload: TokenPayload) {
+    async validate(payload: any) {
         console.log(payload);
         console.log("validate jwt")
         const user = await this.userService.getUser(payload.Id)
@@ -43,15 +46,16 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         }
     }
 
-    private static extractJWT(req: RequestType): string | null {
+    private static extractJWT(req: Request): string | null {
         console.log("extractJWT jwt")
-        // console.log(req.cookies)
+        console.log(req.body)
         if (
             req.cookies &&
-          'token' in req.cookies
+          'Authentication' in req.cookies
         //  && req.cookies.l > 0
         ) {
         console.log("extractJWT jwt sucess")
+        console.log(req.cookies);
 
           return req.cookies.token;
         }
