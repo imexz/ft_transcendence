@@ -26,10 +26,15 @@ export class AuthController{
 		// 	req.user.id,
 		// 	req.user.isTwoFactorAuthenticationEnabled,
 		// )]);
-		res.cookie("token", [this.authService.getCookieWithJwtAccessToken(
+		// res.cookie("token", [this.authService.getCookieWithJwtAccessToken(
+		// 	req.user.id,
+		// 	req.user.isTwoFactorAuthenticationEnabled,
+		// )]);
+		res.setHeader('Set-Cookie', this.authService.getCookieWithJwtAccessToken(
 			req.user.id,
 			req.user.isTwoFactorAuthenticationEnabled,
-		)]);
+		))
+
 		return {
 			url: process.env.HOST + ":8080/login"
 		}
