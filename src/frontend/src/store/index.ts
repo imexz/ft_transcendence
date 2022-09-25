@@ -46,7 +46,10 @@ export default createStore({
       .then(response => {
         context.state.validated = true,
         context.state.user = response.data})
-      .catch(error => {context.state = false})
+      .catch(error => {
+        context.state = false
+        return false
+      })
     }
 
   },

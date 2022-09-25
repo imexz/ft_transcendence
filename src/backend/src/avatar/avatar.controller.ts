@@ -2,7 +2,7 @@ import {  Delete, Controller, Request, Post, UseInterceptors, UploadedFile, MaxF
 import { Express } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { AvatarService } from './avatar.service';
-import { JwtAuthGuard } from '../auth/jwt/jwt-auth.guard';
+import { JwtAuthGuard } from '../auth/jwt-two/jwt-auth.guard';
 
 
 @Controller('avatar')

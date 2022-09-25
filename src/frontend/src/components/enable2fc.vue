@@ -2,9 +2,10 @@
     <div>
         <!-- <button @click="enableTwoFA"> enable two Factor </button> -->
         <img :src=QR  alt='hostURL' >
-
         <input v-model="twoFactorAuthenticationCode"/>
         <button @click="authenticate">validate</button>
+        <button @click="on">turn-on</button>
+        <button @click="off">turn-off</button>
 
     </div>
 </template>
@@ -31,6 +32,25 @@ export default class EnableTwoFA extends Vue{
             method: 'POST',
             withCredentials: true,
             data : { 'twoFactorAuthenticationCode': this.twoFactorAuthenticationCode}
+        })
+    }
+
+    on() {
+        VueAxios({
+            url: '/users/turn-on',
+            baseURL: hostURL + ':3000',
+            method: 'POST',
+            withCredentials: true,
+            data : { 'twoFactorAuthenticationCode': this.twoFactorAuthenticationCode}
+        })
+    }
+
+    off() {
+        VueAxios({
+            url: '/users/turn-off',
+            baseURL: hostURL + ':3000',
+            method: 'GET',
+            withCredentials: true,
         })
     }
 

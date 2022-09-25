@@ -26,5 +26,4 @@ export class chatroom{
     @Column()
     access: number;
 
-
 }

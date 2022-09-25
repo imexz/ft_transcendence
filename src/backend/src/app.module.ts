@@ -1,7 +1,6 @@
 import { Inject, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
-import { AppController } from './app.controller';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { User } from './users/entitys/user.entity'
@@ -36,12 +35,6 @@ import { TwofsModule } from './twofa/twofa.module';
 		type:'postgres',
 		host: 'database',
 		port: 5432,
-		// username: configService.get('POSTGRES_USER'),
-		// password: configService.get('POSTGRES_PASSWORD'),
-		// database: configService.get('PGDATABASE'),
-		// username:'initdb',
-		// password: 'thisisnotasafepasswordl0l',
-		// database: 'initdb',
 		username: process.env.POSTGRES_USER,
 		password: process.env.POSTGRES_PASSWORD,
 		database: process.env.PGDATABASE,
