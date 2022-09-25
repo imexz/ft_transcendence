@@ -7,13 +7,13 @@ import { UsersService } from "../../users/users.service";
 import { Injectable } from "@nestjs/common";
 
 @Injectable()
-export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
+export class Jwt2Strategy extends PassportStrategy(Strategy, 'jwttwo') {
     constructor(
       private readonly userService: UsersService,
     ) {
         super({
             jwtFromRequest: ExtractJwt.fromExtractors([
-                JwtStrategy.extractJWT,
+                Jwt2Strategy.extractJWT,
                 ExtractJwt.fromAuthHeaderAsBearerToken(),
             ]),
             // jwtFromRequest: ExtractJwt.fromExtractors([(request: Request) => {
@@ -25,37 +25,22 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     }
 
     async validate(payload: TokenPayload) {
-        console.log(payload);
+        // console.log(payload);
         console.log("validate jwt")
-        const user = await this.userService.getUser(payload.Id)
-        console.log(user);
-        
-        if(user.isTwoFactorAuthenticationEnabled == false) {
-          console.log("user1");
-          return user
-        } else {
-          if (payload.isSecondFactorAuthenticated) {
-            console.log("user");
-            return user;
-          } else {
-            console.log("return null");
-             
-            return user
-          }
+        return await this.userService.getUser(payload.Id)
 
-        }
     }
 
     private static extractJWT(req: Request): string | null {
         console.log("extractJWT jwt")
-        console.log(req.header)
+        // console.log(req.header)
         if (
             req.cookies &&
           'Authentication' in req.cookies
         //  && req.cookies.l > 0
         ) {
         console.log("extractJWT jwt sucess")
-        console.log(req.cookies.Authentication);
+        // console.log(req.cookies.Authentication);
 
           // return req.cookies.token;
           return req.cookies.Authentication;

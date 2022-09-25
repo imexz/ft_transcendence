@@ -2,15 +2,17 @@ import { Body, Controller, Delete, Get, Param, Post, Res, UseGuards, Request, Us
 import { FileInterceptor } from '@nestjs/platform-express';
 import { UsersService } from './users.service';
 import { User } from './entitys/user.entity';
-import { JwtAuthGuard } from '../auth/jwt/jwt-auth.guard';
+import { JwtAuthGuard } from '../auth/jwt-two/jwt-auth.guard';
 import { response } from 'express';
-import { TwofaService } from '../twofa/twofa.service'
 import TwoFactorAuthenticationCodeDto from 'src/auth/dto/turnOnTwoFactorAuthentication.dto';
+import { AuthService } from 'src/auth/auth.service';
+import { TwofaService } from 'src/twofa/twofa.service';
 
 
 @Controller('users')
 export class UsersController {
 	constructor(private readonly usersService: UsersService,
+				private readonly authService: AuthService,
 				private readonly twofaService: TwofaService ){}
 
 	@Get('find/:id')
@@ -58,6 +60,17 @@ export class UsersController {
 		return req.user
 	}
 
+	@Get('logout')
+	@UseGuards(JwtAuthGuard)
+	logout(@Request() req){
+		console.log("logout");
+		req.res.setHeader('Set-Cookie', this.authService.getCookieWithJwtAccessToken(
+			req.user.id,
+			false,
+		))
+
+	}
+
 	@Post('update_name')
 	@UseGuards(JwtAuthGuard)
 	update_name(@Body("name") name, @Request() req) {
@@ -77,12 +90,22 @@ export class UsersController {
 	  @Body() { twoFactorAuthenticationCode } : TwoFactorAuthenticationCodeDto
 	) {
 	  const isCodeValid = this.twofaService.isTwoFactorAuthenticationCodeValid(
-		twoFactorAuthenticationCode, request.user
+		twoFactorAuthenticationCode,
+		request.user
 	  );
 	  if (!isCodeValid) {
 		throw new UnauthorizedException('Wrong authentication code');
 	  }
 	  await this.usersService.turnOnTwoFactorAuthentication(request.user.id);
+	}
+
+	@Get('turn-off')
+	@HttpCode(200)
+	@UseGuards(JwtAuthGuard)
+	async turnOffTwoFactorAuthentication(
+	  @Req() request,
+	) {
+	  await this.usersService.turnOffTwoFactorAuthentication(request.user.id);
 	}
 
 }

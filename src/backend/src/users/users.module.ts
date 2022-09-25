@@ -8,7 +8,7 @@ import { TwofsModule } from 'src/twofa/twofa.module';
 
 @Module({
 	// imports: [TypeOrmModule.forFeature([User]), forwardRef(() => AuthModule)],
-	imports: [TypeOrmModule.forFeature([User]), TwofsModule],
+	imports: [TypeOrmModule.forFeature([User]), TwofsModule, forwardRef(() => AuthModule)],
 	providers: [UsersService],
 	controllers: [UsersController],
 	exports: [TypeOrmModule, UsersService]

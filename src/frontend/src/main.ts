@@ -13,7 +13,7 @@ app.config.globalProperties.$socketio = io(hostURL + ":3000", {
     },
     reconnectionDelayMax: 10000000,
     reconnectionDelay: 100000,
-    reconnection: false
+    reconnection: true
 });
 app.config.globalProperties.$socketgame = app.config.globalProperties.$socketchat = app.config.globalProperties.$socketio 
 

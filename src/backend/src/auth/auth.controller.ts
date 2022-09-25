@@ -32,7 +32,7 @@ export class AuthController{
 		// )]);
 		res.setHeader('Set-Cookie', this.authService.getCookieWithJwtAccessToken(
 			req.user.id,
-			req.user.isTwoFactorAuthenticationEnabled,
+			false,
 		))
 
 		return {
