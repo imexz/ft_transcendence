@@ -10,7 +10,6 @@
       <span class="userName">{{ this.$store.getters.getUser.unique_name }} </span>
     </div>
     <div v-else>
-
     </div>
     <router-link :to="'/chat'" class="navButton">chat</router-link>
     <router-link :to="'/play'" class="playButton">PLAY</router-link>

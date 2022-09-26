@@ -12,19 +12,17 @@
 
 <script lang="ts">
 
-
-import { Options, Vue } from 'vue-class-component';
 import VueAxios from 'axios';
 import { API_URL } from '@/models/host';
 
-
-
-export default class EnableTwoFA extends Vue{
-
-    QR = API_URL + '/twofa/generate';
-    twoFactorAuthenticationCode: string = '';
-
-
+export default {
+  data() {
+    return{
+      QR : API_URL + '/twofa/generate',
+      twoFactorAuthenticationCode: '',
+    } 
+  },
+  methods: {
     authenticate() {
         VueAxios({
             url: '/twofa/authenticate',
@@ -33,8 +31,7 @@ export default class EnableTwoFA extends Vue{
             withCredentials: true,
             data : { 'twoFactorAuthenticationCode': this.twoFactorAuthenticationCode}
         })
-    }
-
+    },
     on() {
         VueAxios({
             url: '/users/turn-on',
@@ -43,8 +40,7 @@ export default class EnableTwoFA extends Vue{
             withCredentials: true,
             data : { 'twoFactorAuthenticationCode': this.twoFactorAuthenticationCode}
         })
-    }
-
+    },
     off() {
         VueAxios({
             url: '/users/turn-off',
@@ -53,7 +49,6 @@ export default class EnableTwoFA extends Vue{
             withCredentials: true,
         })
     }
-
-
+  }
 }
 </script>
