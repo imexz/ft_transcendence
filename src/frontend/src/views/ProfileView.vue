@@ -6,17 +6,22 @@
   <div>
     <SearchBar/>
   </div>
+  <div>
+    <FriendList/>
+  </div>
 </template>
 
 <script lang="ts">
   import { Options, Vue } from 'vue-class-component';
   import UserSummary from '../components/UserSummary.vue';
   import SearchBar from '@/components/SearchBar.vue';
+  import FriendList from '@/components/FriendList.vue'
 
   @Options ({
     components : {
       UserSummary,
       SearchBar,
+      FriendList,
     }
   })
 

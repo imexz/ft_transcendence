@@ -1,6 +1,6 @@
 import { createStore, storeKey } from 'vuex'
 import VueAxios from 'axios';
-
+import io from 'socket.io-client'
 import User from '../models/user';
 import { hostURL } from '@/models/host';
 
@@ -16,6 +16,8 @@ export default createStore({
   state: {
     validated : false,
     user : null,
+    socket : io,
+
   },
   getters: {
     isValidated(state) {
@@ -23,7 +25,11 @@ export default createStore({
     },
     getUser(state) {
       return state.user
+    },
+    getSocket(state) {
+      return state.socket
     }
+
   },
   mutations: {
     setUser(user: User) {
@@ -45,9 +51,19 @@ export default createStore({
       })
       .then(response => {
         context.state.validated = true,
-        context.state.user = response.data})
+        context.state.user = response.data
+        context.state.socket = io(hostURL + ":3000", {
+              auth: {
+                  token: context.state.user.id
+              },
+              reconnectionDelayMax: 10000000,
+              reconnectionDelay: 100000,
+              reconnection: true
+          })
+          console.log("test");
+      })
       .catch(error => {
-        context.state = false
+        context.state.validated = false
         return false
       })
     }

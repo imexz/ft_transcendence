@@ -15,6 +15,11 @@ import { ChatService } from './chat.service';
 export class ChatGateway {
 
   // @WebSocketServer()
+  // server: Server;
+
+  // server.use()
+
+  // @WebSocketServer()
   // server = new Server({allowEIO3: true});
   // server = require("socket.io")(httpServer, {
   //   allowEIO2: true // false by default
@@ -31,15 +36,16 @@ export class ChatGateway {
 
 
   afterInit(socket) {
-    console.log("afterInit chat ");
+    // console.log("afterInit chat ");
     
+    // console.log(socket);    
   }
 
   handleConnection(socket) {
-
-    console.log(socket.id );
-    
     console.log('connected chat')
+
+    console.log(socket);
+    
 
     // socket.emit('successfullConnected');
   }

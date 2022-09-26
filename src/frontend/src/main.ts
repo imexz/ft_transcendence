@@ -7,14 +7,17 @@ import { hostURL } from './models/host'
 
 const app = createApp(App)
 
-app.config.globalProperties.$socketio = io(hostURL + ":3000", {
-    auth: {
-        token: ""
-    },
-    reconnectionDelayMax: 10000000,
-    reconnectionDelay: 100000,
-    reconnection: true
-});
+// app.config.globalProperties.$socketio = io(hostURL + ":3000", {
+//     auth: {
+//         token: ""
+//     },
+//     reconnectionDelayMax: 10000000,
+//     reconnectionDelay: 100000,
+//     reconnection: true
+// });
+
+app.config.globalProperties.$socketio ;
+
 app.config.globalProperties.$socketgame = app.config.globalProperties.$socketchat = app.config.globalProperties.$socketio 
 
 // app.config.globalProperties.$socketgame = io(hostURL + ":3000" + "/game", {
