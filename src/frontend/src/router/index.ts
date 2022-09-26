@@ -7,8 +7,9 @@ import store from '../store/index'
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
-    name: 'home',
-    component: () => import('../views/HomeView.vue')
+    name: 'me',
+    props: {id : "0"},
+    component: () => import('../views/ProfileView.vue')
   },
   {
     path: '/api_test',
@@ -22,12 +23,6 @@ const routes: Array<RouteRecordRaw> = [
     path: '/login',
     name: 'login',
     component: () => import('../views/LoginView.vue')
-  },
-  {
-    path: '/profile/',
-    name: 'me',
-    props: {id : "0"},
-    component: () => import('../views/ProfileView.vue')
   },
   {
     path: '/profile/:id',
