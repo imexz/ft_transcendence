@@ -16,24 +16,13 @@ export default class ChangeUserName extends Vue {
   changeUserName(): void {
     VueAxios({
       url: '/users/update_name',
-      baseURL: API_URL + ':3000',
+      baseURL: API_URL,
       method: 'POST',
       withCredentials: true,
-      data : { 'name' : this.newName}
+      data : { 'name' : this.newName }
     })
-      .then(response => {
-        console.log(response),
-        VueAxios({
-          url: '/users/validate',
-          baseURL: API_URL + ':3000',
-          method: 'GET',
-          withCredentials: true,
-        })
-        .then(response => (
-          this.$store.state.validated = true,
-          this.$store.state.user = response.data))
-        .catch(error => (this.$store.state.validated = false))})
-      .catch(error => { console.log(error)})
+      .then(response => { this.$store.commit('changeUserName', this.newName) })
+      .catch(error => { console.log(error) })
   }
 }
 

@@ -32,7 +32,8 @@
         data: fd
       })
       .then(response => {
-        this.$store.dispatch('getUser')})
+        console.log(response)
+        })
       .catch(error => { console.log(error)})
     }
     
@@ -49,7 +50,7 @@
         withCredentials: true,
       })
       .then(response => {
-        this.$store.dispatch('getUser')})
+        this.$store.commit('resetAvatar')})
       .catch(error => { console.log(error)})
     }
 

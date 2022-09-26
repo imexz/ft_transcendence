@@ -5,12 +5,12 @@
       <form @submit.prevent="creat">
         <label>Create Room</label>
         <input v-model="name" />
-        <select name="cars" id="cars">
-          <option value="volvo">Volvo</option>
-          <option value="saab">Saab</option>
-          <option value="mercedes">Mercedes</option>
-          <option value="audi">Audi</option>
+        <select v-model="access">
+          <option>privat</option>
+          <option>public</option> 
+          <option>protected</option> 
         </select>
+        <button type="submit">Send</button>
       </form>
     </div>
     <div class="room-container">
@@ -35,8 +35,6 @@ import RoomSummary from '../components/Chat/RoomSummary.vue'
 import VueAxios from 'axios';
 import { API_URL } from '@/models/host';
 
-Vue.component("v-select", vSelect);
-
 
 @Options({
   components : {
@@ -49,14 +47,22 @@ export default class ChatsTest extends Vue {
 
   name = ''
   rooms = []
-  access = ''
+  access = 'public'
 
-  
   mounted() {
-    this.$store.getters.getUser.id;
-
+    VueAxios({
+        url: '/chatroom/all',
+        baseURL: API_URL,
+        method: 'GET',
+        withCredentials: true,
+      })
+        .then(response => {
+          console.log(response.data);
+          
+           this.rooms = response.data
+          })
+        .catch()
   }
-
 
   creat()
   {
@@ -70,7 +76,11 @@ export default class ChatsTest extends Vue {
         withCredentials: true,
         data: { room_name: this.name, access: this.access}
       })
-        .then(response => { this.users = response.data})
+        .then(response => {
+          console.log(response);
+          
+           this.rooms.push(response.data)
+          })
         .catch()
   }
 }
