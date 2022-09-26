@@ -27,6 +27,7 @@ import { onBeforeMount, ref } from 'vue';
 import { Options, Vue } from 'vue-class-component';
 import { io } from 'socket.io-client';
 import RoomSummary from '../components/Chat/RoomSummary.vue'
+import VueAxios from 'axios';
 
 
 @Options({
@@ -38,42 +39,12 @@ import RoomSummary from '../components/Chat/RoomSummary.vue'
 
 export default class ChatsTest extends Vue {
 
-//   // setup() {
-//   //   const count = ref(0)
-//   //   const socket = io('http://localhost:3000');
-//   //   const rooms = ref([]);
-//   //   const name = ref('');
-//   //   const id = ref('');
-
-//   // //   // expose to template and other options API hooks
-//   // //   return {
-//   // //     count
-//   // //   }
-//   // }
-
-
-//   beforeMount(){
-//     // console.log(this.$store.getters.getUser);
-    
-//     // this.id.value = this.$store.getters.getUser.id;
-//     // this.id.value = 88081
-//       this.socket.emit('findAllRooms', {}, (response: any) => {
-//       this.rooms = response;
-//       console.log(response);
-//       console.log(this.rooms.value);
-//     });
-
-//   };
-
-  socket: io
-  id: number = 0
   name = ''
   rooms = []
 
   
   mounted() {
-    // console.log(this.name);
-    this.id = this.$store.getters.getUser.id;
+    this.$store.getters.getUser.id;
     this.socket = this.$store.getters.getSocket;
 
   }
@@ -82,13 +53,14 @@ export default class ChatsTest extends Vue {
   creat()
   {
     console.log("creat");
-    // this.id.value = 88081
-    // console.log(this.$store.getters.getUser.id);
-
-    this.socket.emit('creat', { room_name: this.name, id: this.id }, (response: any) => {
-      this.rooms = response;
-      console.log(response);
-    });
+    VueAxios({
+        url: '/users/',
+        baseURL: API_URL,
+        method: 'POST',
+        withCredentials: true,
+      })
+        .then(response => { this.users = response.data})
+        .catch()
   }
 }
 
