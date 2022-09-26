@@ -56,7 +56,7 @@ router.beforeEach(async (to) => {
   const authRequired = !publicPages.includes(to.path);
 
   if (authRequired && !store.getters.isLogged) {
-    return 'login';
+    return '/login';
   }
 })
 
