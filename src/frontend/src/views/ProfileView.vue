@@ -3,13 +3,17 @@
   <div>
     <SearchBar/>
   </div>
+  <div>
+    <FriendList/>
+  </div>
 </template>
 
 <script lang="ts">
   import { Options, Vue } from 'vue-class-component';
-  import UserSummary from '../components/Profile/UserSummary.vue';
+  import UserSummary from '@/components/Profile/UserSummary.vue';
   import SearchBar from '@/components/Profile/SearchBar.vue';
   import Profile from '@/components/Profile/Profile.vue';
+  import FriendList from '@/components/FriendList.vue'
 
   @Options ({
     props: {
@@ -19,6 +23,7 @@
       UserSummary,
       SearchBar,
       Profile,
+      FriendList,
     }
   })
 
