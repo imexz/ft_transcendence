@@ -8,12 +8,10 @@
 <script lang="ts">
   import { Options, Vue } from 'vue-class-component';
   import NavBar from '@/components/NavBar/NavBar.vue';
-  import SideBar from '@/components/SideBar/SideBar.vue'
 
   @Options ({
     components: {
       NavBar,
-      SideBar,
     }
   })
 
