@@ -4,8 +4,7 @@
       <button 
         class="authButton"
         @click="authenticate">42 AUTH</button>
-        <button @click="validateUser">validate AUTH</button>
-        <EnableTwoFA/>
+        
     </div>
     <div v-else>
       <button
