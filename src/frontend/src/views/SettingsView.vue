@@ -6,6 +6,7 @@
   <ChangeUserAvatar/>
   <h2>Enable 2FA</h2>
   <EnableTwoFA/>
+  <button @click="show">SHOW</button>
 </template>
 
 <script lang="ts">
@@ -24,6 +25,9 @@
   })
 
  export default class SettingsVue extends Vue {
+  show() {
+    console.log(this.$store.getters.getUser)
+  }
  }
 
 </script>
