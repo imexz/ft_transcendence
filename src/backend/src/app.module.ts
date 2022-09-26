@@ -22,6 +22,7 @@ import { GameGateway } from './game/game.gateway';
 import { GameService } from './game/game.service';
 import { Game } from './game/game.entities/game.entity';
 import { TwofsModule } from './twofa/twofa.module';
+import { UsersController } from './users/users.controller';
 
 
 
@@ -53,7 +54,7 @@ import { TwofsModule } from './twofa/twofa.module';
 	// controllers: [GameController],
 	// providers: [ChatGateway, MessageService, ChatroomService, GameService, GameGateway, ChatGateway, MessageService, ChatroomService],
 	// providers: [ChatGateway, MessageService, ChatroomService, GameService, MessageService, ChatroomService],
-	// providers: [ChatGateway],
+	// providers: [UsersController],
 })
 export class AppModule {
 	constructor(private dataSource: DataSource) {}
