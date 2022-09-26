@@ -1,12 +1,25 @@
 <template>
   <div>
-    <h1 v-if="!this.$store.getters.isLogged">Please login</h1>
-    <h1 v-else>Already logged in</h1>
+    <div v-if="!this.$store.getters.isLogged">
+      <h1>Please login</h1>
+      <button @click="validateUser">validate AUTH</button>
+      <EnableTwoFA/>
+    </div>
+    <div v-else>
+      <h1 >Already logged in</h1>
+    </div>
   </div>
 </template>
 
 <script lang ="ts">
-  import { Vue } from 'vue-class-component';
+  import { Vue, Options } from 'vue-class-component';
+  import EnableTwoFA from '@/components/Auth/enable2fc.vue';
+
+  @Options ({
+    components: {
+      EnableTwoFA,
+    }
+  })
 
   export default class LoginView extends Vue {
   }
