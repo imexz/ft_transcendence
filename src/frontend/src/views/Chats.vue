@@ -65,7 +65,7 @@ export default class ChatsTest extends Vue {
 
 //   };
 
-  socket: io
+  socket: any
   id: number = 0
   name = ''
   rooms = []
