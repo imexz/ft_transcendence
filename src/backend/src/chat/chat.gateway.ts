@@ -36,7 +36,7 @@ export class ChatGateway {
 
 
   afterInit(socket) {
-    // console.log("afterInit chat ");
+    console.log("afterInit chat ");
     
     // console.log(socket);    
   }
