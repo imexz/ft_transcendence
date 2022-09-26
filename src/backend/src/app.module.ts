@@ -23,6 +23,7 @@ import { GameService } from './game/game.service';
 import { Game } from './game/game.entities/game.entity';
 import { TwofsModule } from './twofa/twofa.module';
 import { UsersController } from './users/users.controller';
+import { ChatroomModule } from './chatroom/chatroom.module';
 
 
 
@@ -50,6 +51,7 @@ import { UsersController } from './users/users.controller';
 	ChatModule,
 	GameModule,
 	TwofsModule,
+	ChatroomModule,
 ],
 	// controllers: [GameController],
 	// providers: [ChatGateway, MessageService, ChatroomService, GameService, GameGateway, ChatGateway, MessageService, ChatroomService],

@@ -5,7 +5,12 @@
       <form @submit.prevent="creat">
         <label>Create Room</label>
         <input v-model="name" />
-        <button type="submit">Send</button>
+        <select name="cars" id="cars">
+          <option value="volvo">Volvo</option>
+          <option value="saab">Saab</option>
+          <option value="mercedes">Mercedes</option>
+          <option value="audi">Audi</option>
+        </select>
       </form>
     </div>
     <div class="room-container">
@@ -28,6 +33,9 @@ import { Options, Vue } from 'vue-class-component';
 import { io } from 'socket.io-client';
 import RoomSummary from '../components/Chat/RoomSummary.vue'
 import VueAxios from 'axios';
+import { API_URL } from '@/models/host';
+
+Vue.component("v-select", vSelect);
 
 
 @Options({
@@ -41,11 +49,11 @@ export default class ChatsTest extends Vue {
 
   name = ''
   rooms = []
+  access = ''
 
   
   mounted() {
     this.$store.getters.getUser.id;
-    this.socket = this.$store.getters.getSocket;
 
   }
 
@@ -53,11 +61,14 @@ export default class ChatsTest extends Vue {
   creat()
   {
     console.log("creat");
+    console.log(this.access);
+    
     VueAxios({
-        url: '/users/',
+        url: '/chatroom/creat',
         baseURL: API_URL,
         method: 'POST',
         withCredentials: true,
+        data: { room_name: this.name, access: this.access}
       })
         .then(response => { this.users = response.data})
         .catch()

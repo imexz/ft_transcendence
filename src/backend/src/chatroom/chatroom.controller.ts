@@ -18,7 +18,7 @@ export class ChatroomController {
         return await this.chatroomService.removeRoom(room_name, req.user)
     }
 
-    @Post()
+    @Post('creat')
 	@UseGuards(JwtAuthGuard)
     async CreatChatroon(@Request() req,
         @Body("room_name") room_name: string,
