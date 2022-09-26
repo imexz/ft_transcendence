@@ -1,7 +1,7 @@
 <template>
   <div>
-    <img :src='user.avatar_url' alt='Profile Pic'>
-    <h1>Welcome {{ user.unique_name }}</h1>
+    <img :src='this.user.avatar_url' alt='Profile Pic'>
+    <h1>Welcome {{ this.user.unique_name }}</h1>
   </div>
 </template>
 
@@ -11,17 +11,17 @@
   import { API_URL } from '@/models/host';
   import VueAxios from 'axios';
 
-  @Options ({
+  export default{
+    data() {
+      return {
+        user: null,
+      }
+    },
     props: {
-      pid: Number
-    }
-  })
-
-  export default class Profile extends Vue {
-    pid!: number
-    user!: User
-
+      pid: 0,
+    },
     created(): void {
+      console.log(this.pid)
         if (this.pid == (this.$store.getters.getUser as User).id || this.pid == 0){
          this.user = (this.$store.getters.getUser as User)
         }
@@ -35,21 +35,23 @@
             .then(response => { this.user = response.data })
             .catch()
         }
-    }
-    updated(){
-      if (this.pid == (this.$store.getters.getUser as User).id || this.pid == 0){
-        this.user = (this.$store.getters.getUser as User)
-      }
-      else{
-        VueAxios({
-          url: '/users/find/' + this.pid.toString(),
-          baseURL: API_URL,
-          method: 'GET',
-          withCredentials: true,
-        })
-        .then(response => { this.user = response.data })
-        .catch()
-      }
+    },
+    // beforeUpdate(){
+    //   console.log(this.pid)
+    //   console.log((this.$store.getters.getUser as User).id )
+    //   if (this.pid == (this.$store.getters.getUser as User).id || this.pid == 0){
+    //     this.user = (this.$store.getters.getUser as User)
+    //   }
+    //   else{
+    //     VueAxios({
+    //       url: '/users/find/' + this.pid.toString(),
+    //       baseURL: API_URL,
+    //       method: 'GET',
+    //       withCredentials: true,
+    //     })
+    //     .then(response => { this.user = response.data })
+    //     .catch()
+    //   }
     }
   }
 
