@@ -1,82 +1,72 @@
 import { Injectable } from '@nestjs/common';
-import { GameObj } from './game.interfaces/gameobj.interface';
-import { BallObj } from './game.interfaces/ballobj.interface';
-import { PaddleObj } from './game.interfaces/paddleobj.interface';
-import { ScoreObj } from './game.interfaces/scoreobj.interface';
-import { SetupObj } from './game.interfaces/setupobj.interface';
+import { Game } from './game.entities/game.entity';
+import { Paddle } from './game.entities/paddle.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Socket } from 'socket.io';
+import { GameSetup } from './game.entities/setup.entity';
 
 @Injectable()
 export class GameService {
-	setup: SetupObj = {
-		ballPos: {
-			x: 340,
-			y: 240,
-		},
-		ballRadius: 40,
-		ballSpeed: 1,
-		ballDir: {
-			x: 1,
-			y: 1,
-		},
-		paddleWidth: 20,
-		paddleHeight: 100,
-		paddleSpeed: 10,
-		scoreIncrease: 1,
-	}
-	ball: BallObj = {
-		radius: this.setup.ballRadius,
-		position: {
-			x: this.setup.ballPos.x,
-			y: this.setup.ballPos.y,
-		},
-		direction: {
-			angle: Math.random() * 2 * Math.PI,
-			speed: this.setup.ballSpeed,
-			x: this.setup.ballDir.x,
-			y: this.setup.ballDir.y,
-		}
-	}
-	paddleLeft: PaddleObj = {
-		width: this.setup.paddleWidth,
-		height: this.setup.paddleHeight,
-		position: {
-			x: 10,
-			y: 210,
-		},
-		speed: this.setup.paddleSpeed,
-		reboundAngles:  [-45, -30, -15, 0, 0, 15, 30, 45],
-		id: "left",
-	}
-	paddleRight: PaddleObj = {
-		width: this.setup.paddleWidth,
-		height: this.setup.paddleHeight,
-		position: {
-			x: 610,
-			y: 210,
-		},
-		speed: this.setup.paddleSpeed,
-		reboundAngles: [-135, -150, -165, 180, 180, 165, 150, 135],
-		id: "right",
-	}
-	score: ScoreObj = {
-		scoreLeft: 0,
-		scoreRight: 0,
-		increaseLeft: 1,
-		increaseRight: 1,
+
+	setup = new GameSetup;
+
+	@InjectRepository(Game)
+	private gameRepository: Repository<Game>
+
+	queue: Array<Socket> = [];
+	gameIds = new Map<string, number>();
+	games = new Map<number, Game>();
+
+	checkQueue(id) {
+		return (id === this);
 	}
 
-	getData(): GameObj {
-		this.updateData();
-		this.collisionControl();
-		if (this.scored()){
-			this.reset();
+	addClientIdToQueue(client: Socket): void {
+		if (this.queue.find(this.checkQueue, client) != client) {
+			this.queue.push(client);
+			console.log("%s was added to queue", client.id);
+		} else {
+			console.log("%s already in queue", client.id);
 		}
-		return {ball: this.ball, paddleLeft: this.paddleLeft, paddleRight: this.paddleRight, score: this.score};
 	}
 
-	updateData() {
-		this.ball.position.x += this.ball.direction.x;
-		this.ball.position.y += this.ball.direction.y;
+	async createGame() {
+		console.log('inside createGame()');
+		var gamerepo = this.gameRepository.create();
+		gamerepo = await this.gameRepository.save(gamerepo);
+		var p1: Socket = this.queue.shift();
+		var p2: Socket = this.queue.shift();
+		console.log("createGame() queue.length = %d", this.queue?.length);
+		console.log(this.setup);
+		var newgame = new Game(gamerepo.id, p1.id, p2.id, this.setup);
+		this.games.set(gamerepo.id, newgame);
+		this.gameIds.set(p1.id, gamerepo.id);
+		this.gameIds.set(p2.id, gamerepo.id);
+		p1.emit('gameId', gamerepo.id);
+		p2.emit('gameId', gamerepo.id);
+		console.log('leaving createGame()');
+
+	}
+
+	getData(id: number): Game {
+		this.updateData(id);
+		this.collisionControl(id);
+		if (this.scored(id)){
+			this.reset(id);
+		}
+		return this.games.get(id);
+			// ball: this.games.get(id).ball,
+			// paddleLeft: this.games.get(id).paddleLeft,
+			// paddleRight: this.games.get(id).paddleRight,
+			// score: this.games.get(id).score,
+			// scoreLeft: this.games.get(id).scoreLeft,
+			// scoreRight: this.games.get(id).scoreRight,
+	}
+
+	updateData(id: number) {
+		this.games.get(id).ball.position.x += this.games.get(id).ball.direction.x;
+		this.games.get(id).ball.position.y += this.games.get(id).ball.direction.y;
 		// if (this.ball.direction.x > 0) {
 		// 	if (this.ball.position.x + this.ball.radius >= 640) {
 		// 		this.ball.position.x = 640 - this.ball.radius;
@@ -90,123 +80,123 @@ export class GameService {
 		// 	}
 
 		// }
-		if (this.ball.direction.y > 0) {
-			if (this.ball.position.y + this.ball.radius >= 480) {
-				this.ball.position.y = 480 - this.ball.radius;
-				this.ball.direction.y *= -1;
+		if (this.games.get(id).ball.direction.y > 0) {
+			if (this.games.get(id).ball.position.y + this.games.get(id).ball.radius >= 480) {
+				this.games.get(id).ball.position.y = 480 - this.games.get(id).ball.radius;
+				this.games.get(id).ball.direction.y *= -1;
 			}
 		}
 		else {
-			if (this.ball.position.y - this.ball.radius <= 0) {
-				this.ball.position.y = 0 + this.ball.radius;
-				this.ball.direction.y *= -1;
+			if (this.games.get(id).ball.position.y - this.games.get(id).ball.radius <= 0) {
+				this.games.get(id).ball.position.y = 0 + this.games.get(id).ball.radius;
+				this.games.get(id).ball.direction.y *= -1;
 			}
 		}
 	}
 
-	isBallWithinPaddleRange(paddle: PaddleObj): boolean {
-		return (this.ball.position.y >= paddle.position.y &&
-			this.ball.position.y <= paddle.position.y + paddle.height)
+	isBallWithinPaddleRange(id: number, paddle: Paddle): boolean {
+		return (this.games.get(id).ball.position.y >= paddle.position.y &&
+			this.games.get(id).ball.position.y <= paddle.position.y + paddle.height)
 	}
 
-	isBallAtPaddle(paddle: PaddleObj): boolean {
+	isBallAtPaddle(id: number, paddle: Paddle): boolean {
 		let ret: boolean = false;
 		if (paddle.id == "left") {
-			ret = this.ball.position.x - this.ball.radius <= paddle.position.x + paddle.width;
+			ret = this.games.get(id).ball.position.x - this.games.get(id).ball.radius <= paddle.position.x + paddle.width;
 		} else if (paddle.id == "right") {
-			ret = this.ball.position.x + this.ball.radius >= paddle.position.x;
+			ret = this.games.get(id).ball.position.x + this.games.get(id).ball.radius >= paddle.position.x;
 		}
 		return ret;
 	}
 
-	calcAngle(paddle: PaddleObj) {
+	calcAngle(id: number, paddle: Paddle) {
 		var section: number;
 
 		section = paddle.height / 8;
-		if (this.isBallWithinPaddleRange(paddle)) {
+		if (this.isBallWithinPaddleRange(id, paddle)) {
 			var i: number = 1;
-			while (this.ball.position.y > (paddle.position.y + i * section)) {
+			while (this.games.get(id).ball.position.y > (paddle.position.y + i * section)) {
 				i++;
 			}
-			this.ball.direction.angle = paddle.reboundAngles[i - 1];
+			this.games.get(id).ball.direction.angle = paddle.reboundAngles[i - 1];
 		}
 	}
 
-	updateBallDirection(paddle: PaddleObj) {
-		this.calcAngle(paddle);
-		this.ball.direction.x = this.ball.direction.speed * Math.cos(this.ball.direction.angle * (Math.PI / 180));
-		this.ball.direction.y = this.ball.direction.speed * Math.sin(this.ball.direction.angle * (Math.PI / 180));
+	updateBallDirection(id: number, paddle: Paddle) {
+		this.calcAngle(id, paddle);
+		this.games.get(id).ball.direction.x = this.games.get(id).ball.direction.speed * Math.cos(this.games.get(id).ball.direction.angle * (Math.PI / 180));
+		this.games.get(id).ball.direction.y = this.games.get(id).ball.direction.speed * Math.sin(this.games.get(id).ball.direction.angle * (Math.PI / 180));
 	}
 
-	collisionControl() {
-		if (this.ball.direction.x > 0) {
-			if (this.isBallAtPaddle(this.paddleRight) &&
-				this.isBallWithinPaddleRange(this.paddleRight)) {
-					this.updateBallDirection(this.paddleRight);
+	collisionControl(id: number) {
+		if (this.games.get(id).ball.direction.x > 0) {
+			if (this.isBallAtPaddle(id, this.games.get(id).paddleRight) &&
+				this.isBallWithinPaddleRange(id, this.games.get(id).paddleRight)) {
+					this.updateBallDirection(id, this.games.get(id).paddleRight);
 			}
 		}
 		else {
-			if (this.isBallAtPaddle(this.paddleLeft) &&
-				this.isBallWithinPaddleRange(this.paddleLeft)) {
-					this.updateBallDirection(this.paddleLeft);
+			if (this.isBallAtPaddle(id, this.games.get(id).paddleLeft) &&
+				this.isBallWithinPaddleRange(id, this.games.get(id).paddleLeft)) {
+					this.updateBallDirection(id, this.games.get(id).paddleLeft);
 			}
 		}
 	}
 
-	scored(): boolean {
+	scored(id: number): boolean {
 		var ret: boolean = false;
-		if (this.ball.position.x - this.ball.radius <= 0) {
-			this.score.scoreRight += this.score.increaseRight;
+		if (this.games.get(id).ball.position.x - this.games.get(id).ball.radius <= 0) {
+			this.games.get(id).score.scoreRight += this.games.get(id).score.increaseRight;
+			this.games.get(id).scoreRight += this.games.get(id).score.increaseRight;
 			ret = true;
 		}
-		else if (this.ball.position.x + this.ball.radius >= 640 ) {
-			this.score.scoreLeft += this.score.increaseLeft;
+		else if (this.games.get(id).ball.position.x + this.games.get(id).ball.radius >= 640 ) {
+			this.games.get(id).score.scoreLeft += this.games.get(id).score.increaseLeft;
+			this.games.get(id).scoreLeft += this.games.get(id).score.increaseLeft;
 			ret = true;
 		}
 		return ret;
 	}
 
-	reset() {
-		this.ball.position.x = this.setup.ballPos.x;
-		this.ball.position.y = this.setup.ballPos.y;
-		this.ball.direction.speed = this.setup.ballSpeed;
-		this.ball.direction.angle = Math.random() * 2 * Math.PI;
-		this.ball.direction.x = this.ball.direction.speed * Math.cos(this.ball.direction.angle);
-		this.ball.direction.y = this.ball.direction.speed * Math.sin(this.ball.direction.angle); // * 0.1
-		this.ball.radius = this.setup.ballRadius;
+	reset(id: number) {
+		this.games.get(id).ball.position.x = this.setup.ballPos.x;
+		this.games.get(id).ball.position.y = this.setup.ballPos.y;
+		this.games.get(id).ball.direction.speed = this.setup.ballDir.speed;
+		this.games.get(id).ball.direction.angle = Math.random() * 2 * Math.PI;
+		this.games.get(id).ball.direction.x = this.games.get(id).ball.direction.speed * Math.cos(this.games.get(id).ball.direction.angle);
+		this.games.get(id).ball.direction.y = this.games.get(id).ball.direction.speed * Math.sin(this.games.get(id).ball.direction.angle); // * 0.1
+		this.games.get(id).ball.radius = this.setup.ballRadius;
 
-		this.paddleLeft.width = this.setup.paddleWidth;
-		this.paddleLeft.height = this.setup.paddleHeight;
-		this.paddleLeft.speed = this.setup.paddleSpeed;
-		this.paddleRight.width = this.setup.paddleWidth;
-		this.paddleRight.height = this.setup.paddleHeight;
-		this.paddleRight.speed = this.setup.paddleSpeed;
+		this.games.get(id).paddleLeft.width = this.setup.paddleWidth;
+		this.games.get(id).paddleLeft.height = this.setup.paddleHeight;
+		this.games.get(id).paddleLeft.speed = this.setup.paddleSpeed;
+		this.games.get(id).paddleRight.width = this.setup.paddleWidth;
+		this.games.get(id).paddleRight.height = this.setup.paddleHeight;
+		this.games.get(id).paddleRight.speed = this.setup.paddleSpeed;
 
-		this.score.increaseLeft = this.setup.scoreIncrease;
-		this.score.increaseRight = this.setup.scoreIncrease;
-
-
+		this.games.get(id).score.increaseLeft = this.setup.scoreIncrease;
+		this.games.get(id).score.increaseRight = this.setup.scoreIncrease;
 	}
 
-	movePaddleUp(b: boolean) {
+	movePaddleUp(id: number, b: boolean) {
 		if (b) {
-			if (this.paddleLeft.position.y > 0)
-				this.paddleLeft.position.y -= this.paddleLeft.speed;
+			if (this.games.get(id).paddleLeft.position.y > 0)
+				this.games.get(id).paddleLeft.position.y -= this.games.get(id).paddleLeft.speed;
 		}
 		else {
-			if (this.paddleRight.position.y > 0)
-				this.paddleRight.position.y -= this.paddleRight.speed;
+			if (this.games.get(id).paddleRight.position.y > 0)
+				this.games.get(id).paddleRight.position.y -= this.games.get(id).paddleRight.speed;
 		}
 	}
 
-	movePaddleDown(b: boolean) {
+	movePaddleDown(id: number, b: boolean) {
 		if (b) {
-			if (this.paddleLeft.position.y < (480 - this.paddleLeft.height))
-				this.paddleLeft.position.y += this.paddleLeft.speed;
+			if (this.games.get(id).paddleLeft.position.y < (480 - this.games.get(id).paddleLeft.height))
+				this.games.get(id).paddleLeft.position.y += this.games.get(id).paddleLeft.speed;
 		}
 		else {
-			if (this.paddleRight.position.y < (480 - this.paddleRight.height))
-				this.paddleRight.position.y += this.paddleRight.speed;
+			if (this.games.get(id).paddleRight.position.y < (480 - this.games.get(id).paddleRight.height))
+				this.games.get(id).paddleRight.position.y += this.games.get(id).paddleRight.speed;
 		}
 	}
 }

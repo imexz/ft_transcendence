@@ -3,7 +3,7 @@ import { message } from "../../message/message.entity";
 import { Entity, Column, PrimaryGeneratedColumn, JoinColumn, OneToOne, PrimaryColumn, OneToMany, ManyToMany, JoinTable, ManyToOne } from "typeorm";
 import { fileEntity } from "../../avatar/file.entitys";
 import { Exclude } from 'class-transformer';
-import { game } from "src/game/game.entity";
+import { Game } from '../../game/game.entities/game.entity';
 
 
 @Entity()
@@ -21,11 +21,12 @@ export class User {
 	constructor(partial: Partial<User>) {
 		Object.assign(this, partial);
 	  }
-	
+
 	@PrimaryColumn({unique: true})
 	id: number;
 
-	@Column({unique: true})
+	// @Column({unique: true}) //finall
+	@Column()
 	unique_name: string;
 
 	@Column()
@@ -37,37 +38,59 @@ export class User {
 
 	@OneToMany(() => chatroom, (chatroom) => chatroom.owner)
 	@JoinColumn()
-    owner_of: chatroom[];
+    owner_of?: chatroom[];
 
-	@OneToOne(() => fileEntity, (avatar) => avatar.user) //{ onDelete: 'CASCADE' }
+	@OneToOne(() => fileEntity, (avatar) => avatar.user, {onDelete: 'SET NULL'}) //{ onDelete: 'CASCADE' }
 	@JoinColumn()
-	avatar :fileEntity;
+	avatar?:fileEntity;
 
 	@ManyToMany(() => User)
 	@JoinTable({ joinColumn: { name: 'users_id_1' } })
-	friends: User[];
+	friends?: User[];
 
 	@Column({nullable: true})
 	current_status: number;
 
 	@OneToMany(() => message, (message) => message.user)
-	messeges: message[];
+	messeges?: message[];
 
 	@ManyToMany(() => chatroom, (chatroom) => chatroom.Users)
 	@JoinTable()
-	chatrooms: chatroom[];
+	chatrooms?: chatroom[];
 
 	@ManyToMany(() => chatroom, (chatroom) => chatroom.admins)
 	@JoinTable()
-	admin_of: chatroom[];
+	admin_of?: chatroom[];
 
 	@Exclude()
 	@Column({nullable: true})//maye wrong {unique: true}
-	clientId: string;
+	clientId?: string;
 
-	@OneToOne(() => game, (game) => game.palyer)
-	games: game[];
+	@ManyToMany(() => Game, (game) => game.player)
+	@JoinTable()
+	games?: Game[];
 
 
+
+
+	@Column({ nullable: true })
+  	twoFactorAuthenticationSecret?: string;
+
+	@Column({ default: false })
+	isTwoFactorAuthenticationEnabled: boolean;
+
+	@ManyToMany(() => User, user => user.receivedRequests)
+	@JoinTable({joinColumn: {name: 'senderId'}})
+	sendRequest?: User[];
+
+	@ManyToMany(() => User, user => user.sendRequest)
+	receivedRequests?: User[];
+
+	@ManyToMany(() => User, user => user.blocked_me)
+	@JoinTable({joinColumn: {name: 'senderId'}})
+	blocked?: User[];
+
+	@ManyToMany(() => User, user => user.blocked)
+	blocked_me?: User[];
 
 }

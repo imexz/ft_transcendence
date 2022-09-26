@@ -7,6 +7,8 @@ import { hostURL } from "../hostURL";
 
 @Injectable()
 export class UsersService {
+
+
     async addClientId(id: number, clientId: string) {
 		const user = await this.usersRepository.findOneBy({id: id})
 		user.clientId = clientId
@@ -37,7 +39,7 @@ export class UsersService {
 		return user
 	}
 
-	async findOne(id: number): Promise<User> {
+	async getUser(id: number): Promise<User> {
 			// console.log(id);
 			try{
 				const user = await this.usersRepository.findOneBy({id: id})
@@ -58,6 +60,15 @@ export class UsersService {
 	}
 
 	addUser(user: User): Promise<User> {
+		
+		if(user.avatar_url == null)
+		{
+			user.avatar_url = "https://cdn.intra.42.fr/users/juan.jpg"
+		}
+		if(user.avatar_url_42intra == null)
+		{
+			user.avatar_url_42intra = "https://cdn.intra.42.fr/users/juan.jpg"
+		}
 		const tmp = this.usersRepository.create(user);
 		return this.usersRepository.save(tmp);
 
@@ -68,9 +79,9 @@ export class UsersService {
 		if (user == null) {
 			return
 		}
-		if(fileEntity == undefined) {
+		if(file == undefined) {
 			user.avatar_url = user.avatar_url_42intra;
-			user.avatar = null;
+			// user.avatar = null;
 		}
 		else {
 			user.avatar = file
@@ -159,4 +170,23 @@ export class UsersService {
 		// }
 
 	}
+
+	async setTwoFactorAuthenticationSecret(secret: string, userId: number) {
+		return this.usersRepository.update(userId, {
+		  twoFactorAuthenticationSecret: secret
+		});
+	  }
+
+	async turnOnTwoFactorAuthentication(userId: number) {
+		return this.usersRepository.update(userId, {
+			isTwoFactorAuthenticationEnabled: true
+		});
+	}
+
+	async turnOffTwoFactorAuthentication(userId: number) {
+		return this.usersRepository.update(userId, {
+			isTwoFactorAuthenticationEnabled: false
+		});
+	}
+	
 }
