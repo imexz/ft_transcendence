@@ -1,12 +1,14 @@
 import { chatroom } from "../chatroom/chatroom.entity";
 import { User } from "../users/entitys/user.entity";
-import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
 export class message {
 
+    @PrimaryGeneratedColumn()
+    id: number;
+
     @CreateDateColumn()
-    @PrimaryColumn()
     timestamp: Date;
 
     @Column()
