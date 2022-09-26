@@ -40,6 +40,12 @@ export default createStore({
     logIn(state, user) {
       state.validated = true;
       state.user = user;
+    },
+    changeUserName(state, username) {
+      state.user.username = username;
+    },
+    resetAvatar(state) {
+      state.user.avatar_url = state.user.avatar_url_42intra;
     }
   },
   actions: {
