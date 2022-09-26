@@ -1,13 +1,17 @@
 <template>
   <div>
-    <button 
-      v-if="!this.$store.getters.isLogged"
-      class="authButton"
-      @click="authenticate">42 AUTH</button>
-    <button
-      v-else
-      class="authButton"
-      @click="logout">Logout</button>
+    <div v-if="!this.$store.getters.isLogged">
+      <button 
+        class="authButton"
+        @click="authenticate">42 AUTH</button>
+        <button @click="validateUser">validate AUTH</button>
+        <EnableTwoFA/>
+    </div>
+    <div v-else>
+      <button
+        class="authButton"
+        @click="logout">Logout</button>
+    </div>
   </div>
 </template>
 
@@ -15,10 +19,15 @@
   import { Vue, Options } from 'vue-class-component';
   import VueAxios from 'axios';
   import { API_URL } from '@/models/host';
+  import EnableTwoFA from '@/components/Auth/enable2fc.vue';
+
+  @Options ({
+    components: {
+      EnableTwoFA,
+    }
+  })
+
   export default class FtAuth extends Vue {
-  created(): void {
-      
-  }
   logout(): void {
       this.$store.dispatch('logOut');
       this.$router.push('/login');

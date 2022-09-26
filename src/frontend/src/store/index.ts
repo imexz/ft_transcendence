@@ -1,7 +1,9 @@
-import VueAxios from 'vue-axios';
+
 import { Vue } from 'vue-class-component'
 import { createStore, storeKey } from 'vuex'
-import User from '../models/user';
+import io from 'socket.io-client'
+import User from '@/models/user';
+
 
 export interface validated {
   validated : boolean
@@ -13,8 +15,8 @@ export interface user {
 const storage = localStorage.getItem('user')
 const user = storage?JSON.parse(storage):null;
 const initialState = user?
-  {validated: true, user: user}:
-  {validated: false, user: null}
+  {validated: true, user: user, socket: null}:
+  {validated: false, user: null,  socket: null}
 
 export default createStore({
 
@@ -25,7 +27,11 @@ export default createStore({
     },
     getUser(state) {
       return state.user
+    },
+    getSocket(state) {
+      return state.socket
     }
+
   },
   mutations: {
     logOut(state) {
@@ -50,3 +56,4 @@ export default createStore({
   modules: {
   }
 })
+

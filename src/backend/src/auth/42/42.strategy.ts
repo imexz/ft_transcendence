@@ -1,13 +1,14 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { PassportStrategy } from "@nestjs/passport";
 import { Strategy } from "passport-42"
-import { AuthService } from "./auth.service";
+import { AuthService } from "../auth.service";
 import { HttpService } from '@nestjs/axios'
 import { readFile } from 'fs';
 import { createWriteStream } from 'fs';
 import { promisify } from "util";
-import { User } from "../users/entitys/user.entity";
-import { hostURL } from "../hostURL";
+import { User } from "../../users/entitys/user.entity";
+import { hostURL } from "../../hostURL";
+
 
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy) {
@@ -16,7 +17,7 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
 		super({
 			clientID: process.env.CLIENT_ID,
 			clientSecret: process.env.CLIENT_SECRET,
-			callbackURL: process.env.hostURL + ":3000/auth/login/callback",
+			callbackURL: process.env.HOST + ":3000/auth/login/callback",
 			profileFields: {
 				'name.givenName': 'first_name',
 				'id': function (obj) { return String(obj.id); },
@@ -27,22 +28,18 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
 
 	async validate(accessToken, refreshToken, profile, cb): Promise<any> {
 
+		this.logger.log("validate")
 		this.logger.log(profile.id)
-		// this.logger.log("validate")
 		// this.logger.log(cb)
 
-
 		var user = await this.authService.validateUser(profile.id);
-		this.logger.log("try")
-		if(user != null)
-			return user;
-
-
-		this.logger.log("catch")
-		this.logger.log(profile.id)
-		this.logger.log(profile.name.givenName)
-		this.logger.log(profile.image_url)
-
+		// this.logger.log("try")
+		if(user == null){
+			// this.logger.log("catch")
+			this.logger.log(profile.id)
+			this.logger.log(profile.name.givenName)
+			this.logger.log(profile.image_url)
+	
 			// this.logger.log(tmp)
 			var tmp: User[];
 			user = await this.authService.addUser({
@@ -50,39 +47,13 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
 				unique_name: profile.name.givenName,
 				avatar_url: profile.image_url,
 				avatar_url_42intra: profile.image_url,
-				avatar: null,
-				friends: null,
-				messeges: null,
-				chatrooms: null,
-				admin_of: null,
-				clientId: null,
 				current_status: null,
-				games: null,
-				owner_of: null
+				isTwoFactorAuthenticationEnabled: false,
 				})
 			// cb(err, user, err.info)
 			this.logger.log("return validate")
-
-		// const response = await this.httpService.axiosRef({
-		// 	url: profile.image_url,
-		// 	method: 'GET',
-		// 	responseType: 'stream',
-		// });
-
-		// const test = promisify(readFile);
-		
-		// response.data.pipe(write);
-		// var tmp = await test('./image.jpeg');
-		// this.logger.log("test")
-
-		// this.logger.log(tmp)
-		var tmp: User[];
-		user = await this.authService.addUser(user)
-		// cb(err, user, err.info)
-		this.logger.log("return validate")
-
-		return user 
-
+		}
+		return user
 	}
 
 }
