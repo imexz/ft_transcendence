@@ -3,7 +3,6 @@ import App from './App.vue'
 import router from './router'
 import store from './store'
 import io from 'socket.io-client'
-import { hostURL } from './models/host'
 
 const app = createApp(App)
 

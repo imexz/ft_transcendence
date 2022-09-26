@@ -6,7 +6,7 @@ import { HttpService } from '@nestjs/axios'
 import { readFile } from 'fs';
 import { createWriteStream } from 'fs';
 import { promisify } from "util";
-import { User } from "../users/entitys/user.entity";
+import { User } from "../../users/entitys/user.entity";
 import { hostURL } from "../../hostURL";
 
 
@@ -17,7 +17,7 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
 		super({
 			clientID: process.env.CLIENT_ID,
 			clientSecret: process.env.CLIENT_SECRET,
-			callbackURL: process.env.hostURL + ":3000/auth/login/callback",
+			callbackURL: process.env.HOST + ":3000/auth/login/callback",
 			profileFields: {
 				'name.givenName': 'first_name',
 				'id': function (obj) { return String(obj.id); },

@@ -26,14 +26,9 @@
   <!-- <button type="submit" @click="emitMessage">Send</button> -->
 
 <script lang="ts">
-import store from '../store/index'
-import { onBeforeMount, ref } from 'vue';
 import { Options, Vue } from 'vue-class-component';
 import { Socket } from 'socket.io-client';
 import Message from '@/models/message';
-import { DefaultEventsMap } from '@socket.io/component-emitter';
-
-
 
 @Options ({
   props: {
@@ -70,7 +65,7 @@ export default class Chat extends Vue {
     
 
     // this.socket.emit('findAllMessages', {}, (response) => {
-    this.socket.emit('findAllMessages', {room_name: this.room_name}, (response) => {
+    this.socket.emit('findAllMessages', {room_name: this.room_name}, (response: any) => {
       console.log(response);
       this.messages = response;
     });

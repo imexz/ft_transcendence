@@ -14,7 +14,7 @@
 <script lang="ts">
 
 import Room from '@/models/room';
-import Chat from '@/components/Chat.vue';
+import Chat from '@/components/Chat/Chat.vue';
 import { Options, Vue } from 'vue-class-component';
 // import { Socket } from 'socket.io-client';
 import room from '@/models/room';

@@ -85,11 +85,7 @@ export class UsersService {
 		}
 		else {
 			user.avatar = file
-<<<<<<< HEAD
 			user.avatar_url = hostURL + ":3000/avatar"			
-=======
-			user.avatar_url = process.env.HOST + ":3000" + "/avatar"
->>>>>>> 89de9b31839ebc278f8eda046c111977d9986923
 		}
 		this.usersRepository.update(id, user)
 	}

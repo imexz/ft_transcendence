@@ -13,7 +13,7 @@
   import UserSummary from '@/components/Profile/UserSummary.vue';
   import SearchBar from '@/components/Profile/SearchBar.vue';
   import Profile from '@/components/Profile/Profile.vue';
-  import FriendList from '@/components/FriendList.vue'
+  import FriendList from '@/components/Profile/FriendList.vue'
 
   @Options ({
     props: {
