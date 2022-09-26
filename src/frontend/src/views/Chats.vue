@@ -65,10 +65,17 @@ export default class ChatsTest extends Vue {
 
 //   };
 
+  socket: io
+  id: number = 0
+  name = ''
+  rooms = []
+
   
   mounted() {
     // console.log(this.name);
     this.id = this.$store.getters.getUser.id;
+    this.socket = this.$store.getters.getSocket;
+
   }
 
 
