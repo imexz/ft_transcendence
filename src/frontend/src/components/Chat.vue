@@ -26,6 +26,7 @@
   <!-- <button type="submit" @click="emitMessage">Send</button> -->
 
 <script lang="ts">
+import store from '../store/index'
 import { onBeforeMount, ref } from 'vue';
 import { Options, Vue } from 'vue-class-component';
 import { Socket } from 'socket.io-client';
@@ -51,26 +52,28 @@ export default class Chat extends Vue {
   messageText: string = '';
   messages: Message[] = [];
   timeout: number = 0;
-
+  socket: Socket;
+  
   
   mounted(){
+    this.socket = this.$store.getters.getSocket
     console.log("tests");
-    console.log(this.$socketio.id);     
-    console.log(this.$socketchat.id);
+    // console.log(this.$socketio.id);     
+    // console.log(this.$socketchat.id);
     
-    this.$socketchat.emit('join', { room_name: this.room_name, user_id: this.user_id}, () => {
+    this.socket.emit('join', { room_name: this.room_name, user_id: this.user_id}, () => {
         // joined.value = true;
     })
     // console.log(this.socket);
     
 
     // this.socket.emit('findAllMessages', {}, (response) => {
-    this.$socketchat.emit('findAllMessages', {room_name: this.room_name}, (response) => {
+    this.socket.emit('findAllMessages', {room_name: this.room_name}, (response) => {
       console.log(response);
       this.messages = response;
     });
 
-    this.$socketchat.on('message',(message) => {
+    this.socket.on('message',(message) => {
       console.log('message');
       console.log(message);
       this.messages.push(message);
@@ -79,7 +82,7 @@ export default class Chat extends Vue {
 
 
 
-    this.$socketchat.on('typing', ({name, isTyping}) => {
+    this.socket.on('typing', ({name, isTyping}) => {
       console.log("recive typing");
       console.log(name);
       console.log(isTyping);
@@ -93,7 +96,7 @@ export default class Chat extends Vue {
         }
     });
 
-    this.$socketchat.on('successfullConnected', () => {
+    this.socket.on('successfullConnected', () => {
         console.log("recive successfullConnected");
         
     });
@@ -102,7 +105,7 @@ export default class Chat extends Vue {
   unmounted() {
     console.log("unmounted");
     
-    this.$socketchat.emit('leave', () => {
+    this.socket.emit('leave', () => {
         console.log("leave");
         
     });
@@ -117,7 +120,7 @@ export default class Chat extends Vue {
 
 sendMessage() {
   console.log("sendMessage");
-  this.$socketchat.emit('createMessage', { room_name: this.room_name, content: this.messageText}, (response) =>
+  this.socket.emit('createMessage', { room_name: this.room_name, content: this.messageText}, (response) =>
   {
     console.log(response);
     this.messages.push(response)
@@ -127,9 +130,9 @@ sendMessage() {
 }
 
 emitTyping() {
-  this.$socketchat.emit('typing', {isTyping: true, room_name: this.room_name});
+  this.socket.emit('typing', {isTyping: true, room_name: this.room_name});
   this.timeout = setTimeout(() => {
-    this.$socketchat.emit('typing', { isTyping: false, room_name: this.room_name});
+    this.socket.emit('typing', { isTyping: false, room_name: this.room_name});
   }, 2000);
   console.log("emit typing ");
   console.log(this.room_name);

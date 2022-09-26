@@ -51,35 +51,37 @@ export default class ChatsTest extends Vue {
   room_name = ref('')
   name = ref('')
   id: number = 0
-
-
-
-  // setup() {
-  //   const count = ref(0)
-  //   const socket = io('http://localhost:3000');
-  //   const rooms = ref([]);
-  //   const name = ref('');
-  //   const id = ref('');
-
-  // //   // expose to template and other options API hooks
-  // //   return {
-  // //     count
-  // //   }
-  // }
-
-
-  beforeMount(){
-    // console.log(this.$store.getters.getUser);
-    
-
-
-    // this.id = this.$store.getters.getUser.id;
-  };
+  socket: io
   
-  mounted() {
-    this.id = this.$store.getters.getUser.id;
-    // this.id.value = 88081
-      this.$socketchat.emit('findAllRooms', {id: this.id}, (response) => {
+  
+  
+  // setup() {
+    //   const count = ref(0)
+    //   const socket = io('http://localhost:3000');
+    //   const rooms = ref([]);
+    //   const name = ref('');
+    //   const id = ref('');
+    
+    // //   // expose to template and other options API hooks
+    // //   return {
+      // //     count
+      // //   }
+      // }
+      
+      
+      beforeMount(){
+        // console.log(this.$store.getters.getUser);
+        
+        
+        
+        // this.id = this.$store.getters.getUser.id;
+      };
+      
+      mounted() {
+        this.socket = this.$store.getters.getSocket
+        this.id = this.$store.getters.getUser.id;
+        // this.id.value = 88081
+        this.socket.emit('findAllRooms', {id: this.id}, (response) => {
         this.rooms = response;
         console.log(response);
         console.log(this.rooms.value);
@@ -90,13 +92,13 @@ export default class ChatsTest extends Vue {
 
   creat()
   {
-    // console.log(this.name);
+    console.log("creat");
     // this.id.value = 88081
     // console.log(this.$store.getters.getUser.id);
 
-    this.$socketchat.emit('creat', { room_name: this.name, id: this.id }, (response) => {
+    this.socket.emit('creat', { room_name: this.name, id: this.id }, (response) => {
       this.rooms = response;
-      // console.log(response);
+      console.log(response);
     });
   }
 }
