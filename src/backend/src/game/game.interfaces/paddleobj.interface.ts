@@ -7,4 +7,5 @@ export interface PaddleObj {
 	speed: number;
 	reboundAngles: Array<number>;
 	id: string;
+	socketid: string;
 }
