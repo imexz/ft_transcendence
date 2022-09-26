@@ -2,7 +2,6 @@
     <div>
         <span>{{room.name}}</span>
         <button @click="switchState" > {{button_text}}</button>
-        <!-- <span>{{joined}}</span> -->
         <div v-if=joined class="test">
           <Chat
           :room_name = room.name />     

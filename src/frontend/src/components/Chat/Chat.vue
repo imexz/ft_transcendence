@@ -7,7 +7,6 @@
       </div>
 
       <div>
-        test==========
         <div v-if="typingDiplay">{{ typingDiplay }}</div>
         <hr />
       </div>
