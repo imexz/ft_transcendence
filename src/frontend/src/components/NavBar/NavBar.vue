@@ -34,6 +34,11 @@
         type: 'left'
       },
       {
+        label: 'Chats',
+        link: '/chat',
+        type: 'left'
+      },
+      {
         label: 'Play',
         link: '/play',
         type: 'middle'

@@ -26,7 +26,7 @@
 import { onBeforeMount, ref } from 'vue';
 import { Options, Vue } from 'vue-class-component';
 import { io } from 'socket.io-client';
-import RoomSummary from '../components/RoomSummary.vue'
+import RoomSummary from '../components/Chat/RoomSummary.vue'
 
 
 @Options({
@@ -61,7 +61,7 @@ export default class ChatsTest extends Vue {
     // this.id.value = 88081
     // console.log(this.$store.getters.getUser.id);
 
-    this.socket.emit('creat', { room_name: this.name, id: this.id }, (response) => {
+    this.socket.emit('creat', { room_name: this.name, id: this.id }, (response: any) => {
       this.rooms = response;
       console.log(response);
     });

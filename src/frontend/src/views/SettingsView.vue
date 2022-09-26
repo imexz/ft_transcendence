@@ -8,9 +8,9 @@
 <script lang="ts">
 
  import { Vue, Options } from 'vue-class-component';
- import ChangeUserName from '@/components/ChangeUserName.vue';
-import ChangeUserAvatar from '@/components/ChangeUserAvatar.vue';
-import EnableTwoFA from '@/components/enable2fc.vue';
+ import ChangeUserName from '@/components/Settings/ChangeUserName.vue';
+import ChangeUserAvatar from '@/components/Settings/ChangeUserAvatar.vue';
+import EnableTwoFA from '@/components/Auth/enable2fc.vue';
 
   @Options ({
     components: {
