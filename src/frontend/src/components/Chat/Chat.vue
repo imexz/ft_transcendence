@@ -26,12 +26,13 @@
 
 <script lang="ts">
 import { Options, Vue } from 'vue-class-component';
-import { Socket } from 'socket.io-client';
+import { io } from 'socket.io-client';
 import Message from '@/models/message';
+import { API_URL } from '@/models/host';
+
 
 @Options ({
   props: {
-    // socket: Object,
     room_name: Object,
   }
 })
@@ -40,18 +41,19 @@ import Message from '@/models/message';
 export default class Chat extends Vue {
   // socket!: Socket<DefaultEventsMap, DefaultEventsMap>;
   // socket = socket
-  // socket = io(hostURL + ":3000")
+  // socket = io(API_URL + ":3000", {auth: (cb) => {
+  //   cb({ token: localStorage.user.id })
+  //  }})
+   socket = io(API_URL + ":3000")
   room_name!: string;
   typingDiplay = '';
   messageText: string = '';
   messages: Message[] = [];
   timeout: number = 0;
-  socket!: Socket;
   user_id!: Number;
   
   
   mounted(){
-    this.socket = this.$store.getters.getSocket
     this.user_id = this.$store.getters.getUser.user_id
     console.log("tests");
     // console.log(this.$socketio.id);     

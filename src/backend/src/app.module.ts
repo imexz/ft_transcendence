@@ -56,7 +56,7 @@ import { ChatroomModule } from './chatroom/chatroom.module';
 	// controllers: [GameController],
 	// providers: [ChatGateway, MessageService, ChatroomService, GameService, GameGateway, ChatGateway, MessageService, ChatroomService],
 	// providers: [ChatGateway, MessageService, ChatroomService, GameService, MessageService, ChatroomService],
-	// providers: [UsersController],
+	// providers: [ChatGateway],
 })
 export class AppModule {
 	constructor(private dataSource: DataSource) {}
