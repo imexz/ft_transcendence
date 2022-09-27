@@ -3,16 +3,6 @@ import { Socket, Server } from 'socket.io';
 import { message } from '../message/message.entity';
 import { ChatService } from './chat.service';
 
-// const io = require('socket.io')(server, {
-//   cors: {
-//       origin: "http://localhost:8100",
-//       methods: ["GET", "POST"],
-//       transports: ['websocket', 'polling'],
-//       credentials: true
-//   },
-//   allowEIO3: true
-// });
-
 @WebSocketGateway({
   cors: {
     // origin: "*",
@@ -20,9 +10,14 @@ import { ChatService } from './chat.service';
     credentials: true
   },
   // namespace: 'chat'
-}) //not shure
+})
 
 export class ChatGateway {
+
+  // @WebSocketServer()
+  // server: Server;
+
+  // server.use()
 
   // @WebSocketServer()
   // server = new Server({allowEIO3: true});
@@ -41,15 +36,16 @@ export class ChatGateway {
 
 
   afterInit(socket) {
-    console.log("afterInit chat ");
+    // console.log("afterInit chat ");
     
+    // console.log(socket);    
   }
 
   handleConnection(socket) {
-
-    console.log(socket.id );
-    
     console.log('connected chat')
+
+    console.log(socket);
+    
 
     // socket.emit('successfullConnected');
   }

@@ -1,13 +1,15 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
+
 
 import store from '../store/index'
+
 
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
-    name: 'home',
-    component: HomeView
+    name: 'me',
+    props: {id : "0"},
+    component: () => import('../views/ProfileView.vue')
   },
   {
     path: '/api_test',
@@ -23,8 +25,9 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import('../views/LoginView.vue')
   },
   {
-    path: '/profile',
+    path: '/profile/:id',
     name: 'profile',
+    props: true,
     component: () => import('../views/ProfileView.vue')
   },
   {
@@ -38,7 +41,7 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import('../views/PlayView.vue')
   },
   {
-    path: '/chats',
+    path: '/chat',
     name: 'Chats',
     component: () => import('../views/Chats.vue')
   }    
@@ -48,9 +51,12 @@ const router = createRouter({
   routes
 })
 
-router.beforeEach((to,from) => {
-  if (to.name != 'login' && !store.getters.isValidated) {
-    return { name: 'login' };
+router.beforeEach(async (to) => {
+  const publicPages = ['/login'];
+  const authRequired = !publicPages.includes(to.path);
+
+  if (authRequired && !store.getters.isLogged) {
+    return '/login';
   }
 })
 

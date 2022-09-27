@@ -9,7 +9,7 @@
 
 <script lang="ts">
 
-  import { hostURL } from '@/models/host'
+  import { API_URL } from '@/models/host'
   import { Vue } from 'vue-class-component'
 
 	export default class ScoreCounter extends Vue {
@@ -18,7 +18,7 @@
     eventSource: any
 
 		created() {
-			this.eventSource = new EventSource(hostURL + ":3000/game/sse");
+			this.eventSource = new EventSource(API_URL + "/game/sse");
 		}
 		mounted() {
 			this.eventSource.onmessage = ({data} : {data: any}) => {

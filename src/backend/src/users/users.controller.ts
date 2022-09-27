@@ -2,7 +2,7 @@ import { Body, Controller, Delete, Get, Param, Post, Res, UseGuards, Request, Us
 import { FileInterceptor } from '@nestjs/platform-express';
 import { UsersService } from './users.service';
 import { User } from './entitys/user.entity';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { JwtAuthGuard } from '../auth/jwt-two/jwt-auth.guard';
 import { response } from 'express';
 
 
@@ -13,7 +13,7 @@ export class UsersController {
 	@Get('find/:id')
 	@UseGuards(JwtAuthGuard)
 	findOne(@Param('id') params: number){
-		return this.usersService.findOne(params)
+		return this.usersService.getUser(params)
 	}
 
 	@Get('allUser')
@@ -50,7 +50,7 @@ export class UsersController {
 		console.log("inside validate");
 		console.log(req.user);
 
-		const user = this.usersService.findOne(req.user.id)
+		const user = this.usersService.getUser(req.user.id)
 		// console.log(user);
 		return user
 	}

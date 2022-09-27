@@ -16,9 +16,9 @@
 
 <script lang="ts">
   import { Vue, Options } from 'vue-class-component';
-  import ScoreCounter from '../components/ScoreCounter.vue'
-//   import io from "socket.io-client";
-  import { hostURL } from '@/models/host';
+  import ScoreCounter from '@/components/Game/ScoreCounter.vue'
+  //import io from "socket.io-client";
+  import { API_URL } from '@/models/host';
 
   @Options({
     components: {
@@ -42,7 +42,7 @@ export default class PongGame extends Vue {
 		// this.socket = io(hostURL + ":3000");
 		this.$socketgame.on('GameId', (gameid: string) => {
 			this.gameId = gameid;
-			this.eventSource = new EventSource(hostURL + ":3000/game/sse/" + this.gameId);
+			this.eventSource = new EventSource(API_URL + "/game/sse/" + this.gameId);
 		})
 		this.$socketgame.emit('joinQueue');
 

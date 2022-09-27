@@ -21,7 +21,7 @@
 <script lang="ts">
   import { Options, Vue } from 'vue-class-component';
   import VueAxios from 'axios';
-  import { hostURL } from '@/models/host';
+  import { API_URL } from '@/models/host';
 
   export default class ApiTest extends Vue {
     value = 'empty'
@@ -33,7 +33,7 @@
         console.log(this.body)
         VueAxios({
           url: this.text,
-          baseURL: hostURL +':3000',
+          baseURL: API_URL,
           method: this.method,
           withCredentials: true,
           // data : JSON.parse(this.body)
@@ -45,7 +45,7 @@
       else {
         VueAxios({
           url: this.text,
-          baseURL: hostURL + ':3000',
+          baseURL: API_URL,
           method: this.method,
           withCredentials: true,
           data : JSON.parse(this.body)
