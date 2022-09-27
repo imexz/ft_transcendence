@@ -3,11 +3,13 @@
     <div 
       v-if=isLoggedIn
       class="currentUser"
-      :class="{'userActive': this.$route.name === 'me'}"
-      @click="this.$router.push('/')"
-    >
+      @click="this.$router.push('/')">
       <img :src="this.$store.getters.getUser.avatar_url" class="userPic">
-      <span class="userName">{{ this.$store.getters.getUser.unique_name }} </span>
+      <span 
+        class="userName"
+        :class="{'userActive': this.$route.name === 'me'">
+        {{ this.$store.getters.getUser.unique_name }}
+      </span>
     </div>
     <div v-else>
     </div>
@@ -40,11 +42,9 @@
       } 
     },
     computed: {
-      isLoggedIn: {
-        get(): boolean {
+      isLoggedIn(): boolean {
           return store.state.validated;
         }
-      }
     },
     components: {
       FtAuth,
@@ -64,20 +64,20 @@
 }
 
 .currentUser {
-  padding-left: 20px;
-  color: var(--ft_pink);
-}
-.userActive {
-  color: var(--ft_blue);
+  padding-left: 25px;
+  vertical-align: middle;
 }
 
 .userName {
+  color: var(--ft_pink);
   padding-left: 10px;
   font-size: 25px;
   font-weight: bold;
   vertical-align: middle;
 }
-
+.userActive {
+  color: var(--ft_blue);
+}
 .userPic {
   width: 50px;
   height: 50px;
