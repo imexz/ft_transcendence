@@ -8,17 +8,11 @@ import {TokenPayload} from './tokenPayload.interface';
 export class AuthService {
 	constructor(private usersService: UsersService, private jwtService: JwtService) {}
 	
-	validateUser(id: number): Promise<any> {
-		console.log("validateUser");
-		try {
-			const user = this.usersService.getUser(id);
+	async validateUser(id: number) {
+
+			const user = await this.usersService.getUser(id);
 			console.log("all good");
 			return user;
-		} catch(err) {
-			console.log("validateUser error");
-			console.log(err);
-			throw err;
-		}
 	}
 
 	addUser(user: User) {

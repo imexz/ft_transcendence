@@ -40,6 +40,13 @@ export class UsersController {
 		return  this.usersService.addfriend(req.user.id, id);
 	}
 
+	@Post('removeFriend')
+	@UseGuards(JwtAuthGuard)
+	removeFriend(@Request() req, @Body("id") id: number){
+		// console.log(id);
+		return  this.usersService.addfriend(req.user.id, id);
+	}
+
 	@Get('friends')
 	@UseGuards(JwtAuthGuard)
 	getFriends(@Request() req) {

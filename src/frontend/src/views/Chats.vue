@@ -3,14 +3,13 @@
   <div>
     <div class="room-input">
       <form @submit.prevent="creat">
-        <label>Create Room</label>
         <input v-model="name" />
         <select v-model="access">
           <option>privat</option>
           <option>public</option> 
           <option>protected</option> 
         </select>
-        <button type="submit">Send</button>
+        <button type="submit">Create Room</button>
       </form>
     </div>
     <div class="room-container">
@@ -18,9 +17,7 @@
         v-for="room in rooms"
           :room = room />
     </div>
-    <h1>
-      "geht das heir"
-    </h1>
+    <Toast></Toast>
 
   </div>
 
@@ -79,10 +76,12 @@ export default class ChatsTest extends Vue {
       })
         .then(response => {
           console.log(response);
-          
-           this.rooms.push(response.data)
+          if(response != null)
+            this.rooms.push(response.data)
+            this.$emit('success', 'creat Room')
+            console.log("succes");
           })
-        .catch()
+        .catch(error => { this.$emit('error') })
   }
 }
 
