@@ -34,6 +34,8 @@ export class GameService {
 	async createGame() {
 		console.log('inside createGame()');
 		var gamerepo = this.gameRepository.create();
+		console.log("after repo create");
+
 		gamerepo = await this.gameRepository.save(gamerepo);
 		var p1: Socket = this.queue.shift();
 		var p2: Socket = this.queue.shift();
