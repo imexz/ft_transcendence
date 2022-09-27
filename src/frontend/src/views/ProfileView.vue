@@ -1,28 +1,36 @@
 <template>
-  <div>
-    <img :src='this.$store.getters.getUser.avatar_url' alt='Profile Pic'>
-    <h1>Welcome {{ this.$store.getters.getUser.unique_name }}</h1>
-  </div>
+  <Profile :pid=parseInt(id) />
   <div>
     <SearchBar/>
+  </div>
+  <div>
+    <FriendList/>
   </div>
 </template>
 
 <script lang="ts">
   import { Options, Vue } from 'vue-class-component';
-  import UserSummary from '../components/UserSummary.vue';
-  import SearchBar from '@/components/SearchBar.vue';
+  import UserSummary from '@/components/Profile/UserSummary.vue';
+  import SearchBar from '@/components/Profile/SearchBar.vue';
+  import Profile from '@/components/Profile/Profile.vue';
+  import FriendList from '@/components/Profile/FriendList.vue'
 
   @Options ({
+    props: {
+      id: String,
+    },
     components : {
       UserSummary,
       SearchBar,
+      Profile,
+      FriendList,
     }
   })
 
   export default class ProileView extends Vue {
-    ProfilePicUrl: string = ""
-  }
+    id!:string
+    
+    }
 </script>
 
 <style scoped>

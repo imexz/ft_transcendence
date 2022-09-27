@@ -1,13 +1,13 @@
 <template>
-  <NavBar></NavBar>
-  <!-- <img alt="Pong Logo" src="./assets/pong_logo.jpg"> -->
-  <router-view/>
+  <div class="site">
+    <NavBar></NavBar>
+    <router-view class="routerView"/>
+  </div>
 </template>
 
 <script lang="ts">
   import { Options, Vue } from 'vue-class-component';
-  import NavBar from './components/NavBar.vue';
-  // import {SocketContext, socket} from './context/socket';
+  import NavBar from '@/components/NavBar/NavBar.vue';
 
   @Options ({
     components: {
@@ -35,6 +35,11 @@
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: var(--ft_blue);
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
 }
 
 img {

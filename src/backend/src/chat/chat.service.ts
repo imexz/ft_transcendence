@@ -21,6 +21,7 @@ export class ChatService {
         room.owner = user;
         room.admins = [user]
         room.Users = [user]
+        room.access = "private"
         await this.chatroomRepository.save(room)
     }
   }

@@ -1,7 +1,8 @@
 import {Redirect, Controller, Request, Get, Param, UseGuards, Delete, Res } from '@nestjs/common';
-import { LocalAuthGuard } from './local-auth.guard'
+import { LocalAuthGuard } from './42/local-auth.guard'
 import { AuthService } from './auth.service';
-import { JwtAuthGuard } from './jwt-auth.guard';
+//import { JwtAuthGuard } from './jwt-auth.guard';
+import { hostURL } from '../hostURL';
 
 @Controller('auth')
 export class AuthController{
@@ -16,20 +17,35 @@ export class AuthController{
 	@UseGuards(LocalAuthGuard)
 	@Get('login/callback')
 	@Redirect("", 302)
-	callback(@Request() req, @Res({ passthrough: true }) res ) {
-		res.cookie("token", this.authService.login(req.user));
-		// res.Redirect = process.env.HOME + ":8080/login"
-		// {domain: "http://localhost:3000/", maxAge: 6000 , sameSite: 'lax'}
+	callback(@Request() req, @Res({ passthrough: true }) res ) { 
+		console.log('login/callback');
+
+		// res.cookie("token", this.authService.login(req.user));
+
+		
+		// res.setHeader('Set-Cookie', [this.authService.getCookieWithJwtAccessToken(
+		// 	req.user.id,
+		// 	req.user.isTwoFactorAuthenticationEnabled,
+		// )]);
+		// res.cookie("token", [this.authService.getCookieWithJwtAccessToken(
+		// 	req.user.id,
+		// 	req.user.isTwoFactorAuthenticationEnabled,
+		// )]);
+		res.setHeader('Set-Cookie', this.authService.getCookieWithJwtAccessToken(
+			req.user.id,
+			false,
+		))
+
 		return {
-			url: process.env.HOST + ":8080/login"
+			url: "http://localhost" + ":8080/login"
 		}
 	}
 
-	@Get('protected')
-	@UseGuards(JwtAuthGuard)
-	getusers(@Request() req): string {
-		return "test"
-	}
+	// @Get('protected')
+	// @UseGuards(JwtAuthGuard)
+	// getusers(@Request() req): string {
+	// 	return "test"
+	// }
 
 
 	// @Get('getall')

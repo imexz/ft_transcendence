@@ -23,5 +23,7 @@ export class chatroom{
     @JoinTable()
     messages: message[];
 
+    @Column()
+    access: string;
 
 }
