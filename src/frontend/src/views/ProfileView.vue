@@ -1,5 +1,7 @@
 <template>
-  <Profile :id="id" />
+  <div>
+    <Profile :id="id" />
+  </div>
   <div>
     <SearchBar/>
   </div>
