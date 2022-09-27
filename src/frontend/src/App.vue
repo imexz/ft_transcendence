@@ -51,27 +51,30 @@ button {
     background-color: var(--ft_black);
     color: var(--ft_white);
     padding: 15px 32px;
-    font-size: 32px;
+    font-size: 20px;
     font-weight: bold;
     margin: auto;
-    border-image: linear-gradient(var(--ft_pink), var(--ft_blue)) 30;
+    border-image: linear-gradient(var(--ft_pink), var(--ft_blue)) 1;
+    box-sizing: border-box;
   }
 select {
     background-color: var(--ft_black);
     color: var(--ft_white);
     padding: 15px 32px;
-    font-size: 32px;
+    font-size: 20px;
     font-weight: bold;
     margin: auto;
-    border-image: linear-gradient(var(--ft_pink), var(--ft_blue)) 30;
+    border-image: linear-gradient(var(--ft_pink), var(--ft_blue)) 1;
+    box-sizing: border-box;
   }
 input {
     background-color: var(--ft_black);
     color: var(--ft_white);
     padding: 15px 32px;
-    font-size: 32px;
+    font-size: 20px;
     font-weight: bold;
     margin: auto;
-    border-image: linear-gradient(var(--ft_pink), var(--ft_blue)) 30;
+    border-image: linear-gradient(var(--ft_pink), var(--ft_blue)) 1;
+    box-sizing: border-box;
   }
 </style>
