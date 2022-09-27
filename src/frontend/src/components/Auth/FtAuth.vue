@@ -46,7 +46,6 @@ export default {
           withCredentials: true,
         })
         .then(response => (
-          console.log(response.data),
           this.$store.dispatch('logIn', response.data)))
         .catch(error => (console.log(error), this.$store.commit('logOut')))
     }

@@ -43,6 +43,7 @@ export class GameGateway {
 			else
 				console.log("queue empty");
 		}
+		console.log("after loop");
 	}
 
   }
