@@ -1,5 +1,6 @@
 <template>
   <div>
+    <Toast v-if="showToast" :msg=toastMsg :mode=toastMode />
     <div v-if="!this.$store.getters.isLogged">
       <button 
         class="authButton"
@@ -18,11 +19,21 @@
   import VueAxios from 'axios';
   import { API_URL } from '@/models/host';
   import EnableTwoFA from '@/components/Auth/enable2fc.vue';
+  import Toast from '@/components/Toast.vue'
+  import { ref }  from 'vue';
 
 
 export default {
   components: {
     EnableTwoFA,
+    Toast,
+  },
+  data() {
+    return {
+      showToast : ref(false),
+      toastMsg : ref(''),
+      toastMode : ref(''),
+    }
   },
   methods: {
     logout(): void {
@@ -38,6 +49,12 @@ export default {
     authenticate() {
       location.href= API_URL + '/auth/login'
     },
+    triggerToast(msg: string, mode: string) {
+        this.showToast = true;
+        this.toastMsg = msg;
+        this.toastMode = mode;
+        setTimeout(() => this.showToast = false, 2000);
+    },
     validateUser() {
         VueAxios({
           url: '/users/validate',
@@ -46,8 +63,12 @@ export default {
           withCredentials: true,
         })
         .then(response => (
-          this.$store.dispatch('logIn', response.data)))
-        .catch(error => (console.log(error), this.$store.commit('logOut')))
+          this.$store.dispatch('logIn', response.data),
+          this.triggerToast('vaildated', 'success')))
+        .catch(error => (
+          console.log(error),
+          this.$store.commit('logOut'),
+          this.triggerToast('please log in', 'error')))
     }
   },
   mounted(): void {
