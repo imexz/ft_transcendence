@@ -44,23 +44,37 @@ export default class Chat extends Vue {
   // socket = io(API_URL + ":3000", {auth: (cb) => {
   //   cb({ token: localStorage.user.id })
   //  }})
-   socket = io(API_URL + ":3000")
   room_name!: string;
   typingDiplay = '';
   messageText: string = '';
   messages: Message[] = [];
   timeout: number = 0;
   user_id!: Number;
+  socket: any;
+  
+  beforeMount(){
+    console.log("beforeMounted");
+    
+    
+  }
   
   
   mounted(){
-    this.user_id = this.$store.getters.getUser.user_id
+    this.socket = io(API_URL, {
+    auth: (cb) => {
+      cb({ id: this.$store.getters.getUser.id })
+    }
+  });
+
+  // this.socket = io(API_URL, {
+  //   auth: { access: this.$store.getters.getUser.id }
+  // });
+    this.user_id = this.$store.getters.getUser.id
     console.log("tests");
     // console.log(this.$socketio.id);     
     // console.log(this.$socketchat.id);
     
-    this.socket.emit('join', { room_name: this.room_name, user_id: this.user_id}, () => {
-        // joined.value = true;
+    this.socket.emit('join', { room_name: this.room_name}, () => {
     })
     // console.log(this.socket);
     

@@ -11,7 +11,6 @@ export class UsersService {
 
     async addClientId(id: number, clientId: string) {
 		const user = await this.usersRepository.findOneBy({id: id})
-		user.clientId = clientId
 		this.usersRepository.update(id, user)
 		return user.unique_name;
     }
@@ -40,19 +39,15 @@ export class UsersService {
 	}
 
 	async getUser(id: number): Promise<User> {
-			// console.log(id);
-			try{
-				const user = await this.usersRepository.findOneBy({id: id})
-				if(user == null) {
-					console.log("user == null");
-				}
-				console.log(user);
-
-			return user
-			} catch (err) {
-				console.log("test1");
-				throw err;
+		if(id != undefined) {
+			const user = await this.usersRepository.findOneBy({id: id})
+			if(user == null) {
+				console.log("user == null");
 			}
+			console.log(user);
+			return user
+		}
+		return undefined
 	}
 
 	async remove(id: number): Promise<void> {
@@ -105,70 +100,28 @@ export class UsersService {
 		console.log(user_id);
 		console.log(friend_id);
 
-		if(!user_id || !friend_id) {
-			console.log("freind or user null");
-
-			return null
+		if(user_id && friend_id) {
+			try{
+				const user = await this.usersRepository.findOne({
+					where: {
+					id: user_id
+					},
+					relations: {
+						friends: true,
+					}
+				});
+				const user_friend: User = await this.usersRepository.findOneBy({id: friend_id});
+	
+				user.friends.push(user_friend);
+				this.usersRepository.save(user);
+	
+			} catch(exception: unknown) {
+				console.log(exception)
+				console.log("freind or user null");
+				return null;
+			}
+			return;
 		}
-		try{
-			const user = await this.usersRepository.findOne({
-				where: {
-				id: user_id
-				},
-				relations: {
-					friends: true,
-				}
-			});
-			const user_friend: User = await this.usersRepository.findOneBy({id: friend_id});
-			// console.log((user.friends));
-			// console.log((user));
-			// console.log((user_friend));
-
-			// var tmp: User[];
-			// tmp = [user_friend];
-			// if (user[0].friends != undefined) {
-			// 	console.log("has already friends");
-
-			// 	user[0].friends.forEach(element => {
-			// 		tmp.push(element)
-			// 	});
-			// }
-			// user.friends.push(user_friend);
-			user.friends.push(user_friend);
-
-			// const tmp1: User = ({
-			// 	id: user.id,
-			// 	unique_name: profile.name.givenName,
-			// 	avatar_url: user.avatar_url,
-			// 	avatar_url_42intra: profile.image_url,
-			// 	avatar: user.avatar,
-			// 	friends: user.friends,
-			// 	messeges: null,
-			// 	chatrooms: null,
-			// 	admin_of: null,
-			// 	clientId: null,
-			// 	current_status: null
-			// 	})
-			// 	new User(, user.unique_name, , , );
-
-
-			// tmp.push(user_friend);
-			// (await user).friends = user_friend;
-			// (await user).friends.fill(await user_friend)
-			this.usersRepository.save(user);
-			// this.usersRepository.update(user.id, user);
-
-		} catch(exception: unknown) {
-			console.log(exception)
-			console.log("freind or user null");
-			return null;
-		}
-		return;
-
-		// if(await user == null || await user_friend == null) {
-
-		// }
-
 	}
 
 	async setTwoFactorAuthenticationSecret(secret: string, userId: number) {

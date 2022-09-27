@@ -4,6 +4,7 @@ import { UsersService } from '../users/users.service';
 import { Repository } from 'typeorm';
 import { message } from './message.entity';
 import { User } from '../users/entitys/user.entity';
+import { chatroom } from 'src/chatroom/chatroom.entity';
 
 @Injectable()
 export class MessageService {
@@ -12,8 +13,28 @@ export class MessageService {
         private messageRepository: Repository<message>
     ) {}
 
-    addMessage(message: message) {
+    userAddMessageToRoom(user: User, conntent: string, chatroom: chatroom) {
+        if (user != undefined && chatroom != undefined && conntent != undefined) {
+            var new_message = this.messageRepository.create({user: user, chatroom: chatroom, content: conntent});
+            this.messageRepository.save(new_message);
+        }
+    }
 
+    async getAllMessagesOfRoom(room_name: string) {
+        const messages = await this.messageRepository.find(
+            {
+                where: {
+                    chatroom: {
+                        name: room_name
+                    }
+
+                },
+                relations: {
+                    user: true
+                }
+            }
+        )
+        return messages  
     }
 
 }

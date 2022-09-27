@@ -5,6 +5,10 @@ import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryColumn, PrimaryGene
 @Entity()
 export class message {
 
+    constructor(partial: Partial<message>) {
+		Object.assign(this, partial);
+	  }
+
     @PrimaryGeneratedColumn()
     id: number;
 

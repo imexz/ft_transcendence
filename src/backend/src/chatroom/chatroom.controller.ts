@@ -1,4 +1,4 @@
-import { Controller, Delete, Get, UseGuards, Request, Body, Post } from "@nestjs/common";
+import { Controller, Delete, Get, UseGuards, Request, Body, Post, HttpException, HttpStatus } from "@nestjs/common";
 import { JwtAuthGuard } from "src/auth/jwt-two/jwt-auth.guard";
 import { ChatroomService } from "./chatroom.service";
 
@@ -23,8 +23,11 @@ export class ChatroomController {
     async CreatChatroon(@Request() req,
         @Body("room_name") room_name: string,
         @Body("access") access: string) {
-        return await this.chatroomService.addRoom(room_name, access, req.user)
+        const room = await this.chatroomService.addRoom(room_name, access, req.user)
+        if(room == undefined)
+            throw new HttpException('Forbidden', HttpStatus.CONFLICT);
+        console.log(room);
+        
+        return room
     }
-
-
 }
