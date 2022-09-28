@@ -12,19 +12,6 @@ export class GameGateway {
 
   constructor (private readonly gameService: GameService) {};
 
-  afterInit(socket) {
-	console.log("afterInit game ");
-  }
-
-  handleConnection(socket) {
-
-	console.log(socket.handshake.auth.id );
-
-	console.log('connected game')
-
-	// socket.emit('successfullConnected');
-  }
-
   @SubscribeMessage('joinQueue')
   async handleJoinQueue(@ConnectedSocket() client: Socket): Promise<void> {
 	this.gameService.addClientIdToQueue(client);
@@ -36,11 +23,6 @@ export class GameGateway {
 	}
 	console.log("leaving handleJoinQueue");
   }
-
-//   @SubscribeMessage('joinedGame')
-//   handleJoinedGame(gameid: number, @ConnectedSocket() client: Socket): void {
-// 	this.gameService.gameIds.set(client.handshake.auth.id, gameid);
-//   }
 
   @SubscribeMessage('leftGame')
   handleLeftGame(@ConnectedSocket() client: Socket): void {
