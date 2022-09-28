@@ -75,15 +75,14 @@
   transform: translateY(1px);
 }
 
-.child {
+/* .child {
   flex: 1 0 20%;
-}
+} */
 
 .currentUser {
+  cursor: default;
   float: left;
-  display: inline-block;
   align-items: center;
-  /* padding-left: 25px; */
   padding: 1px 20px;
   vertical-align: middle;
   border: 2px solid var(--c);
@@ -120,6 +119,7 @@
 }
 
 .navButton {
+  cursor: default;
   font-weight: bold;
   color: var(--ft_cyan);
   text-decoration: none;
@@ -144,6 +144,7 @@
 }
 
 .playButton{
+  cursor: default;
   text-decoration: none;
   text-align: center;
   font-size: 25px;
