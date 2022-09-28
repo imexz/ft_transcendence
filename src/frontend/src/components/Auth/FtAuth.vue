@@ -4,13 +4,13 @@
     <div v-if="!this.$store.getters.isLogged">
       <button 
         class="authButton"
-        @click="this.authenticate">42 AUTH</button>
+        @click="this.authenticate">login</button>
         
     </div>
     <div v-else>
       <button
         class="authButton"
-        @click="this.logout">Logout</button>
+        @click="this.logout">logout</button>
     </div>
   </div>
 </template>
@@ -79,7 +79,17 @@ export default {
 </script>
 
 <style>
-  .authButton{
-    float: right;
+  .authButton {
+    text-decoration: none;
+    text-align: center;
+    font-size: 25px;
+    font-weight: bold;
+    color: var(--ft_white);
+    background:  linear-gradient(var(--ft_red), var(--ft_yellow));
+    padding: 14px 24px;
+    border-radius: 10px;
+  }
+  .authButton:active{
+    transform: translateY(1px);
   }
 </style>
