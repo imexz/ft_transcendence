@@ -4,12 +4,14 @@
     <div v-if="!this.$store.getters.isLogged">
       <button 
         class="authButton"
+        :class="{'linkActive': this.$route.name === 'login'}"
         @click="this.authenticate">login</button>
         
     </div>
     <div v-else>
       <button
         class="authButton"
+        :class="{'linkActive': this.$route.name === 'login'}"
         @click="this.logout">logout</button>
     </div>
   </div>
@@ -80,14 +82,27 @@ export default {
 
 <style>
   .authButton {
+    float: right;
     text-decoration: none;
     text-align: center;
     font-size: 25px;
-    font-weight: bold;
-    color: var(--ft_white);
-    background:  linear-gradient(var(--ft_red), var(--ft_yellow));
     padding: 14px 24px;
+    color: var(--ft_cyan);
+    border: 2px solid var(--ft_cyan);
+    background-color: rgba(0, 0, 0, 0);
     border-radius: 10px;
+  }
+  .linkActive {
+    color: var(--ft_red);
+    border-color: var(--ft_red);
+  }
+  .authButton:hover {    
+    color: var(--ft_dark);
+    background-color: var(--ft_cyan);
+  }
+  .linkActive:hover {
+    color: var(--ft_dark);
+    background-color: var(--ft_red);
   }
   .authButton:active{
     transform: translateY(1px);
