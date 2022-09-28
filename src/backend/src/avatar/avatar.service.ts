@@ -29,6 +29,7 @@ export class AvatarService {
         }
 
         await this.usersService.updateAvatar(id, await this.fileRepository.save(avatar))
+        return "/avatar"
     }
 
     async delete(id: number) {

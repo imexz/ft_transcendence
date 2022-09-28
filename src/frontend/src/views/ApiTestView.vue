@@ -10,7 +10,7 @@
       <input v-model="text" placeholder="api address">
       <input v-model="body" placeholder="body">
       <br/>
-      <button>Submit</button>
+      <button class="defaultElement">Submit</button>
       <br/>
       <h1>Response</h1>
       <p>{{ value }}</p>

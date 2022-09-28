@@ -10,3 +10,4 @@ import { MessageService } from './message.service';
 	exports: [TypeOrmModule, MessageService]
 })
 export class MessageModule {}
+

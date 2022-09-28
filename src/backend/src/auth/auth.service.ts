@@ -7,18 +7,12 @@ import {TokenPayload} from './tokenPayload.interface';
 @Injectable()
 export class AuthService {
 	constructor(private usersService: UsersService, private jwtService: JwtService) {}
+	
+	async validateUser(id: number) {
 
-	validateUser(id: number): Promise<any> {
-		// console.log("validateUser");
-		try {
-			const user = this.usersService.getUser(id);
-			// console.log("all good");
+			const user = await this.usersService.getUser(id);
+			console.log("all good");
 			return user;
-		} catch(err) {
-			// console.log("validateUser error");
-			// console.log(err);
-			throw err;
-		}
 	}
 
 	addUser(user: User) {

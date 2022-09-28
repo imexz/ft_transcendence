@@ -1,21 +1,15 @@
 <template>
-  <div class="site">
     <NavBar></NavBar>
     <router-view class="routerView"/>
-  </div>
 </template>
 
 <script lang="ts">
-  import { Options, Vue } from 'vue-class-component';
   import NavBar from '@/components/NavBar/NavBar.vue';
 
-  @Options ({
+  export default {
     components: {
       NavBar,
-    }
-  })
-
-  export default class App extends Vue {    
+    }    
   }
 
 </script>
@@ -27,6 +21,14 @@
     --ft_white: #FFFFFF;
     --ft_pink: #FF0088;
     --ft_blue: #0877E6;
+
+    --ft_dark: #0c052e;
+    --ft_dark_purple: #3b1356;
+    --ft_purple: #802785;
+    --ft_pink:#fe0efe;
+    --ft_yellow: #f5ac0e;
+    --ft_cyan: #0cfbfe;
+    --ft_red: #e70038;
 }
 
 #app {
@@ -40,42 +42,24 @@
 html, body {
   margin: 0;
   padding: 0;
-}
-
-img {
-  width: 400;
-  height: auto;
+  height: 100%;
 }
 
 body {
-  background-color: var(--ft_black);
+  height: 100%;
+  background-color: #000000;
+  /* background: linear-gradient(var(--ft_dark_purple),var(--ft_dark)); */
+  background-repeat: no-repeat;
 }
 
-button {
-    background-color: var(--ft_black);
-    color: var(--ft_white);
-    padding: 15px 32px;
-    font-size: 32px;
-    font-weight: bold;
-    margin: auto;
-    border-image: linear-gradient(var(--ft_pink), var(--ft_blue)) 30;
-  }
-select {
-    background-color: var(--ft_black);
-    color: var(--ft_white);
-    padding: 15px 32px;
-    font-size: 32px;
-    font-weight: bold;
-    margin: auto;
-    border-image: linear-gradient(var(--ft_pink), var(--ft_blue)) 30;
-  }
-input {
-    background-color: var(--ft_black);
-    color: var(--ft_white);
-    padding: 15px 32px;
-    font-size: 32px;
-    font-weight: bold;
-    margin: auto;
-    border-image: linear-gradient(var(--ft_pink), var(--ft_blue)) 30;
-  }
+button, input, select {
+  background-color: var(--ft_black);
+  color: var(--ft_white);
+  padding: 15px 32px;
+  font-size: 20px;
+  font-weight: bold;
+  margin: auto;
+  border-image: linear-gradient(var(--ft_pink), var(--ft_blue)) 1;
+  box-sizing: border-box;
+}
 </style>
