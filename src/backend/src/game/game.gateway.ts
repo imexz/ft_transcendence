@@ -32,14 +32,9 @@ export class GameGateway {
 		console.log("client id %s is not in gamesIds Array", client.handshake.auth.id);
 		while (this.gameService.queue.length > 1) {
 			await this.gameService.createGame();
-			if (this.gameService.queue)
-				console.log(this.gameService.queue.length);
-			else
-				console.log("queue empty");
 		}
-		console.log("after loop");
 	}
-
+	console.log("leaving handleJoinQueue");
   }
 
 //   @SubscribeMessage('joinedGame')

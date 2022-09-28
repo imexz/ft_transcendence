@@ -28,7 +28,7 @@
 
 export default class PongGame extends Vue {
 	gameId: string = ""
-	socket:any = {}
+	socket:any = undefined
 
 	context:any = {}
 	eventSource:any = {}
@@ -38,36 +38,42 @@ export default class PongGame extends Vue {
 	}
 	created() {
 		console.log("in created");
-		this.socket = io(API_URL, {
-			auth: (cb) => {
-				cb ({id: this.$store.getters.getUser.id })
-			}
-		});
-		this.socket.on('gameId', (gameid: string) => {
-			this.gameId = gameid;
-			console.log("new GameId %d", gameid);
-			this.eventSource = new EventSource(API_URL + "/game/sse/" + this.gameId);
-		})
-		this.socket.emit('joinQueue');
-
-		document.addEventListener('keydown', (event) => {
-			console.log(event.key);
-			if (event.key == 'w') {
-				this.paddleLeftUp();
-			}
-			else if (event.key == 's') {
-				this.paddleLeftDown();
-			}
-			else if (event.key == 'ArrowUp') {
-				this.paddleRightUp();
-			}
-			else if (event.key == 'ArrowDown') {
-				this.paddleRightDown();
-			}
-		}, false);
+		if (this.socket === undefined) {
+			console.log("socket undefined");
+			this.socket = io(API_URL, {
+				auth: (cb) => {
+					cb ({id: this.$store.getters.getUser.id })
+				}
+			});
+			this.socket.on('gameId', (gameid: string) => {
+				this.gameId = gameid;
+				console.log("new GameId %d", gameid);
+				this.eventSource = new EventSource(API_URL + "/game/sse/" + this.gameId);
+			})
+			this.socket.emit('joinQueue');
+	
+			document.addEventListener('keydown', (event) => {
+				console.log(event.key);
+				if (event.key == 'w') {
+					this.paddleLeftUp();
+				}
+				else if (event.key == 's') {
+					this.paddleLeftDown();
+				}
+				else if (event.key == 'ArrowUp') {
+					this.paddleRightUp();
+				}
+				else if (event.key == 'ArrowDown') {
+					this.paddleRightDown();
+				}
+			}, false);
+		} else {
+			console.log("socket existent");
+		}
 	}
 
 	mounted() {
+		console.log("in mounted");	
 		this.eventSource.onmessage = (raw_data:  any) => {
 			console.log("event received");
 
