@@ -1,6 +1,5 @@
 <template>
   <div>
-    <FtAuth/>
     <div v-if="!this.$store.getters.isLogged">
       <h1>Please login</h1>
       <button @click="validateUser">validate AUTH</button>
@@ -13,14 +12,11 @@
 </template>
 
 <script lang ="ts">
-  import { Vue, Options } from 'vue-class-component';
   import EnableTwoFA from '@/components/Auth/enable2fc.vue';
-  import FtAuth from '@/components/Auth/FtAuth.vue'
 
   export default {
     components: {
       EnableTwoFA,
-      FtAuth,
     }
     
   }

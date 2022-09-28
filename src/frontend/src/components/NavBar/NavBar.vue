@@ -1,20 +1,30 @@
 <template>
   <div class="topBar">
-    <div 
-      v-if=isLoggedIn
-      class="currentUser topElement"
-      :class="{'userActive': this.$route.name === 'me'}"
-      @click="this.$router.push('/')">
-      <img :src="this.$store.getters.getUser.avatar_url" class="userPic">
-      <span class="userName">
-        {{ this.$store.getters.getUser.unique_name }}
-      </span>
+    <div class="child">
+      <div 
+        v-if=isLoggedIn
+        class="currentUser topElement"
+        :class="{'userActive': this.$route.name === 'me'}"
+        @click="this.$router.push('/')">
+        <img :src="this.$store.getters.getUser.avatar_url" class="userPic">
+        <span class="userName">
+          {{ this.$store.getters.getUser.unique_name }}
+        </span>
+      </div>
+      <div v-else></div>
     </div>
-    <div v-else></div>
-    <router-link :to="'/chat'" class="navButton topElement">chat</router-link>
-    <router-link :to="'/play'" class="playButton topElement">PLAY</router-link>
-    <router-link :to="'/settings'" class="navButton topElement">settings</router-link>
-    <FtAuth/>
+    <div class="child topElement">
+      <router-link :to="'/chat'" class="navButton" >chat</router-link>
+    </div>
+    <div class="child topElement">
+      <router-link :to="'/play'" class="playButton">PLAY</router-link>
+    </div>
+    <div class="child topElement">
+      <router-link :to="'/settings'" class="navButton ">settings</router-link>
+    </div>
+    <div class="child">
+      <FtAuth/>
+    </div>
   </div>
 </template>
 
@@ -54,25 +64,41 @@
 
 .topBar {
   display: flex;
+  flex-wrap: nowrap;
   height: 80px;
   justify-content: space-between;
   align-items: center;
   background: var(--ft_dark);
   border-bottom: 2px solid var(--ft_white);
 }
-
 .topElement:active {
   transform: translateY(1px);
 }
 
+/* .child {
+  flex: 1 0 20%;
+} */
+
 .currentUser {
-  /* padding-left: 25px; */
+  cursor: default;
+  float: left;
+  align-items: center;
   padding: 1px 20px;
   vertical-align: middle;
   border: 2px solid var(--c);
   border-radius: 10px;
   --c : var(--ft_cyan);
-
+}
+.currentUser:hover {
+  --c : var(--ft_dark);
+  background-color: var(--ft_cyan);
+}
+.userActive {
+  --c : var(--ft_red);
+}
+.userActive:hover {
+  --c : var(--ft_dark);
+  background-color: var(--ft_red);
 }
 
 .userName {
@@ -83,19 +109,17 @@
   vertical-align: middle;
   overflow-wrap: break-word;
 }
-.userActive {
-  --c : var(--ft_red);
-}
 .userPic {
   width: 50px;
   height: 50px;
   border-radius: 50%;
-  border: 1px solid white;
+  border: 1px solid var(--c);
   object-fit: cover;
   vertical-align: middle;
 }
 
 .navButton {
+  cursor: default;
   font-weight: bold;
   color: var(--ft_cyan);
   text-decoration: none;
@@ -120,6 +144,7 @@
 }
 
 .playButton{
+  cursor: default;
   text-decoration: none;
   text-align: center;
   font-size: 25px;
