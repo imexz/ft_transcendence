@@ -27,44 +27,54 @@
   })
 
 export default class PongGame extends Vue {
-	gameId?: string
+	gameId: string = ""
 	socket: any
-
 	context: any = {}
 	eventSource: any = {}
 	position: any = {
 		x: 0,
 		y: 0
 	}
-	created() {
-		console.log("in created");
+	side: string = ""
 
-		// TODO: ask backend for infos on existing game
+	created() { // always called when Component is initialized (e.g. on refresh)
+		console.log("in created");
+		// TODO: ask backend for infos on existing game (gameId, which side, etc)
 		this.socket = io(API_URL, {
 			auth: (cb) => {
 				cb ({id: this.$store.getters.getUser.id })
 			}
 		});
-		this.socket.on('gameId', (gameid: string) => {
-			this.gameId = gameid;
-			console.log("new GameId %d", gameid);
+		this.socket.on('gameId', (data) => {
+			console.log("event gameId received");
+			console.log(data.gameId);
+			console.log(data.side);
+			this.gameId = data.gameId;
+			this.side = data.side;
+			console.log("received GameId", this.gameId);
 			this.eventSource = new EventSource(API_URL + "/game/sse/" + this.gameId);
-		})
+		});
 		this.socket.emit('joinQueue');
-
+		this.socket.emit('checkGame');
 		document.addEventListener('keydown', (event) => {
-			console.log(event.key);
-			if (event.key == 'w') {
-				this.paddleLeftUp();
-			}
-			else if (event.key == 's') {
-				this.paddleLeftDown();
-			}
-			else if (event.key == 'ArrowUp') {
-				this.paddleRightUp();
-			}
-			else if (event.key == 'ArrowDown') {
-				this.paddleRightDown();
+			if (this.side === "left") {
+				if (event.key == 'w') {
+					console.log(event.key);
+					this.paddleLeftUp();
+				}
+				else if (event.key == 's') {
+					console.log(event.key);
+					this.paddleLeftDown();
+				}
+			} else if (this.side === "right") {
+				if (event.key == 'ArrowUp') {
+					console.log(event.key);
+					this.paddleRightUp();
+				}
+				else if (event.key == 'ArrowDown') {
+					console.log(event.key);
+					this.paddleRightDown();
+				}
 			}
 		}, false);
 	}
@@ -97,7 +107,7 @@ export default class PongGame extends Vue {
 		delete this.socket;
 		delete this.position;
 		delete this.context;
-		delete this.gameId;
+		// delete this.gameId;
 	}
 
 	drawPaddles(data: any) {

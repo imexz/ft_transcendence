@@ -49,7 +49,7 @@ import { ChatroomModule } from './chatroom/chatroom.module';
 	AvatarModule,
 	// MessageModule,
 	ChatModule,
-	// GameModule,
+	GameModule,
 	TwofsModule,
 	ChatroomModule,
 ],
