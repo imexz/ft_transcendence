@@ -13,7 +13,7 @@ export class ChatService {
 
     const user = await this.matchUserWithClient(user_id, client_id)
     if(user == null)
-        return null  
+        return null
     var room = await this.chatroomRepository.findOneBy({name: room_name})
     if(room == null){
         room = this.chatroomRepository.create()
@@ -38,7 +38,7 @@ export class ChatService {
 
   async findAllRooms(): Promise<chatroom[]> {
     const rooms =  await this.chatroomRepository.find()
-    console.log(rooms);
+    // console.log(rooms);
     return rooms
   }
 
@@ -88,8 +88,8 @@ export class ChatService {
 
             return await this.messageRepository.save(new_message)
         } catch (e){
-            console.log(e)
-            console.log("creat message goes wrong");
+            // console.log(e)
+            // console.log("creat message goes wrong");
         }
     }
 
@@ -97,7 +97,7 @@ export class ChatService {
   async manageJoin(client_id: string, user_id: number, room_name: string) {
     var user : User;
     if(user_id != undefined && client_id != undefined) {
-        user = await this.matchUserWithClient(user_id, client_id);       
+        user = await this.matchUserWithClient(user_id, client_id);
     } else if (client_id != undefined) {
         user = await this.userRepository.findOneBy({id: user_id})
     } else {
@@ -150,7 +150,7 @@ export class ChatService {
         // } catch (e) {
         //     console.log("findAllMessages error")
         //     console.log(e);
-            
+
         // }
 
         const messages = await this.messageRepository.find(
@@ -170,17 +170,17 @@ export class ChatService {
         // return chatroom.messages
         return messages
       }
-  
+
       async getClientName(clientId: string) {
         const user = await this.userRepository.findOneBy({clientId: clientId})
-        console.log("getClientName");
-        console.log(clientId);
-        console.log(user);
+        // console.log("getClientName");
+        // console.log(clientId);
+        // console.log(user);
             return user.unique_name
         }
-  
+
       async addClientIdToUser(clientId: string, user_id: number) {
           await this.userRepository.update(user_id, {clientId: clientId})
       }
-      
+
 }

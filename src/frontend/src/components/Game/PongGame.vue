@@ -17,7 +17,7 @@
 <script lang="ts">
   import { Vue, Options } from 'vue-class-component';
   import ScoreCounter from '@/components/Game/ScoreCounter.vue'
-  //import io from "socket.io-client";
+  import io from "socket.io-client";
   import { API_URL } from '@/models/host';
 
   @Options({
@@ -28,7 +28,7 @@
 
 export default class PongGame extends Vue {
 	gameId: string = ""
-	//socket:any = {}
+	socket:any = {}
 
 	context:any = {}
 	eventSource:any = {}
@@ -37,14 +37,18 @@ export default class PongGame extends Vue {
 		y: 0
 	}
 	created() {
-		console.log(this.$socketio.id);
-		console.log(this.$socketgame.id);
-		// this.socket = io(hostURL + ":3000");
-		this.$socketgame.on('GameId', (gameid: string) => {
+		console.log("in created");
+		this.socket = io(API_URL, {
+			auth: (cb) => {
+				cb ({id: this.$store.getters.getUser.id })
+			}
+		});
+		this.socket.on('gameId', (gameid: string) => {
 			this.gameId = gameid;
+			console.log("new GameId %d", gameid);
 			this.eventSource = new EventSource(API_URL + "/game/sse/" + this.gameId);
 		})
-		this.$socketgame.emit('joinQueue');
+		this.socket.emit('joinQueue');
 
 		document.addEventListener('keydown', (event) => {
 			console.log(event.key);
@@ -65,7 +69,9 @@ export default class PongGame extends Vue {
 
 	mounted() {
 		this.eventSource.onmessage = (raw_data:  any) => {
-			console.log(raw_data);
+			console.log("event received");
+
+			// console.log(raw_data);
 			let data = JSON.parse(raw_data.data);
 			console.log(data);
 			this.context = (this.$refs.game as any).getContext("2d");
@@ -86,16 +92,16 @@ export default class PongGame extends Vue {
 		this.context.fillRect(data.paddleRight.position.x, data.paddleRight.position.y, data.paddleRight.width, data.paddleRight.height);
 	}
 	paddleLeftUp() {
-		this.$socketgame.emit('moveLeftUp');
+		this.socket.emit('moveLeftUp');
 	}
 	paddleLeftDown() {
-		this.$socketgame.emit('moveLeftDown');
+		this.socket.emit('moveLeftDown');
 	}
 	paddleRightUp() {
-		this.$socketgame.emit('moveRightUp');
+		this.socket.emit('moveRightUp');
 	}
 	paddleRightDown() {
-		this.$socketgame.emit('moveRightDown');
+		this.socket.emit('moveRightDown');
 	}
 }
 </script>

@@ -25,9 +25,9 @@ export class GameService {
 	addClientIdToQueue(client: Socket): void {
 		if (this.queue.find(this.checkQueue, client) != client) {
 			this.queue.push(client);
-			console.log("%s was added to queue", client.id);
+			console.log("%s was added to queue", client.handshake.auth.id);
 		} else {
-			console.log("%s already in queue", client.id);
+			console.log("%s already in queue", client.handshake.auth.id);
 		}
 	}
 
@@ -40,11 +40,15 @@ export class GameService {
 		var p1: Socket = this.queue.shift();
 		var p2: Socket = this.queue.shift();
 		console.log("createGame() queue.length = %d", this.queue?.length);
-		console.log(this.setup);
-		var newgame = new Game(gamerepo.id, p1.id, p2.id, this.setup);
-		this.games.set(gamerepo.id, newgame);
-		this.gameIds.set(p1.id, gamerepo.id);
-		this.gameIds.set(p2.id, gamerepo.id);
+		// console.log(this.setup);
+		// var newgame = new Game(gamerepo.id, p1.handshake.auth.id, p2.handshake.auth.id, this.setup);
+		this.games.set(gamerepo.id, new Game(gamerepo.id, p1.handshake.auth.id, p2.handshake.auth.id, this.setup));
+		// this.games.set(gamerepo.id, newgame);
+		console.log("in create game:");
+		console.log(this.games.get(gamerepo.id));
+		this.gameIds.set(p1.handshake.auth.id, gamerepo.id);
+		this.gameIds.set(p2.handshake.auth.id, gamerepo.id);
+		console.log("gameid = %d", gamerepo.id);
 		p1.emit('gameId', gamerepo.id);
 		p2.emit('gameId', gamerepo.id);
 		console.log('leaving createGame()');
@@ -58,12 +62,18 @@ export class GameService {
 			this.reset(id);
 		}
 		return this.games.get(id);
-			// ball: this.games.get(id).ball,
-			// paddleLeft: this.games.get(id).paddleLeft,
-			// paddleRight: this.games.get(id).paddleRight,
-			// score: this.games.get(id).score,
-			// scoreLeft: this.games.get(id).scoreLeft,
-			// scoreRight: this.games.get(id).scoreRight,
+		// return ({
+		// 	ball: this.games.get(id).ball as any,
+		// 	paddleLeft: this.games.get(id).paddleLeft as any,
+		// 	paddleRight: this.games.get(id).paddleRight as any,
+		// 	score: this.games.get(id).score as any,
+		// 	scoreLeft: this.games.get(id).scoreLeft as any,
+		// 	scoreRight: this.games.get(id).scoreRight as any,
+		// 	id: id as any,
+		// 	playerLeft: this.games.get(id).playerLeft as any,
+		// 	playerRight: this.games.get(id).playerRight as any,
+		// 	player: this.games.get(id).player as any,
+		// });
 	}
 
 	updateData(id: number) {

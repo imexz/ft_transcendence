@@ -28,17 +28,17 @@ export class TwoFactorAuthenticationController {
     @Req() request,
     @Body() { twoFactorAuthenticationCode } : TwoFactorAuthenticationCodeDto
     ) {
-        console.log('authenticate');
-        
+        // console.log('authenticate');
+
         const isCodeValid = this.twoFactorAuthenticationService.isTwoFactorAuthenticationCodeValid(
             twoFactorAuthenticationCode,
             request.user
         );
-            console.log('authenticate1');
+            // console.log('authenticate1');
             if (!isCodeValid) {
                 throw new UnauthorizedException('Wrong authentication code');
             }
-            console.log('authenticate2');
+            // console.log('authenticate2');
 
         // const accessTokenCookie = this.authService.getCookieWithJwtAccessToken(request.user.id, true);
 
@@ -52,6 +52,6 @@ export class TwoFactorAuthenticationController {
         return request.user;
     }
 
-    
+
 
 }

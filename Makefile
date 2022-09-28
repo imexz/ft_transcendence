@@ -10,7 +10,7 @@ down:
 	docker compose down
 
 clean:
-	docker system prune -f --volumes --filter label=dangling=true
+	docker system prune -f --volumes
 
 re: down clean build up
 

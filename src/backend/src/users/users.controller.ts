@@ -25,7 +25,7 @@ export class UsersController {
 	@Post('addUser')
 	@UseGuards(JwtAuthGuard)
 	addUser(@Body() user: User){
-		console.log(user);
+		// console.log(user);
 
 		return  this.usersService.addUser(user);
 	}
@@ -47,8 +47,8 @@ export class UsersController {
 	@UseGuards(JwtAuthGuard)
 	@UseInterceptors(ClassSerializerInterceptor)
 	validate(@Request() req): Promise<User> {
-		console.log("inside validate");
-		console.log(req.user);
+		// console.log("inside validate");
+		// console.log(req.user);
 
 		const user = this.usersService.getUser(req.user.id)
 		// console.log(user);
