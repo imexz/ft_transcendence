@@ -1,41 +1,35 @@
 import { SubscribeMessage, WebSocketGateway, ConnectedSocket } from '@nestjs/websockets';
-import { WebSocketServer } from '@nestjs/websockets';
 import { GameService } from './game.service';
-import { Server, Socket } from 'socket.io';
+import { Socket } from 'socket.io';
 
 @WebSocketGateway({
 	cors: {
-		// origin: '*',
-    origin: ['http://localhost:8080', 'http://localhost:3000'],
-    credentials: true
+		origin: ['http://localhost:8080', 'http://localhost:3000'],
+		credentials: true
 	},
-  // namespace: 'game'
 })
 export class GameGateway {
-  // @WebSocketServer()
-  // server: Server;
 
   constructor (private readonly gameService: GameService) {};
 
   afterInit(socket) {
-    console.log("afterInit game ");
-
+	console.log("afterInit game ");
   }
 
   handleConnection(socket) {
 
-    console.log(socket.id );
+	console.log(socket.handshake.auth.id );
 
-    console.log('connected game')
+	console.log('connected game')
 
-    // socket.emit('successfullConnected');
+	// socket.emit('successfullConnected');
   }
 
   @SubscribeMessage('joinQueue')
   async handleJoinQueue(@ConnectedSocket() client: Socket): Promise<void> {
 	this.gameService.addClientIdToQueue(client);
-	if (this.gameService.gameIds.has(client.id) == false) {
-		console.log("client id %s is not in gamesIds Array", client.id);
+	if (this.gameService.gameIds.has(client.handshake.auth.id) == false) {
+		console.log("client id %s is not in gamesIds Array", client.handshake.auth.id);
 		while (this.gameService.queue.length > 1) {
 			await this.gameService.createGame();
 			if (this.gameService.queue)
@@ -50,35 +44,35 @@ export class GameGateway {
 
 //   @SubscribeMessage('joinedGame')
 //   handleJoinedGame(gameid: number, @ConnectedSocket() client: Socket): void {
-// 	this.gameService.gameIds.set(client.id, gameid);
+// 	this.gameService.gameIds.set(client.handshake.auth.id, gameid);
 //   }
 
   @SubscribeMessage('leftGame')
   handleLeftGame(@ConnectedSocket() client: Socket): void {
-	this.gameService.gameIds.delete(client.id);
+	this.gameService.gameIds.delete(client.handshake.auth.id);
   }
 
   @SubscribeMessage('moveLeftUp')
   handleMoveLeftUp(@ConnectedSocket() client: Socket): void {
-	let gameid = this.gameService.gameIds.get(client.id);
+	let gameid = this.gameService.gameIds.get(client.handshake.auth.id);
 	this.gameService.movePaddleUp(gameid, true);
   }
   @SubscribeMessage('moveRightUp')
   handleMoveRightUp(@ConnectedSocket() client: Socket): void {
-	let gameid = this.gameService.gameIds.get(client.id);
+	let gameid = this.gameService.gameIds.get(client.handshake.auth.id);
 	this.gameService.movePaddleUp(gameid, false);
   }
 
 
   @SubscribeMessage('moveLeftDown')
   handleMoveLeftDown(@ConnectedSocket() client: Socket): void {
-	let gameid = this.gameService.gameIds.get(client.id);
+	let gameid = this.gameService.gameIds.get(client.handshake.auth.id);
 	this.gameService.movePaddleDown(gameid, true);
   }
 
   @SubscribeMessage('moveRightDown')
   handleMoveRightDown(@ConnectedSocket() client: Socket): void {
-	let gameid = this.gameService.gameIds.get(client.id);
+	let gameid = this.gameService.gameIds.get(client.handshake.auth.id);
 	this.gameService.movePaddleDown(gameid, false);
   }
 }

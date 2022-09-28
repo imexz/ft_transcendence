@@ -37,15 +37,15 @@ export class ChatGateway {
 
   afterInit(socket) {
     // console.log("afterInit chat ");
-    
-    // console.log(socket);    
+
+    // console.log(socket);
   }
 
   handleConnection(socket) {
-    console.log('connected chat')
+    // console.log('connected chat')
 
-    console.log(socket);
-    
+    // console.log(socket);
+
 
     // socket.emit('successfullConnected');
   }
@@ -56,13 +56,13 @@ export class ChatGateway {
   @SubscribeMessage('join')
   joinRoom(
     @MessageBody('user_id') user_id: number,
-    @MessageBody('room_name') room_name: string,  
+    @MessageBody('room_name') room_name: string,
     @ConnectedSocket() client: Socket,
   ) {
-    console.log("join");
-    console.log(user_id);
-    client.join(room_name)
-    
+    // console.log("join");
+    // console.log(user_id);
+    // client.join(room_name)
+
     this.chatService.manageJoin(client.id, user_id, room_name)
 
   }
@@ -70,12 +70,12 @@ export class ChatGateway {
   @SubscribeMessage('creat')
   async creatRoom(
     @MessageBody('id') user_id: number,
-    @MessageBody('room_name') room_name: string,  
+    @MessageBody('room_name') room_name: string,
     @ConnectedSocket() client:Socket,
   ) {
-    console.log("creat");
-    console.log(room_name);
-    console.log(user_id);
+    // console.log("creat");
+    // console.log(room_name);
+    // console.log(user_id);
     client.join(room_name);
     await this.chatService.createRoom(client.id, user_id, room_name)
     return await this.chatService.findAllRooms()
@@ -85,10 +85,10 @@ export class ChatGateway {
 
   @SubscribeMessage('leave')
   leaveRoom(
-    @MessageBody('room_name') room_name: string,  
+    @MessageBody('room_name') room_name: string,
     @ConnectedSocket() client:Socket,
   ) {
-    console.log("leave");
+    // console.log("leave");
     client.leave(room_name);
     this.chatService.manageLeave(client.id, room_name)
   }
@@ -96,25 +96,25 @@ export class ChatGateway {
   @SubscribeMessage('typing')
   async typing(
     @MessageBody('isTyping') isTyping: boolean,
-    @MessageBody('room_name') room_name: string,  
+    @MessageBody('room_name') room_name: string,
     @ConnectedSocket() client:Socket,
   ) {
-    console.log(client.id)
-    
+    // console.log(client.id)
+
     const name = await this.chatService.getClientName(client.id);
     // const name = client.id
 
     client.to(room_name).emit('typing', { name , isTyping});
-    console.log("recive and emit typing");
-    
+    // console.log("recive and emit typing");
+
   }
 
   @SubscribeMessage('findAllMessages')
   findAllMessages(@MessageBody('room_name') room_name: string, @ConnectedSocket() client:Socket,) {
-    console.log('findAllMessages');
-    console.log(room_name);
-    console.log(client.handshake);
-    
+    // console.log('findAllMessages');
+    // console.log(room_name);
+    // console.log(client.handshake);
+
     return this.chatService.findAllMessages(room_name);
     // return {test};
   }
@@ -124,9 +124,9 @@ export class ChatGateway {
     @MessageBody('id') id: number,
     @ConnectedSocket() client: Socket,
   ) {
-    console.log("findAllRooms");
-    console.log(id);
-    console.log(client.id)
+    // console.log("findAllRooms");
+    // console.log(id);
+    // console.log(client.id)
     await this.chatService.addClientIdToUser(client.id, id);
     return await this.chatService.findAllRooms();
       // return "test";
@@ -138,20 +138,20 @@ export class ChatGateway {
   @MessageBody('content') content: string,
   @ConnectedSocket() client: Socket,
   ) {
-    console.log("createMessage");
-    console.log(room_name);
-    console.log(content);
-    
+    // console.log("createMessage");
+    // console.log(room_name);
+    // console.log(content);
+
     const message = await this.chatService.createMessage(client.id, room_name, content);
 
     client.to(room_name).emit('message', message);
 
-    
+
     // console.log(client.);
-     
-    console.log("emit mesage");
+
+    // console.log("emit mesage");
     // console.log(message);
-    
+
     return message;
   }
 }

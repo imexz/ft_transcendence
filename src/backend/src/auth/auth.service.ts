@@ -7,16 +7,16 @@ import {TokenPayload} from './tokenPayload.interface';
 @Injectable()
 export class AuthService {
 	constructor(private usersService: UsersService, private jwtService: JwtService) {}
-	
+
 	validateUser(id: number): Promise<any> {
-		console.log("validateUser");
+		// console.log("validateUser");
 		try {
 			const user = this.usersService.getUser(id);
-			console.log("all good");
+			// console.log("all good");
 			return user;
 		} catch(err) {
-			console.log("validateUser error");
-			console.log(err);
+			// console.log("validateUser error");
+			// console.log(err);
 			throw err;
 		}
 	}
