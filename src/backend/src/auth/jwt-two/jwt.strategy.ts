@@ -31,15 +31,12 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
         console.log(user);
         
         if(user.isTwoFactorAuthenticationEnabled == false) {
-          console.log("user1");
           return user
         } else {
           if (payload.isSecondFactorAuthenticated) {
-            console.log("user");
             return user;
           } else {
             console.log("return null");
-             
             return
           }
 

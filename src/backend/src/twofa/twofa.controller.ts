@@ -46,7 +46,7 @@ export class TwoFactorAuthenticationController {
 
         request.res.setHeader('Set-Cookie', this.authService.getCookieWithJwtAccessToken(
 			request.user.id,
-			request.user.isTwoFactorAuthenticationEnabled,
+			true,
 		))
 
         return request.user;

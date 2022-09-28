@@ -1,7 +1,6 @@
 
 import { Vue } from 'vue-class-component'
 import { createStore, storeKey } from 'vuex'
-import io from 'socket.io-client'
 import User from '@/models/user';
 
 

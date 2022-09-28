@@ -7,7 +7,6 @@
       </div>
 
       <div>
-        test==========
         <div v-if="typingDiplay">{{ typingDiplay }}</div>
         <hr />
       </div>
@@ -27,12 +26,13 @@
 
 <script lang="ts">
 import { Options, Vue } from 'vue-class-component';
-import { Socket } from 'socket.io-client';
+import { io } from 'socket.io-client';
 import Message from '@/models/message';
+import { API_URL } from '@/models/host';
+
 
 @Options ({
   props: {
-    // socket: Object,
     room_name: Object,
   }
 })
@@ -41,25 +41,38 @@ import Message from '@/models/message';
 export default class Chat extends Vue {
   // socket!: Socket<DefaultEventsMap, DefaultEventsMap>;
   // socket = socket
-  // socket = io(hostURL + ":3000")
+  // socket = io(API_URL + ":3000", {auth: (cb) => {
+  //   cb({ token: localStorage.user.id })
+  //  }})
   room_name!: string;
   typingDiplay = '';
   messageText: string = '';
   messages: Message[] = [];
   timeout: number = 0;
-  socket!: Socket;
   user_id!: Number;
+  socket: any;
+  
+  beforeMount(){
+    console.log("beforeMounted");
+  }
   
   
   mounted(){
-    this.socket = this.$store.getters.getSocket
-    this.user_id = this.$store.getters.getUser.user_id
+    this.socket = io(API_URL, {
+    auth: (cb) => {
+      cb({ id: this.$store.getters.getUser.id })
+    }
+  });
+
+  // this.socket = io(API_URL, {
+  //   auth: { access: this.$store.getters.getUser.id }
+  // });
+    this.user_id = this.$store.getters.getUser.id
     console.log("tests");
     // console.log(this.$socketio.id);     
     // console.log(this.$socketchat.id);
     
-    this.socket.emit('join', { room_name: this.room_name, user_id: this.user_id}, () => {
-        // joined.value = true;
+    this.socket.emit('join', { room_name: this.room_name}, () => {
     })
     // console.log(this.socket);
     
