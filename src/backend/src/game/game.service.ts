@@ -39,13 +39,10 @@ export class GameService {
 		gamerepo = await this.gameRepository.save(gamerepo);
 		var p1: Socket = this.queue.shift();
 		var p2: Socket = this.queue.shift();
-		console.log("createGame() queue.length = %d", this.queue?.length);
-		// console.log(this.setup);
 		// var newgame = new Game(gamerepo.id, p1.handshake.auth.id, p2.handshake.auth.id, this.setup);
-		this.games.set(gamerepo.id, new Game(gamerepo.id, p1.handshake.auth.id, p2.handshake.auth.id, this.setup));
 		// this.games.set(gamerepo.id, newgame);
-		console.log("in create game:");
-		console.log(this.games.get(gamerepo.id));
+		this.games.set(gamerepo.id, new Game(gamerepo.id, p1.handshake.auth.id, p2.handshake.auth.id, this.setup));
+		// console.log(this.games.get(gamerepo.id));
 		this.gameIds.set(p1.handshake.auth.id, gamerepo.id);
 		this.gameIds.set(p2.handshake.auth.id, gamerepo.id);
 		console.log("gameid = %d", gamerepo.id);
