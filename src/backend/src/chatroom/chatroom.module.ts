@@ -8,7 +8,7 @@ import { ChatroomService } from "./chatroom.service";
     imports: [TypeOrmModule.forFeature([chatroom])],
     controllers: [ChatroomController],
     providers: [ChatroomService],
-    exports: [TypeOrmModule]
+    exports: [TypeOrmModule, ChatroomService]
 
 })
 export class ChatroomModule {}

@@ -54,8 +54,6 @@ export default class Chat extends Vue {
   
   beforeMount(){
     console.log("beforeMounted");
-    
-    
   }
   
   

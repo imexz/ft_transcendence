@@ -58,11 +58,10 @@ export class ChatGateway {
     @ConnectedSocket() client: Socket,
   ) {
     console.log("join");
-    console.log(client.handshake.auth.access);
+    console.log(client.handshake.auth.id);
     client.join(room_name)
     
     this.chatService.manageJoin(client.handshake.auth.id, room_name)
-
   }
 
   @SubscribeMessage('leave')
@@ -72,7 +71,7 @@ export class ChatGateway {
   ) {
     console.log("leave");
     client.leave(room_name);
-    this.chatService.manageLeave(client.handshake.auth.access, room_name)
+    this.chatService.manageLeave(client.handshake.auth.id, room_name)
   }
 
   @SubscribeMessage('typing')
@@ -83,7 +82,7 @@ export class ChatGateway {
   ) {
     console.log(client.id)
     
-    const name = await this.chatService.getClientName(client.handshake.auth.access);
+    const name = await this.chatService.getClientName(client.handshake.auth.id);
     // const name = client.id
 
     client.to(room_name).emit('typing', { name , isTyping});
@@ -92,14 +91,14 @@ export class ChatGateway {
   }
 
   @SubscribeMessage('findAllMessages')
-  findAllMessages(@MessageBody('room_name') room_name: string, @ConnectedSocket() client:Socket,) {
+  async findAllMessages(@MessageBody('room_name') room_name: string, @ConnectedSocket() client:Socket,) {
     console.log('findAllMessages');
     console.log(room_name);
     console.log(client.handshake);
-    console.log(client.handshake.auth.access);
+    console.log(client.handshake.auth.id);
     
     
-    return this.chatService.findAllMessages(room_name);
+    return await this.chatService.findAllMessages(room_name);
     // return {test};
   }
 
@@ -113,7 +112,7 @@ export class ChatGateway {
     console.log(room_name);
     console.log(content);
     
-    const message = await this.chatService.createMessage(client.handshake.auth.access, room_name, content);
+    const message = await this.chatService.createMessage(client.handshake.auth.id, room_name, content);
 
     client.to(room_name).emit('message', message);
 
@@ -121,7 +120,7 @@ export class ChatGateway {
     // console.log(client.);
      
     console.log("emit mesage");
-    // console.log(message);
+    console.log(message);
     
     return message;
   }

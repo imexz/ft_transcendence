@@ -8,7 +8,6 @@ import { MessageService } from 'src/message/message.service';
 @Injectable()
 export class ChatService {
     constructor(
-        @InjectRepository(message)
         private chatroomService: ChatroomService,
         private usersService: UsersService,
         private messageService: MessageService,
@@ -22,8 +21,13 @@ export class ChatService {
 
   async createMessage(user_id: number, room_name:string, content: string) {
         const user = await this.usersService.getUser(user_id)
-        const room = await this.chatroomService.getOne(room_name)
-        await this.messageService.userAddMessageToRoom(user, content, room)
+        console.log(user);
+        
+        console.log("test creatMessage");
+        
+        const room = await this.chatroomService.getRoom(room_name)
+        console.log("test creatMessage2");
+        return await this.messageService.userAddMessageToRoom(user, content, room)
     }
 
 
@@ -39,10 +43,10 @@ export class ChatService {
     }
   
     async getClientName(id: number) {
-    const user = await this.usersService.getUser(id)
-    console.log("getClientName");
-    console.log(id);
-    console.log(user);
+        const user = await this.usersService.getUser(id)
+        console.log("getClientName");
+        console.log(id);
+        console.log(user);
         return user.unique_name
     }
       
