@@ -25,8 +25,8 @@ export class User {
 	@PrimaryColumn({unique: true})
 	id: number;
 
-	// @Column({unique: true}) //finall
-	@Column()
+	// @Column()
+	@Column({unique: true}) //finall
 	unique_name: string;
 
 	@Column()
@@ -54,17 +54,13 @@ export class User {
 	@OneToMany(() => message, (message) => message.user)
 	messeges?: message[];
 
-	@ManyToMany(() => chatroom, (chatroom) => chatroom.Users)
+	@ManyToMany(() => chatroom, (chatroom) => chatroom.users)
 	@JoinTable()
 	chatrooms?: chatroom[];
 
 	@ManyToMany(() => chatroom, (chatroom) => chatroom.admins)
 	@JoinTable()
 	admin_of?: chatroom[];
-
-	@Exclude()
-	@Column({nullable: true})//maye wrong {unique: true}
-	clientId?: string;
 
 	@ManyToMany(() => Game, (game) => game.player)
 	@JoinTable()

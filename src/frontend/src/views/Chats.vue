@@ -3,9 +3,13 @@
   <div>
     <div class="room-input">
       <form @submit.prevent="creat">
-        <label>Create Room</label>
         <input v-model="name" />
-        <button type="submit">Send</button>
+        <select v-model="access">
+          <option>privat</option>
+          <option>public</option> 
+          <option>protected</option> 
+        </select>
+        <button type="submit">Create Room</button>
       </form>
     </div>
     <div class="room-container">
@@ -13,9 +17,7 @@
         v-for="room in rooms"
           :room = room />
     </div>
-    <h1>
-      "geht das heir"
-    </h1>
+    <Toast></Toast>
 
   </div>
 
@@ -25,8 +27,9 @@
 <script lang="ts">
 import { onBeforeMount, ref } from 'vue';
 import { Options, Vue } from 'vue-class-component';
-import { io } from 'socket.io-client';
 import RoomSummary from '../components/Chat/RoomSummary.vue'
+import VueAxios from 'axios';
+import { API_URL } from '@/models/host';
 
 
 @Options({
@@ -36,59 +39,48 @@ import RoomSummary from '../components/Chat/RoomSummary.vue'
 })
 
 
+
 export default class ChatsTest extends Vue {
 
-//   // setup() {
-//   //   const count = ref(0)
-//   //   const socket = io('http://localhost:3000');
-//   //   const rooms = ref([]);
-//   //   const name = ref('');
-//   //   const id = ref('');
-
-//   // //   // expose to template and other options API hooks
-//   // //   return {
-//   // //     count
-//   // //   }
-//   // }
-
-
-//   beforeMount(){
-//     // console.log(this.$store.getters.getUser);
-    
-//     // this.id.value = this.$store.getters.getUser.id;
-//     // this.id.value = 88081
-//       this.socket.emit('findAllRooms', {}, (response: any) => {
-//       this.rooms = response;
-//       console.log(response);
-//       console.log(this.rooms.value);
-//     });
-
-//   };
-
-  socket: any
-  id: number = 0
   name = ''
   rooms = []
+  access = 'public'
 
-  
   mounted() {
-    // console.log(this.name);
-    this.id = this.$store.getters.getUser.id;
-    this.socket = this.$store.getters.getSocket;
-
+    VueAxios({
+        url: '/chatroom/all',
+        baseURL: API_URL,
+        method: 'GET',
+        withCredentials: true,
+      })
+        .then(response => {
+          console.log(response.data);
+          
+           this.rooms = response.data
+          })
+        .catch()
   }
-
 
   creat()
   {
     console.log("creat");
-    // this.id.value = 88081
-    // console.log(this.$store.getters.getUser.id);
-
-    this.socket.emit('creat', { room_name: this.name, id: this.id }, (response: any) => {
-      this.rooms = response;
-      console.log(response);
-    });
+    console.log(this.access);
+    
+    VueAxios({
+        url: '/chatroom/creat',
+        baseURL: API_URL,
+        method: 'POST',
+        withCredentials: true,
+        data: { room_name: this.name, access: this.access}
+      })
+        .then(response => {
+          console.log(response);
+          if(response != null)
+            this.rooms.push(response.data)
+            this.$emit('success', 'creat Room')
+            console.log("succes");
+          })
+        .catch(error => { this.$emit('error') })
   }
 }
 
