@@ -13,10 +13,13 @@ export class MessageService {
         private messageRepository: Repository<message>
     ) {}
 
-    userAddMessageToRoom(user: User, conntent: string, chatroom: chatroom) {
+    async userAddMessageToRoom(user: User, conntent: string, chatroom: chatroom) {
         if (user != undefined && chatroom != undefined && conntent != undefined) {
             var new_message = this.messageRepository.create({user: user, chatroom: chatroom, content: conntent});
-            this.messageRepository.save(new_message);
+            return await this.messageRepository.save(new_message);
+        } else {
+            console.log("userAddMessageToRoom goes wrong");
+            
         }
     }
 

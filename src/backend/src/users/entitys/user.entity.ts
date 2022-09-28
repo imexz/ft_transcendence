@@ -25,8 +25,8 @@ export class User {
 	@PrimaryColumn({unique: true})
 	id: number;
 
-	// @Column({unique: true}) //finall
-	@Column()
+	// @Column()
+	@Column({unique: true}) //finall
 	unique_name: string;
 
 	@Column()

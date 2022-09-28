@@ -83,16 +83,15 @@ export class ChatroomService {
         return await this.chatroomRepository.find()
     }
     
-    async getOne(name: string) {
-        return await this.chatroomRepository.findOneBy({name: name})
-    }
-
-    async findOne(room_name: string) {
-        return await this.chatroomRepository.findOneBy({name: room_name})
+    async getRoom(room_name: string) {
+        console.log("before");
+        
+        return await this.chatroomRepository.findOne({where: {name: room_name}})
+        console.log("after");
     }
     
     async addRoom(room_name: string, access: string,  user: User) {
-        const room = await this.findOne(room_name)
+        const room = await this.getRoom(room_name)
         if(room == null) {
             console.log("room == null");
             

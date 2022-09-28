@@ -38,11 +38,14 @@ export class UsersService {
 		return user
 	}
 
-	async getUser(id: number): Promise<User> {
+	async getUser(id: number) {
+		console.log(id);
+		
 		if(id != undefined) {
-			const user = await this.usersRepository.findOneBy({id: id})
+			const user: User = await this.usersRepository.findOne({where: {id: id}})
 			if(user == null) {
 				console.log("user == null");
+				return undefined
 			}
 			console.log(user);
 			return user
