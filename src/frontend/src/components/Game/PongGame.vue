@@ -27,49 +27,46 @@
   })
 
 export default class PongGame extends Vue {
-	gameId: string = ""
-	socket:any = undefined
+	gameId?: string
+	socket: any
 
-	context:any = {}
-	eventSource:any = {}
-	position:any = {
+	context: any = {}
+	eventSource: any = {}
+	position: any = {
 		x: 0,
 		y: 0
 	}
 	created() {
 		console.log("in created");
-		if (this.socket === undefined) {
-			console.log("socket undefined");
-			this.socket = io(API_URL, {
-				auth: (cb) => {
-					cb ({id: this.$store.getters.getUser.id })
-				}
-			});
-			this.socket.on('gameId', (gameid: string) => {
-				this.gameId = gameid;
-				console.log("new GameId %d", gameid);
-				this.eventSource = new EventSource(API_URL + "/game/sse/" + this.gameId);
-			})
-			this.socket.emit('joinQueue');
-	
-			document.addEventListener('keydown', (event) => {
-				console.log(event.key);
-				if (event.key == 'w') {
-					this.paddleLeftUp();
-				}
-				else if (event.key == 's') {
-					this.paddleLeftDown();
-				}
-				else if (event.key == 'ArrowUp') {
-					this.paddleRightUp();
-				}
-				else if (event.key == 'ArrowDown') {
-					this.paddleRightDown();
-				}
-			}, false);
-		} else {
-			console.log("socket existent");
-		}
+
+		// TODO: ask backend for infos on existing game
+		this.socket = io(API_URL, {
+			auth: (cb) => {
+				cb ({id: this.$store.getters.getUser.id })
+			}
+		});
+		this.socket.on('gameId', (gameid: string) => {
+			this.gameId = gameid;
+			console.log("new GameId %d", gameid);
+			this.eventSource = new EventSource(API_URL + "/game/sse/" + this.gameId);
+		})
+		this.socket.emit('joinQueue');
+
+		document.addEventListener('keydown', (event) => {
+			console.log(event.key);
+			if (event.key == 'w') {
+				this.paddleLeftUp();
+			}
+			else if (event.key == 's') {
+				this.paddleLeftDown();
+			}
+			else if (event.key == 'ArrowUp') {
+				this.paddleRightUp();
+			}
+			else if (event.key == 'ArrowDown') {
+				this.paddleRightDown();
+			}
+		}, false);
 	}
 
 	mounted() {
@@ -90,6 +87,17 @@ export default class PongGame extends Vue {
 			this.context.fill();
 			this.drawPaddles(data);
 		};
+	}
+
+	beforeDestory() {
+		console.log("in beforeDestroy");
+		this.eventSource.close();
+		delete this.eventSource;
+		this.socket.close();
+		delete this.socket;
+		delete this.position;
+		delete this.context;
+		delete this.gameId;
 	}
 
 	drawPaddles(data: any) {
