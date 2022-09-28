@@ -24,8 +24,8 @@ export class AvatarController {
     )
     file: Express.Multer.File,
   ) {
-    //   console.log(req.user );
-      await this.avatarService.add(req.user.id, file)
+    //   console.log(req.user);
+      return await this.avatarService.add(req.user.id, file)
   }
 
   @Get()

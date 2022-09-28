@@ -17,7 +17,7 @@ export class chatroom{
     admins: User[];
 
     @ManyToMany(() => User, (User) => User.chatrooms)
-    Users: User[];
+    users: User[];
 
     @OneToMany(() => message, (message) => message.chatroom)
     @JoinTable()

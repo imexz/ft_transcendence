@@ -1,5 +1,7 @@
+import { UseGuards } from '@nestjs/common';
 import { ConnectedSocket, MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Socket, Server } from 'socket.io';
+import { JwtAuthGuard } from 'src/auth/jwt-two/jwt-auth.guard';
 import { message } from '../message/message.entity';
 import { ChatService } from './chat.service';
 
@@ -50,38 +52,18 @@ export class ChatGateway {
     // socket.emit('successfullConnected');
   }
 
-
-
-
   @SubscribeMessage('join')
+	@UseGuards(JwtAuthGuard)
   joinRoom(
-    @MessageBody('user_id') user_id: number,
     @MessageBody('room_name') room_name: string,
     @ConnectedSocket() client: Socket,
   ) {
-    // console.log("join");
-    // console.log(user_id);
-    // client.join(room_name)
-
-    this.chatService.manageJoin(client.id, user_id, room_name)
-
+    console.log("join");
+    console.log(client.handshake.auth.id);
+    client.join(room_name)
+    
+    this.chatService.manageJoin(client.handshake.auth.id, room_name)
   }
-
-  @SubscribeMessage('creat')
-  async creatRoom(
-    @MessageBody('id') user_id: number,
-    @MessageBody('room_name') room_name: string,
-    @ConnectedSocket() client:Socket,
-  ) {
-    // console.log("creat");
-    // console.log(room_name);
-    // console.log(user_id);
-    client.join(room_name);
-    await this.chatService.createRoom(client.id, user_id, room_name)
-    return await this.chatService.findAllRooms()
-    // this.chatService.manageJoin(client.id, user_id, room_name)
-  }
-
 
   @SubscribeMessage('leave')
   leaveRoom(
@@ -90,7 +72,7 @@ export class ChatGateway {
   ) {
     // console.log("leave");
     client.leave(room_name);
-    this.chatService.manageLeave(client.id, room_name)
+    this.chatService.manageLeave(client.handshake.auth.id, room_name)
   }
 
   @SubscribeMessage('typing')
@@ -101,7 +83,7 @@ export class ChatGateway {
   ) {
     // console.log(client.id)
 
-    const name = await this.chatService.getClientName(client.id);
+    const name = await this.chatService.getClientName(client.handshake.auth.id);
     // const name = client.id
 
     client.to(room_name).emit('typing', { name , isTyping});
@@ -110,26 +92,15 @@ export class ChatGateway {
   }
 
   @SubscribeMessage('findAllMessages')
-  findAllMessages(@MessageBody('room_name') room_name: string, @ConnectedSocket() client:Socket,) {
-    // console.log('findAllMessages');
-    // console.log(room_name);
-    // console.log(client.handshake);
-
-    return this.chatService.findAllMessages(room_name);
+  async findAllMessages(@MessageBody('room_name') room_name: string, @ConnectedSocket() client:Socket,) {
+    console.log('findAllMessages');
+    console.log(room_name);
+    console.log(client.handshake);
+    console.log(client.handshake.auth.id);
+    
+    
+    return await this.chatService.findAllMessages(room_name);
     // return {test};
-  }
-
-  @SubscribeMessage('findAllRooms')
-  async findAllRooms(
-    @MessageBody('id') id: number,
-    @ConnectedSocket() client: Socket,
-  ) {
-    // console.log("findAllRooms");
-    // console.log(id);
-    // console.log(client.id)
-    await this.chatService.addClientIdToUser(client.id, id);
-    return await this.chatService.findAllRooms();
-      // return "test";
   }
 
   @SubscribeMessage('createMessage')
@@ -138,11 +109,11 @@ export class ChatGateway {
   @MessageBody('content') content: string,
   @ConnectedSocket() client: Socket,
   ) {
-    // console.log("createMessage");
-    // console.log(room_name);
-    // console.log(content);
-
-    const message = await this.chatService.createMessage(client.id, room_name, content);
+    console.log("createMessage");
+    console.log(room_name);
+    console.log(content);
+    
+    const message = await this.chatService.createMessage(client.handshake.auth.id, room_name, content);
 
     client.to(room_name).emit('message', message);
 

@@ -1,5 +1,7 @@
 <template>
-  <Profile :pid=parseInt(id) />
+  <div>
+    <Profile :id="id" />
+  </div>
   <div>
     <SearchBar/>
   </div>
@@ -10,12 +12,19 @@
 
 <script lang="ts">
   import { Options, Vue } from 'vue-class-component';
+  import VueAxios from 'axios';
   import UserSummary from '@/components/Profile/UserSummary.vue';
   import SearchBar from '@/components/Profile/SearchBar.vue';
   import Profile from '@/components/Profile/Profile.vue';
-  import FriendList from '@/components/Profile/FriendList.vue'
+  import FriendList from '@/components/Profile/FriendList.vue';
+  import { API_URL } from '@/models/host';
 
-  @Options ({
+  export default {
+    data(): unknown {
+      return {
+        currentUser : this.$store.getters.getUser,
+      }
+    },
     props: {
       id: String,
     },
@@ -25,12 +34,7 @@
       Profile,
       FriendList,
     }
-  })
-
-  export default class ProileView extends Vue {
-    id!:string
-    
-    }
+  }
 </script>
 
 <style scoped>
