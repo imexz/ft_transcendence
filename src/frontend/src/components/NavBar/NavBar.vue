@@ -4,11 +4,11 @@
       <div 
         v-if=isLoggedIn
         class="currentUser topElement"
-        :class="{'userActive': this.$route.name === 'me'}"
-        @click="this.$router.push('/')">
-        <img :src="this.$store.getters.getUser.avatar_url" class="userPic">
+        :class="{'userActive': $route.name === 'me'}"
+        @click="$router.push('/')">
+        <img :src="$store.getters.getUser.avatar_url" class="userPic">
         <span class="userName">
-          {{ this.$store.getters.getUser.unique_name }}
+          {{ $store.getters.getUser.unique_name }}
         </span>
       </div>
       <div v-else></div>
@@ -56,7 +56,7 @@ export default defineComponent({
   justify-content: space-between;
   align-items: center;
   background: var(--ft_dark);
-  border-bottom: 2px solid var(--ft_white);
+  border-bottom: 2px solid var(--ft_red);
 }
 .topElement:active {
   transform: translateY(1px);
