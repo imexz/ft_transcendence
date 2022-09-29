@@ -1,7 +1,7 @@
 <template>
-  <div>
+  <div class="friendList">
     <h1> Friends </h1>
-      <UserSummary
+    <UserSummary
       v-for="user in users"
       :user = user as User ></UserSummary>
   </div>
@@ -36,3 +36,11 @@ export default defineComponent({
 })
 
 </script>
+
+<style scoped>
+  .friendList {
+    width: 400px;
+    display: flex;
+    flex-direction: column;
+  }
+</style>
