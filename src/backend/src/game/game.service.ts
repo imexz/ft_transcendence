@@ -6,6 +6,11 @@ import { Repository } from 'typeorm';
 import { Socket } from 'socket.io';
 import { GameSetup } from './game.entities/setup.entity';
 
+interface QueueElem {
+	id: number;
+	socket: Socket;
+};
+
 @Injectable()
 export class GameService {
 
@@ -14,13 +19,9 @@ export class GameService {
 	@InjectRepository(Game)
 	private gameRepository: Repository<Game>
 
-	queue: Array<Socket> = [];
-	mapIds = new Map<string, number>(); // Key: UserId, Value: GameId
-	games = new Map<number, Game>(); // Key: GameId, Value: Game Object
-
-	checkQueue(id) {
-		return (id === this);
-	}
+	queue: Array<QueueElem> = [];
+	users = new Map<string, number>(); // Key: UserId, Value: GameId
+	games = new Map<number, Game>(); // Key: GameId, Value: Game
 
 	getSideFromGame(game: Game, playerid: string): string {
 		if (game.playerLeft === playerid) {
@@ -30,26 +31,36 @@ export class GameService {
 		} else
 			return "";
 	}
-
-	addClientIdToQueue(client: Socket): void {
-		if (this.queue.find(this.checkQueue, client) != client) {
-			this.queue.push(client);
-			console.log("%s was added to queue", client.handshake.auth.id);
-		} else {
-			console.log("%s already in queue", client.handshake.auth.id);
+	
+	checkGame(client: Socket): boolean {
+		var ret: boolean = false;
+		var gameid = this.users.get(client.handshake.auth.id);
+		if (gameid != undefined) {
+			ret = true;
+			console.log("client %d already is in users", client.handshake.auth.id);
+			client.emit('gameInfo',
+				{
+					gameId: gameid,
+					side: this.getSideFromGame(this.games.get(gameid), client.handshake.auth.id),
+				});
 		}
+		return ret;
 	}
 
-	async checkQueueForGame(client: Socket): Promise<void> {
-		if (this.mapIds.has(client.handshake.auth.id) == false) {
-			console.log("client id %s is not in gamesIds Array", client.handshake.auth.id);
+	async	addClientIdToQueue(client: Socket): Promise<void> {
+		var needle: QueueElem = {
+			id: client.handshake.auth.id,
+			socket: client,
+		}
+		console.log(this.queue);
+		if (this.queue.find(({id}) => {return id === needle.id}) == undefined) {
+			this.queue.push({id: client.handshake.auth.id, socket: client});
+			console.log("add %s to queue", client.handshake.auth.id);
 			while (this.queue.length > 1) {
 				await this.createGame();
 			}
-		}
-		else {
-			console.log("client %d already in mapIds", client.handshake.auth.id);
-			client.emit('gameId', {gameId: this.mapIds.get(client.handshake.auth.id), side: this.getSideFromGame(this.games.get(this.mapIds.get(client.handshake.auth.id)), client.handshake.auth.id)});
+		} else {
+			console.log("%s already is in queue", client.handshake.auth.id);
 		}
 	}
 
@@ -59,20 +70,17 @@ export class GameService {
 		console.log("after repo create");
 
 		gamerepo = await this.gameRepository.save(gamerepo);
-		var p1: Socket = this.queue.shift();
-		var p2: Socket = this.queue.shift();
-		// var newgame = new Game(gamerepo.id, p1.handshake.auth.id, p2.handshake.auth.id, this.setup);
-		// this.games.set(gamerepo.id, newgame);
-		this.games.set(gamerepo.id, new Game(gamerepo.id, p1.handshake.auth.id, p2.handshake.auth.id, this.setup));
-		// console.log(this.games.get(gamerepo.id));
-		this.mapIds.set(p1.handshake.auth.id, gamerepo.id);
-		this.mapIds.set(p2.handshake.auth.id, gamerepo.id);
+		var p1: QueueElem = this.queue.shift();
+		var p2: QueueElem = this.queue.shift();
+		var newgame = new Game(gamerepo.id, p1.socket.handshake.auth.id, p2.socket.handshake.auth.id, this.setup);
+		this.games.set(gamerepo.id, newgame);
+		this.users.set(p1.socket.handshake.auth.id, gamerepo.id);
+		this.users.set(p2.socket.handshake.auth.id, gamerepo.id);
 		console.log("gameid = %d", gamerepo.id);
-		console.log(this.mapIds);
-		p1.emit('gameId', {gameId: gamerepo.id, side: "left"});
-		p2.emit('gameId', {gameId: gamerepo.id, side: "right"});
+		console.log(this.users);
+		p1.socket.emit('gameInfo', {gameId: gamerepo.id, side: "left"});
+		p2.socket.emit('gameInfo', {gameId: gamerepo.id, side: "right"});
 		console.log('leaving createGame()');
-
 	}
 
 	getData(id: number): Game {
