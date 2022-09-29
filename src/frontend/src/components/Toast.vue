@@ -41,6 +41,7 @@ export default defineComponent({
     background: red;
     border-radius: 10px;
     font-weight: bold;
+    z-index: 10;
   }
   .errorToast {
     padding: 20px;
@@ -50,6 +51,7 @@ export default defineComponent({
     font-size: 25px;
     font-weight: bold;
     border-radius: 10px;
+    z-index: 10;
   }
   .successToast {
     padding: 20px;
@@ -59,5 +61,6 @@ export default defineComponent({
     font-size: 25px;
     font-weight: bold;
     border-radius: 10px;
+    z-index: 10;
   }
 </style>

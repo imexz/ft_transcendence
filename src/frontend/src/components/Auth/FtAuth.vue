@@ -86,6 +86,7 @@ export default defineComponent({
     float: right;
     text-decoration: none;
     text-align: center;
+    font-weight: bold;
     font-size: 25px;
     padding: 14px 24px;
     color: var(--ft_cyan);

@@ -1,7 +1,7 @@
 <template>
-  <div v-if="this.user">
-    <img :src='this.user.avatar_url' alt='Profile Pic'>
-    <h1>Welcome {{ this.user.unique_name }}</h1>
+  <div class="profile" v-if="user">
+    <h1>Profile of {{ user.unique_name }}</h1>
+    <img :src='user.avatar_url' alt='Profile Pic'>
   </div>
 </template>
 
@@ -51,16 +51,21 @@ export default defineComponent({
 </script>
 
 <style scoped>
-  h1 {
+
+  .profile {
+    width: 320px;
+    margin-right: 10px;
+  }
+  /* h1 {
     float: left;
     padding-left: 30px;
-  }
+  } */
   img {
     float: left;
     width: 300px;
     height: auto;
     border: 10px solid;
     border-image-slice: 1;
-    border-image-source: linear-gradient(var(--ft_pink), var(--ft_blue));
+    border-image-source: linear-gradient(var(--ft_cyan), var(--ft_pink));
   }
 </style>
