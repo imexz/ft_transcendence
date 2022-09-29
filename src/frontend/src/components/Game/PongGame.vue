@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-if="gameId">
 		<canvas
 			key="componentKey"
 			ref="game"
@@ -11,6 +11,9 @@
 		<div>
 			<ScoreCounter />
 		</div>
+	</div>
+	<div class="queue" v-else >
+		Waiting for a match...
 	</div>
 </template>
 
@@ -39,44 +42,47 @@ export default class PongGame extends Vue {
 
 	created() { // always called when Component is initialized (e.g. on refresh)
 		console.log("in created");
-		// TODO: ask backend for infos on existing game (gameId, which side, etc)
 		this.socket = io(API_URL, {
 			auth: (cb) => {
 				cb ({id: this.$store.getters.getUser.id })
 			}
 		});
-		this.socket.on('gameId', (data) => {
-			console.log("event gameId received");
+		this.socket.on('gameInfo', (data) => {
+			console.log("event gameInfo received");
 			console.log(data.gameId);
 			console.log(data.side);
 			this.gameId = data.gameId;
 			this.side = data.side;
-			console.log("received GameId", this.gameId);
+			console.log("received GameId: %s, side: %s", this.gameId, this.side);
 			this.eventSource = new EventSource(API_URL + "/game/sse/" + this.gameId);
+			document.addEventListener('keydown', (event) => {
+				if (this.side === "left") {
+					if (event.key == 'w') {
+						console.log(event.key);
+						this.paddleLeftUp();
+					}
+					else if (event.key == 's') {
+						console.log(event.key);
+						this.paddleLeftDown();
+					}
+				} else if (this.side === "right") {
+					if (event.key == 'ArrowUp') {
+						console.log(event.key);
+						this.paddleRightUp();
+					}
+					else if (event.key == 'ArrowDown') {
+						console.log(event.key);
+						this.paddleRightDown();
+					}
+				}
+			}, false);
 		});
-		this.socket.emit('joinQueue');
-		this.socket.emit('checkGame');
-		document.addEventListener('keydown', (event) => {
-			if (this.side === "left") {
-				if (event.key == 'w') {
-					console.log(event.key);
-					this.paddleLeftUp();
-				}
-				else if (event.key == 's') {
-					console.log(event.key);
-					this.paddleLeftDown();
-				}
-			} else if (this.side === "right") {
-				if (event.key == 'ArrowUp') {
-					console.log(event.key);
-					this.paddleRightUp();
-				}
-				else if (event.key == 'ArrowDown') {
-					console.log(event.key);
-					this.paddleRightDown();
-				}
+		this.socket.emit('checkGame', (cb: boolean) => {
+			if (!cb) {
+				console.log("calling checkQueue");
+				this.socket.emit('checkQueue');
 			}
-		}, false);
+		});
 	}
 
 	mounted() {
@@ -131,5 +137,11 @@ export default class PongGame extends Vue {
 </script>
 
 <style scoped>
+
+.queue {
+	padding-top: 100px;
+	font-size: 20px;
+	text-align: center;
+}
 
 </style>
