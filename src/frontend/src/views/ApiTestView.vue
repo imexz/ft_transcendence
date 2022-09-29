@@ -7,7 +7,7 @@
         <option>GET</option>
         <option>POST</option> 
       </select>
-      <input v-model="text" placeholder="api address">
+      <input v-model="url" placeholder="api address">
       <input v-model="body" placeholder="body">
       <br/>
       <button class="defaultElement">Submit</button>
@@ -19,24 +19,29 @@
 </template>
 
 <script lang="ts">
-  import { Options, Vue } from 'vue-class-component';
-  import VueAxios from 'axios';
-  import { API_URL } from '@/models/host';
 
-  export default class ApiTest extends Vue {
-    value = 'empty'
-    body = ''
-    method !: string 
-    text!: string
+import VueAxios from 'axios';
+import { API_URL } from '@/defines';
+import { defineComponent } from 'vue';
+
+export default defineComponent({
+  data () {
+    return {
+      value: 'empty',
+      body: '',
+      method: '',
+      url: '',
+    }
+  },
+  methods: {
     handleSubmit(): void {
       if (this.body == ''){
         console.log(this.body)
         VueAxios({
-          url: this.text,
+          url: this.url,
           baseURL: API_URL,
           method: this.method,
           withCredentials: true,
-          // data : JSON.parse(this.body)
         }
         )
         .then(response => { this.value = response.data })
@@ -44,7 +49,7 @@
       }
       else {
         VueAxios({
-          url: this.text,
+          url: this.url,
           baseURL: API_URL,
           method: this.method,
           withCredentials: true,
@@ -56,4 +61,6 @@
       }
     }
   }
+})
+
 </script>

@@ -11,8 +11,9 @@
 import VueAxios from 'axios';
 import { ref } from 'vue';
 import { maxLenUserName, API_URL} from '@/defines';
+import { defineComponent } from 'vue';
 
-export default {
+export default defineComponent({
   data() {
     return {
       newName : ref(''),
@@ -43,6 +44,6 @@ export default {
         }
     }
   }
-}
+})
 
 </script>
