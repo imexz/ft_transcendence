@@ -1,11 +1,10 @@
 <template>
-  <div>
+  <div class="top">
     <Profile :id="id" />
+    <MatchHisory/>
   </div>
-  <div>
+  <div class="top">
     <SearchBar/>
-  </div>
-  <div>
     <FriendList/>
   </div>
 </template>
@@ -15,6 +14,7 @@
   import SearchBar from '@/components/Profile/SearchBar.vue';
   import Profile from '@/components/Profile/Profile.vue';
   import FriendList from '@/components/Profile/FriendList.vue';
+  import MatchHisory from '@/components/Profile/MatchHistory.vue'
   import { defineComponent } from 'vue';
 
 export default defineComponent({
@@ -31,26 +31,20 @@ export default defineComponent({
     SearchBar,
     Profile,
     FriendList,
+    MatchHisory
   }
 })
 
 </script>
 
 <style scoped>
-  h1 {
-    float: left;
-    padding-left: 30px;
+  .top {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
   }
-  img {
-    float: left;
-    width: 300px;
-    height: auto;
-    border: 10px solid;
-    border-image-slice: 1;
-    border-image-source: linear-gradient(var(--ft_pink), var(--ft_blue));
-  }
-  div {
-    clear: both;
-    padding: 10px;
+  .bottom {
+    display: flex;
+    justify-content: center;
   }
 </style>
