@@ -9,7 +9,7 @@
 
 <script lang="ts">
 
-  import { API_URL } from '@/models/host'
+import { API_URL } from '@/defines';
   import { Vue } from 'vue-class-component'
 
 	export default class ScoreCounter extends Vue {

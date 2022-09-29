@@ -1,43 +1,44 @@
 <template>
   <div>
-    <img :src="user.avatar_url" alt="Avatar">
-    <span>{{ user.unique_name }}</span>
+    <img :src="this.user.avatar_url" alt="Avatar">
+    <span>{{ this.user.unique_name }}</span>
     <button @click="addFriend" >AddFriend</button>
-    <button @click="viewProfile(user.id)">View Profile</button>
+    <button @click="viewProfile(this.user.id)">View Profile</button>
     <button>Send Dm</button>
   </div>
 </template>
 
 <script lang="ts">
-  import { Options, Vue } from 'vue-class-component';
-  import VueAxios from 'axios';
-  import User from '@/models/user'
-  import { API_URL } from '@/models/host';
 
-  @Options ({
-    props : {
-      user: Object,
-      id: Number
+import VueAxios from 'axios';
+import User from '@/models/user'
+import { API_URL } from '@/defines';
+import { defineComponent } from 'vue';
+
+export default defineComponent({
+  props : {
+    user: {
+    type: Object,
     }
-  })
-
-  export default class UserSummary extends Vue {
-    user!: User;
+  },
+  methods: {
     addFriend(): void {
       VueAxios({
         url: '/users/addFriend',
         baseURL: API_URL,
         method: 'POST',
         withCredentials: true,
-        data: {"id" : this.user.id},
+        data: {"id" : this.user?.id},
       })
         .then()
         .catch()
-    }
+    },
     viewProfile(id: number){
       this.$router.push('/profile/' + id.toString());
     }
-  }
+  },
+})
+
 </script>
 
 <style scoped>

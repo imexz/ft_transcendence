@@ -1,21 +1,23 @@
 <template>
-    <div>
-      <h1> Friends </h1>
-        <UserSummary
-        v-for="user in users"
-        :user = user></UserSummary>
-    </div>
+  <div>
+    <h1> Friends </h1>
+      <UserSummary
+      v-for="user in users"
+      :user = user as User ></UserSummary>
+  </div>
 </template>
 
 <script lang="ts">
 import UserSummary from '@/components/Profile/UserSummary.vue';
 import VueAxios from 'axios';
-import { API_URL } from '@/models/host';
+import { API_URL } from '@/defines';
+import { defineComponent } from 'vue';
+import User from '@/models/user'
 
-export default {
+export default defineComponent({
   data() {
     return {
-      users : [],
+      users : [] as User[],
     }
   },
   mounted() {
@@ -31,5 +33,6 @@ export default {
   components: {
     UserSummary,
   }
-}
+})
+
 </script>

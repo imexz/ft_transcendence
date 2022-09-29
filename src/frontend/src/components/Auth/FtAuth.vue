@@ -18,14 +18,15 @@
 </template>
 
 <script lang="ts">
-  import VueAxios from 'axios';
-  import { API_URL } from '@/models/host';
-  import EnableTwoFA from '@/components/Auth/enable2fc.vue';
-  import Toast from '@/components/Toast.vue'
-  import { ref }  from 'vue';
 
+import VueAxios from 'axios';
+import { API_URL } from '@/defines';
+import EnableTwoFA from '@/components/Auth/enable2fc.vue';
+import Toast from '@/components/Toast.vue'
+import { ref }  from 'vue';
+import { defineComponent } from 'vue';
 
-export default {
+export default defineComponent({
   components: {
     EnableTwoFA,
     Toast,
@@ -76,7 +77,7 @@ export default {
   mounted(): void {
     this.validateUser()
   }
-}
+})
 
 </script>
 

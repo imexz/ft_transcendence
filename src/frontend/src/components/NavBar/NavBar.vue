@@ -29,35 +29,22 @@
 </template>
 
 <script lang="ts">
-  import FtAuth from '../Auth/FtAuth.vue';
-  import store from '@/store/index';
 
-  export default {
-    data() {
-      return {
-        sites: [
-          {
-            label: 'Chats',
-            link: '/chat',
-            type: 'left'
-          },
-          {
-            label: 'Settings',
-            link: '/settings',
-            type: 'right'
-          }
-        ]
-      } 
+import FtAuth from '../Auth/FtAuth.vue';
+import store from '@/store/index';
+import { defineComponent } from 'vue';
+
+export default defineComponent({
+  computed: {
+    isLoggedIn(): boolean {
+        return store.state.validated;
     },
-    computed: {
-      isLoggedIn(): boolean {
-          return store.state.validated;
-      },
-    },
-    components: {
-      FtAuth,
-    }
+  },
+  components: {
+    FtAuth,
   }
+})
+
 </script>
 
 <style>
