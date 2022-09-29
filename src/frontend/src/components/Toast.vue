@@ -13,12 +13,16 @@
 </template>
 
 <script lang="ts">
-  export default {
-    props: {
-      msg: String,
-      mode: String,
-    }
+
+import { defineComponent } from 'vue';
+
+export default defineComponent({
+  props: {
+    msg: String,
+    mode: String,
   }
+})
+
 </script>
 
 <style scoped>

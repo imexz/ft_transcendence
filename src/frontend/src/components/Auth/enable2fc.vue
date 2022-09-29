@@ -13,9 +13,10 @@
 <script lang="ts">
 
 import VueAxios from 'axios';
-import { API_URL } from '@/models/host';
+import { API_URL } from '@/defines';
+import { defineComponent } from 'vue';
 
-export default {
+export default defineComponent({
   data() {
     return{
       QR : API_URL + '/twofa/generate',
@@ -50,5 +51,6 @@ export default {
         })
     }
   }
-}
+})
+
 </script>
