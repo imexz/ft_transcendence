@@ -28,7 +28,7 @@
 import { Options, Vue } from 'vue-class-component';
 import { io } from 'socket.io-client';
 import Message from '@/models/message';
-import { API_URL } from '@/models/host';
+import { API_URL } from '@/defines';
 
 
 @Options ({

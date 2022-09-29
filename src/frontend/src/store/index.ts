@@ -2,6 +2,7 @@
 import { Vue } from 'vue-class-component'
 import { createStore, storeKey } from 'vuex'
 import User from '@/models/user';
+import router from '@/router';
 
 
 export interface validated {
@@ -52,6 +53,7 @@ export default createStore({
       commit('logOut');
       document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 GMT;SameSite=Lax"
       localStorage.removeItem('user');
+      router.push("/login");
     },
     logIn({ commit }, user) {
       commit('logIn', user);
