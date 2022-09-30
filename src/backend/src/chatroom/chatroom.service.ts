@@ -28,20 +28,26 @@ export class ChatroomService {
             }
             return {chatroom, bool: false};
         }
+        return undefined
     }
 
     async userToRoom(user: User, room_name: string)
     {
         if(user != null) {
-            const { chatroom, bool} = await this.findOrCreat(room_name)
-            if(bool) {
-                chatroom.admins = [user]
-                chatroom.users = [user]
-                chatroom.owner = user
-            } else {
-                chatroom.users.push(user)
+            var ret: { chatroom: chatroom, bool: boolean } 
+            ret = await this.findOrCreat(room_name)
+            console.log();
+            if(ret != undefined) {
+                if(ret.bool) {
+                    ret.chatroom.admins = [user]
+                    ret.chatroom.users = [user]
+                    ret.chatroom.owner = user
+                } else {
+                    if(ret.chatroom.users.indexOf(user) == -1)
+                    ret.chatroom.users.push(user)
+                }
+                this.chatroomRepository.save(ret.chatroom)
             }
-            this.chatroomRepository.save(chatroom)
         }
     }
 
