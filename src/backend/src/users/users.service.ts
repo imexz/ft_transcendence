@@ -34,7 +34,7 @@ export class UsersService {
 	async findAll(): Promise<User[]> {
 		console.log("findAll");
 		const user = await this.usersRepository.find();
-		console.log(user);
+		// console.log(user);
 		return user
 	}
 
@@ -47,7 +47,7 @@ export class UsersService {
 				console.log("user == null");
 				return undefined
 			}
-			console.log(user);
+			// console.log(user);
 			return user
 		}
 		return undefined
