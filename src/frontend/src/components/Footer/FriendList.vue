@@ -5,7 +5,7 @@
     <div class="headline">Friends</div>
     <div class="friends">
       <UserSummary
-      v-for="user in users"
+      v-for="user in $store.getters.getFriends"
       :user = user as User ></UserSummary>
     </div>
   </div>
@@ -13,16 +13,12 @@
 
 <script lang="ts">
 import UserSummary from '@/components/Profile/UserSummary.vue';
-import VueAxios from 'axios';
-import { API_URL } from '@/defines';
 import { defineComponent } from 'vue';
-import User from '@/models/user'
 
 export default defineComponent({
   data() {
     return {
       isCollapsed: true as boolean,
-      users : [] as User[],
     }
   },
   methods: {
@@ -31,14 +27,7 @@ export default defineComponent({
     }
   },
   mounted() {
-    VueAxios({
-      url: '/users/friends',
-      baseURL: API_URL,
-      method: 'GET',
-      withCredentials: true,
-    })
-      .then(response => { this.users = response.data })
-      .catch()
+    this.$store.dispatch('getFriendsList')
   },
   components: {
     UserSummary,
