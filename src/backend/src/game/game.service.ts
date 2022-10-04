@@ -83,25 +83,16 @@ export class GameService {
 		console.log('leaving createGame()');
 	}
 
-	getData(id: number): Game {
+	getData(id: number): Game | undefined {
+		if (this.games.get(id) === undefined) {
+			return undefined;
+		} 
 		this.updateData(id);
 		this.collisionControl(id);
 		if (this.scored(id)){
 			this.reset(id);
 		}
 		return this.games.get(id);
-		// return ({
-		// 	ball: this.games.get(id).ball as any,
-		// 	paddleLeft: this.games.get(id).paddleLeft as any,
-		// 	paddleRight: this.games.get(id).paddleRight as any,
-		// 	score: this.games.get(id).score as any,
-		// 	scoreLeft: this.games.get(id).scoreLeft as any,
-		// 	scoreRight: this.games.get(id).scoreRight as any,
-		// 	id: id as any,
-		// 	playerLeft: this.games.get(id).playerLeft as any,
-		// 	playerRight: this.games.get(id).playerRight as any,
-		// 	player: this.games.get(id).player as any,
-		// });
 	}
 
 	updateData(id: number) {
