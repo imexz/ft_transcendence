@@ -1,16 +1,21 @@
 <template>
   <NavBar></NavBar>
-  <router-view/>
+  <div class="content">
+    <router-view/>
+  </div>
+  <Footer></Footer>
 </template>
 
 <script lang="ts">
 
 import NavBar from '@/components/NavBar/NavBar.vue';
 import { defineComponent } from 'vue';
+import Footer from '@/components/Footer/Footer.vue'
 
 export default defineComponent({
   components: {
     NavBar,
+    Footer,
   }    
 })
 
@@ -57,6 +62,10 @@ body {
   background-color: var(--ft_dark);
   /* background: linear-gradient(var(--ft_dark_purple),var(--ft_dark)); */
   background-repeat: no-repeat;
+}
+
+.content {
+  padding-bottom: 80px;
 }
 
 /* button, input, select {

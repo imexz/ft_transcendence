@@ -73,10 +73,10 @@ export default defineComponent({
     object-fit: cover;
   }
   .userSummary {
-    position: relative;
-    width: 316px;
+    /* position: relative; */
+    /* width: 316px; */
     border: 2px solid;
-    border-image: linear-gradient(var(--ft_cyan), var(--ft_pink)) 1;
+    border-image: linear-gradient(90deg, var(--ft_cyan), var(--ft_pink)) 1;
   }
   .normalView {
     padding: 5px;
