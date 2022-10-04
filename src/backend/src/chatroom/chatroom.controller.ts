@@ -23,11 +23,9 @@ export class ChatroomController {
     async CreatChatroon(@Request() req,
         @Body("room_name") room_name: string,
         @Body("access") access: string) {
-        const room = await this.chatroomService.addRoom(room_name, access, req.user)
-        if(room == undefined)
-            throw new HttpException('Forbidden', HttpStatus.CONFLICT);
-        console.log(room);
         
-        return room
+        if(await this.chatroomService.addRoom(room_name, access, req.user) == undefined)
+            throw new HttpException('Forbidden', HttpStatus.CONFLICT);
+        return this.getAll()
     }
 }

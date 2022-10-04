@@ -5,10 +5,10 @@ import { message } from "../message/message.entity";
 @Entity()
 export class chatroom{
     @PrimaryGeneratedColumn()
-    id: number;
+    roomId: number;
 
     @Column({ unique: true })
-    name: string;
+    roomName: string;
 
     @ManyToOne(() => User, (User) => User.owner_of)
     owner: User;

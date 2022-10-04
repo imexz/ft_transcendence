@@ -2,7 +2,6 @@
   <form @submit.prevent="changeUserName">
     <input v-model="newName" placeholder="Enter new Username"/>
     <button>Submit</button>
-    <Toast></Toast>
   </form>
 </template>
 

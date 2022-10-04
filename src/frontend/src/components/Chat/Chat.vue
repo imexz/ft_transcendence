@@ -17,7 +17,7 @@
           <button type="submit">Send</button>
         </form>
     </div>
-  </template>
+</template>
   
   <!-- <button type="submit" @click="emitMessage">Send</button> -->
 

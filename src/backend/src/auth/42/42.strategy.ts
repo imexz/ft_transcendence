@@ -43,8 +43,8 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
 			// this.logger.log(tmp)
 			var tmp: User[];
 			user = await this.authService.addUser({
-				id: profile.id,
-				unique_name: profile.name.givenName,
+				_id: profile.id,
+				username: profile.name.givenName,
 				avatar_url: profile.image_url,
 				avatar_url_42intra: profile.image_url,
 				current_status: null,

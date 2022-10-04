@@ -25,7 +25,7 @@ export default {
         }
     },
     methods: {
-        getRooms(): void{
+        creatRoom(): void{
             VueAxios({
                 url: '/chatroom/creat',
                 baseURL: API_URL,
