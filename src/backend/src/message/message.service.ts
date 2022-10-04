@@ -23,12 +23,12 @@ export class MessageService {
         }
     }
 
-    async getAllMessagesOfRoom(room_name: string) {
+    async getAllMessagesOfRoom(roomId: number) {
         const messages = await this.messageRepository.find(
             {
                 where: {
                     chatroom: {
-                        roomName: room_name
+                        roomId: roomId
                     }
 
                 },

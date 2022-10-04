@@ -5,22 +5,25 @@
       :messages="JSON.stringify(messages)"
       :room-actions="JSON.stringify(roomActions)"
       @send-message="sendMessage($event.detail[0])"
-      @add-room="creatRoom()"
+      @add-room="makePopup()"
       @room-action-handler="roomActionHandler($event.detail[0])"
-      @typing-message="emitTyping()"
+      @typing-message="emitTyping($event.detail[0])"
+      @fetch-messages="updateMessages($event.detail[0])"
     />
-    <!-- <CreatRoomPopup>
-      
-    </CreatRoomPopup> -->
+    <creatRoomPopup
+      v-if="popupTrigger"
+      :TogglePopup="() => makePopup()" >
+      <h2>Creat Room</h2>
+    </creatRoomPopup>
   </template>
   
   <script >
   import { register } from 'vue-advanced-chat'
   import { io } from 'socket.io-client';
+  import { ref } from 'vue';
   import VueAxios from 'axios';
   import { API_URL } from '@/defines';
-  // import { CreatRoomPopup } from '@/components/Chat/creatRoomPopup.vue';
-
+  import creatRoomPopup from '@/components/Chat/creatRoomPopup.vue';
 
 
   register()
@@ -36,27 +39,37 @@
             { name: 'removeUser', title: 'Remove User' },
             { name: 'deleteRoom', title: 'Delete Room' }
           ],
-          socket: io
+          socket: io,
+          popupTrigger: ref(false)
         }
       },
       components:{
-        // CreatRoomPopup,
+        creatRoomPopup,
       },
       methods: {
-        async updateMessages() {
-          this.socket.emit('findAllMessages', {room_name: this.room_name}, (response) => {
+        async updateMessages(room) {
+          console.log("updateMessages");
+          this.socket.emit('findAllMessages', {roomId: room.roomId}, (response) => {
             console.log(response);
             this.messages = response;
           })
         },
         sendMessage(message) {
           console.log("sendMessage");
-          this.socket.emit('createMessage', { room_name: message.roomId, content: message.content}, (response) =>
+          this.socket.emit('createMessage', { roomId: message.roomId, content: message.content}, (response) =>
           {
             console.log(response);
-            this.messages.push(response)
+            // this.messages.push(response)
             
           })
+        },
+        makePopup() {
+          console.log("makePopup");
+          this.popupTrigger = !this.popupTrigger
+          if (this.popupTrigger == false) {
+            this.getRooms()
+          }
+          console.log(this.popupTrigger);
         },
         creatRoom(){
             VueAxios({
@@ -81,13 +94,13 @@
                 .catch(error => { this.$emit('error') })
         },
       
-        emitTyping() {
-          this.socket.emit('typing', {isTyping: true, room_name: this.room_name});
+        emitTyping(roomId) {
+          this.socket.emit('typing', {isTyping: true, roomId: roomId});
           this.timeout = setTimeout(() => {
-            this.socket.emit('typing', { isTyping: false, room_name: this.room_name});
+            this.socket.emit('typing', { isTyping: false, roomId: roomId});
           }, 2000);
           console.log("emit typing ");
-          console.log(this.room_name);
+          console.log(roomId);
           
         },
         getRooms(){
@@ -118,9 +131,10 @@
       },
       mounted() {
         this.getRooms();
-        this.initSocket();
         this.currentUserId = this.$store.getters.getUser.id;
+        this.initSocket();
         console.log("mounted CHAT");
+        console.log(this.$store.getters.getUser.id)
       }      
     }
 </script>
