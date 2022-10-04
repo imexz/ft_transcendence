@@ -22,6 +22,7 @@ export default defineComponent({
       matchData: [
         { opponent: 1, myScore: 6, opponentScore: 10 },
         { opponent: 2, myScore: 10, opponentScore: 3},
+        { opponent: 2, myScore: 10, opponentScore: 10},
       ] as MatchData[],
     }
   },
