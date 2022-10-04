@@ -2,7 +2,7 @@
   <div class="userSummary">
     <div class="normalView">
       <img :src="user?.avatar_url" alt="Avatar">
-      <span>{{ user?.unique_name }}</span>
+      <span>{{ user?.username }}</span>
       <div class="toggleDropdown" @click="toggleDropdown">:</div>
     </div>
     <div class="dropdownMenu" v-if="show">
@@ -11,7 +11,7 @@
         @click="addFriend">AddFriend</button>
       <button 
         class="dropdownElement"
-        @click="viewProfile(user?.id)">View Profile</button>
+        @click="viewProfile(user?._id)">View Profile</button>
       <button
         class="dropdownElement">Send Dm</button>
       <button
@@ -46,7 +46,7 @@ export default defineComponent({
         baseURL: API_URL,
         method: 'POST',
         withCredentials: true,
-        data: {"id" : this.user?.id},
+        data: {"id" : this.user?._id},
       })
         .then()
         .catch()
