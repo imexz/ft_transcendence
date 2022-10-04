@@ -8,7 +8,7 @@
         @click="$router.push('/')">
         <img :src="$store.getters.getUser.avatar_url" class="userPic">
         <span class="userName">
-          {{ $store.getters.getUser.unique_name }}
+          {{ $store.getters.getUser.username }}
         </span>
       </div>
       <div v-else></div>
