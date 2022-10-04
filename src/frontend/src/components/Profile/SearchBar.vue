@@ -38,7 +38,7 @@ export default defineComponent({
   methods: {
     filteredUsers() {
       return this.users.filter((user) => 
-        user.unique_name.toLowerCase().includes(this.searchQuery.toLocaleLowerCase()))
+        user.username.toLowerCase().includes(this.searchQuery.toLocaleLowerCase()))
     }
   },
   mounted() {
