@@ -14,6 +14,7 @@
 
 <script lang="ts">
 import VueAxios from 'axios';
+import { API_URL } from '@/defines';
 
 
 
