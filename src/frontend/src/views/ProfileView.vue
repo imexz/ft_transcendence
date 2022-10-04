@@ -5,7 +5,6 @@
   </div>
   <div class="top">
     <SearchBar/>
-    <FriendList/>
   </div>
 </template>
 
@@ -13,7 +12,6 @@
   import UserSummary from '@/components/Profile/UserSummary.vue';
   import SearchBar from '@/components/Profile/SearchBar.vue';
   import Profile from '@/components/Profile/Profile.vue';
-  import FriendList from '@/components/Profile/FriendList.vue';
   import MatchHisory from '@/components/Profile/MatchHistory.vue'
   import { defineComponent } from 'vue';
 
@@ -30,7 +28,6 @@ export default defineComponent({
     UserSummary,
     SearchBar,
     Profile,
-    FriendList,
     MatchHisory
   }
 })
