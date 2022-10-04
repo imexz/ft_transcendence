@@ -7,6 +7,11 @@
     </div>
     <div class="dropdownMenu" v-if="show">
       <button 
+        v-if="this.$store.getters.getFriends.some(us => us._id == this.user._id)"
+        class="dropdownElement"
+        @click="removeFriend">Remove Friend</button>
+      <button 
+        v-else
         class="dropdownElement"
         @click="addFriend">AddFriend</button>
       <button 
@@ -50,8 +55,12 @@ export default defineComponent({
         withCredentials: true,
         data: {"id" : this.user?._id},
       })
-        .then()
+        .then(this.$store.commit('addFriend', this.user))
         .catch()
+    },
+    removeFriend(){
+      console.log("IMPLEMENT API TO REMOVE FRIEND")
+      this.$store.commit('removeFriend', this.user._id);
     },
     viewProfile(id: number){
       this.$router.push('/profile/' + id.toString());
@@ -74,9 +83,9 @@ export default defineComponent({
   }
   .userSummary {
     position: relative;
-    width: 316px;
+    /* width: 316px; */
     border: 2px solid;
-    border-image: linear-gradient(var(--ft_cyan), var(--ft_pink)) 1;
+    border-image: linear-gradient(90deg, var(--ft_cyan), var(--ft_pink)) 1;
   }
   .normalView {
     padding: 5px;
