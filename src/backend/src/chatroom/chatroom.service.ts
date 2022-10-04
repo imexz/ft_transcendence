@@ -7,6 +7,11 @@ import { message } from 'src/message/message.entity';
 
 @Injectable()
 export class ChatroomService {
+    async getRoomName(roomId: number): Promise<string> {
+       const room = await this.chatroomRepository.findOneBy({roomId: roomId})
+
+       return room.roomName
+    }
     async findOrCreat(name: string): Promise<{ chatroom: chatroom; bool: boolean; }> {
         if (name != undefined && name != '')
         {

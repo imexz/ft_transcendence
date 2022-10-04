@@ -78,12 +78,13 @@ export class ChatGateway {
   @SubscribeMessage('typing')
   async typing(
     @MessageBody('isTyping') isTyping: boolean,
-    @MessageBody('room_name') room_name: string,
+    @MessageBody('roomId') roomId: number,
     @ConnectedSocket() client:Socket,
   ) {
     // console.log(client.id)
 
     const name = await this.chatService.getClientName(client.handshake.auth.id);
+    const room_name = await this.chatService.getRoomName(roomId)
     // const name = client.id
 
     client.to(room_name).emit('typing', { name , isTyping});
@@ -92,14 +93,14 @@ export class ChatGateway {
   }
 
   @SubscribeMessage('findAllMessages')
-  async findAllMessages(@MessageBody('room_name') room_name: string, @ConnectedSocket() client:Socket,) {
+  async findAllMessages(@MessageBody('roomId') roomId: number, @ConnectedSocket() client:Socket,) {
     console.log('findAllMessages');
-    console.log(room_name);
+    console.log(roomId);
     console.log(client.handshake);
     console.log(client.handshake.auth.id);
     
     
-    return await this.chatService.findAllMessages(room_name);
+    return await this.chatService.findAllMessages(roomId);
     // return {test};
   }
 
@@ -126,6 +127,3 @@ export class ChatGateway {
     return message;
   }
 }
-
-
-
