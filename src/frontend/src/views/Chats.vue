@@ -25,11 +25,11 @@
 
 
 <script lang="ts">
-import { onBeforeMount, ref } from 'vue';
+  
 import { Options, Vue } from 'vue-class-component';
 import RoomSummary from '../components/Chat/RoomSummary.vue'
 import VueAxios from 'axios';
-import { API_URL } from '@/models/host';
+import { API_URL } from '@/defines';
 
 
 @Options({

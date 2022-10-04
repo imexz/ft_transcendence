@@ -1,16 +1,18 @@
 <template>
-    <NavBar></NavBar>
-    <router-view class="routerView"/>
+  <NavBar></NavBar>
+  <router-view/>
 </template>
 
 <script lang="ts">
-  import NavBar from '@/components/NavBar/NavBar.vue';
 
-  export default {
-    components: {
-      NavBar,
-    }    
-  }
+import NavBar from '@/components/NavBar/NavBar.vue';
+import { defineComponent } from 'vue';
+
+export default defineComponent({
+  components: {
+    NavBar,
+  }    
+})
 
 </script>
 
@@ -36,23 +38,28 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
-  color: var(--ft_blue);
+  color: var(--ft_cyan);
 }
 
-html, body {
+html{
   margin: 0;
   padding: 0;
   height: 100%;
+  min-width: 800px;
+  overflow: auto;
 }
 
 body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
   height: 100%;
-  background-color: #000000;
+  background-color: var(--ft_dark);
   /* background: linear-gradient(var(--ft_dark_purple),var(--ft_dark)); */
   background-repeat: no-repeat;
 }
 
-button, input, select {
+/* button, input, select {
   background-color: var(--ft_black);
   color: var(--ft_white);
   padding: 15px 32px;
@@ -61,5 +68,5 @@ button, input, select {
   margin: auto;
   border-image: linear-gradient(var(--ft_pink), var(--ft_blue)) 1;
   box-sizing: border-box;
-}
+} */
 </style>
