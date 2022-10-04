@@ -38,9 +38,9 @@ export class ChatGateway {
 
 
   afterInit(socket) {
-    console.log("afterInit chat ");
-    
-    // console.log(socket);    
+    // console.log("afterInit chat ");
+
+    // console.log(socket);
   }
 
   handleConnection(socket) {
@@ -55,7 +55,7 @@ export class ChatGateway {
 
   @SubscribeMessage('join')
   joinRoom(
-    @MessageBody('room_name') room_name: string,  
+    @MessageBody('room_name') room_name: string,
     @ConnectedSocket() client: Socket,
   ) {
     console.log("join");
@@ -67,10 +67,10 @@ export class ChatGateway {
 
   @SubscribeMessage('leave')
   leaveRoom(
-    @MessageBody('room_name') room_name: string,  
+    @MessageBody('room_name') room_name: string,
     @ConnectedSocket() client:Socket,
   ) {
-    console.log("leave");
+    // console.log("leave");
     client.leave(room_name);
     this.chatService.manageLeave(client.handshake.auth.id, room_name)
   }
@@ -78,17 +78,17 @@ export class ChatGateway {
   @SubscribeMessage('typing')
   async typing(
     @MessageBody('isTyping') isTyping: boolean,
-    @MessageBody('room_name') room_name: string,  
+    @MessageBody('room_name') room_name: string,
     @ConnectedSocket() client:Socket,
   ) {
-    console.log(client.id)
-    
+    // console.log(client.id)
+
     const name = await this.chatService.getClientName(client.handshake.auth.id);
     // const name = client.id
 
     client.to(room_name).emit('typing', { name , isTyping});
-    console.log("recive and emit typing");
-    
+    // console.log("recive and emit typing");
+
   }
 
   @SubscribeMessage('findAllMessages')
@@ -117,12 +117,12 @@ export class ChatGateway {
 
     client.to(room_name).emit('message', message);
 
-    
+
     // console.log(client.);
-     
-    console.log("emit mesage");
-    console.log(message);
-    
+
+    // console.log("emit mesage");
+    // console.log(message);
+
     return message;
   }
 }

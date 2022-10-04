@@ -26,7 +26,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
 
     async validate(payload: TokenPayload) {
         // console.log(payload);
-        console.log("validate jwt")
+        // console.log("validate jwt")
         const user = await this.userService.getUser(payload.Id)
         // console.log(user);
         if (user != undefined) {
@@ -48,7 +48,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     }
 
     private static extractJWT(req: Request): string | null {
-        console.log("extractJWT jwt")
+        // console.log("extractJWT jwt")
         // console.log(req.header)
         if (
             req.cookies &&
@@ -61,9 +61,9 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
           // return req.cookies.token;
           return req.cookies.Authentication;
         }
-        console.log("extractJWT jwt null")
+        // console.log("extractJWT jwt null")
           // console.log(req);
-          
+
         return;
       }
 }

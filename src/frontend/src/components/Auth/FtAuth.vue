@@ -4,26 +4,29 @@
     <div v-if="!this.$store.getters.isLogged">
       <button 
         class="authButton"
-        @click="this.authenticate">42 AUTH</button>
+        :class="{'linkActive': this.$route.name === 'login'}"
+        @click="this.authenticate">login</button>
         
     </div>
     <div v-else>
       <button
         class="authButton"
-        @click="this.logout">Logout</button>
+        :class="{'linkActive': this.$route.name === 'login'}"
+        @click="this.logout">logout</button>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-  import VueAxios from 'axios';
-  import { API_URL } from '@/models/host';
-  import EnableTwoFA from '@/components/Auth/enable2fc.vue';
-  import Toast from '@/components/Toast.vue'
-  import { ref }  from 'vue';
 
+import VueAxios from 'axios';
+import { API_URL } from '@/defines';
+import EnableTwoFA from '@/components/Auth/enable2fc.vue';
+import Toast from '@/components/Toast.vue'
+import { ref }  from 'vue';
+import { defineComponent } from 'vue';
 
-export default {
+export default defineComponent({
   components: {
     EnableTwoFA,
     Toast,
@@ -74,12 +77,36 @@ export default {
   mounted(): void {
     this.validateUser()
   }
-}
+})
 
 </script>
 
 <style>
-  .authButton{
+  .authButton {
     float: right;
+    text-decoration: none;
+    text-align: center;
+    font-weight: bold;
+    font-size: 25px;
+    padding: 14px 24px;
+    color: var(--ft_cyan);
+    border: 2px solid var(--ft_cyan);
+    background-color: rgba(0, 0, 0, 0);
+    border-radius: 10px;
+  }
+  .linkActive {
+    color: var(--ft_red);
+    border-color: var(--ft_red);
+  }
+  .authButton:hover {    
+    color: var(--ft_dark);
+    background-color: var(--ft_cyan);
+  }
+  .linkActive:hover {
+    color: var(--ft_dark);
+    background-color: var(--ft_red);
+  }
+  .authButton:active{
+    transform: translateY(1px);
   }
 </style>

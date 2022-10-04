@@ -2,7 +2,6 @@
   <div>
     <div v-if="!this.$store.getters.isLogged">
       <h1>Please login</h1>
-      <button @click="validateUser">validate AUTH</button>
       <EnableTwoFA/>
     </div>
     <div v-else>
@@ -12,15 +11,14 @@
 </template>
 
 <script lang ="ts">
-  import { Vue, Options } from 'vue-class-component';
-  import EnableTwoFA from '@/components/Auth/enable2fc.vue';
 
-  @Options ({
-    components: {
-      EnableTwoFA,
-    }
-  })
+import EnableTwoFA from '@/components/Auth/enable2fc.vue';
+import { defineComponent } from 'vue';
 
-  export default class LoginView extends Vue {
-  }
+export default defineComponent({
+  components: {
+    EnableTwoFA,
+  }  
+})
+
 </script>

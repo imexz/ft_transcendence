@@ -38,7 +38,7 @@ import { UsersService } from "src/users/users.service";
             secret: user.twoFactorAuthenticationSecret
         })
 
-    }   
+    }
 
 }
 
