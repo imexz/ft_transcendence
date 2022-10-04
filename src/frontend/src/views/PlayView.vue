@@ -5,15 +5,14 @@
 </template>
 
 <script lang="ts">
-  import { Vue, Options } from 'vue-class-component';
-  import PongGame from '@/components/Game/PongGame.vue';
 
-  @Options({
-    components: {
-      PongGame,
-    }
-  })
+import PongGame from '@/components/Game/PongGame.vue';
+import { defineComponent } from 'vue';
 
-  export default class PlayView extends Vue {
-  }
+export default defineComponent({
+  components: {
+    PongGame,
+  },
+})
+
 </script>

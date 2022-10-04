@@ -32,7 +32,7 @@ export class UsersService {
 	}
 
 	async findAll(): Promise<User[]> {
-		console.log("findAll");
+		// console.log("findAll");
 		const user = await this.usersRepository.find();
 		// console.log(user);
 		return user
@@ -58,7 +58,7 @@ export class UsersService {
 	}
 
 	addUser(user: User): Promise<User> {
-		
+
 		if(user.avatar_url == null)
 		{
 			user.avatar_url = "https://cdn.intra.42.fr/users/juan.jpg"
@@ -83,7 +83,7 @@ export class UsersService {
 		}
 		else {
 			user.avatar = file
-			user.avatar_url = hostURL + ":3000/avatar"			
+			user.avatar_url = hostURL + ":3000/avatar"
 		}
 		this.usersRepository.update(id, user)
 	}
@@ -100,8 +100,8 @@ export class UsersService {
 	}
 
 	async addfriend(user_id: number, friend_id: number) {
-		console.log(user_id);
-		console.log(friend_id);
+		// console.log(user_id);
+		// console.log(friend_id);
 
 		if(user_id && friend_id) {
 			try{
@@ -144,5 +144,5 @@ export class UsersService {
 			isTwoFactorAuthenticationEnabled: false
 		});
 	}
-	
+
 }

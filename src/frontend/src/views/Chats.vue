@@ -9,17 +9,17 @@
       @room-action-handler="roomActionHandler($event.detail[0])"
       @typing-message="emitTyping()"
     />
-    <CreatRoomPopup>
+    <!-- <CreatRoomPopup>
       
-    </CreatRoomPopup>
+    </CreatRoomPopup> -->
   </template>
   
   <script >
   import { register } from 'vue-advanced-chat'
   import { io } from 'socket.io-client';
   import VueAxios from 'axios';
-  import { API_URL } from '@/models/host';
-  import { CreatRoomPopup } from '@/components/Chat/creatRoomPopup.vue';
+  import { API_URL } from '@/defines';
+  // import { CreatRoomPopup } from '@/components/Chat/creatRoomPopup.vue';
 
 
 
@@ -40,7 +40,7 @@
         }
       },
       components:{
-        CreatRoomPopup,
+        // CreatRoomPopup,
       },
       methods: {
         async updateMessages() {

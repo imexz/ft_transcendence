@@ -13,18 +13,22 @@
 </template>
 
 <script lang="ts">
-  export default {
-    props: {
-      msg: String,
-      mode: String,
-    }
+
+import { defineComponent } from 'vue';
+
+export default defineComponent({
+  props: {
+    msg: String,
+    mode: String,
   }
+})
+
 </script>
 
 <style scoped>
   .toast-wrapper {
-    --error_color: #f60445;
-    --succes_color: #21e6f8;
+    --error_color: var(--ft_red);
+    --succes_color: var(--ft_cyan);
     float: right;
     position: fixed;
     width: 400px;
@@ -36,25 +40,27 @@
     color: white;
     background: red;
     border-radius: 10px;
-    box-shadow: 1px 3px 5px, rgb(5, 186, 252);
-    margin: 0, auto;
+    font-weight: bold;
+    z-index: 10;
   }
   .errorToast {
     padding: 20px;
     background: rgba(0, 0, 0, 100);
     color: var(--error_color);
     border: 3px solid var(--error_color);
-    font-size: 20px;
+    font-size: 25px;
+    font-weight: bold;
     border-radius: 10px;
-    margin: 0, auto;
+    z-index: 10;
   }
   .successToast {
     padding: 20px;
     background: rgba(0, 0, 0, 100);
     color: var(--succes_color);
     border: 3px solid var(--succes_color);
-    font-size: 20px;
+    font-size: 25px;
+    font-weight: bold;
     border-radius: 10px;
-    margin: 0, auto;
+    z-index: 10;
   }
 </style>

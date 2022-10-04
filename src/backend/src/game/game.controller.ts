@@ -1,12 +1,10 @@
 import { Controller, Sse, Param } from '@nestjs/common';
 import { GameService } from './game.service';
 import { map, interval, Observable } from 'rxjs';
-import { GameObj } from './game.interfaces/gameobj.interface';
-import { ConnectedSocket } from '@nestjs/websockets';
-import { Socket } from 'socket.io';
+import { Game } from './game.entities/game.entity';
 
 interface MessageEvent {
-	data: GameObj;
+	data: Game;
 }
 
 @Controller('game')
@@ -15,6 +13,6 @@ export class GameController {
 
 	@Sse('sse/:gameid')
 	sse(@Param('gameid') gameid: number): Observable<MessageEvent> {
-		return interval(5).pipe(map((_) => ({data : this.gameService.getData(gameid)})));
+		return interval(100).pipe(map((_) => ({data: this.gameService.getData(gameid)})));
 	}
 }

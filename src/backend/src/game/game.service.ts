@@ -15,19 +15,41 @@ export class GameService {
 	private gameRepository: Repository<Game>
 
 	queue: Array<Socket> = [];
-	gameIds = new Map<string, number>();
-	games = new Map<number, Game>();
+	mapIds = new Map<string, number>(); // Key: UserId, Value: GameId
+	games = new Map<number, Game>(); // Key: GameId, Value: Game Object
 
 	checkQueue(id) {
 		return (id === this);
 	}
 
+	getSideFromGame(game: Game, playerid: string): string {
+		if (game.playerLeft === playerid) {
+			return "left";
+		} else if (game.playerRight === playerid) {
+			return "right";
+		} else
+			return "";
+	}
+
 	addClientIdToQueue(client: Socket): void {
 		if (this.queue.find(this.checkQueue, client) != client) {
 			this.queue.push(client);
-			console.log("%s was added to queue", client.id);
+			console.log("%s was added to queue", client.handshake.auth.id);
 		} else {
-			console.log("%s already in queue", client.id);
+			console.log("%s already in queue", client.handshake.auth.id);
+		}
+	}
+
+	async checkQueueForGame(client: Socket): Promise<void> {
+		if (this.mapIds.has(client.handshake.auth.id) == false) {
+			console.log("client id %s is not in gamesIds Array", client.handshake.auth.id);
+			while (this.queue.length > 1) {
+				await this.createGame();
+			}
+		}
+		else {
+			console.log("client %d already in mapIds", client.handshake.auth.id);
+			client.emit('gameId', {gameId: this.mapIds.get(client.handshake.auth.id), side: this.getSideFromGame(this.games.get(this.mapIds.get(client.handshake.auth.id)), client.handshake.auth.id)});
 		}
 	}
 
@@ -39,14 +61,16 @@ export class GameService {
 		gamerepo = await this.gameRepository.save(gamerepo);
 		var p1: Socket = this.queue.shift();
 		var p2: Socket = this.queue.shift();
-		console.log("createGame() queue.length = %d", this.queue?.length);
-		console.log(this.setup);
-		var newgame = new Game(gamerepo.id, p1.id, p2.id, this.setup);
-		this.games.set(gamerepo.id, newgame);
-		this.gameIds.set(p1.id, gamerepo.id);
-		this.gameIds.set(p2.id, gamerepo.id);
-		p1.emit('gameId', gamerepo.id);
-		p2.emit('gameId', gamerepo.id);
+		// var newgame = new Game(gamerepo.id, p1.handshake.auth.id, p2.handshake.auth.id, this.setup);
+		// this.games.set(gamerepo.id, newgame);
+		this.games.set(gamerepo.id, new Game(gamerepo.id, p1.handshake.auth.id, p2.handshake.auth.id, this.setup));
+		// console.log(this.games.get(gamerepo.id));
+		this.mapIds.set(p1.handshake.auth.id, gamerepo.id);
+		this.mapIds.set(p2.handshake.auth.id, gamerepo.id);
+		console.log("gameid = %d", gamerepo.id);
+		console.log(this.mapIds);
+		p1.emit('gameId', {gameId: gamerepo.id, side: "left"});
+		p2.emit('gameId', {gameId: gamerepo.id, side: "right"});
 		console.log('leaving createGame()');
 
 	}
@@ -58,12 +82,18 @@ export class GameService {
 			this.reset(id);
 		}
 		return this.games.get(id);
-			// ball: this.games.get(id).ball,
-			// paddleLeft: this.games.get(id).paddleLeft,
-			// paddleRight: this.games.get(id).paddleRight,
-			// score: this.games.get(id).score,
-			// scoreLeft: this.games.get(id).scoreLeft,
-			// scoreRight: this.games.get(id).scoreRight,
+		// return ({
+		// 	ball: this.games.get(id).ball as any,
+		// 	paddleLeft: this.games.get(id).paddleLeft as any,
+		// 	paddleRight: this.games.get(id).paddleRight as any,
+		// 	score: this.games.get(id).score as any,
+		// 	scoreLeft: this.games.get(id).scoreLeft as any,
+		// 	scoreRight: this.games.get(id).scoreRight as any,
+		// 	id: id as any,
+		// 	playerLeft: this.games.get(id).playerLeft as any,
+		// 	playerRight: this.games.get(id).playerRight as any,
+		// 	player: this.games.get(id).player as any,
+		// });
 	}
 
 	updateData(id: number) {
