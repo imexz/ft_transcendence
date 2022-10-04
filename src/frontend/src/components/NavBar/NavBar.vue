@@ -4,11 +4,11 @@
       <div 
         v-if=isLoggedIn
         class="currentUser topElement"
-        :class="{'userActive': this.$route.name === 'me'}"
-        @click="this.$router.push('/')">
-        <img :src="this.$store.getters.getUser.avatar_url" class="userPic">
+        :class="{'userActive': $route.name === 'me'}"
+        @click="$router.push('/')">
+        <img :src="$store.getters.getUser.avatar_url" class="userPic">
         <span class="userName">
-          {{ this.$store.getters.getUser.unique_name }}
+          {{ $store.getters.getUser.unique_name }}
         </span>
       </div>
       <div v-else></div>
@@ -29,35 +29,22 @@
 </template>
 
 <script lang="ts">
-  import FtAuth from '../Auth/FtAuth.vue';
-  import store from '@/store/index';
 
-  export default {
-    data() {
-      return {
-        sites: [
-          {
-            label: 'Chats',
-            link: '/chat',
-            type: 'left'
-          },
-          {
-            label: 'Settings',
-            link: '/settings',
-            type: 'right'
-          }
-        ]
-      } 
+import FtAuth from '../Auth/FtAuth.vue';
+import store from '@/store/index';
+import { defineComponent } from 'vue';
+
+export default defineComponent({
+  computed: {
+    isLoggedIn(): boolean {
+        return store.state.validated;
     },
-    computed: {
-      isLoggedIn(): boolean {
-          return store.state.validated;
-      },
-    },
-    components: {
-      FtAuth,
-    }
+  },
+  components: {
+    FtAuth,
   }
+})
+
 </script>
 
 <style>
@@ -69,7 +56,7 @@
   justify-content: space-between;
   align-items: center;
   background: var(--ft_dark);
-  border-bottom: 2px solid var(--ft_white);
+  border-bottom: 2px solid var(--ft_red);
 }
 .topElement:active {
   transform: translateY(1px);

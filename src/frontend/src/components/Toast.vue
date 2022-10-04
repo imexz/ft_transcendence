@@ -13,12 +13,16 @@
 </template>
 
 <script lang="ts">
-  export default {
-    props: {
-      msg: String,
-      mode: String,
-    }
+
+import { defineComponent } from 'vue';
+
+export default defineComponent({
+  props: {
+    msg: String,
+    mode: String,
   }
+})
+
 </script>
 
 <style scoped>
@@ -37,8 +41,7 @@
     background: red;
     border-radius: 10px;
     font-weight: bold;
-    box-shadow: 1px 3px 5px, rgb(5, 186, 252);
-    margin: 0, auto;
+    z-index: 10;
   }
   .errorToast {
     padding: 20px;
@@ -48,7 +51,7 @@
     font-size: 25px;
     font-weight: bold;
     border-radius: 10px;
-    margin: 0, auto;
+    z-index: 10;
   }
   .successToast {
     padding: 20px;
@@ -58,6 +61,6 @@
     font-size: 25px;
     font-weight: bold;
     border-radius: 10px;
-    margin: 0, auto;
+    z-index: 10;
   }
 </style>

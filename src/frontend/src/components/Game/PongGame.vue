@@ -21,7 +21,7 @@
   import { Vue, Options } from 'vue-class-component';
   import ScoreCounter from '@/components/Game/ScoreCounter.vue'
   import io from "socket.io-client";
-  import { API_URL } from '@/models/host';
+  import { API_URL } from '@/defines';
 
   @Options({
     components: {
