@@ -36,7 +36,7 @@ export class AvatarService {
         const avatar = await this.fileRepository.findOne({
             where: {
                 user: {
-                    id: id
+                    _id: id
                 }
             }
         }

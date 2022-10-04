@@ -37,20 +37,20 @@ export class UsersController {
 	@UseGuards(JwtAuthGuard)
 	addFriend(@Request() req, @Body("id") id: number){
 		// console.log(id);
-		return  this.usersService.addfriend(req.user.id, id);
+		return  this.usersService.addfriend(req.user._id, id);
 	}
 
 	@Post('removeFriend')
 	@UseGuards(JwtAuthGuard)
 	removeFriend(@Request() req, @Body("id") id: number){
 		// console.log(id);
-		return  this.usersService.addfriend(req.user.id, id);
+		return  this.usersService.addfriend(req.user._id, id);
 	}
 
 	@Get('friends')
 	@UseGuards(JwtAuthGuard)
 	getFriends(@Request() req) {
-		return this.usersService.getFriends(req.user.id)
+		return this.usersService.getFriends(req.user._id)
 	}
 
 	@Get('validate')
@@ -60,7 +60,7 @@ export class UsersController {
 		console.log("inside validate");
 		console.log(req.user);
 
-		const user = this.usersService.getUser(req.user.id)
+		const user = this.usersService.getUser(req.user._id)
 		// console.log(user);
 		return user
 	}
@@ -68,12 +68,12 @@ export class UsersController {
 	@Post('update_name')
 	@UseGuards(JwtAuthGuard)
 	update_name(@Body("name") name, @Request() req) {
-		this.usersService.updateName(req.user.id, name);
+		this.usersService.updateName(req.user._id, name);
 	}
 
 	@Delete()
 	delete(@Request() req) {
-		this.usersService.remove(req.user.id)
+		this.usersService.remove(req.user._id)
 	}
 
 	@Post('turn-on')
@@ -90,7 +90,7 @@ export class UsersController {
 	  if (!isCodeValid) {
 		throw new UnauthorizedException('Wrong authentication code');
 	  }
-	  await this.usersService.turnOnTwoFactorAuthentication(request.user.id);
+	  await this.usersService.turnOnTwoFactorAuthentication(request.user._id);
 	}
 
 	@Get('turn-off')
@@ -99,7 +99,7 @@ export class UsersController {
 	async turnOffTwoFactorAuthentication(
 	  @Req() request,
 	) {
-	  await this.usersService.turnOffTwoFactorAuthentication(request.user.id);
+	  await this.usersService.turnOffTwoFactorAuthentication(request.user._id);
 	}
 
 }

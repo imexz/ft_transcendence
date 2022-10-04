@@ -24,15 +24,15 @@ export class AuthController{
 
 		
 		// res.setHeader('Set-Cookie', [this.authService.getCookieWithJwtAccessToken(
-		// 	req.user.id,
+		// 	req.user._id,
 		// 	req.user.isTwoFactorAuthenticationEnabled,
 		// )]);
 		// res.cookie("token", [this.authService.getCookieWithJwtAccessToken(
-		// 	req.user.id,
+		// 	req.user._id,
 		// 	req.user.isTwoFactorAuthenticationEnabled,
 		// )]);
 		res.setHeader('Set-Cookie', this.authService.getCookieWithJwtAccessToken(
-			req.user.id,
+			req.user._id,
 			false,
 		))
 
@@ -66,6 +66,6 @@ export class AuthController{
 	// 	console.log(id);
 	// 	// console.log(req);
 
-	// 	return	this.authService.addfriend(req.user.id, id);
+	// 	return	this.authService.addfriend(req.user._id, id);
 	// }
 }

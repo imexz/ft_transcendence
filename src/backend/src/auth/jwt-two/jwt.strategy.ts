@@ -29,17 +29,21 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
         console.log("validate jwt")
         const user = await this.userService.getUser(payload.Id)
         // console.log(user);
-        
-        if(user.isTwoFactorAuthenticationEnabled == false) {
-          return user
-        } else {
-          if (payload.isSecondFactorAuthenticated) {
-            return user;
+        if (user != undefined) {
+          if(user.isTwoFactorAuthenticationEnabled == false) {
+            return user
           } else {
-            console.log("return null");
-            return
+            if (payload.isSecondFactorAuthenticated) {
+              return user;
+            } else {
+              console.log("return null");
+              return
+            }
+  
           }
-
+        } else {
+          console.log("user not found");
+          
         }
     }
 
@@ -52,7 +56,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
         //  && req.cookies.l > 0
         ) {
         console.log("extractJWT jwt sucess")
-        console.log(req.cookies.Authentication);
+        // console.log(req.cookies.Authentication);
 
           // return req.cookies.token;
           return req.cookies.Authentication;

@@ -10,7 +10,7 @@ export class message {
 	  }
 
     @PrimaryGeneratedColumn()
-    id: number;
+    _id: number;
 
     @CreateDateColumn()
     timestamp: Date;

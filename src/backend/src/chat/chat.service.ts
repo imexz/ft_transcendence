@@ -43,7 +43,7 @@ export class ChatService {
         console.log("getClientName");
         console.log(id);
         console.log(user);
-        return user.unique_name
+        return user.username
     }
       
 }

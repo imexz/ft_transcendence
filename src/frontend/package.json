@@ -13,6 +13,7 @@
     "socket.io": "^4.5.2",
     "socket.io-client": "^4.5.2",
     "vue": "^3.2.13",
+    "vue-advanced-chat": "^2.0.3",
     "vue-axios": "^3.4.1",
     "vue-class-component": "^8.0.0-0",
     "vue-router": "^4.0.3",
