@@ -42,7 +42,7 @@ export default createStore({
       state.user = user;
     },
     changeUserName(state, username) {
-      state.user.unique_name = username;
+      state.user.username = username;
     },
     resetAvatar(state) {
       state.user.avatar_url = state.user.avatar_url_42intra;
