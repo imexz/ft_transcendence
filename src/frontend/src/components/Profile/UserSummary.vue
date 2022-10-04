@@ -16,6 +16,8 @@
         class="dropdownElement">Send Dm</button>
       <button
         class="dropdownElement">Block</button>
+<button
+        class="dropdownElement">Challenge to Match</button>
     </div>
   </div>
 </template>
