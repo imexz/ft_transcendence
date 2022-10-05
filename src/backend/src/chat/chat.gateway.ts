@@ -43,34 +43,50 @@ export class ChatGateway {
     // console.log(socket);
   }
 
-  handleConnection(socket) {
+  async handleConnection(socket) {
     console.log('connected chat')
+
+    const rooms = await this.chatService.getUserRooms(socket.handshake.auth.id)
+
+    rooms.forEach(room => {
+      socket.join(room.roomName)
+      console.log("joind");
+      console.log(room.roomName);
+      
+    });
     
 
     // console.log(socket.handshake);
 
     
     // socket.emit('successfullConnected');
+
   }
 
   @SubscribeMessage('join')
-  joinRoom(
-    @MessageBody('room_name') room_name: string,
+  async joinRoom(
+    @MessageBody() roomId: number,
     @ConnectedSocket() client: Socket,
   ) {
     console.log("join");
+    console.log(roomId);
+    
     console.log(client.handshake.auth.id);
+    const room_name = await this.chatService.getRoomName(roomId)
     client.join(room_name)
     
-    this.chatService.manageJoin(client.handshake.auth.id, room_name)
+    this.chatService.manageJoin(client.handshake.auth.id, roomId)
   }
 
   @SubscribeMessage('leave')
-  leaveRoom(
-    @MessageBody('room_name') room_name: string,
+  async leaveRoom(
+    @MessageBody() roomId: number,
     @ConnectedSocket() client:Socket,
   ) {
-    // console.log("leave");
+    console.log("leave");
+    
+    const room_name = await this.chatService.getRoomName(roomId)
+    
     client.leave(room_name);
     this.chatService.manageLeave(client.handshake.auth.id, room_name)
   }
@@ -81,7 +97,8 @@ export class ChatGateway {
     @MessageBody('roomId') roomId: number,
     @ConnectedSocket() client:Socket,
   ) {
-    // console.log(client.id)
+    console.log(roomId)
+    console.log("roomId")
 
     const name = await this.chatService.getClientName(client.handshake.auth.id);
     const room_name = await this.chatService.getRoomName(roomId)
@@ -106,24 +123,35 @@ export class ChatGateway {
 
   @SubscribeMessage('createMessage')
   async create(
-  @MessageBody('room_name') room_name: string,
+  @MessageBody('roomId') roomId: number,
   @MessageBody('content') content: string,
   @ConnectedSocket() client: Socket,
   ) {
     console.log("createMessage");
-    console.log(room_name);
+    console.log(roomId);
     console.log(content);
     
-    const message = await this.chatService.createMessage(client.handshake.auth.id, room_name, content);
-
-    client.to(room_name).emit('message', message);
-
-
-    // console.log(client.);
-
-    // console.log("emit mesage");
-    // console.log(message);
-
-    return message;
+    const room_name = await this.chatService.getRoomName(roomId)
+    
+    const message = await this.chatService.createMessage(client.handshake.auth.id, roomId, content);
+    
+    // client.to(room_name).emit('message', message);
+    const tmp = {_id: message._id,
+      content: message.content,
+      senderId: message.user._id,
+      timestamp: message.timestamp,
+      avatar: message.user.avatar_url}
+      
+      client.to(room_name).emit('message', tmp);
+      
+      
+      // console.log(client.);
+      
+      // console.log("emit mesage");
+      // console.log(message);
+      console.log(tmp);
+      
+      console.log("createMessage ende");
+    return tmp;
   }
 }
