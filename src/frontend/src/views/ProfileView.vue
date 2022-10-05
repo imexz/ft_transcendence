@@ -1,32 +1,22 @@
 <template>
   <div class="top">
     <Profile :id="id" />
-    <MatchHisory/>
-  </div>
-  <div class="top">
-    <SearchBar/>
+    <MatchHisory :id="id"/>
   </div>
 </template>
 
 <script lang="ts">
   import UserSummary from '@/components/Profile/UserSummary.vue';
-  import SearchBar from '@/components/Profile/SearchBar.vue';
   import Profile from '@/components/Profile/Profile.vue';
   import MatchHisory from '@/components/Profile/MatchHistory.vue'
   import { defineComponent } from 'vue';
 
 export default defineComponent({
-  data() {
-    return {
-      currentUser : this.$store.getters.getUser,
-    }
-  },
   props: {
     id: String,
   },
   components : {
     UserSummary,
-    SearchBar,
     Profile,
     MatchHisory
   }
