@@ -14,10 +14,10 @@ import { UsersService } from "src/users/users.service";
 
         const secret = authenticator.generateSecret();
 
-        const otpauthUrl = authenticator.keyuri(user.unique_name,  process.env.TWO_FACTOR_AUTHENTICATION_APP_NAME , secret);
-
-        await this.usersService.setTwoFactorAuthenticationSecret(secret, user.id);
-
+        const otpauthUrl = authenticator.keyuri(user.username,  process.env.TWO_FACTOR_AUTHENTICATION_APP_NAME , secret);
+ 
+        await this.usersService.setTwoFactorAuthenticationSecret(secret, user._id);
+     
         return {
           secret,
           otpauthUrl
@@ -29,10 +29,10 @@ import { UsersService } from "src/users/users.service";
     }
 
     async isTwoFactorAuthenticationCodeValid(twoFactorAuthenticationCode: string, user: User) {
-        // console.log('isTwoFactorAuthenticationCodeValid');
-        // const tmp_user  = await this.usersService.getUser(user.id)
-
-        // console.log(twoFactorAuthenticationCode);
+        console.log('isTwoFactorAuthenticationCodeValid');
+        // const tmp_user  = await this.usersService.getUser(user._id)
+        
+        console.log(twoFactorAuthenticationCode);
         return authenticator.verify({
             token: twoFactorAuthenticationCode,
             secret: user.twoFactorAuthenticationSecret

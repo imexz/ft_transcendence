@@ -38,7 +38,7 @@ export default defineComponent({
   },
   methods: {
     show() {
-      console.log(this.$store.getters.getUser);
+      console.log(this.$store.state);
     },
     changeSuccess(msg: string) {
       this.showToast = true;

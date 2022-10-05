@@ -44,16 +44,16 @@ export class ChatGateway {
   }
 
   handleConnection(socket) {
-    // console.log('connected chat')
+    console.log('connected chat')
+    
 
-    // console.log(socket);
+    // console.log(socket.handshake);
 
-
+    
     // socket.emit('successfullConnected');
   }
 
   @SubscribeMessage('join')
-	@UseGuards(JwtAuthGuard)
   joinRoom(
     @MessageBody('room_name') room_name: string,
     @ConnectedSocket() client: Socket,

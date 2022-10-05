@@ -23,11 +23,11 @@ export class User {
 	  }
 
 	@PrimaryColumn({unique: true})
-	id: number;
+	_id: number;
 
 	// @Column()
 	@Column({unique: true}) //finall
-	unique_name: string;
+	username: string;
 
 	@Column()
 	avatar_url: string;
