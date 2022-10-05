@@ -20,17 +20,17 @@
 <script lang="ts">
   import { Vue, Options } from 'vue-class-component';
   import ScoreCounter from '@/components/Game/ScoreCounter.vue'
-  import io from "socket.io-client";
+  import { io, Socket } from "socket.io-client";
   import { API_URL } from '@/defines';
   import { defineComponent } from 'vue';
 		
   export default defineComponent({
   	data () {
   		return {
+			isFirstCall: true as boolean,
   			gameId: "" as string,
-  			socket: null as any,
+  			gamesocket: null as Socket,
   			context: null as any,
-  			eventSource: null as any,
   			position: {
   				x: 0 as number,
   				y: 0 as number,
@@ -43,17 +43,16 @@
   	},
   	created() { // always called when Component is initialized (e.g. on refresh)
   		console.log("in created");
-  		this.socket = io(API_URL, {
+  		this.gamesocket = io(API_URL + '/game', {
   			auth: (cb: any) => {
-  				cb ({id: this.$store.getters.getUser.id })
+  				cb ({id: this.$store.getters.getUser._id })
   			}
   		});
-  		this.socket.on('gameInfo', (data: any) => {
+  		this.gamesocket.on('gameInfo', (data: any) => {
   			console.log("event gameInfo received");
   			this.gameId = data.gameId;
   			this.side = data.side;
   			console.log("received GameId: %s, side: %s", this.gameId, this.side);
-  			this.eventSource = new EventSource(API_URL + "/game/sse/" + this.gameId);
   			document.addEventListener('keydown', (event) => {
   				if (this.side === "left") {
   					if (event.key == 'w') {
@@ -76,44 +75,54 @@
   				}
   			}, false);
   		});
-  		this.socket.emit('checkGame', (cb: boolean) => {
-  		if (!cb) {
-  			console.log("calling checkQueue");
-  			this.socket.emit('checkQueue');
-  		}
+  		this.gamesocket.emit('checkGame', (res: boolean) => {
+  			if (!res) {
+  				console.log("calling checkQueue");
+  				this.gamesocket.emit('checkQueue');
+  			}
   		});
   		console.log("leaving created");
   	},
   	mounted() {
-  		if (this.eventSource === null) return;
   		console.log("in mounted");
-  		this.eventSource.onmessage = (raw_data: any) => {
-  			console.log("event received");
-  			if (raw_data.data === undefined) {
-  				console.log("data undefined");
-  				return;
-  			}
-  			// console.log(raw_data);
-  			let data = JSON.parse(raw_data.data);
-  			console.log(data);
-  			this.context = (this.$refs.game as any).getContext("2d");
-  			this.context.fillStyle = "#FFFFFF";
-  			this.position.x = data.ball.position.x;
-  			this.position.y = data.ball.position.y;
-  			this.context.clearRect(0, 0, (this.$refs.game as any).width, (this.$refs.game as any).height);
-  			this.context.beginPath();
-  			this.context.arc(this.position.x, this.position.y, data.ball.radius, 0, 2 * Math.PI);
-  			this.context.fill();
-  			this.drawPaddles(data);
-  		};
   		console.log("leaving mounted");
   	},
+	beforeUpdate() {
+		console.log("in beforeUpdate");
+		if (this.gameId && this.isFirstCall) {
+			console.log("next: updateGame emit");
+			this.gamesocket.on('updateGame', (data: any) => {
+				console.log("callback updateGame");
+				if (data === undefined) {
+  					console.log("data undefined");
+					this.gameId = "";
+					this.side = "";
+					this.position.x = 0;
+					this.position.y = 0;
+  					return;
+  				}
+  				this.context = (this.$refs.game as any).getContext("2d");
+  				this.context.fillStyle = "#FFFFFF";
+  				this.position.x = data.ball.position.x;
+  				this.position.y = data.ball.position.y;
+  				this.context.clearRect(0, 0, (this.$refs.game as any).width, (this.$refs.game as any).height);
+  				this.context.beginPath();
+  				this.context.arc(this.position.x, this.position.y, data.ball.radius, 0, 2 * Math.PI);
+  				this.context.fill();
+  				this.drawPaddles(data);
+			})
+			this.isFirstCall = false;
+		}
+		console.log("leaving beforeUpdate");
+		
+	},
+
   	beforeDestory() {
   		console.log("in beforeDestroy");
-  		this.eventSource.close();
+  		// this.eventSource.close();
   		delete this.eventSource;
-  		this.socket.close();
-  		delete this.socket;
+  		this.gamesocket.close();
+  		delete this.gamesocket;
   		// delete this.position;
   		delete this.context;
   		// delete this.gameId;
@@ -125,16 +134,16 @@
   			this.context.fillRect(data.paddleRight.position.x, data.paddleRight.position.y, data.paddleRight.width, data.paddleRight.height);
   		},
   		paddleLeftUp() {
-  			this.socket.emit('moveLeftUp');
+  			this.gamesocket.emit('moveLeftUp');
   		},
   		paddleLeftDown() {
-  			this.socket.emit('moveLeftDown');
+  			this.gamesocket.emit('moveLeftDown');
   		},
   		paddleRightUp() {
-  			this.socket.emit('moveRightUp');
+  			this.gamesocket.emit('moveRightUp');
   		},
   		paddleRightDown() {
-  			this.socket.emit('moveRightDown');
+  			this.gamesocket.emit('moveRightDown');
   		},
   	}
   })	

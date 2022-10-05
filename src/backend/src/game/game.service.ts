@@ -22,6 +22,7 @@ export class GameService {
 	queue: Array<QueueElem> = [];
 	users = new Map<string, number>(); // Key: UserId, Value: GameId
 	games = new Map<number, Game>(); // Key: GameId, Value: Game
+	intervals = new Map<number, number>(); // Key: GameId, Value: IntervalId
 
 	getSideFromGame(game: Game, playerid: string): string {
 		if (game.playerLeft === playerid) {
@@ -54,17 +55,17 @@ export class GameService {
 		}
 		console.log(this.queue);
 		if (this.queue.find(({id}) => {return id === needle.id}) == undefined) {
-			this.queue.push({id: client.handshake.auth.id, socket: client});
+			this.queue.push({id: client.handshake.auth._id, socket: client});
 			console.log("add %s to queue", client.handshake.auth.id);
 			while (this.queue.length > 1) {
-				await this.createGame();
+				await this.createGame(client);
 			}
 		} else {
-			console.log("%s already is in queue", client.handshake.auth.id);
+			console.log("%s already is in queue", client.handshake.auth._id);
 		}
 	}
 
-	async createGame() {
+	async createGame(client: Socket) {
 		console.log('inside createGame()');
 		var gamerepo = this.gameRepository.create();
 		console.log("after repo create");
@@ -78,9 +79,23 @@ export class GameService {
 		this.users.set(p2.socket.handshake.auth.id, gamerepo.id);
 		console.log("gameid = %d", gamerepo.id);
 		console.log(this.users);
+		p1.socket.join(gamerepo.id.toString());
+		p2.socket.join(gamerepo.id.toString());
 		p1.socket.emit('gameInfo', {gameId: gamerepo.id, side: "left"});
 		p2.socket.emit('gameInfo', {gameId: gamerepo.id, side: "right"});
+		// const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+		// await sleep(1000);
+		var intervalId = setInterval(() => this.emitData(p1.socket, p2.socket, gamerepo.id), 10) as unknown as number;
+		console.log("intervalId %d", intervalId);
+		this.intervals.set(gamerepo.id, intervalId);
 		console.log('leaving createGame()');
+	}
+
+	emitData(player1: Socket, player2: Socket, gameId: number) {
+		// console.log("in emitData %d", gameId);
+		player1.emit('updateGame', this.getData(gameId)); //.to(gameId.toString())
+		player2.emit('updateGame', this.getData(gameId)); //.to(gameId.toString())
+		// player1.to(gameId.toString()).emit('updateGame', this.getData(gameId));
 	}
 
 	getData(id: number): Game | undefined {
@@ -92,6 +107,7 @@ export class GameService {
 		if (this.scored(id)){
 			this.reset(id);
 		}
+		// this.isGameFinished(id);
 		return this.games.get(id);
 	}
 
@@ -207,6 +223,19 @@ export class GameService {
 
 		this.games.get(id).score.increaseLeft = this.setup.scoreIncrease;
 		this.games.get(id).score.increaseRight = this.setup.scoreIncrease;
+	}
+
+	isGameFinished(id: number) {
+		var game: Game = this.games.get(id);
+		if (game.score.scoreLeft == 10 || game.score.scoreRight == 10) {
+			clearInterval(this.intervals.get(id));
+			this.users.delete(game.playerLeft);
+			this.users.delete(game.playerRight);
+			this.games.delete(id);
+			console.log("game finished, keys removed");
+			// TODO: sockets have to leave the related room
+			// TODO: reset frontend variables
+		}
 	}
 
 	movePaddleUp(id: number, b: boolean) {

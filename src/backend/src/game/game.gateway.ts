@@ -1,16 +1,29 @@
-import { SubscribeMessage, WebSocketGateway, ConnectedSocket } from '@nestjs/websockets';
+import { SubscribeMessage, WebSocketGateway, ConnectedSocket, OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect, MessageBody } from '@nestjs/websockets';
 import { GameService } from './game.service';
 import { Socket } from 'socket.io';
+import { Game } from './game.entities/game.entity';
+import { Observable, map, interval } from 'rxjs';
+
+interface GameEvent {
+  data: Game;
+}
 
 @WebSocketGateway({
+  namespace: 'game',
 	cors: {
 		origin: ['http://localhost:8080', 'http://localhost:3000'],
 		credentials: true
 	},
 })
-export class GameGateway {
+export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
 
   constructor (private readonly gameService: GameService) {};
+
+  afterInit() { console.log("GameGateway: After init"); }
+
+  handleConnection(@ConnectedSocket() client: Socket) { console.log("client %s connected", client.handshake.auth.id); }
+
+  handleDisconnect(@ConnectedSocket() client: Socket) { console.log("client %s disconnected", client.handshake.auth.id); }
 
   @SubscribeMessage('checkQueue')
   handleCheckQueue(@ConnectedSocket() client: Socket) {
@@ -22,10 +35,15 @@ export class GameGateway {
 	  return this.gameService.checkGame(client);
   }
 
-  @SubscribeMessage('leftGame')
-  handleLeftGame(@ConnectedSocket() client: Socket): void {
-	this.gameService.users.delete(client.handshake.auth.id);
-  }
+  // @SubscribeMessage('updateGame')
+  // handleUpdateGame(@MessageBody() gameid: number): Observable<GameEvent> {
+  //   return interval(100).pipe(map((_) => ({data: this.gameService.getData(gameid)})));
+  // }
+
+  // @SubscribeMessage('leftGame')
+  // handleLeftGame(@ConnectedSocket() client: Socket): void {
+	// this.gameService.users.delete(client.handshake.auth.id);
+  // }
 
   @SubscribeMessage('moveLeftUp')
   handleMoveLeftUp(@ConnectedSocket() client: Socket): void {
