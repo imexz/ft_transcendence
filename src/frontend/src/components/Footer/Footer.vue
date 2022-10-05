@@ -27,14 +27,9 @@ export default defineComponent({
     --hot: var(--ft_pink);
     position: fixed;
     bottom: 0px;
-    height: 80px;
+    height: 62px;
     width: 100%;
     background-color: var(--dark);
     border-top: 2px solid var(--hot);
   }
-  /* .dropup {
-   position: absolute;
-   right: 10px;
-   top: 200px;
-  } */
 </style>

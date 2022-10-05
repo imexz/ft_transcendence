@@ -1,9 +1,25 @@
 <template>
   <div class="wrapper">    
-    <button v-if="!isCollapsed" @click="toggleFriendList" class="friendListButton">^</button>
-    <button v-else @click="toggleFriendList" class="friendListButtonPassive friendListButton">Friends</button>
+    <button 
+      v-if="!isCollapsed"
+      @click="toggleFriendList"
+      class="friendListButton">
+      ^</button>
+    <button
+      v-else
+      @click="toggleFriendList"
+      class="friendListButtonPassive friendListButton">
+      Friends({{ $store.getters.getFriends?.length }})</button>
     <div v-show="!isCollapsed" class="friendList">
-      <div class="headline">Friends</div>
+      <!-- <div class="headline">
+        <span>
+          Friends({{ $store.getters.getFriends?.length }})
+        </span>
+      </div> -->
+      <button
+        @click="toggleFriendList"
+        class="friendListButton friendListButtonActive">
+      Friends({{ $store.getters.getFriends?.length }})</button>
       <div class="friends">
         <UserSummary
         v-for="user in $store.getters.getFriends"
@@ -40,31 +56,31 @@ export default defineComponent({
 
 <style scoped>
 
-  /* .wrapper {
-    position: relative;
-  } */
-  .friendList {
+  .wrapper {
     --dark: var(--ft_dark);
     --cold: var(--ft_cyan);
     --hot: var(--ft_pink);
+    position: absolute;
+    right: 0px;
+    top: 0px;
+    height: 0px;
+  }
+  .friendList {
     width: 340px;
     height: 600px;
-    position: r;
+    position: relative;
     background-color: var(--dark);
-    bottom: 82px;
-    right: 20px;
+    top: -666px;
     border: 2px solid var(--cold);
     border-bottom: none;
     border-radius: 10px 10px 0px 0px;
-    margin-left: 20px;
-    animation: growUp 300ms ease-in-out forwards;
+    animation: growUp 200ms ease-in-out forwards;
     transform-origin: bottom center;
   }
 
   .friendListButton {
-    position: absolute;
-    right: 20px;
-    bottom: 20px;
+    position: relative;
+    top: -2px;
     width: 344px;
     height: 62px;
     font-size: 25px;
@@ -81,15 +97,25 @@ export default defineComponent({
     border-radius: 10px;
 
   }
+  .friendListButtonActive {
+    position: relative;
+    left: -2px;
+    top: -2px;
+    border-radius: 10px 10px 0px 0px;
+  }
   .headline {
+    align-items: center;
+    justify-content: center;
+    display: flex ;
     height: 62px;
     font-size: 25px;
     font-weight: bold;
-    padding: 10px 25px;
     border-bottom: 2px solid var(--cold);
   }
   .friends {
-    overflow: auto;
+    overflow-y: auto;
+    margin-top: -2px;
+    height: calc(600px - 64px);
   }
   
   @keyframes growUp {
