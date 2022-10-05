@@ -68,6 +68,7 @@
           this.popupTrigger = !this.popupTrigger
           if (this.popupTrigger == false) {
             this.getRooms()
+            this.initSocket()
           }
           console.log(this.popupTrigger);
         },

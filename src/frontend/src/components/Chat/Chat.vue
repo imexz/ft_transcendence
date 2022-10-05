@@ -24,7 +24,7 @@
 <script lang="ts">
 import { Options, Vue } from 'vue-class-component';
 import { io } from 'socket.io-client';
-import { API_URL } from '@/models/host';
+import { API_URL } from '@/defines';
 import Message from './Message.vue';
 import { ref, Ref } from 'vue'
 
