@@ -3,7 +3,7 @@
     "target": "esnext",
     "module": "esnext",
     // compile error msg
-    "strict": true,
+    "strict": false,
     "jsx": "preserve",
     "moduleResolution": "node",
     "experimentalDecorators": true,

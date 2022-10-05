@@ -18,14 +18,14 @@ import { API_URL } from '@/defines';
     eventSource: any
 
 		created() {
-			this.eventSource = new EventSource(API_URL + "/game/sse");
+			// this.eventSource = new EventSource(API_URL + "/game/sse");
 		}
 		mounted() {
-			this.eventSource.onmessage = ({data} : {data: any}) => {
-			data = JSON.parse(data);
-			this.left = data.score.scoreLeft;
-			this.right = data.score.scoreRight;
-			};
+			// this.eventSource.onmessage = ({data} : {data: any}) => {
+			// data = JSON.parse(data);
+			// this.left = data.score.scoreLeft;
+			// this.right = data.score.scoreRight;
+			// };
 		}
 	}
 </script>
