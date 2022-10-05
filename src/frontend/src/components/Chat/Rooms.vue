@@ -17,7 +17,7 @@
 </template>
 
 <script lang="ts">
-import { API_URL } from '@/models/host';
+import { API_URL } from '@/defines';
 import { io } from 'socket.io-client';
 import RoomSummary from './RoomSummary.vue'
 import Chat from './Chat.vue'

@@ -2,6 +2,7 @@
   "compilerOptions": {
     "target": "esnext",
     "module": "esnext",
+    // compile error msg
     "strict": true,
     "jsx": "preserve",
     "moduleResolution": "node",

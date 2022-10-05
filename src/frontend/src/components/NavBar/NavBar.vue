@@ -14,7 +14,7 @@
       <div v-else></div>
     </div>
     <div class="child topElement">
-      <router-link :to="'/chat'" class="navButton" >chat</router-link>
+      <router-link :to="'/chat'" class="navButton">chat</router-link>
     </div>
     <div class="child topElement">
       <router-link :to="'/play'" class="playButton">PLAY</router-link>
@@ -50,21 +50,25 @@ export default defineComponent({
 <style>
 
 .topBar {
+  --dark: var(--ft_dark);
+  --cold: var(--ft_cyan);
+  --hot: var(--ft_pink);
+  position: sticky;
+  top: 0px;
+  z-index: 10;
   display: flex;
   flex-wrap: nowrap;
   height: 80px;
   justify-content: space-between;
   align-items: center;
-  background: var(--ft_dark);
-  border-bottom: 2px solid var(--ft_red);
+  background: var(--dark);
+  border-bottom: 2px solid var(--hot);
+  margin-bottom: 20px;
 }
 .topElement:active {
   transform: translateY(1px);
+  
 }
-
-/* .child {
-  flex: 1 0 20%;
-} */
 
 .currentUser {
   cursor: default;
@@ -74,18 +78,19 @@ export default defineComponent({
   vertical-align: middle;
   border: 2px solid var(--c);
   border-radius: 10px;
-  --c : var(--ft_cyan);
+  user-select: none;
+  --c : var(--cold);
 }
 .currentUser:hover {
-  --c : var(--ft_dark);
-  background-color: var(--ft_cyan);
+  --c : var(--dark);
+  background-color: var(--cold);
 }
 .userActive {
-  --c : var(--ft_red);
+  --c : var(--hot);
 }
 .userActive:hover {
-  --c : var(--ft_dark);
-  background-color: var(--ft_red);
+  --c : var(--dark);
+  background-color: var(--hot);
 }
 
 .userName {
@@ -108,26 +113,26 @@ export default defineComponent({
 .navButton {
   cursor: default;
   font-weight: bold;
-  color: var(--ft_cyan);
+  color: var(--cold);
   text-decoration: none;
   font-size: 25px;
   padding: 10px 20px;
-  border: 2px solid var(--ft_cyan);
+  border: 2px solid var(--cold);
   border-radius: 10px;
 }
 
 .navButton.router-link-exact-active {
-  color: var(--ft_red);
-  border: 2px solid var(--ft_red);
+  color: var(--hot);
+  border: 2px solid var(--hot);
 }
 
 .navButton:hover {
-  color: var(--ft_dark);
-  background-color: var(--ft_cyan);
+  color: var(--dark);
+  background-color: var(--cold);
 }
 .navButton.router-link-exact-active:hover {
-  color: var(--ft_dark);
-  background-color: var(--ft_red);
+  color: var(--dark);
+  background-color: var(--hot);
 }
 
 .playButton{
@@ -137,7 +142,7 @@ export default defineComponent({
   font-size: 25px;
   font-weight: bold;
   color: var(--ft_white);
-  background:  linear-gradient(var(--ft_red), var(--ft_yellow));
+  background:  linear-gradient(var(--hot), var(--ft_yellow));
   padding: 14px 24px;
   border-radius: 10px;
 }

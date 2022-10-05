@@ -82,29 +82,33 @@ export default defineComponent({
 </script>
 
 <style>
+  
   .authButton {
+    --hot: var(--ft_pink);
+    --cold: var(--ft_cyan);
+    --dark: var(--ft_dark);
     float: right;
     text-decoration: none;
     text-align: center;
     font-weight: bold;
     font-size: 25px;
     padding: 14px 24px;
-    color: var(--ft_cyan);
-    border: 2px solid var(--ft_cyan);
+    color: var(--cold);
+    border: 2px solid var(--cold);
     background-color: rgba(0, 0, 0, 0);
     border-radius: 10px;
   }
   .linkActive {
-    color: var(--ft_red);
-    border-color: var(--ft_red);
+    color: var(--hot);
+    border-color: var(--ft_hot);
   }
   .authButton:hover {    
-    color: var(--ft_dark);
-    background-color: var(--ft_cyan);
+    color: var(--dark);
+    background-color: var(--cold);
   }
   .linkActive:hover {
-    color: var(--ft_dark);
-    background-color: var(--ft_red);
+    color: var(--dark);
+    background-color: var(--hot);
   }
   .authButton:active{
     transform: translateY(1px);
