@@ -22,7 +22,7 @@ export class ChatroomService {
             // }, "name")
             // .where(users )
 
-            console.log(test);
+            // console.log(test);
             return test
             
     }
