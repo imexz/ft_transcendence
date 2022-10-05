@@ -3,7 +3,9 @@
     <div class="normalView">
       <img :src="user?.avatar_url" alt="Avatar">
       <span>{{ user?.username }}</span>
-      <div class="toggleDropdown" @click="toggleDropdown">:</div>
+      <div class="toggleDropdown" @click="toggleDropdown">
+        <font-awesome-icon icon="fa-solid fa-bars" />
+      </div>
     </div>
     <div class="dropdownMenu" v-if="show">
       <button 
@@ -113,8 +115,9 @@ export default defineComponent({
     border: 2px solid var(--ft_pink);
   }
   .toggleDropdown {
-    padding-left: 10px;
-    padding-right: 10px;
+    padding: 10px;
+    align-items: center;
+    display: flex;
     border: 1px solid var(--ft_cyan);
     border-radius: 5px;
   }

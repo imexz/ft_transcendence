@@ -11,7 +11,9 @@
           v-model="searchQuery" />
         </div>
       </Transition>
-    <button class="searchButton" :class="{'searchButtonPassive': !isActive}" @click="toggleSearchBar">S</button>
+    <button class="searchButton" :class="{'searchButtonPassive': !isActive}" @click="toggleSearchBar">
+      <font-awesome-icon icon="fa-solid fa-magnifying-glass" />
+    </button>
   </div>
     <div class="searchResults"
       v-if="searchQuery != ''">
@@ -96,7 +98,8 @@ export default defineComponent({
     animation: slideOut 200ms ease-in-out forwards;
   }
   .searchButton {
-    text-align: center;
+    align-items: center;
+    padding: 0px;
     height: 60px;
     width: 60px;
     color: var(--ft_cyan);
@@ -108,8 +111,10 @@ export default defineComponent({
     padding-left: 10px;
   }
   .searchButtonPassive {
+    /* border: 2px solid var(--ft_cyan);
+    border-radius: 10px; */
     border: none;
-    padding-left: 0px;
+    padding: 0px;
   }
   .searchInput {
     align-self: right;
@@ -125,7 +130,7 @@ export default defineComponent({
   .searchResults{
     position: absolute;
     top: 64px;
-    height: 100px;
+    height: 400px;
     width: 384px;
     overflow-y: auto;
     background-color: var(--ft_dark);
