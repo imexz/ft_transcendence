@@ -1,7 +1,10 @@
 <template>
-    <div>
-        <div>
+    <div class="popup">
+        <div class="popup-inner">
             <slot />
+            <creatRoom
+                :TogglePopup="() => TogglePopup()" >
+            </creatRoom>
             <button class="popup-close" @click="TogglePopup()">
                 Close Popup
             </button>
@@ -10,12 +13,17 @@
 </template>
 
 <script lang="ts">
+import creatRoom from './creatRoom.vue';
+
 export default {
-    props: ['TogglePopup']
+    props: ['TogglePopup'],
+    components: {
+        creatRoom,
+    }
 }
 </script>
 
-<style lang="scss" scoped>
+<style>
     .popup {
         position: fixed;
         top: 0;
@@ -28,9 +36,9 @@ export default {
         display: flex;
         align-items: center;
         justify-content: center;
-        .popup-inner {
-            background: #FFF;
-            padding: 32px;
-        }
     }
-    </style>
+    .popup-inner {
+        background: #FFF;
+        padding: 32px;
+    } 
+</style>

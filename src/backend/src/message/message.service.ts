@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { message } from './message.entity';
 import { User } from '../users/entitys/user.entity';
 import { chatroom } from 'src/chatroom/chatroom.entity';
+import { timestamp } from 'rxjs';
 
 @Injectable()
 export class MessageService {
@@ -23,21 +24,22 @@ export class MessageService {
         }
     }
 
-    async getAllMessagesOfRoom(room_name: string) {
-        const messages = await this.messageRepository.find(
-            {
-                where: {
-                    chatroom: {
-                        roomName: room_name
-                    }
+    async getAllMessagesOfRoom(roomId: number) {
+        const messages = await this.messageRepository.createQueryBuilder("messages")
+            .leftJoinAndSelect("messages.user", "user")
+            .select('messages.user_id AS "senderId", messages._id, content, user.avatar_url AS avatar, messages.timestamp AS timestamp')
+            // .select('messages.user_id AS "senderId", _id, content, messages.user')
+            .where('messages.chatroom.roomId = :roomId', { roomId: roomId})
+            .orderBy('timestamp')
+            .getRawMany()
 
-                },
-                relations: {
-                    user: true
-                }
-            }
-        )
-        return messages  
+        console.log("getAllMessagesOfRoom");
+        console.log(roomId);
+
+        console.log(messages);
+        
+
+        return messages
     }
 
 }
