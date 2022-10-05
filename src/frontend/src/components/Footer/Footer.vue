@@ -1,6 +1,5 @@
 <template>
   <div class="footer">
-    Hello World
     <div class="dropUp">
       <FriendList></FriendList>
     </div>
@@ -27,13 +26,9 @@ export default defineComponent({
     --hot: var(--ft_pink);
     position: fixed;
     bottom: 0px;
-    height: 80px;
+    height: 62px;
     width: 100%;
     background-color: var(--dark);
     border-top: 2px solid var(--hot);
-  }
-  .dropup {
-    float: left;
-
   }
 </style>

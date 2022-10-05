@@ -52,18 +52,15 @@ export default defineComponent({
 
 <style scoped>
 
-  .profile {
+  /* .profile {
     width: 320px;
     margin-right: 10px;
-  }
-  /* h1 {
-    float: left;
-    padding-left: 30px;
   } */
   img {
     float: left;
     width: 300px;
-    height: auto;
+    height: 450px;
+    object-fit: cover;
     border: 10px solid;
     border-image-slice: 1;
     border-image-source: linear-gradient(var(--ft_cyan), var(--ft_pink));
