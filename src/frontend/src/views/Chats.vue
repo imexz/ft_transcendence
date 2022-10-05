@@ -35,11 +35,11 @@
           rooms: [],
           messages: [],
           roomActions: [
-            { name: 'inviteUser', title: 'Invite User' },
-            { name: 'removeUser', title: 'Remove User' },
+            { name: 'join', title: 'join Room' },
+            { name: 'leave', title: 'leave Room' },
             { name: 'deleteRoom', title: 'Delete Room' }
           ],
-          socket: io,
+          // socket: io,
           popupTrigger: ref(false)
         }
       },
@@ -49,18 +49,18 @@
       methods: {
         async updateMessages(room) {
           console.log("updateMessages");
-          this.socket.emit('findAllMessages', {roomId: room.roomId}, (response) => {
+          console.log(room.room.roomId);
+          this.$socketio.emit('findAllMessages', {roomId: room.room.roomId}, (response) => {
             console.log(response);
             this.messages = response;
           })
         },
-        sendMessage(message) {
-          console.log("sendMessage");
-          this.socket.emit('createMessage', { roomId: message.roomId, content: message.content}, (response) =>
+        sendMessage({ roomId, content, files, replyMessage, usersTag }) {
+          console.log("createMessage");
+          this.$socketio.emit('createMessage', { roomId: roomId, content: content}, (response) =>
           {
-            console.log(response);
-            // this.messages.push(response)
-            
+            console.log("createMessage response");
+            this.addMessage(response)
           })
         },
         makePopup() {
@@ -95,12 +95,13 @@
         },
       
         emitTyping(roomId) {
-          this.socket.emit('typing', {isTyping: true, roomId: roomId});
+          this.$socketio.emit('typing', {isTyping: true, roomId: roomId.roomId});
           this.timeout = setTimeout(() => {
-            this.socket.emit('typing', { isTyping: false, roomId: roomId});
+            this.$socketio.emit('typing', { isTyping: false, roomId: roomId.roomId});
           }, 2000);
           console.log("emit typing ");
-          console.log(roomId);
+          console.log("roomId");
+          console.log(roomId.roomId);
           
         },
         getRooms(){
@@ -118,23 +119,52 @@
                 .catch()
         },
         initSocket(){
-          this.socket = io(API_URL, {
-            auth: (cb) => {
-                    cb({ id: this.$store.getters.getUser.id })
-                  }
-                })
+          // this.socket = io(API_URL, {
+          //   auth: (cb) => {
+          //           cb({ id: this.$store.getters.getUser._id })
+          //         }
+          //       })
+          this.$socketio.auth.id = this.$store.getters.getUser._id;
+          console.log("initSocket");
+          console.log(this.$store.getters.getUser._id);
+          this.$socketio.disconnect().connect()
         },
-        roomActionHandler(roomId, action) {
+        roomActionHandler({ roomId, action }) {
           console.log("roomActionHandler");
+          console.log(action);
+          console.log(roomId);
+          this.$socketio.emit(action.name, roomId)
+        },
+        addMessage(message) {
+          console.log("addMessage");
+          console.log(this.messages.length);
+          const messages = []
+          for (let i = 0; i < this.messages.length; i++) {
+            messages.push(this.messages[i])
+          }
+          messages.push(message)
+          this.messages = messages
         }
 
       },
-      mounted() {
-        this.getRooms();
-        this.currentUserId = this.$store.getters.getUser.id;
+      created() {
+
         this.initSocket();
+      },
+      beforeMount() {
+        console.log("beforeMount");
+      },
+      mounted() {
+        this.$socketio.on('message',(message) => {
+          console.log('message');
+          console.log(message);
+          this.addMessage(message)
+        });
+        this.getRooms();
+        this.currentUserId = this.$store.getters.getUser._id;
+
         console.log("mounted CHAT");
-        console.log(this.$store.getters.getUser.id)
+        console.log(this.$store.getters.getUser._id)
       }      
     }
 </script>
