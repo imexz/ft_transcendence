@@ -65,7 +65,7 @@ export default {
             console.log("mounted CHAT");
             this.socket = io(API_URL, {
                 auth: (cb) => {
-                    cb({ id: this.$store.getters.getUser.id })
+                    cb({ id: this.$store.getters.getUser._id })
                 }
             })
         },
