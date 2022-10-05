@@ -26,6 +26,12 @@ export default defineComponent({
       ] as MatchData[],
     }
   },
+  props: {
+    id: {
+      type: String,
+      default: "0"
+    },
+  },
   components: {
     UserSummary,
     MatchSummary
@@ -36,8 +42,8 @@ export default defineComponent({
 
 <style scoped>
 
-.matchHistory {
+/* .matchHistory {
   width: 480px;
-}
+} */
 
 </style>

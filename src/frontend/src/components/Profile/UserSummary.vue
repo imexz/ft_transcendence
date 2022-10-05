@@ -7,7 +7,7 @@
     </div>
     <div class="dropdownMenu" v-if="show">
       <button 
-        v-if="this.$store.getters.getFriends.some(us => us._id == this.user._id)"
+        v-if="$store.getters.getFriends.some((us: User) => us._id == user._id)"
         class="dropdownElement"
         @click="removeFriend">Remove Friend</button>
       <button 

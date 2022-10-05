@@ -22,6 +22,9 @@
     <div class="child topElement">
       <router-link :to="'/settings'" class="navButton ">settings</router-link>
     </div>
+    <div class="sb">
+      <SearchBar></SearchBar>
+    </div>
     <div class="child">
       <FtAuth/>
     </div>
@@ -33,6 +36,7 @@
 import FtAuth from '../Auth/FtAuth.vue';
 import store from '@/store/index';
 import { defineComponent } from 'vue';
+import SearchBar from '@/components/NavBar/SearchBar.vue';
 
 export default defineComponent({
   computed: {
@@ -42,6 +46,7 @@ export default defineComponent({
   },
   components: {
     FtAuth,
+    SearchBar,
   }
 })
 
@@ -68,6 +73,10 @@ export default defineComponent({
 .topElement:active {
   transform: translateY(1px);
   
+}
+
+.sb {
+  flex-basis: 20%;
 }
 
 .currentUser {
