@@ -14,19 +14,25 @@
       <div v-else></div>
     </div>
     <div class="child topElement">
-      <router-link :to="'/chat'" class="navButton">chat</router-link>
-    </div>
-    <div class="child topElement">
       <router-link :to="'/play'" class="playButton">PLAY</router-link>
     </div>
-    <div class="child topElement">
-      <router-link :to="'/settings'" class="navButton ">settings</router-link>
-    </div>
-    <div class="sb">
-      <SearchBar></SearchBar>
-    </div>
-    <div class="child">
-      <FtAuth/>
+    <div class="rightSide child">      
+      <div class="sb rightSideElement">
+        <SearchBar></SearchBar>
+      </div>
+      <div class="topElement rightSideElement">
+        <router-link :to="'/chat'" class="navButton">
+          <font-awesome-icon icon="fa-solid fa-message" />
+        </router-link>
+      </div>
+      <div class="topElement rightSideElement">
+        <router-link :to="'/settings'" class="navButton ">
+          <font-awesome-icon icon="fa-solid fa-gear" />
+        </router-link>
+      </div>
+      <div>
+        <FtAuth/>
+      </div>
     </div>
   </div>
 </template>
@@ -75,8 +81,12 @@ export default defineComponent({
   
 }
 
-.sb {
+/* .sb {
   flex-basis: 20%;
+} */
+
+.child {
+  flex-basis: 33%;
 }
 
 .currentUser {
@@ -119,13 +129,28 @@ export default defineComponent({
   vertical-align: middle;
 }
 
+.rightSide {
+  display: flex;
+  justify-content: end; 
+}
+
+.rightSideElement {
+  margin-right: 15px;
+}
+
 .navButton {
   cursor: default;
   font-weight: bold;
   color: var(--cold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
   text-decoration: none;
+  height: 60px;
+  width: 60px;
   font-size: 25px;
-  padding: 10px 20px;
+  align-self: flex-start;
+  /* padding: 10px 20px; */
   border: 2px solid var(--cold);
   border-radius: 10px;
 }
