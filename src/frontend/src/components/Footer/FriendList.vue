@@ -1,12 +1,14 @@
 <template>
-  <button v-if="!isCollapsed" @click="toggleFriendList" class="friendListButton">^</button>
-  <button v-else @click="toggleFriendList" class="friendListButtonPassive friendListButton">Friends</button>
-  <div v-show="!isCollapsed" class="friendList">
-    <div class="headline">Friends</div>
-    <div class="friends">
-      <UserSummary
-      v-for="user in $store.getters.getFriends"
-      :user = user as User ></UserSummary>
+  <div class="wrapper">    
+    <button v-if="!isCollapsed" @click="toggleFriendList" class="friendListButton">^</button>
+    <button v-else @click="toggleFriendList" class="friendListButtonPassive friendListButton">Friends</button>
+    <div v-show="!isCollapsed" class="friendList">
+      <div class="headline">Friends</div>
+      <div class="friends">
+        <UserSummary
+        v-for="user in $store.getters.getFriends"
+        :user = user as User ></UserSummary>
+      </div>
     </div>
   </div>
 </template>
@@ -37,15 +39,20 @@ export default defineComponent({
 </script>
 
 <style scoped>
+
+  /* .wrapper {
+    position: relative;
+  } */
   .friendList {
     --dark: var(--ft_dark);
     --cold: var(--ft_cyan);
     --hot: var(--ft_pink);
     width: 340px;
     height: 600px;
-    position: absolute;
+    position: r;
     background-color: var(--dark);
     bottom: 82px;
+    right: 20px;
     border: 2px solid var(--cold);
     border-bottom: none;
     border-radius: 10px 10px 0px 0px;
@@ -56,7 +63,7 @@ export default defineComponent({
 
   .friendListButton {
     position: absolute;
-    left: 20px;
+    right: 20px;
     bottom: 20px;
     width: 344px;
     height: 62px;

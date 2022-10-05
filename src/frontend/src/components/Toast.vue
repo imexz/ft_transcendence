@@ -33,7 +33,7 @@ export default defineComponent({
     position: fixed;
     width: 400px;
     bottom: 20px;
-    right: 20px;
+    left: 20px;
   }
   .toast {
     padding: 20px;

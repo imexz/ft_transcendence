@@ -32,8 +32,9 @@ export default defineComponent({
     background-color: var(--dark);
     border-top: 2px solid var(--hot);
   }
-  .dropup {
-    float: left;
-
-  }
+  /* .dropup {
+   position: absolute;
+   right: 10px;
+   top: 200px;
+  } */
 </style>
