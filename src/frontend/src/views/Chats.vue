@@ -40,7 +40,9 @@
             { name: 'deleteRoom', title: 'Delete Room' }
           ],
           // socket: io,
-          popupTrigger: ref(false)
+          popupTrigger: ref(false),
+          timeout: 0
+
         }
       },
       components:{
@@ -95,14 +97,15 @@
                 .catch(error => { this.$emit('error') })
         },
       
-        emitTyping(roomId) {
-          this.$socketio.emit('typing', {isTyping: true, roomId: roomId.roomId});
-          this.timeout = setTimeout(() => {
-            this.$socketio.emit('typing', { isTyping: false, roomId: roomId.roomId});
-          }, 2000);
-          console.log("emit typing ");
-          console.log("roomId");
-          console.log(roomId.roomId);
+        emitTyping({ roomId, message }) {
+          console.log(message);
+          // this.$socketio.emit('typing', {isTyping: true, roomId: roomId});
+          // this.timeout = setTimeout(() => {
+          //   this.$socketio.emit('typing', { isTyping: false, roomId: roomId.roomId});
+          // }, 2000);
+          // console.log("emit typing ");
+          // console.log("roomId");
+          // console.log(roomId.roomId);
           
         },
         getRooms(){
@@ -149,13 +152,32 @@
 
       },
       created() {
-
+        console.log("created");
         this.initSocket();
       },
       beforeMount() {
         console.log("beforeMount");
       },
       mounted() {
+       
+        this.$socketio.on('typing',({ userId, isTyping , roomId}) => {
+          console.log('typing');
+          const room = this.rooms.find((room) => {
+            return room.roomId === roomId
+          })
+          if(isTyping) {
+            room.typingUsers = [...room.typingUsers, userId]
+          } else {
+            const index = room.typingUsers.indexOf(userId)
+            typingUsers = []
+            for (let i = 0; i < room.typingUsers.length; i++) {
+              if (room.typingUsers[i] != userId)
+                typingUsers.push(room.typingUsers[i])
+            }
+            room.typingUsers = typingUsers
+          }
+        });
+
         this.$socketio.on('message',(message) => {
           console.log('message');
           console.log(message);
