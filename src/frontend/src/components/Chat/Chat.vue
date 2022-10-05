@@ -85,7 +85,7 @@ export default{
     Message
   },
   mounted() {
-    this.user_id = this.$store.getters.getUser.id
+    this.user_id = this.$store.getters.getUser._id
     this.socket.on('message',(message) => {
       console.log('message');
       console.log(message);

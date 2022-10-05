@@ -11,13 +11,18 @@ import {
   } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import io from 'socket.io-client'
+import { API_URL } from "./defines"
 
 library.add(faMagnifyingGlass, faBars, faGear, faMessage)
 
 
 const app = createApp(App)
 
-// app.config.globalProperties.$socketio ;
+app.config.globalProperties.$socketio = io(API_URL, {
+    auth: {
+        id: undefined
+    }
+});
 // app.config.globalProperties.$socketgame = app.config.globalProperties.$socketchat = app.config.globalProperties.$socketio;
 
 
