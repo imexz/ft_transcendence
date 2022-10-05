@@ -28,7 +28,7 @@ export class MessageService {
             {
                 where: {
                     chatroom: {
-                        name: room_name
+                        roomName: room_name
                     }
 
                 },

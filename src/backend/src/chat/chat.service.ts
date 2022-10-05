@@ -21,12 +21,8 @@ export class ChatService {
 
   async createMessage(user_id: number, room_name:string, content: string) {
         const user = await this.usersService.getUser(user_id)
-        console.log(user);
-        
-        console.log("test creatMessage");
         
         const room = await this.chatroomService.getRoom(room_name)
-        console.log("test creatMessage2");
         return await this.messageService.userAddMessageToRoom(user, content, room)
     }
 
@@ -47,7 +43,7 @@ export class ChatService {
         console.log("getClientName");
         console.log(id);
         console.log(user);
-        return user.unique_name
+        return user.username
     }
       
 }

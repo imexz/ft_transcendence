@@ -40,12 +40,12 @@ export class TwoFactorAuthenticationController {
             }
             // console.log('authenticate2');
 
-        // const accessTokenCookie = this.authService.getCookieWithJwtAccessToken(request.user.id, true);
+        // const accessTokenCookie = this.authService.getCookieWithJwtAccessToken(request.user._id, true);
 
         // request.res.cookie('token', [accessTokenCookie]);
 
         request.res.setHeader('Set-Cookie', this.authService.getCookieWithJwtAccessToken(
-			request.user.id,
+			request.user._id,
 			true,
 		))
 

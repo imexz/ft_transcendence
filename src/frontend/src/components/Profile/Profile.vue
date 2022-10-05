@@ -1,6 +1,6 @@
 <template>
   <div class="profile" v-if="user">
-    <h1>Profile of {{ user.unique_name }}</h1>
+    <h1>Profile of {{ user.username }}</h1>
     <img :src='user.avatar_url' alt='Profile Pic'>
   </div>
 </template>
@@ -43,7 +43,7 @@ export default defineComponent({
     this.fetchUser();
   },
   updated() {
-    if (this.user && ( parseInt(this.id) != this.user.id) )
+    if (this.user && ( parseInt(this.id) != this.user._id) )
       this.fetchUser();
   }
 })

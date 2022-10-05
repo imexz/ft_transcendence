@@ -1,13 +1,10 @@
 <template>
-    <div>
+    <div @click="resetNumber">
         <span>{{room.name}}</span>
         <button @click="switchState" > {{button_text}}</button>
-        <div v-if=joined class="test">
-          <Chat
-          :room_name = room.name />     
-        </div>
-      </div>
-    </template>
+        <span> {{ number }}</span>
+    </div>
+</template>
     <!-- @userSentMessage="emitMessageToServer" -->
 
 <script lang="ts">
@@ -18,39 +15,49 @@ import { Options, Vue } from 'vue-class-component';
 // import { Socket } from 'socket.io-client';
 import room from '@/models/room';
 import { DefaultEventsMap } from '@socket.io/component-emitter';
+import Message from '@/models/message';
 
-    @Options ({
-      components: {
-        Chat,
-      },
-      props: {
-        // socket: Object,
-        room: Room
+  export default {
+    data(): unknown {
+      return {
+        joined: false,
+        button_text: "join",
+        number: 0
       }
-    })
 
-    export default class RoomSummary extends Vue {
+    },
+    components: {
+      Chat,
+    },
+    props: {
+      socket: Object,
+      room: Room
+    },
+    methods: {
+      switchState(): void {
+        this.joined = !this.joined;
+        this.button_text = (this.joined) ? "leaf" : "join";
+        if(this.joined) {
+          this.socket.emit('join', {room_name: this.room.name}, () => {
 
-        joined = false; 
-        button_text = "join";  
-        room!: Room;
-        // socket!: Socket<DefaultEventsMap, DefaultEventsMap>;
-        // socket = socket;
+          })
+        } else {
+          this.socket.emit('leave', {room_name: this.room.name}, () => {
 
-
-        // mounted() {
-        //   this.button_text = this.switchState();  
-        // }
-
-        switchState(): void {
-          this.joined = !this.joined;
-          this.button_text = (this.joined) ? "leaf" : "join";
+          })
         }
-
-        // emitMessageToServer(value) {
-
-        // }
+      },
+      resetNumber(): void
+      {
+        this.number = 0
+      }
+    },
+    mounted() {
+      this.socket.on('message', (message) => {
+        this.number++
+      })
     }
+  }
 
 </script>
 
@@ -73,7 +80,7 @@ import { DefaultEventsMap } from '@socket.io/component-emitter';
     }
     div {
       text-align: left;
-      border: 5px solid;
+      /* border: 5px solid; */
       border-image-slice: 1;
       border-image-source: linear-gradient(var(--ft_pink), var(--ft_blue));
     }

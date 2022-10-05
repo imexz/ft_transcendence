@@ -2,20 +2,27 @@
   <div class="userSummary">
     <div class="normalView">
       <img :src="user?.avatar_url" alt="Avatar">
-      <span>{{ user?.unique_name }}</span>
+      <span>{{ user?.username }}</span>
       <div class="toggleDropdown" @click="toggleDropdown">:</div>
     </div>
     <div class="dropdownMenu" v-if="show">
       <button 
+        v-if="this.$store.getters.getFriends.some(us => us._id == this.user._id)"
+        class="dropdownElement"
+        @click="removeFriend">Remove Friend</button>
+      <button 
+        v-else
         class="dropdownElement"
         @click="addFriend">AddFriend</button>
       <button 
         class="dropdownElement"
-        @click="viewProfile(user?.id)">View Profile</button>
+        @click="viewProfile(user?._id)">View Profile</button>
       <button
         class="dropdownElement">Send Dm</button>
       <button
         class="dropdownElement">Block</button>
+<button
+        class="dropdownElement">Challenge to Match</button>
     </div>
   </div>
 </template>
@@ -46,10 +53,14 @@ export default defineComponent({
         baseURL: API_URL,
         method: 'POST',
         withCredentials: true,
-        data: {"id" : this.user?.id},
+        data: {"id" : this.user?._id},
       })
-        .then()
+        .then(this.$store.commit('addFriend', this.user))
         .catch()
+    },
+    removeFriend(){
+      console.log("IMPLEMENT API TO REMOVE FRIEND")
+      this.$store.commit('removeFriend', this.user._id);
     },
     viewProfile(id: number){
       this.$router.push('/profile/' + id.toString());
@@ -72,9 +83,9 @@ export default defineComponent({
   }
   .userSummary {
     position: relative;
-    width: 316px;
+    /* width: 316px; */
     border: 2px solid;
-    border-image: linear-gradient(var(--ft_cyan), var(--ft_pink)) 1;
+    border-image: linear-gradient(90deg, var(--ft_cyan), var(--ft_pink)) 1;
   }
   .normalView {
     padding: 5px;

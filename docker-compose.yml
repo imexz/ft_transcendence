@@ -5,9 +5,9 @@ services:
     build:
       context: ./src/frontend/
     # image: vuejs/ci:latest
-    depends_on:
-      - backend
-      - database
+    # depends_on:
+    #   - backend
+    #   - database
     restart: always
     ports:
       - "8080:8080"
@@ -27,7 +27,7 @@ services:
     networks:
       - back-tier
     volumes:
-      - ./src/backend/:/home/data/
+      - ./src/backend/src:/home/data/src
     # env_file: .env
     # image: nestjs/cli:latest
     # stdin_open: true

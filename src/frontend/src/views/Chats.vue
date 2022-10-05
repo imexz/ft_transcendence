@@ -1,108 +1,146 @@
-
 <template>
-  <div>
-    <div class="room-input">
-      <form @submit.prevent="creat">
-        <input v-model="name" />
-        <select v-model="access">
-          <option>privat</option>
-          <option>public</option> 
-          <option>protected</option> 
-        </select>
-        <button type="submit">Create Room</button>
-      </form>
-    </div>
-    <div class="room-container">
-        <RoomSummary
-        v-for="room in rooms"
-          :room = room />
-    </div>
-    <Toast></Toast>
-
-  </div>
-
-</template>
-
-
-<script lang="ts">
+    <vue-advanced-chat
+      :current-user-id="currentUserId"
+      :rooms="JSON.stringify(rooms)"
+      :messages="JSON.stringify(messages)"
+      :room-actions="JSON.stringify(roomActions)"
+      @send-message="sendMessage($event.detail[0])"
+      @add-room="creatRoom()"
+      @room-action-handler="roomActionHandler($event.detail[0])"
+      @typing-message="emitTyping()"
+    />
+    <!-- <CreatRoomPopup>
+      
+    </CreatRoomPopup> -->
+  </template>
   
-import { Options, Vue } from 'vue-class-component';
-import RoomSummary from '../components/Chat/RoomSummary.vue'
-import VueAxios from 'axios';
-import { API_URL } from '@/defines';
-
-
-@Options({
-  components : {
-    RoomSummary,
-  }
-})
+  <script >
+  import { register } from 'vue-advanced-chat'
+  import { io } from 'socket.io-client';
+  import VueAxios from 'axios';
+  import { API_URL } from '@/defines';
+  // import { CreatRoomPopup } from '@/components/Chat/creatRoomPopup.vue';
 
 
 
-export default class ChatsTest extends Vue {
-
-  name = ''
-  rooms = []
-  access = 'public'
-
-  mounted() {
-    VueAxios({
-        url: '/chatroom/all',
-        baseURL: API_URL,
-        method: 'GET',
-        withCredentials: true,
-      })
-        .then(response => {
-          console.log(response.data);
+  register()
+  
+    export default {
+      data() {
+        return {
+          currentUserId: '1234',
+          rooms: [],
+          messages: [],
+          roomActions: [
+            { name: 'inviteUser', title: 'Invite User' },
+            { name: 'removeUser', title: 'Remove User' },
+            { name: 'deleteRoom', title: 'Delete Room' }
+          ],
+          socket: io
+        }
+      },
+      components:{
+        // CreatRoomPopup,
+      },
+      methods: {
+        async updateMessages() {
+          this.socket.emit('findAllMessages', {room_name: this.room_name}, (response) => {
+            console.log(response);
+            this.messages = response;
+          })
+        },
+        sendMessage(message) {
+          console.log("sendMessage");
+          this.socket.emit('createMessage', { room_name: message.roomId, content: message.content}, (response) =>
+          {
+            console.log(response);
+            this.messages.push(response)
+            
+          })
+        },
+        creatRoom(){
+            VueAxios({
+                url: '/chatroom/creat',
+                baseURL: API_URL,
+                method: 'POST',
+                withCredentials: true,
+                data: { room_name: "test", access: "public"}
+            })
+                .then(response => {
+                  console.log(response);
+                  if(response != null) {
+                    const rooms = []
+                    for (let i = 0; i < response.length; i++) {
+                      rooms.push(response)
+                    }
+                    this.rooms = rooms
+                    this.$emit('success', 'creat Room')
+                    console.log("succes");
+                  }
+                })
+                .catch(error => { this.$emit('error') })
+        },
+      
+        emitTyping() {
+          this.socket.emit('typing', {isTyping: true, room_name: this.room_name});
+          this.timeout = setTimeout(() => {
+            this.socket.emit('typing', { isTyping: false, room_name: this.room_name});
+          }, 2000);
+          console.log("emit typing ");
+          console.log(this.room_name);
           
-           this.rooms = response.data
-          })
-        .catch()
-  }
+        },
+        getRooms(){
+            VueAxios({
+                url: '/chatroom/all',
+                baseURL: API_URL,
+                method: 'GET',
+                withCredentials: true,
+            })
+                .then(response => {
+                console.log(response.data);
+                
+                this.rooms = response.data
+                })
+                .catch()
+        },
+        initSocket(){
+          this.socket = io(API_URL, {
+            auth: (cb) => {
+                    cb({ id: this.$store.getters.getUser.id })
+                  }
+                })
+        },
+        roomActionHandler(roomId, action) {
+          console.log("roomActionHandler");
+        }
 
-  creat()
-  {
-    console.log("creat");
-    console.log(this.access);
-    
-    VueAxios({
-        url: '/chatroom/creat',
-        baseURL: API_URL,
-        method: 'POST',
-        withCredentials: true,
-        data: { room_name: this.name, access: this.access}
-      })
-        .then(response => {
-          console.log(response);
-          if(response != null)
-            this.rooms.push(response.data)
-            this.$emit('success', 'creat Room')
-            console.log("succes");
-          })
-        .catch(error => { this.$emit('error') })
-  }
-}
-
+      },
+      mounted() {
+        this.getRooms();
+        this.initSocket();
+        this.currentUserId = this.$store.getters.getUser.id;
+        console.log("mounted CHAT");
+      }      
+    }
 </script>
 
-<!-- // @import '../assets/base.css'; -->
-
-<style>
-
-.chat{
-  padding: flex;
-  height: 100vh;  
-}
-
-.chat-container {
-  display: flex;
-  flex-direction: colum;
-  height: 100%;
-}
-
-.messages-container {
-  flex: 1;
-}
-
-</style>
+<!-- <script lang="ts">
+    import { register } from 'vue-advanced-chat'
+    
+      export default {
+        data() {
+          return {
+            register: register,
+            currentUserId: '1234',
+            rooms: [],
+            messages: [],
+            roomActions: [
+              { name: 'inviteUser', title: 'Invite User' },
+              { name: 'removeUser', title: 'Remove User' },
+              { name: 'deleteRoom', title: 'Delete Room' }
+            ]
+          }
+        }
+      }
+</script> -->

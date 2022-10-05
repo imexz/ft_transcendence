@@ -10,9 +10,9 @@ export class UsersService {
 
 
     async addClientId(id: number, clientId: string) {
-		const user = await this.usersRepository.findOneBy({id: id})
+		const user = await this.usersRepository.findOneBy({_id: id})
 		this.usersRepository.update(id, user)
-		return user.unique_name;
+		return user.username;
     }
 	constructor(
 		@InjectRepository(User)
@@ -22,7 +22,7 @@ export class UsersService {
 	async getFriends(id: number) {
 		const user = await this.usersRepository.findOne({
 			where: {
-				id: id
+				_id: id
 			},
 			relations: {
 				friends: true,
@@ -42,12 +42,12 @@ export class UsersService {
 		console.log(id);
 		
 		if(id != undefined) {
-			const user: User = await this.usersRepository.findOne({where: {id: id}})
+			const user: User = await this.usersRepository.findOne({where: {_id: id}})
 			if(user == null) {
 				console.log("user == null");
 				return undefined
 			}
-			console.log(user);
+			// console.log(user);
 			return user
 		}
 		return undefined
@@ -73,7 +73,7 @@ export class UsersService {
 	}
 
 	async updateAvatar(id: number, file: fileEntity) {
-		const user = await this.usersRepository.findOneBy({id: id})
+		const user = await this.usersRepository.findOneBy({_id: id})
 		if (user == null) {
 			return
 		}
@@ -88,14 +88,14 @@ export class UsersService {
 		this.usersRepository.update(id, user)
 	}
 
-	async updateName(id: number, unique_name: string)
+	async updateName(id: number, username: string)
 	{
-		const user = await this.usersRepository.findOneBy({id: id})
+		const user = await this.usersRepository.findOneBy({_id: id})
 		if (user == null)
 		{
 			return
 		}
-		user.unique_name = unique_name
+		user.username = username
 		return this.usersRepository.save(user)
 	}
 
@@ -107,13 +107,13 @@ export class UsersService {
 			try{
 				const user = await this.usersRepository.findOne({
 					where: {
-					id: user_id
+						_id: user_id
 					},
 					relations: {
 						friends: true,
 					}
 				});
-				const user_friend: User = await this.usersRepository.findOneBy({id: friend_id});
+				const user_friend: User = await this.usersRepository.findOneBy({_id: friend_id});
 	
 				user.friends.push(user_friend);
 				this.usersRepository.save(user);
