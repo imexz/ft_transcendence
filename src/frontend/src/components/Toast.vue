@@ -32,7 +32,7 @@ export default defineComponent({
     float: right;
     position: fixed;
     width: 400px;
-    bottom: 20px;
+    bottom: 80px;
     left: 20px;
   }
   .toast {
@@ -41,7 +41,7 @@ export default defineComponent({
     background: red;
     border-radius: 10px;
     font-weight: bold;
-    z-index: 10;
+    z-index: 11;
   }
   .errorToast {
     padding: 20px;
@@ -51,7 +51,7 @@ export default defineComponent({
     font-size: 25px;
     font-weight: bold;
     border-radius: 10px;
-    z-index: 10;
+    z-index: 11;
   }
   .successToast {
     padding: 20px;
@@ -61,6 +61,6 @@ export default defineComponent({
     font-size: 25px;
     font-weight: bold;
     border-radius: 10px;
-    z-index: 10;
+    z-index: 11;
   }
 </style>

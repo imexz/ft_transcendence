@@ -1,6 +1,5 @@
 <template>
   <div class="footer">
-    Hello World
     <div class="dropUp">
       <FriendList></FriendList>
     </div>
