@@ -42,8 +42,8 @@ export default defineComponent({
 
 <style scoped>
 
-.matchHistory {
+/* .matchHistory {
   width: 480px;
-}
+} */
 
 </style>

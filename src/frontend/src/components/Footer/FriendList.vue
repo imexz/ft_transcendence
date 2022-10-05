@@ -11,11 +11,6 @@
       class="friendListButtonPassive friendListButton">
       Friends({{ $store.getters.getFriends?.length }})</button>
     <div v-show="!isCollapsed" class="friendList">
-      <!-- <div class="headline">
-        <span>
-          Friends({{ $store.getters.getFriends?.length }})
-        </span>
-      </div> -->
       <button
         @click="toggleFriendList"
         class="friendListButton friendListButtonActive">
