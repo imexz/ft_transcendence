@@ -1,7 +1,7 @@
 <template>
   <div class="top">
     <Profile :id="id" />
-    <MatchHisory/>
+    <MatchHisory :id="id"/>
   </div>
   <div class="top">
     <SearchBar/>
@@ -16,11 +16,6 @@
   import { defineComponent } from 'vue';
 
 export default defineComponent({
-  data() {
-    return {
-      currentUser : this.$store.getters.getUser,
-    }
-  },
   props: {
     id: String,
   },

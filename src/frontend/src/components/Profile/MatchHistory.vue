@@ -26,6 +26,12 @@ export default defineComponent({
       ] as MatchData[],
     }
   },
+  props: {
+    id: {
+      type: String,
+      default: "0"
+    },
+  },
   components: {
     UserSummary,
     MatchSummary
