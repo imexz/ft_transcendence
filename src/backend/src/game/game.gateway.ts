@@ -1,6 +1,13 @@
-import { SubscribeMessage, WebSocketGateway, ConnectedSocket, OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect, MessageBody } from '@nestjs/websockets';
+import { SubscribeMessage,
+  WebSocketGateway,
+  WebSocketServer,
+  ConnectedSocket,
+  OnGatewayInit,
+  OnGatewayConnection,
+  OnGatewayDisconnect,
+  MessageBody } from '@nestjs/websockets';
 import { GameService } from './game.service';
-import { Socket } from 'socket.io';
+import { Socket, Server } from 'socket.io';
 import { Game } from './game.entities/game.entity';
 import { Observable, map, interval } from 'rxjs';
 
@@ -19,6 +26,9 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
   constructor (private readonly gameService: GameService) {};
 
+  @WebSocketServer()
+	server: Server;
+
   afterInit() { console.log("GameGateway: After init"); }
 
   handleConnection(@ConnectedSocket() client: Socket) { console.log("client %s connected", client.handshake.auth.id); }
@@ -27,7 +37,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
   @SubscribeMessage('checkQueue')
   handleCheckQueue(@ConnectedSocket() client: Socket) {
-	  this.gameService.addClientIdToQueue(client);
+	  this.gameService.addClientIdToQueue(client, this.server);
   }
 
   @SubscribeMessage('checkGame')
@@ -35,27 +45,17 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	  return this.gameService.checkGame(client);
   }
 
-  // @SubscribeMessage('updateGame')
-  // handleUpdateGame(@MessageBody() gameid: number): Observable<GameEvent> {
-  //   return interval(100).pipe(map((_) => ({data: this.gameService.getData(gameid)})));
-  // }
-
-  // @SubscribeMessage('leftGame')
-  // handleLeftGame(@ConnectedSocket() client: Socket): void {
-	// this.gameService.users.delete(client.handshake.auth.id);
-  // }
-
   @SubscribeMessage('moveLeftUp')
   handleMoveLeftUp(@ConnectedSocket() client: Socket): void {
 	let gameid = this.gameService.users.get(client.handshake.auth.id);
 	this.gameService.movePaddleUp(gameid, true);
   }
+
   @SubscribeMessage('moveRightUp')
   handleMoveRightUp(@ConnectedSocket() client: Socket): void {
 	let gameid = this.gameService.users.get(client.handshake.auth.id);
 	this.gameService.movePaddleUp(gameid, false);
   }
-
 
   @SubscribeMessage('moveLeftDown')
   handleMoveLeftDown(@ConnectedSocket() client: Socket): void {

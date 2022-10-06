@@ -90,7 +90,6 @@
 	beforeUpdate() {
 		console.log("in beforeUpdate");
 		if (this.gameId && this.isFirstCall) {
-			console.log("next: updateGame emit");
 			this.gamesocket.on('updateGame', (data: any) => {
 				console.log("callback updateGame");
 				if (data === undefined) {
@@ -101,6 +100,7 @@
 					this.position.y = 0;
   					return;
   				}
+				console.log(data);
   				this.context = (this.$refs.game as any).getContext("2d");
   				this.context.fillStyle = "#FFFFFF";
   				this.position.x = data.ball.position.x;
@@ -111,7 +111,7 @@
   				this.context.fill();
   				this.drawPaddles(data);
 			})
-			this.isFirstCall = false;
+			// this.isFirstCall = false;
 		}
 		console.log("leaving beforeUpdate");
 		
@@ -119,7 +119,6 @@
 
   	beforeDestory() {
   		console.log("in beforeDestroy");
-  		// this.eventSource.close();
   		delete this.eventSource;
   		this.gamesocket.close();
   		delete this.gamesocket;

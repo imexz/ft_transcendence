@@ -3,7 +3,7 @@ import { Game } from './game.entities/game.entity';
 import { Paddle } from './game.entities/paddle.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Socket } from 'socket.io';
+import { Socket, Server } from 'socket.io';
 import { GameSetup } from './game.entities/setup.entity';
 
 interface QueueElem {
@@ -44,11 +44,12 @@ export class GameService {
 					gameId: gameid,
 					side: this.getSideFromGame(this.games.get(gameid), client.handshake.auth.id),
 				});
+			client.join(gameid.toString());
 		}
 		return ret;
 	}
 
-	async	addClientIdToQueue(client: Socket): Promise<void> {
+	async	addClientIdToQueue(client: Socket, server: Server): Promise<void> {
 		var needle: QueueElem = {
 			id: client.handshake.auth.id,
 			socket: client,
@@ -58,18 +59,17 @@ export class GameService {
 			this.queue.push({id: client.handshake.auth._id, socket: client});
 			console.log("add %s to queue", client.handshake.auth.id);
 			while (this.queue.length > 1) {
-				await this.createGame(client);
+				await this.createGame(server);
 			}
 		} else {
 			console.log("%s already is in queue", client.handshake.auth._id);
 		}
 	}
-
-	async createGame(client: Socket) {
+	
+	async createGame(server: Server) {
 		console.log('inside createGame()');
 		var gamerepo = this.gameRepository.create();
 		console.log("after repo create");
-
 		gamerepo = await this.gameRepository.save(gamerepo);
 		var p1: QueueElem = this.queue.shift();
 		var p2: QueueElem = this.queue.shift();
@@ -83,19 +83,14 @@ export class GameService {
 		p2.socket.join(gamerepo.id.toString());
 		p1.socket.emit('gameInfo', {gameId: gamerepo.id, side: "left"});
 		p2.socket.emit('gameInfo', {gameId: gamerepo.id, side: "right"});
-		// const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
-		// await sleep(1000);
-		var intervalId = setInterval(() => this.emitData(p1.socket, p2.socket, gamerepo.id), 10) as unknown as number;
+		var intervalId = setInterval(() => this.emitData(gamerepo.id, server), 1000) as unknown as number;
 		console.log("intervalId %d", intervalId);
 		this.intervals.set(gamerepo.id, intervalId);
 		console.log('leaving createGame()');
 	}
-
-	emitData(player1: Socket, player2: Socket, gameId: number) {
-		// console.log("in emitData %d", gameId);
-		player1.emit('updateGame', this.getData(gameId)); //.to(gameId.toString())
-		player2.emit('updateGame', this.getData(gameId)); //.to(gameId.toString())
-		// player1.to(gameId.toString()).emit('updateGame', this.getData(gameId));
+	
+	emitData(gameId: number, server: Server) {
+		server.to(gameId.toString()).emit('updateGame', this.getData(gameId));
 	}
 
 	getData(id: number): Game | undefined {
@@ -139,6 +134,7 @@ export class GameService {
 				this.games.get(id).ball.direction.y *= -1;
 			}
 		}
+		console.log("gameid: %d | ball: x %d, y %d", id, this.games.get(id).ball.position.x, this.games.get(id).ball.position.y);
 	}
 
 	isBallWithinPaddleRange(id: number, paddle: Paddle): boolean {
