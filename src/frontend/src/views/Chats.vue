@@ -100,11 +100,13 @@
       
         emitTyping({ roomId, message }) {
           // console.log(message);
-          // this.$socketio.emit('typing', {isTyping: true, roomId: roomId});
-          // this.timeout = setTimeout(() => {
-          //   this.$socketio.emit('typing', { isTyping: false, roomId: roomId.roomId});
-          // }, 2000);
-          // console.log("emit typing ");
+          console.log(roomId);
+          console.log(message);
+          this.$socketio.emit('typing', {isTyping: true, roomId: roomId});
+          this.timeout = setTimeout(() => {
+            this.$socketio.emit('typing', { isTyping: false, roomId: roomId});
+          }, 2000);
+          console.log("emit typing ");
           // console.log("roomId");
           // console.log(roomId.roomId);
           
@@ -166,17 +168,24 @@
           const room = this.rooms.find((room) => {
             return room.roomId === roomId
           })
-          if(isTyping) {
-            room.typingUsers = [...room.typingUsers, userId]
-          } else {
-            const index = room.typingUsers.indexOf(userId)
-            typingUsers = []
-            for (let i = 0; i < room.typingUsers.length; i++) {
-              if (room.typingUsers[i] != userId)
-                typingUsers.push(room.typingUsers[i])
-            }
-            room.typingUsers = typingUsers
-          }
+          console.log(room.roomId)
+          console.log(isTyping)
+
+          // console.log(room.typingUsers)
+          // if(isTyping) {
+          //   console.log(room.typingUsers)
+          //   // room.typingUsers = [...room.typingUsers, userId]
+          //   room.typingUsers = [userId]
+          // } 
+          // else {
+          //   const index = room.typingUsers.indexOf(userId)
+          //   typingUsers = []
+          //   for (let i = 0; i < room.typingUsers.length; i++) {
+          //     if (room.typingUsers[i] != userId)
+          //       typingUsers.push(room.typingUsers[i])
+          //   }
+          //   room.typingUsers = typingUsers
+          // }
         });
 
         this.$socketio.on('message',(message) => {
