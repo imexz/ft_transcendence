@@ -123,7 +123,7 @@ export class ChatGateway {
     console.log(client.handshake.auth.id);
     
     
-    return await this.chatService.findAllMessages(roomId);
+    return await this.chatService.findAllMessages(roomId, client.handshake.auth.id);
     // return {test};
   }
 

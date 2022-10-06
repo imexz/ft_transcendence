@@ -142,9 +142,9 @@ export class ChatroomService {
         // return rooms;
 
          const rooms = await this.chatroomRepository.find({
-            where: {
-                access: Not("private")
-            },
+            where: [
+                access: Not("privat")
+            ],
             relations: {
             users: true,
             messages: true
