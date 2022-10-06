@@ -1,11 +1,15 @@
 <template>
-  <div>
-    <form @submit.prevent="ChangeUserAvatar">
-      <input type="file" @change="uploadFile">
-      <button>Submit</button>
-    </form>
-    <button @click="deleteFile">Delete</button>
+  <div class="wrapper">
+    <div>
+      <button v-if="selectedFile === null" class="btnupload" @click="($refs.file as any).click()">Select File</button>
+      <button v-else class="btnupload" @click="($refs.file as any).click()">{{ selectedFile.name }}</button>
+      <button @click="ChangeUserAvatar">Upload</button>
+    </div>
+    <div>
+      <button @click="deleteFile">Restore Default</button>
+    </div>
   </div>
+  <input ref="file" type="file" class="d-none" @change="uploadFile"/>
 </template>
   
 <script lang="ts">
@@ -61,3 +65,17 @@ export default defineComponent({
 })
 
 </script>
+
+
+<style scoped>
+  
+  .d-none {
+    display: none;
+  }
+  .wrapper {
+    display: flex;
+    justify-content: space-between;
+  }
+
+
+</style>
