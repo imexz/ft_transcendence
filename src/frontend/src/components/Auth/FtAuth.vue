@@ -1,18 +1,18 @@
 <template>
   <div>
     <Toast v-if="showToast" :msg=toastMsg :mode=toastMode />
-    <div v-if="!this.$store.getters.isLogged">
+    <div v-if="!$store.getters.isLogged">
       <button 
         class="authButton"
-        :class="{'linkActive': this.$route.name === 'login'}"
-        @click="this.authenticate">login</button>
+        :class="{'linkActive': $route.name === 'login'}"
+        @click="authenticate">login</button>
         
     </div>
     <div v-else>
       <button
         class="authButton"
-        :class="{'linkActive': this.$route.name === 'login'}"
-        @click="this.logout">logout</button>
+        :class="{'linkActive': $route.name === 'login'}"
+        @click="logout">logout</button>
     </div>
   </div>
 </template>

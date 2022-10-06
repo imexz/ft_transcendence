@@ -18,8 +18,14 @@ import { defineComponent } from 'vue';
 
 export default defineComponent({
   props: {
-    msg: String,
-    mode: String,
+    msg: {
+      type: String,
+      default: 'Please give me a meaning',
+    },
+    mode: {
+      type: String,
+      default: '',
+    }
   }
 })
 
