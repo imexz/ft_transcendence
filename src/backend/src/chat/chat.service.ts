@@ -38,9 +38,13 @@ export class ChatService {
         
         
         
-        async findAllMessages(roomId: number) {
-            
-            return await this.messageService.getAllMessagesOfRoom(roomId)
+        async findAllMessages(roomId: number, userId: number) {
+          const rooms = await this.chatroomService.getAllwithUser(userId)
+          for (let index = 0; index < rooms.length; index++) {
+            if(rooms[index].roomId == roomId) {
+              return await this.messageService.getAllMessagesOfRoom(roomId)
+            }
+          }
         }
         
         async getClientName(id: number) {
