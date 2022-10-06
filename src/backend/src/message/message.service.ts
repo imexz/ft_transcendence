@@ -27,7 +27,7 @@ export class MessageService {
     async getAllMessagesOfRoom(roomId: number) {
         const messages = await this.messageRepository.createQueryBuilder("messages")
             .leftJoinAndSelect("messages.user", "user")
-            .select('messages.user_id AS "senderId", messages._id, content, user.avatar_url AS avatar, messages.timestamp AS timestamp')
+            .select('CAST( messages.user_id AS varchar ) AS "senderId", messages._id, content, user.avatar_url AS avatar, messages.timestamp AS timestamp')
             // .select('messages.user_id AS "senderId", _id, content, messages.user')
             .where('messages.chatroom.roomId = :roomId', { roomId: roomId})
             .orderBy('timestamp')

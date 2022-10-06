@@ -144,7 +144,7 @@ export class ChatGateway {
     // client.to(room_name).emit('message', message);
     const tmp = {_id: message._id,
       content: message.content,
-      senderId: message.user._id,
+      senderId: message.user._id.toString(),
       timestamp: message.timestamp,
       avatar: message.user.avatar_url}
       
