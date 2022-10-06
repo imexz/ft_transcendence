@@ -1,5 +1,5 @@
 <template>
-    <vue-advanced-chat
+  <vue-advanced-chat
       :current-user-id="currentUserId"
       :rooms="JSON.stringify(rooms)"
       :messages="JSON.stringify(messages)"
@@ -31,7 +31,7 @@
     export default {
       data() {
         return {
-          currentUserId: '1234',
+          currentUserId: '',
           rooms: [],
           messages: [],
           roomActions: [
@@ -62,6 +62,7 @@
           this.$socketio.emit('createMessage', { roomId: roomId, content: content}, (response) =>
           {
             console.log("createMessage response");
+            console.log(response);
             this.addMessage(response)
           })
         },
@@ -98,7 +99,7 @@
         },
       
         emitTyping({ roomId, message }) {
-          console.log(message);
+          // console.log(message);
           // this.$socketio.emit('typing', {isTyping: true, roomId: roomId});
           // this.timeout = setTimeout(() => {
           //   this.$socketio.emit('typing', { isTyping: false, roomId: roomId.roomId});
@@ -187,7 +188,7 @@
         this.currentUserId = this.$store.getters.getUser._id;
 
         console.log("mounted CHAT");
-        console.log(this.$store.getters.getUser._id)
+        // console.log(this.currentUserId)
       }      
     }
 </script>
