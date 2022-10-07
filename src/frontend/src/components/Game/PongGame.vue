@@ -23,7 +23,7 @@
   import { io, Socket } from "socket.io-client";
   import { API_URL } from '@/defines';
   import { defineComponent } from 'vue';
-		
+
   export default defineComponent({
   	data () {
   		return {
@@ -31,10 +31,10 @@
   			gameId: "" as string,
   			gamesocket: null as Socket,
   			context: null as any,
-  			position: {
-  				x: 0 as number,
-  				y: 0 as number,
-  			},
+  			// position: {
+  			// 	x: 0 as number,
+  			// 	y: 0 as number,
+  			// },
   			side: "" as string,
   		}
   	},
@@ -103,18 +103,19 @@
 				console.log(data);
   				this.context = (this.$refs.game as any).getContext("2d");
   				this.context.fillStyle = "#FFFFFF";
-  				this.position.x = data.ball.position.x;
-  				this.position.y = data.ball.position.y;
+  				// this.position.x = data.ball.position.x;
+  				// this.position.y = data.ball.position.y;
   				this.context.clearRect(0, 0, (this.$refs.game as any).width, (this.$refs.game as any).height);
   				this.context.beginPath();
-  				this.context.arc(this.position.x, this.position.y, data.ball.radius, 0, 2 * Math.PI);
+  				this.context.arc(data.ball.position.x, data.ball.position.y, data.ball.radius, 0, 2 * Math.PI);
+  				// this.context.arc(this.position.x, this.position.y, data.ball.radius, 0, 2 * Math.PI);
   				this.context.fill();
   				this.drawPaddles(data);
 			})
 			// this.isFirstCall = false;
 		}
 		console.log("leaving beforeUpdate");
-		
+
 	},
 
   	beforeDestory() {
@@ -145,7 +146,7 @@
   			this.gamesocket.emit('moveRightDown');
   		},
   	}
-  })	
+  })
 </script>
 
 <style scoped>

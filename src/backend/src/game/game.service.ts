@@ -32,15 +32,14 @@ export class GameService {
 		} else
 			return "";
 	}
-	
+
 	checkGame(client: Socket): boolean {
 		var ret: boolean = false;
 		var gameid = this.users.get(client.handshake.auth.id);
 		if (gameid != undefined) {
 			ret = true;
 			console.log("client %d already is in users", client.handshake.auth.id);
-			client.emit('gameInfo',
-				{
+			client.emit('gameInfo', {
 					gameId: gameid,
 					side: this.getSideFromGame(this.games.get(gameid), client.handshake.auth.id),
 				});
@@ -56,16 +55,16 @@ export class GameService {
 		}
 		console.log(this.queue);
 		if (this.queue.find(({id}) => {return id === needle.id}) == undefined) {
-			this.queue.push({id: client.handshake.auth._id, socket: client});
 			console.log("add %s to queue", client.handshake.auth.id);
+			this.queue.push({id: client.handshake.auth.id, socket: client});
 			while (this.queue.length > 1) {
 				await this.createGame(server);
 			}
 		} else {
-			console.log("%s already is in queue", client.handshake.auth._id);
+			console.log("%s already is in queue", client.handshake.auth.id);
 		}
 	}
-	
+
 	async createGame(server: Server) {
 		console.log('inside createGame()');
 		var gamerepo = this.gameRepository.create();
@@ -88,7 +87,7 @@ export class GameService {
 		this.intervals.set(gamerepo.id, intervalId);
 		console.log('leaving createGame()');
 	}
-	
+
 	emitData(gameId: number, server: Server) {
 		server.to(gameId.toString()).emit('updateGame', this.getData(gameId));
 	}
@@ -96,7 +95,7 @@ export class GameService {
 	getData(id: number): Game | undefined {
 		if (this.games.get(id) === undefined) {
 			return undefined;
-		} 
+		}
 		this.updateData(id);
 		this.collisionControl(id);
 		if (this.scored(id)){
@@ -225,6 +224,7 @@ export class GameService {
 		var game: Game = this.games.get(id);
 		if (game.score.scoreLeft == 10 || game.score.scoreRight == 10) {
 			clearInterval(this.intervals.get(id));
+			this.intervals.delete(id);
 			this.users.delete(game.playerLeft);
 			this.users.delete(game.playerRight);
 			this.games.delete(id);
