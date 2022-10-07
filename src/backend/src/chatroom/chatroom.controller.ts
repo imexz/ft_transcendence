@@ -22,9 +22,11 @@ export class ChatroomController {
 	@UseGuards(JwtAuthGuard)
     async CreatChatroon(@Request() req,
         @Body("room_name") room_name: string,
-        @Body("access") access: string) {
+        @Body("access") access: string, 
+        @Body("password") password: string)
+    {
         
-        if(await this.chatroomService.addRoom(room_name, access, req.user) == undefined)
+        if(await this.chatroomService.addRoom(room_name, access, req.user, password) == undefined)
             throw new HttpException('Forbidden', HttpStatus.CONFLICT);
         return this.getAll()
     }
