@@ -141,6 +141,16 @@
           console.log(action);
           console.log(roomId);
           this.$socketio.emit(action.name, roomId)
+          switch (action.name) {
+            case 'join':
+              this.updateMessages(roomId)
+              break;
+            case 'leave':
+              this.updateMessages(roomId)
+              break;
+            default:
+              break;
+          }
         },
         addMessage(message) {
           console.log("addMessage");

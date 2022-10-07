@@ -37,7 +37,7 @@ export default {
                 baseURL: API_URL,
                 method: 'POST',
                 withCredentials: true,
-                data: { room_name: this.name, access: this.access}
+                data: { room_name: this.name, access: this.access, password: this.password}
             })
                 .then(response => {
                 console.log(response);

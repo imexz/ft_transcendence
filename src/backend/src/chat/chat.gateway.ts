@@ -137,7 +137,7 @@ export class ChatGateway {
     console.log(roomId);
     console.log(content);
     
-    const room_name = await this.chatService.getRoomName(roomId)
+    // const room_name = await this.chatService.getRoomName(roomId)
     
     const message = await this.chatService.createMessage(client.handshake.auth.id, roomId, content);
     
@@ -160,4 +160,6 @@ export class ChatGateway {
       console.log("createMessage ende");
     return tmp;
   }
+
+
 }

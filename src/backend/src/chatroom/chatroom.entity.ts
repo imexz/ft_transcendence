@@ -26,4 +26,7 @@ export class chatroom{
     @Column()
     access: string;
 
+    @Column({nullable: true})
+    hash: string
+
 }

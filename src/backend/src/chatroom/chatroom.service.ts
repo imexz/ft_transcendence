@@ -4,6 +4,7 @@ import { Column, FindOptionsWhere, ManyToMany, Not, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { chatroom } from './chatroom.entity';
 import { message } from 'src/message/message.entity';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class ChatroomService {
@@ -142,9 +143,9 @@ export class ChatroomService {
         // return rooms;
 
          const rooms = await this.chatroomRepository.find({
-            where: [
-                access: Not("privat")
-            ],
+            where: {
+                access: Not("privat"),
+            },
             relations: {
             users: true,
             messages: true
@@ -164,7 +165,7 @@ export class ChatroomService {
         console.log("after");
     }
     
-    async addRoom(room_name: string, access: string,  user: User) {
+    async addRoom(room_name: string, access: string,  user: User, password?: string) {
         const room = await this.getRoom(room_name)
         if(room == null) {
             console.log("room == null");
@@ -175,6 +176,15 @@ export class ChatroomService {
             room.admins = [user]
             room.users = [user]
             room.access = access
+            if (access == 'protected' && password){
+                bcrypt.hash(password, 10, function(err, hash) {
+                    if (err) {
+                        console.log("error hashing");                   
+                        return undefined
+                    }
+                    room.hash = hash
+                })    
+            } 
             return await this.chatroomRepository.save(room);     
         }
         return undefined
