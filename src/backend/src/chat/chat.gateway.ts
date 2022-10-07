@@ -150,7 +150,6 @@ export class ChatGateway {
       
       client.to(roomId.toString()).emit('message', tmp);
       
-      
       // console.log(client.);
       
       // console.log("emit mesage");
