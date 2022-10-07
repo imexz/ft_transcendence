@@ -36,9 +36,9 @@ export class ChatService {
         }
         
         
-        async manageJoin(user_id: number, roomId: number) {
+        async manageJoin(user_id: number, roomId: number, password?: string) {
             const user = await this.usersService.getUser(user_id)
-            this.chatroomService.userToRoom(user, roomId);
+              this.chatroomService.userToRoom(user, roomId, password);
         }
         
         

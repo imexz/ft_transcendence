@@ -20,12 +20,13 @@
       <h2>Creat Room</h2>
     </creatRoomPopup>
 
-    <joinRoomPopup
+    <!-- <joinRoomPopup
       v-if="PoppupJoin"
       :TogglePopup="() => makePopupJoin()"
-      :password="password" >
+      :password="password"
+      :roomId="">
       <h2>Join Room</h2>
-    </joinRoomPopup>
+    </joinRoomPopup> -->
   </template>
   
   <script >
@@ -44,6 +45,7 @@
       data() {
         return {
           currentUserId: '',
+          currentRoomId: '',
           rooms: [],
           messages: [],
           roomActions: [
@@ -55,7 +57,8 @@
           PoppupCreate: ref(false),
           PoppupJoin: ref(false),
           password: '',
-          timeout: 0
+          timeout: 0,
+          
 
         }
       },
@@ -65,7 +68,9 @@
       },
       methods: {
         async putMessages({room}) {
-            this.updateMessages(room.roomId)
+          console.log("putMessages");
+          this.currentRoomId = room.roomId
+          this.updateMessages(room.roomId)
         },
 
         async updateMessages(roomId) {
@@ -96,10 +101,10 @@
         },
         makePopupJoin(roomId) {
           console.log("makePopupJoin");
+          console.log(roomId)
           this.PoppupJoin = !this.PoppupJoin
-          const password = this.password
           if (this.PoppupJoin == false) {
-            this.$socketio.emit('join', {roomId, password})
+            this.$socketio.emit('join', {roomId: roomId, password: this.password})
           }
           console.log(this.PoppupJoin);
         },
@@ -176,7 +181,10 @@
                 {
                   if (this.rooms[index].access == 'protected')
                   {
-                    this.makePopupJoin(roomId)
+                    const result = prompt("This room is protected\n password", "password")
+                    console.log(result);
+                      this.$socketio.emit('join', {roomId: roomId, password: result})
+                    // this.makePopupJoin(roomId)
                   }
                 }
               }
@@ -198,6 +206,7 @@
           }
           messages.push(message)
           this.messages = messages
+          console.log("addMessage ende");
         }
 
       },
@@ -235,11 +244,20 @@
           // }
         });
 
-        this.$socketio.on('message',(message) => {
+        this.$socketio.on('message',({message, roomId}) => {
           console.log('message');
           console.log(message);
-          this.addMessage(message)
+          console.log(roomId);
+          console.log(this.currentRoomId);
+          if(this.currentRoomId == roomId) {
+
+            console.log("this.currentRoomId == roomId");
+            this.addMessage(message)
+            console.log("this.currentRoomId == roomId behind");
+          }
+
         });
+
         this.getRooms();
         this.currentUserId = this.$store.getters.getUser._id;
 
