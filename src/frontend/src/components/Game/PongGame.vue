@@ -96,8 +96,8 @@
   					console.log("data undefined");
 					this.gameId = "";
 					this.side = "";
-					this.position.x = 0;
-					this.position.y = 0;
+					// this.position.x = 0;
+					// this.position.y = 0;
   					return;
   				}
 				console.log(data);
