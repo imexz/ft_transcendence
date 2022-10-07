@@ -71,8 +71,8 @@ export class ChatGateway {
 
   @SubscribeMessage('join')
   async joinRoom(
-    @MessageBody() roomId: number,
-    @MessageBody() password: string,
+    @MessageBody('roomId') roomId: number,
+    @MessageBody('password') password: string,
     @ConnectedSocket() client: Socket,
   ) {
     console.log("join");
@@ -81,7 +81,7 @@ export class ChatGateway {
     console.log(client.handshake.auth.id);
     // const room_name = await this.chatService.getRoomName(roomId)
     
-    if (this.chatService.manageJoin(client.handshake.auth.id, roomId))
+    if (this.chatService.manageJoin(client.handshake.auth.id, roomId, password))
     {
       client.join(roomId.toString())
     }
@@ -151,8 +151,14 @@ export class ChatGateway {
       senderId: message.user._id.toString(),
       timestamp: message.timestamp,
       avatar: message.user.avatar_url}
+
+      const test = roomId.toString()
+
+      console.log(test);
+      console.log(tmp);
       
-      client.to(roomId.toString()).emit('message', tmp);
+      
+      client.to(roomId.toString()).emit('message', {tmp, roomId});
       console.log("createMessage ende");
       return tmp;
     }

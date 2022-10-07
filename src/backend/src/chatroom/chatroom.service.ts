@@ -64,7 +64,7 @@ export class ChatroomService {
         return undefined
     }
 
-    async userToRoom(user: User, roomId: number)
+    async userToRoom(user: User, roomId: number, password?: string)
     {
         if(user != null) {
             var ret: { chatroom: chatroom, bool: boolean } 
@@ -76,6 +76,18 @@ export class ChatroomService {
                     ret.chatroom.users = [user]
                     ret.chatroom.owner = user
                 } else {
+                    if(ret.chatroom.access == 'protected')
+                    {
+                        bcrypt.compare(password, ret.chatroom.hash, function(err, result) {
+                            if(result === false) {
+                                console.log("result === false");
+                                
+                                return
+                            } else {
+                                console.log("result === true");
+                            }
+                        });   
+                    }
                     if(ret.chatroom.users.indexOf(user) == -1)
                     ret.chatroom.users.push(user)
                 }
