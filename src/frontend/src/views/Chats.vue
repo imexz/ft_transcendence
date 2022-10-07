@@ -5,16 +5,27 @@
       :messages="JSON.stringify(messages)"
       :room-actions="JSON.stringify(roomActions)"
       @send-message="sendMessage($event.detail[0])"
-      @add-room="makePopup()"
+      @add-room="makePopupCreate()"
       @room-action-handler="roomActionHandler($event.detail[0])"
       @typing-message="emitTyping($event.detail[0])"
-      @fetch-messages="updateMessages($event.detail[0])"
-    />
+      @fetch-messages="putMessages($event.detail[0])"
+    >
+    <!-- <div slot="room-list-item_1">
+      This is a new room header
+    </div> -->
+  </vue-advanced-chat>
     <creatRoomPopup
-      v-if="popupTrigger"
-      :TogglePopup="() => makePopup()" >
+      v-if="PoppupCreate"
+      :TogglePopup="() => makePopupCreate()" >
       <h2>Creat Room</h2>
     </creatRoomPopup>
+
+    <joinRoomPopup
+      v-if="PoppupJoin"
+      :TogglePopup="() => makePopupJoin()"
+      :password="password" >
+      <h2>Join Room</h2>
+    </joinRoomPopup>
   </template>
   
   <script >
@@ -24,6 +35,7 @@
   import VueAxios from 'axios';
   import { API_URL } from '@/defines';
   import creatRoomPopup from '@/components/Chat/creatRoomPopup.vue';
+  import joinRoomPopup from '@/components/Chat/joinRoomPopup.vue';
 
 
   register()
@@ -40,19 +52,26 @@
             { name: 'deleteRoom', title: 'Delete Room' }
           ],
           // socket: io,
-          popupTrigger: ref(false),
+          PoppupCreate: ref(false),
+          PoppupJoin: ref(false),
+          password: '',
           timeout: 0
 
         }
       },
       components:{
         creatRoomPopup,
+        joinRoomPopup
       },
       methods: {
-        async updateMessages(room) {
+        async putMessages({room}) {
+            this.updateMessages(room.roomId)
+        },
+
+        async updateMessages(roomId) {
           console.log("updateMessages");
-          console.log(room.room.roomId);
-          this.$socketio.emit('findAllMessages', {roomId: room.room.roomId}, (response) => {
+          console.log(roomId);
+          this.$socketio.emit('findAllMessages', {roomId: roomId}, (response) => {
             console.log(response);
             this.messages = response;
           })
@@ -66,14 +85,23 @@
             this.addMessage(response)
           })
         },
-        makePopup() {
-          console.log("makePopup");
-          this.popupTrigger = !this.popupTrigger
-          if (this.popupTrigger == false) {
+        makePopupCreate() {
+          console.log("makePopupCreate");
+          this.PoppupCreate = !this.PoppupCreate
+          if (this.PoppupCreate == false) {
             this.getRooms()
             this.initSocket()
           }
-          console.log(this.popupTrigger);
+          console.log(this.PoppupCreate);
+        },
+        makePopupJoin(roomId) {
+          console.log("makePopupJoin");
+          this.PoppupJoin = !this.PoppupJoin
+          const password = this.password
+          if (this.PoppupJoin == false) {
+            this.$socketio.emit('join', {roomId, password})
+          }
+          console.log(this.PoppupJoin);
         },
         creatRoom(){
             VueAxios({
@@ -140,15 +168,24 @@
           console.log("roomActionHandler");
           console.log(action);
           console.log(roomId);
-          this.$socketio.emit(action.name, roomId)
           switch (action.name) {
             case 'join':
+              console.log("case join");
+              for (let index = 0; index < this.rooms.length; index++) {
+                if(this.rooms[index].roomId == roomId)
+                {
+                  if (this.rooms[index].access == 'protected')
+                  {
+                    this.makePopupJoin(roomId)
+                  }
+                }
+              }
               this.updateMessages(roomId)
               break;
-            case 'leave':
-              this.updateMessages(roomId)
-              break;
-            default:
+              case 'leave':
+                this.updateMessages(roomId)
+              default:
+                this.$socketio.emit(action.name, roomId)
               break;
           }
         },
