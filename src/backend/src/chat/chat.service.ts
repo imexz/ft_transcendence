@@ -26,8 +26,13 @@ export class ChatService {
         
         async createMessage(user_id: number, roomId:number, content: string) {
             const user = await this.usersService.getUser(user_id)
-            const room = await this.chatroomService.getRoom(roomId)
-            return await this.messageService.userAddMessageToRoom(user, content, room)
+            const rooms = await this.chatroomService.getAllwithUser(user_id)
+            for (let index = 0; index < rooms.length; index++) {
+              if(rooms[index].roomId == roomId) {
+                return await this.messageService.userAddMessageToRoom(user, content, rooms[index])
+              }
+            }
+            
         }
         
         
@@ -38,9 +43,13 @@ export class ChatService {
         
         
         
-        async findAllMessages(roomId: number) {
-            
-            return await this.messageService.getAllMessagesOfRoom(roomId)
+        async findAllMessages(roomId: number, userId: number) {
+          const rooms = await this.chatroomService.getAllwithUser(userId)
+          for (let index = 0; index < rooms.length; index++) {
+            if(rooms[index].roomId == roomId) {
+              return await this.messageService.getAllMessagesOfRoom(roomId)
+            }
+          }
         }
         
         async getClientName(id: number) {
