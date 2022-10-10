@@ -6,6 +6,7 @@ import { Repository } from 'typeorm';
 import { Socket, Server } from 'socket.io';
 import { GameSetup } from './game.entities/setup.entity';
 
+
 interface QueueElem {
 	id: number;
 	socket: Socket;
@@ -72,7 +73,8 @@ export class GameService {
 		gamerepo = await this.gameRepository.save(gamerepo);
 		var p1: QueueElem = this.queue.shift();
 		var p2: QueueElem = this.queue.shift();
-		var newgame = new Game(gamerepo.id, p1.socket.handshake.auth.id, p2.socket.handshake.auth.id, this.setup);
+		const setup = new GameSetup;
+		var newgame = new Game(gamerepo.id, p1.socket.handshake.auth.id, p2.socket.handshake.auth.id, setup);
 		this.games.set(gamerepo.id, newgame);
 		this.users.set(p1.socket.handshake.auth.id, gamerepo.id);
 		this.users.set(p2.socket.handshake.auth.id, gamerepo.id);
@@ -82,7 +84,7 @@ export class GameService {
 		p2.socket.join(gamerepo.id.toString());
 		p1.socket.emit('gameInfo', {gameId: gamerepo.id, side: "left"});
 		p2.socket.emit('gameInfo', {gameId: gamerepo.id, side: "right"});
-		var intervalId = setInterval(() => this.emitData(gamerepo.id, server), 1000) as unknown as number;
+		var intervalId = setInterval(() => this.emitData(gamerepo.id, server), 10) as unknown as number;
 		console.log("intervalId %d", intervalId);
 		this.intervals.set(gamerepo.id, intervalId);
 		console.log('leaving createGame()');
