@@ -11,20 +11,32 @@
       <button 
         v-if="$store.getters.getFriends.some((us: User) => us._id == user._id)"
         class="dropdownElement"
-        @click="removeFriend">Remove Friend</button>
+        @click="removeFriend">
+        <font-awesome-icon icon="fa-solid fa-user-minus" />
+      </button>
       <button 
         v-else
         class="dropdownElement"
-        @click="addFriend">AddFriend</button>
+        @click="addFriend">
+        <font-awesome-icon icon="fa-solid fa-user-plus" />
+      </button>
       <button 
         class="dropdownElement"
-        @click="viewProfile(user?._id)">View Profile</button>
+        @click="viewProfile(user?._id)">
+        <font-awesome-icon icon="fa-solid fa-eye" />
+      </button>
       <button
-        class="dropdownElement">Send Dm</button>
+        class="dropdownElement">
+        <font-awesome-icon icon="fa-solid fa-message" />
+      </button>
       <button
-        class="dropdownElement">Block</button>
-<button
-        class="dropdownElement">Challenge to Match</button>
+        class="dropdownElement">
+        <font-awesome-icon icon="fa-solid fa-ban" />
+      </button>
+      <button
+        class="dropdownElement">
+        <font-awesome-icon icon="fa-solid fa-table-tennis-paddle-ball" />
+      </button>
     </div>
   </div>
 </template>
@@ -41,6 +53,12 @@ export default defineComponent({
     return {
       show: false as boolean,
     }
+  },
+  created() {
+    window.addEventListener('click', this.hideOnClick)  
+  },
+  unmounted() {
+    window.removeEventListener('click', this.hideOnClick)
   },
   props : {
     user: {
@@ -60,11 +78,17 @@ export default defineComponent({
         .then(this.$store.commit('addFriend', this.user))
         .catch()
     },
+    hideOnClick(e) {
+      if (!this.$el.contains(e.target)){
+        this.show = false;
+      }
+    },
     removeFriend(){
       console.log("IMPLEMENT API TO REMOVE FRIEND")
       this.$store.commit('removeFriend', this.user._id);
     },
     viewProfile(id: number){
+      this.show = false;
       this.$router.push('/profile/' + id.toString());
     },
     toggleDropdown() {
@@ -86,6 +110,7 @@ export default defineComponent({
   .userSummary {
     position: relative;
     /* width: 316px; */
+    min-width: 253px;
     border: 2px solid;
     border-image: linear-gradient(90deg, var(--ft_cyan), var(--ft_pink)) 1;
   }
@@ -98,21 +123,27 @@ export default defineComponent({
     justify-content: space-between;
   }
   .dropdownMenu {
-    display: inline-block;
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
     position: absolute;
-    background-color: var(--ft_pink);
+    border: 2px solid;
+    background-color: var(--ft_dark);
+    border-image: linear-gradient(90deg, var(--ft_cyan), var(--ft_pink)) 1;
     top: 64px;
     left: -2px;
     z-index: 1;
   }
   .dropdownElement {
-    width: 320px;
-    font-size: 20px;
+    width: 17%;
+    font-size: 25px;
     font-weight: bold;
-    text-align: end;
+    text-align: center;
     color: var(--ft_cyan);
     background-color: var(--ft_dark);
-    border: 2px solid var(--ft_pink);
+    border: 1px solid var(--ft_cyan);
+    border-radius: 5px;
+    margin: 3px;
   }
   .toggleDropdown {
     padding: 10px;
