@@ -131,7 +131,7 @@ export default defineComponent({
 
 .rightSide {
   display: flex;
-  justify-content: end; 
+  justify-content: flex-end; 
 }
 
 .rightSideElement {
