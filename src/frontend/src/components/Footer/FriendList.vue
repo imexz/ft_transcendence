@@ -37,7 +37,7 @@ export default defineComponent({
   methods: {
     toggleFriendList(): void {
       this.isCollapsed = !this.isCollapsed;
-    }
+    },
   },
   mounted() {
     this.$store.dispatch('getFriendsList')
