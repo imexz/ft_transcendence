@@ -8,12 +8,31 @@ import {
   faBars,
   faGear,
   faMessage,
+  faEye,
+  faUserPlus,
+  faUserMinus,
+  faQuestion,
+  faTableTennisPaddleBall,
+  faBan,
+  faXmark,
   } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import io from 'socket.io-client'
 import { API_URL } from "./defines"
 
-library.add(faMagnifyingGlass, faBars, faGear, faMessage)
+library.add(
+  faMagnifyingGlass,
+  faBars,
+  faGear,
+  faMessage,
+  faEye,
+  faUserPlus,
+  faUserMinus,
+  faQuestion,
+  faBan,
+  faTableTennisPaddleBall,
+  faXmark,
+)
 
 
 const app = createApp(App)

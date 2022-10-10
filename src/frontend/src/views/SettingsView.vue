@@ -141,22 +141,22 @@ export default defineComponent({
     border: none;
   }
 
-  /deep/ button {
+  :deep() button {
     color: var(--ft_cyan);
     border: 1px solid var(--ft_cyan);
     border-radius: 5px;
     background-color: var(--ft_dark);
     padding: 5px 8px;
   }
-  /deep/ button:active {
+  :deep() button:active {
     transform: translateY(1px);
   }
-  /deep/ button:hover {
+  :deep() button:hover {
     color: var(--ft_dark);
     background-color: var(--ft_cyan);
   }
 
-  /deep/ input {
+  :deep() input {
     color: var(--ft_cyan);
     background-color: var(--ft_dark);
     padding: 5px 8px;
