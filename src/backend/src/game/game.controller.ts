@@ -2,7 +2,6 @@ import { Controller, Sse, Param } from '@nestjs/common';
 import { GameService } from './game.service';
 import { map, interval, Observable } from 'rxjs';
 import { Game } from './game.entities/game.entity';
-// import { Ball } from './game.entities/ball.entity';
 import { Paddle } from './game.entities/paddle.entity';
 import { Score } from './game.entities/score.entity';
 import { GameSetup } from './game.entities/setup.entity';

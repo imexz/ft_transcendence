@@ -5,12 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Socket, Server } from 'socket.io';
 import { GameSetup } from './game.entities/setup.entity';
-
-
-interface QueueElem {
-	id: number;
-	socket: Socket;
-};
+import { QueueElem } from './game.interfaces/queueobj.interface'
 
 @Injectable()
 export class GameService {
@@ -24,8 +19,9 @@ export class GameService {
 	users = new Map<string, number>(); // Key: UserId, Value: GameId
 	games = new Map<number, Game>(); // Key: GameId, Value: Game
 	intervals = new Map<number, number>(); // Key: GameId, Value: IntervalId
+	sockets = new Map<number, Socket[]>();
 
-	getSideFromGame(game: Game, playerid: string): string {
+	#getSideFromGame(game: Game, playerid: string): string {
 		if (game.playerLeft === playerid) {
 			return "left";
 		} else if (game.playerRight === playerid) {
@@ -42,7 +38,7 @@ export class GameService {
 			console.log("client %d already is in users", client.handshake.auth.id);
 			client.emit('gameInfo', {
 					gameId: gameid,
-					side: this.getSideFromGame(this.games.get(gameid), client.handshake.auth.id),
+					side: this.#getSideFromGame(this.games.get(gameid), client.handshake.auth.id),
 				});
 			client.join(gameid.toString());
 		}
@@ -59,55 +55,73 @@ export class GameService {
 			console.log("add %s to queue", client.handshake.auth.id);
 			this.queue.push({id: client.handshake.auth.id, socket: client});
 			while (this.queue.length > 1) {
-				await this.createGame(server);
+				await this.#initializeGame(server);			
 			}
 		} else {
 			console.log("%s already is in queue", client.handshake.auth.id);
 		}
 	}
+	
+	async #initializeGame(server: Server) {
+		let game: Game = await this.#createGameInstance();
+		this.#updateMaps(game);
+		this.#joinSocketsToDedicatedRoom(game);
+		this.#emitGameInfoToFrontend(game);
+		this.#startGame(server, game.id);
+	}
 
-	async createGame(server: Server) {
-		console.log('inside createGame()');
+	async #createGameInstance(): Promise<Game> {
+		console.log('inside createGameInstance()');
 		var gamerepo = this.gameRepository.create();
 		console.log("after repo create");
 		gamerepo = await this.gameRepository.save(gamerepo);
-		var p1: QueueElem = this.queue.shift();
-		var p2: QueueElem = this.queue.shift();
+		var firstPlayer: QueueElem = this.queue.shift();
+		var secondPlayer: QueueElem = this.queue.shift();
+		this.sockets.set(gamerepo.id, [firstPlayer.socket, secondPlayer.socket]);
 		const setup = new GameSetup;
-		var newgame = new Game(gamerepo.id, p1.socket.handshake.auth.id, p2.socket.handshake.auth.id, setup);
-		this.games.set(gamerepo.id, newgame);
-		this.users.set(p1.socket.handshake.auth.id, gamerepo.id);
-		this.users.set(p2.socket.handshake.auth.id, gamerepo.id);
-		console.log("gameid = %d", gamerepo.id);
-		console.log(this.users);
-		p1.socket.join(gamerepo.id.toString());
-		p2.socket.join(gamerepo.id.toString());
-		p1.socket.emit('gameInfo', {gameId: gamerepo.id, side: "left"});
-		p2.socket.emit('gameInfo', {gameId: gamerepo.id, side: "right"});
-		var intervalId = setInterval(() => this.emitData(gamerepo.id, server), 10) as unknown as number;
-		console.log("intervalId %d", intervalId);
-		this.intervals.set(gamerepo.id, intervalId);
-		console.log('leaving createGame()');
+		console.log('leaving createGameInstance()');
+		return new Game(gamerepo.id, firstPlayer.socket.handshake.auth.id, secondPlayer.socket.handshake.auth.id, setup);
 	}
 
-	emitData(gameId: number, server: Server) {
+	#updateMaps(game: Game) {
+		this.games.set(game.id, game);
+		this.users.set(game.playerRight, game.id);
+		this.users.set(game.playerLeft, game.id);
+	}
+
+	#joinSocketsToDedicatedRoom(game: Game) {
+		this.sockets.get(game.id)[0].join(game.id.toString());
+		this.sockets.get(game.id)[1].join(game.id.toString());
+	}
+
+	#emitGameInfoToFrontend(game: Game) {
+		this.sockets.get(game.id)[0].emit('gameInfo', {gameId: game.id, side: "left"});
+		this.sockets.get(game.id)[1].emit('gameInfo', {gameId: game.id, side: "right"});
+	}
+
+	#emitGameData(gameId: number, server: Server) {
 		server.to(gameId.toString()).emit('updateGame', this.getData(gameId));
+	}
+
+	#startGame(server: Server, gameid: number) {
+		var intervalId = setInterval(() => this.#emitGameData(gameid, server), 10) as unknown as number;
+		this.intervals.set(gameid, intervalId);
 	}
 
 	getData(id: number): Game | undefined {
 		if (this.games.get(id) === undefined) {
 			return undefined;
 		}
-		this.updateData(id);
-		this.collisionControl(id);
-		if (this.scored(id)){
-			this.reset(id);
+		this.#updateData(id);
+		this.#collisionControl(id);
+		if (this.#scored(id)){
+			this.#reset(id);
 		}
-		// this.isGameFinished(id);
+		this.isGameFinished(id);
 		return this.games.get(id);
 	}
 
-	updateData(id: number) {
+	#updateData(id: number) {
 		this.games.get(id).ball.position.x += this.games.get(id).ball.direction.x;
 		this.games.get(id).ball.position.y += this.games.get(id).ball.direction.y;
 		// if (this.ball.direction.x > 0) {
@@ -135,15 +149,15 @@ export class GameService {
 				this.games.get(id).ball.direction.y *= -1;
 			}
 		}
-		console.log("gameid: %d | ball: x %d, y %d", id, this.games.get(id).ball.position.x, this.games.get(id).ball.position.y);
+		// console.log("gameid: %d | ball: x %d, y %d", id, this.games.get(id).ball.position.x, this.games.get(id).ball.position.y);
 	}
 
-	isBallWithinPaddleRange(id: number, paddle: Paddle): boolean {
+	#isBallWithinPaddleRange(id: number, paddle: Paddle): boolean {
 		return (this.games.get(id).ball.position.y >= paddle.position.y &&
 			this.games.get(id).ball.position.y <= paddle.position.y + paddle.height)
 	}
 
-	isBallAtPaddle(id: number, paddle: Paddle): boolean {
+	#isBallAtPaddle(id: number, paddle: Paddle): boolean {
 		let ret: boolean = false;
 		if (paddle.id == "left") {
 			ret = this.games.get(id).ball.position.x - this.games.get(id).ball.radius <= paddle.position.x + paddle.width;
@@ -153,11 +167,11 @@ export class GameService {
 		return ret;
 	}
 
-	calcAngle(id: number, paddle: Paddle) {
+	#calcAngle(id: number, paddle: Paddle) {
 		var section: number;
 
 		section = paddle.height / 8;
-		if (this.isBallWithinPaddleRange(id, paddle)) {
+		if (this.#isBallWithinPaddleRange(id, paddle)) {
 			var i: number = 1;
 			while (this.games.get(id).ball.position.y > (paddle.position.y + i * section)) {
 				i++;
@@ -166,28 +180,28 @@ export class GameService {
 		}
 	}
 
-	updateBallDirection(id: number, paddle: Paddle) {
-		this.calcAngle(id, paddle);
+	#updateBallDirection(id: number, paddle: Paddle) {
+		this.#calcAngle(id, paddle);
 		this.games.get(id).ball.direction.x = this.games.get(id).ball.direction.speed * Math.cos(this.games.get(id).ball.direction.angle * (Math.PI / 180));
 		this.games.get(id).ball.direction.y = this.games.get(id).ball.direction.speed * Math.sin(this.games.get(id).ball.direction.angle * (Math.PI / 180));
 	}
 
-	collisionControl(id: number) {
+	#collisionControl(id: number) {
 		if (this.games.get(id).ball.direction.x > 0) {
-			if (this.isBallAtPaddle(id, this.games.get(id).paddleRight) &&
-				this.isBallWithinPaddleRange(id, this.games.get(id).paddleRight)) {
-					this.updateBallDirection(id, this.games.get(id).paddleRight);
+			if (this.#isBallAtPaddle(id, this.games.get(id).paddleRight) &&
+				this.#isBallWithinPaddleRange(id, this.games.get(id).paddleRight)) {
+					this.#updateBallDirection(id, this.games.get(id).paddleRight);
 			}
 		}
 		else {
-			if (this.isBallAtPaddle(id, this.games.get(id).paddleLeft) &&
-				this.isBallWithinPaddleRange(id, this.games.get(id).paddleLeft)) {
-					this.updateBallDirection(id, this.games.get(id).paddleLeft);
+			if (this.#isBallAtPaddle(id, this.games.get(id).paddleLeft) &&
+				this.#isBallWithinPaddleRange(id, this.games.get(id).paddleLeft)) {
+					this.#updateBallDirection(id, this.games.get(id).paddleLeft);
 			}
 		}
 	}
 
-	scored(id: number): boolean {
+	#scored(id: number): boolean {
 		var ret: boolean = false;
 		if (this.games.get(id).ball.position.x - this.games.get(id).ball.radius <= 0) {
 			this.games.get(id).score.scoreRight += this.games.get(id).score.increaseRight;
@@ -202,7 +216,7 @@ export class GameService {
 		return ret;
 	}
 
-	reset(id: number) {
+	#reset(id: number) {
 		this.games.get(id).ball.position.x = this.setup.ballPos.x;
 		this.games.get(id).ball.position.y = this.setup.ballPos.y;
 		this.games.get(id).ball.direction.speed = this.setup.ballDir.speed;
@@ -222,7 +236,7 @@ export class GameService {
 		this.games.get(id).score.increaseRight = this.setup.scoreIncrease;
 	}
 
-	isGameFinished(id: number) {
+	#isGameFinished(id: number) {
 		var game: Game = this.games.get(id);
 		if (game.score.scoreLeft == 10 || game.score.scoreRight == 10) {
 			clearInterval(this.intervals.get(id));
@@ -230,8 +244,11 @@ export class GameService {
 			this.users.delete(game.playerLeft);
 			this.users.delete(game.playerRight);
 			this.games.delete(id);
+			this.sockets.get(id)[0].leave(id.toString());
+			this.sockets.get(id)[1].leave(id.toString());
+			this.sockets.delete(id);
 			console.log("game finished, keys removed");
-			// TODO: sockets have to leave the related room
+			// TODO: delete room (?)
 			// TODO: reset frontend variables
 		}
 	}
