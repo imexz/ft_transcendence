@@ -34,7 +34,8 @@ export default defineComponent({
     margin: auto;
     padding: 30px;
     width: 800px;
-    border: 2px solid var(--ft_cyan);
+    background-color: var(--ft_dark);
+    /* border: 2px solid var(--ft_cyan); */
     /* border-radius: 10px 10px 0px 0px; */
     /* background: linear-gradient(0deg ,var(--ft_cyan), var(--ft_dark) 80%, var(--ft_pink)) ; */
   }

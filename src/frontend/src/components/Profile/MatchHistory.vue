@@ -1,13 +1,35 @@
 <template>
   <div class="container">
     <div class="statistics">
-      Games Played: {{ matchData.length }}
+      <div class="headLine">
+        Statistics
+      </div>
+      <div>
+        Games Played: {{ matchData.length }}
+      </div>
+      <div>
+      Winrate: {{ 
+        (matchData.filter(obj => {
+        return obj.myScore > obj.opponentScore
+      }).length / matchData.length * 100).toFixed(2)}}%
+      </div>
+      <div>
+        W: {{ (matchData.filter(obj => {
+        return obj.myScore > obj.opponentScore
+        }).length) }}
+        L: {{ (matchData.filter(obj => {
+        return obj.myScore < obj.opponentScore
+        }).length) }}
+        D: {{ (matchData.filter(obj => {
+        return obj.myScore == obj.opponentScore
+        }).length) }}
+      </div>
     </div>
-    <div>
+    <div class="matchHistory" >
       <div class="headLine">
         MatchHistory
       </div>
-      <div class="matchHistory">
+      <div class="matches">
         <div v-for="match in matchData">
           <MatchSummary :match=match></MatchSummary>
         </div>
@@ -54,7 +76,7 @@ export default defineComponent({
   components: {
     UserSummary,
     MatchSummary
-}
+  },
 })
 
 </script>
@@ -62,20 +84,37 @@ export default defineComponent({
 <style scoped>
 
 .container {
+  margin-top: 20px;
   display: flex;
+  justify-content: space-between;
+
 }
 
 .headLine {
-  border: 1px solid var(--ft_cyan);
-  border-radius: 10px;
+  border-bottom: 1px solid var(--ft_cyan);
+  /* border-radius: 10px; */
   font-size: 32px;
   font-weight: bold;
   padding: 10px 0px;
-  margin-bottom: 20px;
+  /* margin-bottom: 20px; */
 }
 
 .matchHistory {
-  border: 10px solid var(--ft_cyan);
+  overflow: hidden;
+  border: 1px solid var(--ft_cyan);
+  border-radius: 10px;
+  margin-left: 5px;
+  width: 66%;
+}
+
+.statistics {
+  border: 1px solid var(--ft_cyan);
+  border-radius: 10px;
+  margin-right: 5px;
+  width: 34%;
+}
+.matches {
+  /* border: 2px solid var(--ft_cyan); */
   /* border-radius: 10px; */
   height: 450px;
   overflow-y: scroll;
