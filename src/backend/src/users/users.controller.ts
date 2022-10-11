@@ -29,7 +29,6 @@ export class UsersController {
 	@UseGuards(JwtAuthGuard)
 	addUser(@Body() user: User){
 		// console.log(user);
-
 		return  this.usersService.addUser(user);
 	}
 
