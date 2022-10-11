@@ -64,16 +64,16 @@ export default defineComponent({
   .profile {
     position: relative;
     top: 30px;
-    margin-bottom: 30px;
+    margin-bottom: 40px;
     display: flex;
     justify-content: flex-start;
     align-items: center;
     width: 100%;
     height: 170px;
     /* background-color: var(--ft_red); */
-    background: linear-gradient(-90deg, var(--ft_red), var(--ft_dark));
+    background: linear-gradient(-90deg, var(--ft_pink), var(--ft_dark));
     border: 2px solid var(--ft_cyan);
-    border-radius: 0px 10px 0px 0px;
+    border-radius: 0px 10px 10px 10px;
     border-left: none;
 
   }
@@ -97,7 +97,7 @@ export default defineComponent({
     height: 200px;
     object-fit: cover;
     border: 2px solid var(--ft_cyan);
-    border-radius: 10px 10px 0px 0px;
+    border-radius: 10px 10px 0px 10px;
     border-bottom: none;
     /* border-image-slice: 1;
     border-image-source: linear-gradient(var(--ft_cyan), var(--ft_pink)); */
