@@ -1,10 +1,17 @@
 <template>
-  <div class="matchHistory">
-    <div>
-      <h1>MatchHistory</h1>
+  <div class="container">
+    <div class="statistics">
+      Games Played: {{ matchData.length }}
     </div>
-    <div v-for="match in matchData">
-      <MatchSummary :match=match></MatchSummary>
+    <div>
+      <div class="headLine">
+        MatchHistory
+      </div>
+      <div class="matchHistory">
+        <div v-for="match in matchData">
+          <MatchSummary :match=match></MatchSummary>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -20,6 +27,18 @@ export default defineComponent({
   data() {
     return {
       matchData: [
+        { opponent: 1, myScore: 6, opponentScore: 10 },
+        { opponent: 2, myScore: 10, opponentScore: 3},
+        { opponent: 2, myScore: 10, opponentScore: 10},
+        { opponent: 1, myScore: 6, opponentScore: 10 },
+        { opponent: 1, myScore: 6, opponentScore: 10 },
+        { opponent: 2, myScore: 10, opponentScore: 3},
+        { opponent: 2, myScore: 10, opponentScore: 10},
+        { opponent: 1, myScore: 6, opponentScore: 10 },
+        { opponent: 2, myScore: 10, opponentScore: 3},
+        { opponent: 2, myScore: 10, opponentScore: 3},
+        { opponent: 2, myScore: 10, opponentScore: 10},
+        { opponent: 2, myScore: 10, opponentScore: 10},
         { opponent: 1, myScore: 6, opponentScore: 10 },
         { opponent: 2, myScore: 10, opponentScore: 3},
         { opponent: 2, myScore: 10, opponentScore: 10},
@@ -42,8 +61,24 @@ export default defineComponent({
 
 <style scoped>
 
-/* .matchHistory {
-  width: 480px;
-} */
+.container {
+  display: flex;
+}
+
+.headLine {
+  border: 1px solid var(--ft_cyan);
+  border-radius: 10px;
+  font-size: 32px;
+  font-weight: bold;
+  padding: 10px 0px;
+  margin-bottom: 20px;
+}
+
+.matchHistory {
+  border: 10px solid var(--ft_cyan);
+  /* border-radius: 10px; */
+  height: 450px;
+  overflow-y: scroll;
+}
 
 </style>
