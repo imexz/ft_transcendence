@@ -64,7 +64,7 @@ export class ChatroomService {
         return undefined
     }
 
-    async userToRoom(user: User, roomId: number, password?: string)
+    async userToRoom(user: User, roomId: number, password?: string): Promise<boolean>
     {
         if(user != null) {
             var ret: { chatroom: chatroom, bool: boolean } 
@@ -76,22 +76,31 @@ export class ChatroomService {
                     ret.chatroom.users = [user]
                     ret.chatroom.owner = user
                 } else {
-                    if(ret.chatroom.access == 'protected')
-                    {
-                        bcrypt.compare(password, ret.chatroom.hash, function(err, result) {
-                            if(result === false) {
+                    switch (ret.chatroom.access) {
+                        case 'protected':
+                            // bcrypt.compare()                 
+                            if(await bcrypt.compare(password, ret.chatroom.hash) == false) {
                                 console.log("result === false");
-                                
-                                return
+                                return false
                             } else {
+                                // console.log(result);
+                                // console.log(err);
+                                // console.log(password);
+                                // console.log(ret.chatroom.hash);
+                                // console.log(ret.chatroom);
                                 console.log("result === true");
+                                if(ret.chatroom.users.indexOf(user) == -1)
+                                    ret.chatroom.users.push(user)
+                                    // this.chatroomRepository.save(ret.chatroom)
                             }
-                        });   
-                    }
-                    if(ret.chatroom.users.indexOf(user) == -1)
-                    ret.chatroom.users.push(user)
+                        
+                        case 'public':
+                        default:
+                            break;
+                    }                   
                 }
                 this.chatroomRepository.save(ret.chatroom)
+                return true
             }
         }
     }
@@ -188,15 +197,23 @@ export class ChatroomService {
             room.admins = [user]
             room.users = [user]
             room.access = access
-            if (access == 'protected' && password){
-                bcrypt.hash(password, 10, function(err, hash) {
+            if (access == 'protected' && password) {
+                console.log("password set");
+                bcrypt.hash(password, 10, async (err, hash: string) => {
+                    console.log("room hash");
                     if (err) {
                         console.log("error hashing");                   
                         return undefined
                     }
                     room.hash = hash
+                    console.log("geht");
+                    console.log(room.hash)
+                    return await this.chatroomRepository.save(room);     
                 })    
-            } 
+            } else {
+                console.log("no password set");
+            }
+            // console.log("room hash after")
             return await this.chatroomRepository.save(room);     
         }
         return undefined

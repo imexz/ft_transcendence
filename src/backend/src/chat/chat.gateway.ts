@@ -59,7 +59,7 @@ export class ChatGateway {
     for (let index = 0; index < rooms.length; index++) {
       tmp.push(rooms[index].roomId.toString())
     }
-    console.log(tmp);
+    // console.log(tmp);
     
     socket.join(tmp)
     // console.log(socket.handshake);
@@ -113,7 +113,7 @@ export class ChatGateway {
     // const room_name = await this.chatService.getRoomName(roomId)
     // const name = client.id
     const userId = client.handshake.auth.id
-    client.to(roomId.toString()).emit('typing', { userId, isTyping , roomId});
+    client.to(roomId.toString()).emit('typing', { userId: userId , isTyping , roomId});
     // console.log("recive and emit typing");
 
   }
@@ -146,21 +146,27 @@ export class ChatGateway {
     
     // client.to(room_name).emit('message', message);
     if(message) {
-      const tmp = {_id: message._id,
-      content: message.content,
-      senderId: message.user._id.toString(),
-      timestamp: message.timestamp,
-      avatar: message.user.avatar_url}
+      const tmp = {
+      senderId: client.handshake.auth.id.toString(),
+      _id: message._id,
+      content: content,
+      avatar: message.user.avatar_url,
+      timestamp: message.timestamp }
+      // _id: 0,
+      // indexId: 12092,
 
       const test = roomId.toString()
 
-      console.log(test);
-      console.log(tmp);
+      // console.log(test);
+      console.log({tmp, roomId});
       
       
-      client.to(roomId.toString()).emit('message', {tmp, roomId});
+      client.to(roomId.toString()).emit('message', {message: tmp, roomId});
       console.log("createMessage ende");
       return tmp;
+    } else {
+      console.log("message == empty");
+      
     }
       
       // console.log(client.);

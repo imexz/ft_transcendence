@@ -25,6 +25,8 @@ export class ChatroomController {
         @Body("access") access: string, 
         @Body("password") password: string)
     {
+        console.log("password");
+        console.log(password);
         
         if(await this.chatroomService.addRoom(room_name, access, req.user, password) == undefined)
             throw new HttpException('Forbidden', HttpStatus.CONFLICT);
