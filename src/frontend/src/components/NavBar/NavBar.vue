@@ -98,6 +98,10 @@ export default defineComponent({
   border: 2px solid var(--c);
   border-radius: 10px;
   user-select: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 250px;
   --c : var(--cold);
 }
 .currentUser:hover {
