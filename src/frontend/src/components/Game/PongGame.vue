@@ -8,8 +8,14 @@
 			style="border: 1px solid white;"
 		>
 		</canvas>
-		<div>
+		<!-- <div>
 			<ScoreCounter />
+		</div> -->
+		<div id = "scoreLeft">
+			{{left}}
+		</div>
+		<div id = "scoreRight">
+			{{right}}
 		</div>
 	</div>
 	<div class="queue" v-else >
@@ -31,15 +37,14 @@
   			gameId: "" as string,
   			gamesocket: null as Socket,
   			context: null as any,
-  			// position: {
-  			// 	x: 0 as number,
-  			// 	y: 0 as number,
-  			// },
   			side: "" as string,
+			left: 0 as number,
+			right: 0 as number,
+			finished: false as boolean,
   		}
   	},
   	components: {
-  		ScoreCounter
+  		// ScoreCounter
   	},
   	created() { // always called when Component is initialized (e.g. on refresh)
   		console.log("in created");
@@ -52,9 +57,10 @@
   			console.log("event gameInfo received");
   			this.gameId = data.gameId;
   			this.side = data.side;
+			this.finished = false;
   			console.log("received GameId: %s, side: %s", this.gameId, this.side);
   			document.addEventListener('keydown', (event) => {
-  				if (this.side === "left") {
+  				if (this.side === "left" && !this.finished) {
   					if (event.key == 'w') {
   						console.log(event.key);
   						this.paddleLeftUp();
@@ -63,7 +69,7 @@
   						console.log(event.key);
   						this.paddleLeftDown();
   					}
-  				} else if (this.side === "right") {
+  				} else if (this.side === "right" && !this.finished) {
   					if (event.key == 'ArrowUp') {
   						console.log(event.key);
   						this.paddleRightUp();
@@ -96,19 +102,19 @@
   					console.log("data undefined");
 					this.gameId = "";
 					this.side = "";
-					// this.position.x = 0;
-					// this.position.y = 0;
+					this.left = 0;
+					this.right = 0;
   					return;
   				}
+				this.finished = data.finished;
+				this.left = data.score.scoreLeft;
+				this.right = data.score.scoreRight;
 				console.log(data);
   				this.context = (this.$refs.game as any).getContext("2d");
   				this.context.fillStyle = "#FFFFFF";
-  				// this.position.x = data.ball.position.x;
-  				// this.position.y = data.ball.position.y;
   				this.context.clearRect(0, 0, (this.$refs.game as any).width, (this.$refs.game as any).height);
   				this.context.beginPath();
   				this.context.arc(data.ball.position.x, data.ball.position.y, data.ball.radius, 0, 2 * Math.PI);
-  				// this.context.arc(this.position.x, this.position.y, data.ball.radius, 0, 2 * Math.PI);
   				this.context.fill();
   				this.drawPaddles(data);
 			})
@@ -155,6 +161,22 @@
 	padding-top: 100px;
 	font-size: 20px;
 	text-align: center;
+}
+
+#scoreLeft {
+  transform-style: preserve-3d;
+  font-size:90px;
+  line-height: 90px;
+  float: left;
+  position: relative;
+}
+#scoreRight {
+  transform-style: preserve-3d;
+  font-size:90px;
+  line-height: 90px;
+  float: left;
+  position: relative;
+  left: 560px;
 }
 
 </style>

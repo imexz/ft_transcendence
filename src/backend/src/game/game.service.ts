@@ -117,7 +117,7 @@ export class GameService {
 		if (this.#scored(id)){
 			this.#reset(id);
 		}
-		this.isGameFinished(id);
+		this.#isGameFinished(id);
 		return this.games.get(id);
 	}
 
@@ -238,7 +238,7 @@ export class GameService {
 
 	#isGameFinished(id: number) {
 		var game: Game = this.games.get(id);
-		if (game.score.scoreLeft == 10 || game.score.scoreRight == 10) {
+		if (game.finished) {
 			clearInterval(this.intervals.get(id));
 			this.intervals.delete(id);
 			this.users.delete(game.playerLeft);
@@ -250,6 +250,9 @@ export class GameService {
 			console.log("game finished, keys removed");
 			// TODO: delete room (?)
 			// TODO: reset frontend variables
+		}
+		if (game.score.scoreLeft == 10 || game.score.scoreRight == 10) {
+			game.finished = true;
 		}
 	}
 
