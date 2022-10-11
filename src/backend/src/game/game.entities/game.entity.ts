@@ -22,6 +22,7 @@ export class Game {
 	paddleLeft = new Paddle;
 	paddleRight = new Paddle;
 	score = new Score;
+	finished: boolean = false;
 
 	@Column()
 	scoreLeft: number = 0;
@@ -66,6 +67,8 @@ export class Game {
 		this.scoreRight = 0;
 		this.score.increaseLeft = gsetup.scoreIncrease;
 		this.score.increaseRight = gsetup.scoreIncrease;
+
+		this.finished = false;
 		}
 	console.log("leaving Game constructor");
 	}
