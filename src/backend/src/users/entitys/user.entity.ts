@@ -45,7 +45,7 @@ export class User {
 	avatar?:fileEntity;
 
 	@ManyToMany(() => User)
-	@JoinTable({ joinColumn: { name: 'users_id_1' } })
+	@JoinTable({ joinColumn: { name: 'users_id_1'} })
 	friends?: User[];
 
 	@Column({nullable: true})
@@ -66,21 +66,18 @@ export class User {
 	@JoinTable()
 	games?: Game[];
 
-
-
-
 	@Column({ nullable: true })
   	twoFactorAuthenticationSecret?: string;
 
 	@Column({ default: false })
 	isTwoFactorAuthenticationEnabled: boolean;
 
-	@ManyToMany(() => User, user => user.receivedRequests)
-	@JoinTable({joinColumn: {name: 'senderId'}})
-	sendRequest?: User[];
+	// @ManyToMany(() => User, user => user.receivedRequests)
+	// @JoinTable({joinColumn: {name: 'senderId'}})
+	// sendRequest?: User[];
 
-	@ManyToMany(() => User, user => user.sendRequest)
-	receivedRequests?: User[];
+	// @ManyToMany(() => User, user => user.sendRequest)
+	// receivedRequests?: User[];
 
 	@ManyToMany(() => User, user => user.blocked_me)
 	@JoinTable({joinColumn: {name: 'senderId'}})

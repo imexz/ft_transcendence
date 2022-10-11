@@ -58,8 +58,7 @@
           PoppupJoin: ref(false),
           password: '',
           timeout: 0,
-          
-
+          typing: false,
         }
       },
       components:{
@@ -83,6 +82,7 @@
         },
         sendMessage({ roomId, content, files, replyMessage, usersTag }) {
           console.log("createMessage");
+          console.log(roomId);
           this.$socketio.emit('createMessage', { roomId: roomId, content: content}, (response) =>
           {
             console.log("createMessage response");
@@ -132,13 +132,21 @@
         },
       
         emitTyping({ roomId, message }) {
-          // console.log(message);
+          console.log("emitTyping");
           console.log(roomId);
-          console.log(message);
-          this.$socketio.emit('typing', {isTyping: true, roomId: roomId});
-          this.timeout = setTimeout(() => {
-            this.$socketio.emit('typing', { isTyping: false, roomId: roomId});
-          }, 2000);
+          console.log(this.timeout);
+          if(this.typing == false)
+          {
+            this.$socketio.emit('typing', {isTyping: true, roomId: roomId});
+            this.typing = true
+          
+            this.timeout = setTimeout(() => {
+              if(this.typing == true) {
+                this.$socketio.emit('typing', { isTyping: false, roomId: roomId});
+                this.typing = false
+              }
+            }, 2000);
+          }
           console.log("emit typing ");
           // console.log("roomId");
           // console.log(roomId.roomId);
@@ -184,7 +192,9 @@
                     const result = prompt("This room is protected\n password", "password")
                     console.log(result);
                       this.$socketio.emit('join', {roomId: roomId, password: result})
-                    // this.makePopupJoin(roomId)
+                      // this.makePopupJoin(roomId)
+                    } else {
+                      this.$socketio.emit('join', {roomId: roomId})
                   }
                 }
               }
@@ -206,6 +216,10 @@
           }
           messages.push(message)
           this.messages = messages
+          console.log(this.messages.length);
+          console.log(this.messages[this.messages.length - 1]);
+          console.log(this.messages[this.messages.length - 2]);
+
           console.log("addMessage ende");
         }
 
@@ -226,22 +240,28 @@
           })
           console.log(room.roomId)
           console.log(isTyping)
+          console.log(userId)
 
-          // console.log(room.typingUsers)
-          // if(isTyping) {
-          //   console.log(room.typingUsers)
-          //   // room.typingUsers = [...room.typingUsers, userId]
-          //   room.typingUsers = [userId]
-          // } 
-          // else {
-          //   const index = room.typingUsers.indexOf(userId)
-          //   typingUsers = []
-          //   for (let i = 0; i < room.typingUsers.length; i++) {
-          //     if (room.typingUsers[i] != userId)
-          //       typingUsers.push(room.typingUsers[i])
-          //   }
-          //   room.typingUsers = typingUsers
-          // }
+          console.log(room.typingUsers)
+          if(isTyping) {
+            console.log(room.typingUsers)
+            if(room.typingUsers == undefined || room.typingUsers.length == 0)
+              room.typingUsers = [ userId ]
+            else if(room.typingUsers.indexOf(userId) == -1)
+              room.typingUsers = [...room.typingUsers, userId]
+
+          } else {
+            const typingUsers = []
+            for (let i = 0; i < room.typingUsers.length; i++) {
+                if (room.typingUsers[i] != userId)
+                  typingUsers.push(room.typingUsers[i])
+              }
+              room.typingUsers = typingUsers
+          }
+
+          console.log("before ende typing");
+          console.log(room.typingUsers);
+          console.log("ende typing");
         });
 
         this.$socketio.on('message',({message, roomId}) => {
@@ -254,7 +274,10 @@
             console.log("this.currentRoomId == roomId");
             this.addMessage(message)
             console.log("this.currentRoomId == roomId behind");
+          } else {
+            console.log("message for an other room");
           }
+          console.log("message ende");
 
         });
 
