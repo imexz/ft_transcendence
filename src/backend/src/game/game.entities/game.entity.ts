@@ -6,6 +6,8 @@ import { GameSetup } from "./setup.entity";
 import { Paddle } from "./paddle.entity";
 import { Score } from "./score.entity";
 import { PosXY } from "../game.interfaces/pos.interface";
+import { QueueElem } from "../game.interfaces/queueobj.interface";
+import { Socket } from "socket.io"
 
 @Entity()
 export class Game {
@@ -14,14 +16,11 @@ export class Game {
 	id: number;
 	@ManyToMany(() => User, (User) => User.games)
 	player: User[];
-
 	playerRight: string;
 	playerLeft: string;
-
 	ball = new Ball;
 	paddleLeft = new Paddle;
 	paddleRight = new Paddle;
-
 	score = new Score;
 
 	@Column()
@@ -30,6 +29,7 @@ export class Game {
 	@Column()
 	scoreRight: number = 0;
 
+	// constructor(gameid: number, p1: string, p2: string, p1s: Socket, p2s: Socket, gsetup: GameSetup) {
 	constructor(gameid: number, p1: string, p2: string, gsetup: GameSetup) {
 		console.log("in Game constructor");
 		this.id = gameid;
@@ -44,9 +44,6 @@ export class Game {
 		console.log(gsetup);
 		this.ball.radius = gsetup.ballRadius;
 		this.ball.position = gsetup.ballPos;
-		// this.ball.position = new PosXY()
-		// this.ball.position.x = gsetup.ballPos.x;
-		// this.ball.position.y = gsetup.ballPos.y;
 		this.ball.direction = gsetup.ballDir;
 
 		this.paddleLeft.id = "left";
