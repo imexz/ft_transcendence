@@ -117,7 +117,7 @@ export class GameService {
 		if (this.#scored(id)){
 			this.#reset(id);
 		}
-		this.isGameFinished(id);
+		this.#isGameFinished(id);
 		return this.games.get(id);
 	}
 
