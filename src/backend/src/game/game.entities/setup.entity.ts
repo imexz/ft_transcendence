@@ -7,7 +7,7 @@ export class GameSetup {
 	ballSpeed: number = 10;
 	ballDir: BallDirObj = {
 		angle: Math.random() * 2 * Math.PI,
-		speed: 10,
+		speed: 1,
 		x: 1,
 		y: 1,
 	};

@@ -42,7 +42,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
   @SubscribeMessage('checkGame')
   handleCheckGame(@ConnectedSocket() client: Socket): boolean {
-	  return this.gameService.checkGame(client);
+	  return this.gameService.checkForExistingGame(client);
   }
 
   @SubscribeMessage('moveLeftUp')

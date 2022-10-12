@@ -32,17 +32,17 @@ export class Game {
 
 	// constructor(gameid: number, p1: string, p2: string, p1s: Socket, p2s: Socket, gsetup: GameSetup) {
 	constructor(gameid: number, p1: string, p2: string, gsetup: GameSetup) {
-		console.log("in Game constructor");
+		// console.log("in Game constructor");
 		this.id = gameid;
 		this.playerLeft = p1;
 		this.playerRight = p2;
 
 		if (gsetup == undefined) {
-			console.log("gsetup undefined");
+			// console.log("gsetup undefined");
 		}
 		else {
 
-		console.log(gsetup);
+		// console.log(gsetup);
 		this.ball.radius = gsetup.ballRadius;
 		this.ball.position = gsetup.ballPos;
 		this.ball.direction = gsetup.ballDir;
@@ -70,6 +70,6 @@ export class Game {
 
 		this.finished = false;
 		}
-	console.log("leaving Game constructor");
+		// console.log("leaving Game constructor");
 	}
 }

@@ -6,9 +6,14 @@ import { Repository } from 'typeorm';
 import { Socket, Server } from 'socket.io';
 import { GameSetup } from './game.entities/setup.entity';
 import { QueueElem } from './game.interfaces/queueobj.interface'
+import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class GameService {
+
+	constructor(
+		private userService: UsersService,
+	){}
 
 	setup = new GameSetup;
 
@@ -19,7 +24,7 @@ export class GameService {
 	users = new Map<string, number>(); // Key: UserId, Value: GameId
 	games = new Map<number, Game>(); // Key: GameId, Value: Game
 	intervals = new Map<number, number>(); // Key: GameId, Value: IntervalId
-	sockets = new Map<number, Socket[]>();
+	sockets = new Map<number, Socket[]>(); // Key: GameId, Value: Array of Sockets
 
 	#getSideFromGame(game: Game, playerid: string): string {
 		if (game.playerLeft === playerid) {
@@ -30,7 +35,7 @@ export class GameService {
 			return "";
 	}
 
-	checkGame(client: Socket): boolean {
+	checkForExistingGame(client: Socket): boolean {
 		var ret: boolean = false;
 		var gameid = this.users.get(client.handshake.auth.id);
 		if (gameid != undefined) {
@@ -50,12 +55,12 @@ export class GameService {
 			id: client.handshake.auth.id,
 			socket: client,
 		}
-		console.log(this.queue);
+		// console.log(this.queue);
 		if (this.queue.find(({id}) => {return id === needle.id}) == undefined) {
 			console.log("add %s to queue", client.handshake.auth.id);
 			this.queue.push({id: client.handshake.auth.id, socket: client});
 			while (this.queue.length > 1) {
-				await this.#initializeGame(server);			
+				await this.#initializeGame(server);
 			}
 		} else {
 			console.log("%s already is in queue", client.handshake.auth.id);
@@ -99,16 +104,16 @@ export class GameService {
 		this.sockets.get(game.id)[1].emit('gameInfo', {gameId: game.id, side: "right"});
 	}
 
-	#emitGameData(gameId: number, server: Server) {
-		server.to(gameId.toString()).emit('updateGame', this.getData(gameId));
+	async #emitGameData(gameId: number, server: Server) {
+		server.to(gameId.toString()).emit('updateGame', await this.getData(gameId));
 	}
 
-	#startGame(server: Server, gameid: number) {
+	async #startGame(server: Server, gameid: number) {
 		var intervalId = setInterval(() => this.#emitGameData(gameid, server), 10) as unknown as number;
 		this.intervals.set(gameid, intervalId);
 	}
 
-	getData(id: number): Game | undefined {
+	async getData(id: number): Promise<Game | undefined> {
 		if (this.games.get(id) === undefined) {
 			return undefined;
 		}
@@ -117,13 +122,14 @@ export class GameService {
 		if (this.#scored(id)){
 			this.#reset(id);
 		}
-		this.#isGameFinished(id);
+		await this.#isGameFinished(id);
 		return this.games.get(id);
 	}
 
 	#updateData(id: number) {
-		this.games.get(id).ball.position.x += this.games.get(id).ball.direction.x;
-		this.games.get(id).ball.position.y += this.games.get(id).ball.direction.y;
+		let game: Game = this.games.get(id);
+		game.ball.position.x += game.ball.direction.x;
+		game.ball.position.y += game.ball.direction.y;
 		// if (this.ball.direction.x > 0) {
 		// 	if (this.ball.position.x + this.ball.radius >= 640) {
 		// 		this.ball.position.x = 640 - this.ball.radius;
@@ -137,19 +143,19 @@ export class GameService {
 		// 	}
 
 		// }
-		if (this.games.get(id).ball.direction.y > 0) {
-			if (this.games.get(id).ball.position.y + this.games.get(id).ball.radius >= 480) {
-				this.games.get(id).ball.position.y = 480 - this.games.get(id).ball.radius;
-				this.games.get(id).ball.direction.y *= -1;
+		if (game.ball.direction.y > 0) {
+			if (game.ball.position.y + game.ball.radius >= 480) {
+				game.ball.position.y = 480 - game.ball.radius;
+				game.ball.direction.y *= -1;
 			}
 		}
 		else {
-			if (this.games.get(id).ball.position.y - this.games.get(id).ball.radius <= 0) {
-				this.games.get(id).ball.position.y = 0 + this.games.get(id).ball.radius;
-				this.games.get(id).ball.direction.y *= -1;
+			if (game.ball.position.y - game.ball.radius <= 0) {
+				game.ball.position.y = 0 + game.ball.radius;
+				game.ball.direction.y *= -1;
 			}
 		}
-		// console.log("gameid: %d | ball: x %d, y %d", id, this.games.get(id).ball.position.x, this.games.get(id).ball.position.y);
+		// console.log("gameid: %d | ball: x %d, y %d", id, game.ball.position.x, game.ball.position.y);
 	}
 
 	#isBallWithinPaddleRange(id: number, paddle: Paddle): boolean {
@@ -159,122 +165,142 @@ export class GameService {
 
 	#isBallAtPaddle(id: number, paddle: Paddle): boolean {
 		let ret: boolean = false;
+		let game: Game = this.games.get(id);
 		if (paddle.id == "left") {
-			ret = this.games.get(id).ball.position.x - this.games.get(id).ball.radius <= paddle.position.x + paddle.width;
+			ret = game.ball.position.x - game.ball.radius <= paddle.position.x + paddle.width;
 		} else if (paddle.id == "right") {
-			ret = this.games.get(id).ball.position.x + this.games.get(id).ball.radius >= paddle.position.x;
+			ret = game.ball.position.x + game.ball.radius >= paddle.position.x;
 		}
 		return ret;
 	}
 
 	#calcAngle(id: number, paddle: Paddle) {
 		var section: number;
+		let game: Game = this.games.get(id);
 
 		section = paddle.height / 8;
 		if (this.#isBallWithinPaddleRange(id, paddle)) {
 			var i: number = 1;
-			while (this.games.get(id).ball.position.y > (paddle.position.y + i * section)) {
+			while (game.ball.position.y > (paddle.position.y + i * section)) {
 				i++;
 			}
-			this.games.get(id).ball.direction.angle = paddle.reboundAngles[i - 1];
+			game.ball.direction.angle = paddle.reboundAngles[i - 1];
 		}
 	}
 
 	#updateBallDirection(id: number, paddle: Paddle) {
 		this.#calcAngle(id, paddle);
-		this.games.get(id).ball.direction.x = this.games.get(id).ball.direction.speed * Math.cos(this.games.get(id).ball.direction.angle * (Math.PI / 180));
-		this.games.get(id).ball.direction.y = this.games.get(id).ball.direction.speed * Math.sin(this.games.get(id).ball.direction.angle * (Math.PI / 180));
+		let game: Game = this.games.get(id);
+		game.ball.direction.x = game.ball.direction.speed * Math.cos(game.ball.direction.angle * (Math.PI / 180));
+		game.ball.direction.y = game.ball.direction.speed * Math.sin(game.ball.direction.angle * (Math.PI / 180));
 	}
 
 	#collisionControl(id: number) {
-		if (this.games.get(id).ball.direction.x > 0) {
-			if (this.#isBallAtPaddle(id, this.games.get(id).paddleRight) &&
-				this.#isBallWithinPaddleRange(id, this.games.get(id).paddleRight)) {
-					this.#updateBallDirection(id, this.games.get(id).paddleRight);
+		var game: Game = this.games.get(id);
+		if (game.ball.direction.x > 0) {
+			if (this.#isBallAtPaddle(id, game.paddleRight) &&
+				this.#isBallWithinPaddleRange(id, game.paddleRight)) {
+					this.#updateBallDirection(id, game.paddleRight);
 			}
 		}
 		else {
-			if (this.#isBallAtPaddle(id, this.games.get(id).paddleLeft) &&
-				this.#isBallWithinPaddleRange(id, this.games.get(id).paddleLeft)) {
-					this.#updateBallDirection(id, this.games.get(id).paddleLeft);
+			if (this.#isBallAtPaddle(id, game.paddleLeft) &&
+				this.#isBallWithinPaddleRange(id, game.paddleLeft)) {
+					this.#updateBallDirection(id, game.paddleLeft);
 			}
 		}
 	}
 
 	#scored(id: number): boolean {
 		var ret: boolean = false;
-		if (this.games.get(id).ball.position.x - this.games.get(id).ball.radius <= 0) {
-			this.games.get(id).score.scoreRight += this.games.get(id).score.increaseRight;
-			this.games.get(id).scoreRight += this.games.get(id).score.increaseRight;
+		let game: Game = this.games.get(id);
+		if (game.ball.position.x - game.ball.radius <= 0) {
+			game.score.scoreRight += game.score.increaseRight;
+			game.scoreRight += game.score.increaseRight;
 			ret = true;
 		}
-		else if (this.games.get(id).ball.position.x + this.games.get(id).ball.radius >= 640 ) {
-			this.games.get(id).score.scoreLeft += this.games.get(id).score.increaseLeft;
-			this.games.get(id).scoreLeft += this.games.get(id).score.increaseLeft;
+		else if (game.ball.position.x + game.ball.radius >= 640 ) {
+			game.score.scoreLeft += game.score.increaseLeft;
+			game.scoreLeft += game.score.increaseLeft;
 			ret = true;
 		}
 		return ret;
 	}
 
 	#reset(id: number) {
-		this.games.get(id).ball.position.x = this.setup.ballPos.x;
-		this.games.get(id).ball.position.y = this.setup.ballPos.y;
-		this.games.get(id).ball.direction.speed = this.setup.ballDir.speed;
-		this.games.get(id).ball.direction.angle = Math.random() * 2 * Math.PI;
-		this.games.get(id).ball.direction.x = this.games.get(id).ball.direction.speed * Math.cos(this.games.get(id).ball.direction.angle);
-		this.games.get(id).ball.direction.y = this.games.get(id).ball.direction.speed * Math.sin(this.games.get(id).ball.direction.angle); // * 0.1
-		this.games.get(id).ball.radius = this.setup.ballRadius;
+		let game: Game = this.games.get(id);
+		game.ball.position.x = this.setup.ballPos.x;
+		game.ball.position.y = this.setup.ballPos.y;
+		game.ball.direction.speed = this.setup.ballDir.speed;
+		do {
+			game.ball.direction.angle = Math.random() * 2 * Math.PI;
+			game.ball.direction.x = game.ball.direction.speed * Math.cos(game.ball.direction.angle);
+			game.ball.direction.y = game.ball.direction.speed * Math.sin(game.ball.direction.angle); // * 0.1
+		}
+		while (game.ball.direction.x < 0.2);
+		// console.log("dir x: %d | dir y: %d | angle: %d", game.ball.direction.x, game.ball.direction.y, game.ball.direction.angle);
+		game.ball.radius = this.setup.ballRadius;
 
-		this.games.get(id).paddleLeft.width = this.setup.paddleWidth;
-		this.games.get(id).paddleLeft.height = this.setup.paddleHeight;
-		this.games.get(id).paddleLeft.speed = this.setup.paddleSpeed;
-		this.games.get(id).paddleRight.width = this.setup.paddleWidth;
-		this.games.get(id).paddleRight.height = this.setup.paddleHeight;
-		this.games.get(id).paddleRight.speed = this.setup.paddleSpeed;
+		game.paddleLeft.width = this.setup.paddleWidth;
+		game.paddleLeft.height = this.setup.paddleHeight;
+		game.paddleLeft.speed = this.setup.paddleSpeed;
+		game.paddleRight.width = this.setup.paddleWidth;
+		game.paddleRight.height = this.setup.paddleHeight;
+		game.paddleRight.speed = this.setup.paddleSpeed;
 
-		this.games.get(id).score.increaseLeft = this.setup.scoreIncrease;
-		this.games.get(id).score.increaseRight = this.setup.scoreIncrease;
+		game.score.increaseLeft = this.setup.scoreIncrease;
+		game.score.increaseRight = this.setup.scoreIncrease;
 	}
 
-	#isGameFinished(id: number) {
-		var game: Game = this.games.get(id);
-		if (game.finished) {
+	async #isGameFinished(id: number) {
+		var game: Game | undefined = this.games.get(id);
+		if (game != undefined && game.finished) {
+			// const gameEntry = this.gameRepository.create({scoreLeft: game.scoreLeft, scoreRight: game.scoreRight});
+			game.player = await Promise.all([
+				this.userService.getUser(game.playerLeft as unknown as number), 
+				this.userService.getUser(game.playerRight as unknown as number),
+				]);
+			await this.gameRepository.save(game);
 			clearInterval(this.intervals.get(id));
 			this.intervals.delete(id);
 			this.users.delete(game.playerLeft);
 			this.users.delete(game.playerRight);
 			this.games.delete(id);
+			console.log("in isGameFinished");
 			this.sockets.get(id)[0].leave(id.toString());
 			this.sockets.get(id)[1].leave(id.toString());
 			this.sockets.delete(id);
+			game.finished = false;
 			console.log("game finished, keys removed");
 			// TODO: delete room (?)
 			// TODO: reset frontend variables
 		}
-		if (game.score.scoreLeft == 10 || game.score.scoreRight == 10) {
+		if (game != undefined && (game.score.scoreLeft == 10 || game.score.scoreRight == 10)) {
 			game.finished = true;
 		}
 	}
 
 	movePaddleUp(id: number, b: boolean) {
+		let game: Game = this.games.get(id);
 		if (b) {
-			if (this.games.get(id).paddleLeft.position.y > 0)
-				this.games.get(id).paddleLeft.position.y -= this.games.get(id).paddleLeft.speed;
+			if (game.paddleLeft.position.y > 0)
+				game.paddleLeft.position.y -= game.paddleLeft.speed;
 		}
 		else {
-			if (this.games.get(id).paddleRight.position.y > 0)
-				this.games.get(id).paddleRight.position.y -= this.games.get(id).paddleRight.speed;
+			if (game.paddleRight.position.y > 0)
+				game.paddleRight.position.y -= game.paddleRight.speed;
 		}
 	}
 
 	movePaddleDown(id: number, b: boolean) {
+		let game: Game = this.games.get(id);
 		if (b) {
-			if (this.games.get(id).paddleLeft.position.y < (480 - this.games.get(id).paddleLeft.height))
-				this.games.get(id).paddleLeft.position.y += this.games.get(id).paddleLeft.speed;
+			if (game.paddleLeft.position.y < (480 - game.paddleLeft.height))
+				game.paddleLeft.position.y += game.paddleLeft.speed;
 		}
 		else {
-			if (this.games.get(id).paddleRight.position.y < (480 - this.games.get(id).paddleRight.height))
-				this.games.get(id).paddleRight.position.y += this.games.get(id).paddleRight.speed;
+			if (game.paddleRight.position.y < (480 - game.paddleRight.height))
+				game.paddleRight.position.y += game.paddleRight.speed;
 		}
 	}
 }
