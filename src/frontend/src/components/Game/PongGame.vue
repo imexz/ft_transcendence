@@ -59,27 +59,29 @@
   			this.side = data.side;
 			this.finished = false;
   			console.log("received GameId: %s, side: %s", this.gameId, this.side);
-  			document.addEventListener('keydown', (event) => {
-  				if (this.side === "left" && !this.finished) {
-  					if (event.key == 'w') {
-  						console.log(event.key);
-  						this.paddleLeftUp();
-  					}
-  					else if (event.key == 's') {
-  						console.log(event.key);
-  						this.paddleLeftDown();
-  					}
-  				} else if (this.side === "right" && !this.finished) {
-  					if (event.key == 'ArrowUp') {
-  						console.log(event.key);
-  						this.paddleRightUp();
-  					}
-  					else if (event.key == 'ArrowDown') {
-  						console.log(event.key);
-  						this.paddleRightDown();
-  					}
-  				}
-  			}, false);
+			if (this.side === "left" || this.side === "right") {
+				document.addEventListener('keydown', (event) => {
+					if (this.side === "left" && !this.finished) {
+						if (event.key == 'w') {
+							console.log(event.key);
+							this.paddleLeftUp();
+						}
+						else if (event.key == 's') {
+							console.log(event.key);
+							this.paddleLeftDown();
+						}
+					} else if (this.side === "right" && !this.finished) {
+						if (event.key == 'ArrowUp') {
+							console.log(event.key);
+							this.paddleRightUp();
+						}
+						else if (event.key == 'ArrowDown') {
+							console.log(event.key);
+							this.paddleRightDown();
+						}
+					}
+				}, false);
+			}
   		});
   		this.gamesocket.emit('checkGame', (res: boolean) => {
   			if (!res) {
