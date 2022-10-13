@@ -36,20 +36,20 @@ export class UsersController {
 	@UseGuards(JwtAuthGuard)
 	addFriend(@Request() req, @Body("id") id: number){
 		// console.log(id);
-		return  this.usersService.addfriend(req.user._id, id);
+		// return  this.usersService.addfriend(req.user._id, id);
 	}
 
 	@Post('removeFriend')
 	@UseGuards(JwtAuthGuard)
 	removeFriend(@Request() req, @Body("id") id: number){
 		// console.log(id);
-		return  this.usersService.addfriend(req.user._id, id);
+		// return  this.usersService.addfriend(req.user._id, id);
 	}
 
 	@Get('friends')
 	@UseGuards(JwtAuthGuard)
 	getFriends(@Request() req) {
-		return this.usersService.getFriends(req.user._id)
+		// return this.usersService.getFriends(req.user._id)
 	}
 
 	@Get('validate')

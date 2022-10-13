@@ -24,6 +24,7 @@ import { Game } from './game/game.entities/game.entity';
 import { TwofsModule } from './twofa/twofa.module';
 import { UsersController } from './users/users.controller';
 import { ChatroomModule } from './chatroom/chatroom.module';
+import { Friend } from './users/friends/friend.entity';
 
 
 
@@ -52,6 +53,7 @@ import { ChatroomModule } from './chatroom/chatroom.module';
 	GameModule,
 	TwofsModule,
 	ChatroomModule,
+	Friend,
 ],
 	// controllers: [GameController],
 	// providers: [ChatGateway, MessageService, ChatroomService, GameService, GameGateway, ChatGateway, MessageService, ChatroomService],
