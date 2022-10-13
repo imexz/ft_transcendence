@@ -4,7 +4,8 @@
       v-if="!isCollapsed"
       @click="toggleFriendList"
       class="friendListButton">
-      ^</button>
+      <font-awesome-icon icon="fa-solid fa-chevron-up" />
+    </button>
     <button
       v-else
       @click="toggleFriendList"

@@ -1,26 +1,21 @@
 <template>
-  <div class="wrapper" @mouseleave="mouseOut">
-    <div class="searchBar" :class="{'searchBarActive': isActive}">
-      <Transition>
-        <div
-          v-if="isActive" 
-          class="activeSearchBar">
-        <input 
-          type="text"
-          class="searchInput"
-          v-model="searchQuery" />
-        </div>
-      </Transition>
-    <button class="searchButton" :class="{'searchButtonPassive': !isActive}" @click="toggleSearchBar">
+  <div class="wrapper" >
+    <button class="searchButton" @click="toggleSearchBar">
       <font-awesome-icon icon="fa-solid fa-magnifying-glass" />
     </button>
-  </div>
-    <div class="searchResults"
-      v-if="searchQuery != ''">
-      <UserSummary
-        class="searchResult"
-        v-for="user in filteredUsers()"
-        :user = user />
+    <div v-if="show" class="searchPopUp">
+      <input 
+        type="text"
+        class="searchInput"
+        placeholder="username"
+        v-model="searchQuery" />
+      <div class="searchResults"
+        v-if="searchQuery != ''">
+        <UserSummary
+          class="searchResult"
+          v-for="user in filteredUsers()"
+          :user = user />
+      </div>
     </div>
   </div>
 </template>
@@ -41,9 +36,8 @@ export default defineComponent({
   data() {
     return {
       searchQuery: '' as string,
-      active: false as boolean,
       users : [] as User[],
-      isActive: false as boolean,
+      show: false as boolean,
     }
   },
   methods: {
@@ -51,16 +45,23 @@ export default defineComponent({
       return this.users.filter((user) => 
         user.username.toLowerCase().includes(this.searchQuery.toLocaleLowerCase()))
     },
-    toggleSearchBar() {
-      if (this.isActive)
-        this.searchQuery = ""
-      else
-        this.getData()
-      this.isActive = !this.isActive
-    },
-    mouseOut() {
-      if (this.isActive)
+    hideOnClick(e) {
+      if (!this.$el.contains(e.target)){
         this.toggleSearchBar()
+      }
+    },
+    toggleSearchBar() {
+      if (!this.$store.state.validated)
+        return
+      if (this.show) {
+        this.searchQuery = ""
+        window.removeEventListener('click', this.hideOnClick)
+      }
+      else {
+        this.getData()
+        window.addEventListener('click', this.hideOnClick)
+      }
+      this.show = !this.show
     },
     getData() {
       VueAxios({
@@ -83,8 +84,6 @@ export default defineComponent({
 <style scoped>
 
   .wrapper {
-    display: inline-block;
-    position: relative;
   }
   .searchBar {
     display: flex;
@@ -93,49 +92,58 @@ export default defineComponent({
     border-radius: 10px;
     padding: 0px 10px 0px 10px;
   }
-  .searchBarActive {
-    border-radius: 10px 10px 0px 0px;
-    animation: slideOut 200ms ease-in-out forwards;
-  }
   .searchButton {
     align-items: center;
-    padding: 0px;
-    height: 60px;
-    width: 60px;
+    height: 64px;
+    width: 64px;
     color: var(--ft_cyan);
     background-color: var(--ft_dark);
     font-size: 25px;
     font-weight: bold;
-    border: none;
-    border-left: 2px solid var(--ft_cyan);
-    padding-left: 10px;
+    border: 2px solid var(--ft_cyan);
+    border-radius: 10px;
   }
-  .searchButtonPassive {
-    /* border: 2px solid var(--ft_cyan);
-    border-radius: 10px; */
-    border: none;
-    padding: 0px;
+
+  .searchButton:hover {
+    background-color: var(--ft_cyan);
+    color: var(--ft_dark);
   }
+
+  .searchPopUp {
+    position: absolute;
+    margin: auto;
+    left: 0;
+    right: 0;
+    top: 100px;
+    border: 2px solid var(--ft_cyan);
+    width: 440px;
+    height: 600px;
+    background-color: var(--ft_dark);
+    border-radius: 10px;
+  }
+  
+  
   .searchInput {
-    align-self: right;
+    display: inline-block;
     height: 60px;
-    width: 300px;
+    width: 380px; 
     color: var(--ft_cyan);
     background-color: var(--ft_dark);
     font-size: 25px;
     font-weight: bold;
-    border: none;
+    border: 1px solid var(--ft_cyan);
+    margin-top: 18px;
+    padding: 0px 10px 0px 10px;
   }
 
   .searchResults{
-    position: absolute;
-    top: 64px;
-    height: 400px;
-    width: 384px;
+    display: inline-block;
+    height: calc(600px - 60px - 20px - 18px - 18px);
+    width: 404px;
+    margin-top: 18px;
+    border: 1px solid var(--ft_cyan);
     overflow-y: auto;
     background-color: var(--ft_dark);
-    border: 2px solid var(--ft_cyan);
-    border-radius:  0px 0px 10px 10px;
     animation: slideDown 200ms ease-in-out forwards;
     transform-origin: top center;
   }
