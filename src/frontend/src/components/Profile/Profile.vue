@@ -1,7 +1,16 @@
 <template>
   <div class="profile" v-if="user">
-    <h1>Profile of {{ user.username }}</h1>
-    <img :src='user.avatar_url' alt='Profile Pic'>
+    <div class="Avatar">
+      <img :src='user.avatar_url' alt='Profile Pic'>
+    </div>
+    <div class="nameLine">
+      <p>
+        Profile of
+      </p>
+      <p>
+        {{ user.username }}
+      </p>
+    </div>
   </div>
 </template>
 
@@ -52,17 +61,45 @@ export default defineComponent({
 
 <style scoped>
 
-  /* .profile {
-    width: 320px;
-    margin-right: 10px;
-  } */
+  .profile {
+    position: relative;
+    top: 30px;
+    margin-bottom: 40px;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    width: 100%;
+    height: 170px;
+    /* background-color: var(--ft_red); */
+    background: linear-gradient(-90deg, var(--ft_pink), var(--ft_dark));
+    border: 2px solid var(--ft_cyan);
+    border-radius: 0px 10px 10px 10px;
+    border-left: none;
+
+  }
+  
+  .nameLine {
+    margin-left: 136px;
+    font-size: 25px;
+    font-weight: bold;
+    padding-left: 10px;
+    text-align: start;
+  }
+
+  .Avatar {
+    height: 100%;
+  }
+
   img {
-    float: left;
-    width: 300px;
-    height: 450px;
+    position: absolute;
+    bottom: 0px;
+    width: 132px;
+    height: 200px;
     object-fit: cover;
-    border: 10px solid;
-    border-image-slice: 1;
-    border-image-source: linear-gradient(var(--ft_cyan), var(--ft_pink));
+    border: 2px solid var(--ft_cyan);
+    border-radius: 10px 10px 0px 10px;
+    border-bottom: none;
+    /* border-image-slice: 1;
+    border-image-source: linear-gradient(var(--ft_cyan), var(--ft_pink)); */
   }
 </style>

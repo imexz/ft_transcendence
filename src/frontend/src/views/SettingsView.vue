@@ -115,6 +115,7 @@ export default defineComponent({
     margin: auto;
     display: flex;
     flex-direction: column;
+    background-color: var(--ft_dark);
   }
   .wrapper h1 {
     text-align: left;
