@@ -15,6 +15,7 @@ import {
   faTableTennisPaddleBall,
   faBan,
   faXmark,
+  faChevronUp,
   } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import io from 'socket.io-client'
@@ -32,6 +33,7 @@ library.add(
   faBan,
   faTableTennisPaddleBall,
   faXmark,
+  faChevronUp
 )
 
 
