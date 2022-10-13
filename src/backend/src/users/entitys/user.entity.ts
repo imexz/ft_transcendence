@@ -4,6 +4,7 @@ import { Entity, Column, PrimaryGeneratedColumn, JoinColumn, OneToOne, PrimaryCo
 import { fileEntity } from "../../avatar/file.entitys";
 import { Exclude } from 'class-transformer';
 import { Game } from '../../game/game.entities/game.entity';
+import { Friend } from "../friends/friend.entity";
 
 
 @Entity()
@@ -44,9 +45,9 @@ export class User {
 	@JoinColumn()
 	avatar?:fileEntity;
 
-	@ManyToMany(() => User)
-	@JoinTable({ joinColumn: { name: 'users_id_1'} })
-	friends?: User[];
+	@OneToMany(() => Friend, (friend) => friend.accepter)
+	@JoinTable()
+	friends?: Friend[];
 
 	@Column({nullable: true})
 	current_status: number;
