@@ -134,7 +134,7 @@ export class UsersService {
 		});
 	  }
 
-	async turnOnTwoFactorAuthentication(userId: number) {
+	turnOnTwoFactorAuthentication(userId: number) {
 		return this.usersRepository.update(userId, {
 			isTwoFactorAuthenticationEnabled: true
 		});
