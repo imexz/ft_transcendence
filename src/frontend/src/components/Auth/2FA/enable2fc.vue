@@ -3,13 +3,8 @@
   <div>
     <div>
         <!-- <button @click="enableTwoFA"> enable two Factor </button> -->
-        <img :src=QR  alt='hostURL' >
     </div>
     <div class="btns">
-      <div>
-        <input v-model="twoFactorAuthenticationCode"/>
-        <button @click="authenticate">validate</button>
-      </div>
       <div>
         <button @click="on">turn-on</button>
         <button @click="off">turn-off</button>

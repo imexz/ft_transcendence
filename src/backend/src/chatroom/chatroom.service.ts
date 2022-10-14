@@ -89,13 +89,14 @@ export class ChatroomService {
                                 // console.log(ret.chatroom.hash);
                                 // console.log(ret.chatroom);
                                 console.log("result === true");
+                                // this.chatroomRepository.save(ret.chatroom)
+                            }
+                            
+                            case 'public':
+                                
+                            default:
                                 if(ret.chatroom.users.indexOf(user) == -1)
                                     ret.chatroom.users.push(user)
-                                    // this.chatroomRepository.save(ret.chatroom)
-                            }
-                        
-                        case 'public':
-                        default:
                             break;
                     }                   
                 }
