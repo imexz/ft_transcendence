@@ -1,6 +1,7 @@
 <template>
+	<div>{{ fps }}</div>
   <canvas id="pixi"></canvas>
-  <div v-if="gameId">
+  <div v-show="gameId">
 		<canvas
 			key="componentKey"
 			ref="game"
@@ -19,13 +20,12 @@
 			{{right}}
 		</div>
 	</div>
-	<div class="queue" v-else >
+	<div class="queue" v-show="!gameId" >
 		Waiting for a match...
 	</div>
 </template>
 
 <script lang="ts">
-  import { Vue, Options } from 'vue-class-component';
   import ScoreCounter from '@/components/Game/ScoreCounter.vue'
   import { io, Socket } from "socket.io-client";
   import { API_URL } from '@/defines';
@@ -46,6 +46,31 @@
       pixiApp: null,
       leftPaddle: null,
       rightPaddle: null,
+			ball: {
+				position: {
+					x: 0,
+					y: 0
+				},
+				radius: 0
+			},
+			paddleLeft: {
+				position: {
+					x: 0,
+					y: 0
+				},
+				width: 0,
+				height: 0
+			},
+			paddleRight: {
+				position: {
+					x: 0,
+					y: 0
+				},
+				width: 0,
+				height: 0
+			},
+			then: 0,
+			fps: 0
   		}
   	},
   	components: {
@@ -63,10 +88,10 @@
   			this.gameId = data.gameId;
   			this.side = data.side;
 			this.finished = false;
-  			console.log("received GameId: %s, side: %s", this.gameId, this.side);
-  			document.addEventListener('keydown', this.keyEvents, false);
-  		});
-  		this.gamesocket.emit('checkGame', (res: boolean) => {
+			console.log("received GameId: %s, side: %s", this.gameId, this.side);
+			document.addEventListener('keydown', this.keyEvents, false);
+		});
+		this.gamesocket.emit('checkGame', (res: boolean) => {
   			if (!res) {
   				console.log("calling checkQueue");
   				this.gamesocket.emit('checkQueue');
@@ -75,17 +100,18 @@
   		console.log("leaving created");
   	},
   	mounted() {
-  		console.log("in mounted");
-      this.drawPixi();
+			console.log("in mounted");
+      // this.drawPixi();
+			this.updateContext();
   		console.log("leaving mounted");
   	},
-	beforeUpdate() {
-		console.log("in beforeUpdate");
-		if (this.gameId && this.isFirstCall) {
-			this.gamesocket.on('updateGame', this.updateContext)
+		beforeUpdate() {
+			// console.log("in beforeUpdate");
+			if (this.gameId && this.isFirstCall) {
+				this.gamesocket.on('updateGame', this.updateData)
 			// this.isFirstCall = false;
 		}
-		console.log("leaving beforeUpdate");
+		// console.log("leaving beforeUpdate");
 
 	},
 
@@ -133,36 +159,57 @@
         
         console.log("hi", this.pixiApp)
       },
-  		drawPaddles(data: any) {
+  		drawPaddles() {
   			this.context.fillStyle = "#FFFFFF";
-  			this.context.fillRect(data.paddleLeft.position.x, data.paddleLeft.position.y, data.paddleLeft.width, data.paddleLeft.height);
-  			this.context.fillRect(data.paddleRight.position.x, data.paddleRight.position.y, data.paddleRight.width, data.paddleRight.height);
-        // this.rightPaddle.moveTo(data.paddleLeft.position.x, data.paddleLeft.position.y)
-        // this.leftPaddle.moveTo(data.paddleRight.position.x, data.paddleRight.position.y)
+  			this.context.fillRect(
+					this.paddleLeft.position.x,
+					this.paddleLeft.position.y,
+					this.paddleLeft.width,
+					this.paddleLeft.height
+				);
+  			this.context.fillRect(
+					this.paddleRight.position.x,
+					this.paddleRight.position.y,
+					this.paddleRight.width,
+					this.paddleRight.height
+				);
       },
-      updateContext(data: any) {
-        console.log("callback updateGame");
+      updateData(data: any) {
+        // console.log("callback updateGame");
 				if (data === undefined) {
-          console.log("data undefined");
+          // console.log("data undefined");
 					this.gameId = "";
 					this.side = "";
 					this.left = 0;
 					this.right = 0;
           return;
         }
-        console.log(data)
+        // console.log(data)
 				this.finished = data.finished;
 				this.left = data.score.scoreLeft;
 				this.right = data.score.scoreRight;
-				console.log(data);
-  				this.context = (this.$refs.game as any).getContext("2d");
-  				this.context.fillStyle = "#FFFFFF";
-  				this.context.clearRect(0, 0, (this.$refs.game as any).width, (this.$refs.game as any).height);
-  				this.context.beginPath();
-  				this.context.arc(data.ball.position.x, data.ball.position.y, data.ball.radius, 0, 2 * Math.PI);
-  				this.context.fill();
-  				this.drawPaddles(data);
+				// console.log(data);
+				this.ball = data.ball;
+				this.paddleLeft = data.paddleLeft;
+				this.paddleRight = data.paddleRight;
       },
+			updateContext(now) {
+				// console.log(now)
+				if (this.finished)
+					return
+				now *= 0.001
+				let d = now - this.then
+				this.then = now
+				this.fps = 1/d
+				this.context = (this.$refs.game as any).getContext("2d");
+				this.context.fillStyle = "#FFFFFF";
+				this.context.clearRect(0, 0, (this.$refs.game as any).width, (this.$refs.game as any).height);
+				this.context.beginPath();
+				this.context.arc(this.ball.position.x, this.ball.position.y, this.ball.radius, 0, 2 * Math.PI);
+				this.context.fill();
+				this.drawPaddles();
+				requestAnimationFrame(this.updateContext)
+			},
       keyEvents(event) {
         if (this.side === "left" && !this.finished) {
   				if (event.key == 'w') {
