@@ -1,9 +1,4 @@
-import { chatroom } from "../../chatroom/chatroom.entity";
-import { message } from "../../message/message.entity";
-import { Entity, Column, PrimaryGeneratedColumn, JoinColumn, OneToOne, PrimaryColumn, OneToMany, ManyToMany, JoinTable, ManyToOne } from "typeorm";
-import { fileEntity } from "../../avatar/file.entitys";
-import { Exclude } from 'class-transformer';
-import { Game } from '../../game/game.entities/game.entity';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from "typeorm";
 import { User } from "../entitys/user.entity";
 
 
@@ -42,7 +37,4 @@ export class Friend {
 	@ManyToOne(() => User, (user)=> user.friends)
 	public accepter: User
 	
-
-
-
 }

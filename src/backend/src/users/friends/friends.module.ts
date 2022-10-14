@@ -9,7 +9,7 @@ import { UsersModule } from '../users.module';
 
 
 @Module({
-	imports: [TypeOrmModule.forFeature([Friend]), TwofsModule, forwardRef(() => AuthModule), UsersModule],
+	imports: [TypeOrmModule.forFeature([Friend]), TwofsModule, forwardRef(() => AuthModule), forwardRef(() =>UsersModule)],
     providers: [FriendsService],
     controllers: [FriendsController],
     exports: [TypeOrmModule, FriendsService]

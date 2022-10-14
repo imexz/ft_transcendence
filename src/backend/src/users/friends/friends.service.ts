@@ -13,24 +13,22 @@ export class FriendsService {
 
     private usersService: UsersService
 
-    // async request_friendship(user_id: number, friend_id: number) {
-	// 	// console.log(user_id);
-	// 	// console.log(friend_id);
-    //     var user1 = this.usersService.getUser(user_id)
-    //     var user2 = this.usersService.getUser(friend_id)
+    async request_friendship(user_id: number, friend_id: number) {
+		// console.log(user_id);
+		// console.log(friend_id);
+		if(user_id && friend_id) {
+			var user1 = this.usersService.getUser(user_id)
+			var user2 = this.usersService.getUser(friend_id)
 
-    //     const friend = this.friendRepository.create({status: Status.requsted , user: [ user1, user2]})
-    //     this.friendRepository.save(friend)
-
-	// 	if(user_id && friend_id) {
-
-	// 	}
-	// }
+			const friend = this.friendRepository.create({status: Status.requsted , requester: await user1, accepter: await user2})
+			await this.friendRepository.save(friend)
+		}
+	}
 
     // async getFriends(id: number) {
 	// 	const user = await this.friendRepository.findOne({
 	// 		where: {
-	// 			_id: id
+	// 			id: id
 	// 		},
 	// 		relations: {
 	// 			friends: true,
