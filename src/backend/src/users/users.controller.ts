@@ -6,12 +6,14 @@ import { JwtAuthGuard } from '../auth/jwt-two/jwt-auth.guard';
 import { response } from 'express';
 import TwoFactorAuthenticationCodeDto from 'src/auth/dto/turnOnTwoFactorAuthentication.dto';
 import { TwofaService } from 'src/twofa/twofa.service';
+import { FriendsService } from './friends/friends.service';
 
 
 @Controller('users')
 export class UsersController {
 	constructor(private readonly usersService: UsersService,
-		private readonly twofaService: TwofaService ){}
+		private readonly twofaService: TwofaService,
+		private readonly friendsService: FriendsService ){}
 
 	@Get('find/:id')
 	@UseGuards(JwtAuthGuard)
@@ -35,6 +37,7 @@ export class UsersController {
 	@Post('addFriend')
 	@UseGuards(JwtAuthGuard)
 	addFriend(@Request() req, @Body("id") id: number){
+		this.friendsService.request_friendship(req.user._id, id)
 		// console.log(id);
 		// return  this.usersService.addfriend(req.user._id, id);
 	}
