@@ -9,7 +9,7 @@
     </div>
     <div class="dropdownMenu" v-if="show">
       <button 
-        v-if="$store.getters.getFriends.some((us: User) => us._id == user._id)"
+        v-if="$store.getters.getFriends != null && $store.getters.getFriends.some((us: User) => us._id == user._id)"
         class="dropdownElement"
         @click="removeFriend">
         <font-awesome-icon icon="fa-solid fa-user-minus" />
@@ -92,6 +92,7 @@ export default defineComponent({
       this.$router.push('/profile/' + id.toString());
     },
     toggleDropdown() {
+      console.log("toggleDropdown");
       this.show = !this.show
     },
   },
