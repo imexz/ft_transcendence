@@ -38,6 +38,8 @@ export default createStore<State>({
       return state.socket
     },
     getFriends(state) {
+      console.log(state);
+      
       return state.friendsList
     } 
   },
