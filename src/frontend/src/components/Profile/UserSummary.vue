@@ -2,7 +2,10 @@
   <div class="userSummary">
     <div class="normalView">
       <img :src="user?.avatar_url" alt="Avatar">
+      <div>
       <span>{{ user?.username }}</span>
+      <h6> {{user?.status}} </h6>
+      </div>
       <div class="toggleDropdown" @click="toggleDropdown">
         <font-awesome-icon icon="fa-solid fa-bars" />
       </div>

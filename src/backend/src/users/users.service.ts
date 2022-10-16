@@ -4,11 +4,21 @@ import { Injectable } from "@nestjs/common";
 import { Repository } from "typeorm";
 import { fileEntity } from "../avatar/file.entitys"
 import { hostURL } from "../hostURL";
-import { Friend } from "./friends/friend.entity";
 import { FriendsService } from "./friends/friends.service";
 
 @Injectable()
 export class UsersService {
+	async getFriends(_id: any) {
+
+		const friends = await this.usersRepository.findOne({where:{
+			_id: _id
+		},
+		relations:{
+			friends: true
+		}})
+		console.log(friends);
+		return(friends.friends)
+	}
 
 
     async addClientId(id: number, clientId: string) {
@@ -18,8 +28,7 @@ export class UsersService {
     }
 	constructor(
 		@InjectRepository(User)
-		private usersRepository: Repository<User>,
-		private friendService: FriendsService
+		private usersRepository: Repository<User>
 		){}
 
 

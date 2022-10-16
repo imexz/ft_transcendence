@@ -25,7 +25,11 @@ export class Friend {
 	@PrimaryGeneratedColumn()
 	id: number;
 
-    @Column()
+    @Column({
+        type: "enum",
+        enum: Status,
+        default: Status.requsted,
+    })
     public status!: Status
 
 	// @ManyToMany(() => User, (user) => user.friends)
