@@ -46,7 +46,6 @@ export class User {
 	avatar?:fileEntity;
 
 	@OneToMany(() => Friend, (friend) => friend.accepter)
-	@JoinTable()
 	friends?: Friend[];
 
 	@Column({nullable: true})

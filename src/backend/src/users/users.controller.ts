@@ -36,8 +36,8 @@ export class UsersController {
 
 	@Post('addFriend')
 	@UseGuards(JwtAuthGuard)
-	addFriend(@Request() req, @Body("id") id: number){
-		this.friendsService.request_friendship(req.user._id, id)
+	requestFriend(@Request() req, @Body("id") id: number){
+		return this.friendsService.request_friendship(req.user._id, id)
 		// console.log(id);
 		// return  this.usersService.addfriend(req.user._id, id);
 	}
@@ -45,6 +45,7 @@ export class UsersController {
 	@Post('removeFriend')
 	@UseGuards(JwtAuthGuard)
 	removeFriend(@Request() req, @Body("id") id: number){
+		this.friendsService.remove_friendship(req.user._id, id)
 		// console.log(id);
 		// return  this.usersService.addfriend(req.user._id, id);
 	}
@@ -52,6 +53,7 @@ export class UsersController {
 	@Get('friends')
 	@UseGuards(JwtAuthGuard)
 	getFriends(@Request() req) {
+		return this.friendsService.getFriends(req.user._id)
 		// return this.usersService.getFriends(req.user._id)
 	}
 
