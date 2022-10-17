@@ -32,9 +32,6 @@ export class Friend {
     })
     public status!: Status
 
-	// @ManyToMany(() => User, (user) => user.friends)
-	// public user!: User[]
-
 	@ManyToOne(() => User, (user)=> user.friends)
 	public requester: User
 

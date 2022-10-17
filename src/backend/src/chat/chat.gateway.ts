@@ -47,6 +47,11 @@ export class ChatGateway {
     console.log('====connected chat====')
 
     const rooms = await this.chatService.getUserRooms(socket.handshake.auth.id)
+    if (socket.handshake.auth.id == undefined) {
+      console.log("client not outorised diconnect");
+      socket.disconnect()
+    }
+    
 
     // rooms.forEach(room => {
     //   socket.join(room.roomName)
