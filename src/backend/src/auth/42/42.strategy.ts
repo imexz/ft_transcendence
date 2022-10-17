@@ -29,7 +29,6 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
 	async validate(accessToken, refreshToken, profile, cb): Promise<any> {
 
 		this.logger.log("validate")
-		this.logger.log(profile.id)
 		// this.logger.log(cb)
 
 		var user = await this.authService.validateUser(profile.id);

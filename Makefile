@@ -1,4 +1,4 @@
-all: build up
+all: build up 
 
 up:
 	docker compose up
