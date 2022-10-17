@@ -1,52 +1,61 @@
 import { Injectable } from '@nestjs/common';
 import { Friend, Status } from './friend.entity';
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
+import { Repository, FindOptionsWhere } from "typeorm";
 import { UsersService } from '../users.service';
+
+interface friend {
+	status: number;
+	senderId: number;
+	avatar_url: string;
+	username: string;
+}
 
 @Injectable()
 export class FriendsService {
-	async getFriends(user_id: number) {
 
-		class test {
-			status: number
-			senderId: number
-			avatar_url: string
-			username: string
-		}
-
-		const requested: test[] =  await this.friendRepository.createQueryBuilder("friend")
+	async getRequestedFriends(user_id): Promise<friend[]> {
+		return await this.friendRepository.createQueryBuilder("friend")
 			.innerJoin('friend.requester', 'requester', 'requester._id = :id1', { id1: user_id })
 			.leftJoinAndSelect('friend.accepter', 'accepter')
-			.select('status, accepter._id  AS "senderId", accepter.avatar_url AS avatar_url, accepter.username AS username')
+			.select('status, accepter._id  AS "senderId", accepter.avatar_url AS avatar_url, accepter.username AS username, 1 AS test')
 			.getRawMany()
+	}
 
-		console.log("requested");
-		console.log(requested);
-		
-		
-		const accepted: test[] =  await this.friendRepository.createQueryBuilder("friend")
+	async getAskedFriends(user_id): Promise<friend[]>{
+		return await this.friendRepository.createQueryBuilder("friend")
 			.innerJoin('friend.accepter', 'accepter', 'accepter._id = :id', { id: user_id })
 			.leftJoinAndSelect('friend.requester', 'requester')
-			.select('status, requester._id  AS "senderId", requester.avatar_url AS avatar_url, requester.username AS username')
+			.select('status, requester._id  AS "senderId", requester.avatar_url AS avatar_url, requester.username AS username, 2 AS test')
 			.getRawMany()
+	}
 
+	async getFriends(user_id: number) {
+
+		const requested: friend[] = await this.getRequestedFriends(user_id)
+		const accepted: friend[] = await this.getAskedFriends(user_id)
 		console.log("accepted");
 		console.log(requested.concat(accepted));
-		
-		// const ret = await this.friendRepository.createQueryBuilder("friends")
-		// 	.where(accepted.getQuery())
-		// 	.orWhere(requested.getQuery())
-		// 	.setParameters(accepted.getParameters())
-		// 	.setParameters(requested.getParameters())
-		// 	.getRawMany()
-		
-		// console.log(ret);
 		return(requested.concat(accepted))
 	}
 
-	remove_friendship(_id: any, id: number) {
-		throw new Error('Method not implemented.');
+	async remove_friendship(_id: any, id: number) {
+		console.log("remove_friendship");
+		
+		const friends = await this.friendRepository.findOne({
+			relations: {
+				requester: true,
+				accepter: true
+			},
+			where: [
+				{requester:{ _id: _id }, accepter:{	_id: id }},
+				{accepter:{	_id: _id }, requester:{ _id: id }},
+			]
+		})
+		console.log(friends);
+		
+		// const test: FindOptionsWhere<Friend> = 
+		return await this.friendRepository.remove(friends)
 	}
 
 	constructor(
