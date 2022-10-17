@@ -21,7 +21,7 @@
 
 import VueAxios from 'axios';
 import { API_URL } from '@/defines';
-import EnableTwoFA from '@/components/Auth/enable2fc.vue';
+import EnableTwoFA from '@/components/Auth/2FA/enable2fc.vue';
 import Toast from '@/components/Toast.vue'
 import { ref }  from 'vue';
 import { defineComponent } from 'vue';
@@ -43,7 +43,7 @@ export default defineComponent({
         this.$store.dispatch('logOut');
         this.$router.push('/login');
         VueAxios({
-            url: '/users/logout',
+            url: '/auth/logout',
             baseURL: API_URL,
             method: 'GET',
             withCredentials: true,
