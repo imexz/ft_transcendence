@@ -3,6 +3,7 @@ import { LocalAuthGuard } from './42/local-auth.guard'
 import { AuthService } from './auth.service';
 //import { JwtAuthGuard } from './jwt-auth.guard';
 import { hostURL } from '../hostURL';
+import { JwtAuthGuard } from './jwt-two/jwt-auth.guard';
 
 @Controller('auth')
 export class AuthController{
@@ -39,6 +40,17 @@ export class AuthController{
 		return {
 			url: "http://localhost" + ":8080/login"
 		}
+	}
+
+	@Get('logout')
+	@UseGuards(JwtAuthGuard)
+	logout(@Request() req, @Res({ passthrough: true }) res) {
+		console.log("logout");
+		
+		res.setHeader('Set-Cookie', this.authService.getCookieWithJwtAccessToken(
+			req.user._id,
+			false,
+		) + '; Max-Age=0')
 	}
 
 	// @Get('protected')
