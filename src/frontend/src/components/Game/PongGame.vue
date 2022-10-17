@@ -1,24 +1,17 @@
 <template>
-	<div>{{ fps }}</div>
-  <canvas id="pixi"></canvas>
+	<div>{{ fps }} fps</div>
   <div v-show="gameId">
-		<canvas
-			key="componentKey"
-			ref="game"
-			width="640"
-			height="480"
-			style="border: 1px solid white;"
-		>
-		</canvas>
-		<!-- <div>
-			<ScoreCounter />
-		</div> -->
-		<div id = "scoreLeft">
-			{{left}}
-		</div>
-		<div id = "scoreRight">
-			{{right}}
-		</div>
+    <div class="scoreCounter">
+      <div id = "scoreLeft">
+        {{leftScore}}
+      </div>
+      <div id = "scoreRight">
+        {{rightScore}}
+      </div>
+    </div>
+    <div class="gameCanvas">
+      <canvas id="pixi"></canvas>
+    </div>
 	</div>
 	<div class="queue" v-show="!gameId" >
 		Waiting for a match...
@@ -35,42 +28,46 @@
   export default defineComponent({
   	data () {
   		return {
-			isFirstCall: true as boolean,
-  			gameId: "" as string,
-  			gamesocket: null as Socket,
-  			context: null as any,
-  			side: "" as string,
-			left: 0 as number,
-			right: 0 as number,
-			finished: false as boolean,
-      pixiApp: null,
-      leftPaddle: null,
-      rightPaddle: null,
-			ball: {
-				position: {
-					x: 0,
-					y: 0
-				},
-				radius: 0
-			},
-			paddleLeft: {
-				position: {
-					x: 0,
-					y: 0
-				},
-				width: 0,
-				height: 0
-			},
-			paddleRight: {
-				position: {
-					x: 0,
-					y: 0
-				},
-				width: 0,
-				height: 0
-			},
-			then: 0,
-			fps: 0
+			  isFirstCall: true as boolean,
+  		  gameId: "" as string,
+  		  gamesocket: null as Socket,
+  		  context: null as any,
+  		  side: "" as string,
+			  leftScore: 0 as number,
+			  rightScore: 0 as number,
+			  finished: false as boolean,
+        pixiApp: null,
+        pixiScene: null,
+        fps: 0,
+        gameData: {
+          ball: {
+            position: {
+              x: 0,
+              y: 0
+            },
+            radius: 0
+          },
+          paddleLeft: {
+            position: {
+              x: 0,
+              y: 0
+            },
+            width: 0,
+            height: 0
+          },
+          paddleRight: {
+            position: {
+              x: 0,
+              y: 0
+            },
+            width: 0,
+            height: 0
+          }
+        },
+        styleData: {
+          bgColor: 0x000000,
+          fgColor: 0x00FF00,
+        }
   		}
   	},
   	components: {
@@ -100,9 +97,9 @@
   		console.log("leaving created");
   	},
   	mounted() {
-			console.log("in mounted");
-      // this.drawPixi();
-			this.updateContext();
+      console.log("in mounted");
+      this.initPixi();
+      this.pixiApp.ticker.add(this.updatePixi)
   		console.log("leaving mounted");
   	},
 		beforeUpdate() {
@@ -125,39 +122,51 @@
   		// delete this.gameId;
   	},
   	methods: {
-      drawPixi(){
+      initPixi(){
         let canvas: HTMLElement = document.getElementById('pixi')
-        console.log(canvas)
 
         this.pixiApp = new PIXI.Application({
-          width: 600,
-          height: 600,
+          width: 640,
+          height: 480,
           antialias: true,
-          backgroundAlpha: 0,
+          backgroundColor: this.styleData.bgColor,
           view: canvas as HTMLCanvasElement,
           
         })
+        this.pixiScene = new PIXI.Graphics()
+        this.pixiApp.stage.addChild(this.pixiScene)
+      },
+      updatePixi(){
+        this.pixiScene.clear();
 
-        let graphics = new PIXI.Graphics()
-        graphics.lineStyle(8, 0x000000)
+        //left Paddle
+        this.pixiScene.lineStyle(2, this.styleData.fgColor)
+        this.pixiScene.drawRect(
+          this.gameData.paddleLeft.position.x,
+          this.gameData.paddleLeft.position.y,
+          this.gameData.paddleLeft.width,
+          this.gameData.paddleLeft.height
+        )
 
-        graphics.moveTo(300, 250)
-        graphics.lineTo(500, 250)
-        this.pixiApp.stage.addChild(graphics)
+        //right Paddle
+        this.pixiScene.lineStyle(2, this.styleData.fgColor)
+        this.pixiScene.drawRect(
+          this.gameData.paddleRight.position.x,
+          this.gameData.paddleRight.position.y,
+          this.gameData.paddleRight.width,
+          this.gameData.paddleRight.height
+        )
 
-        this.leftPaddle = new PIXI.Graphics()
-        this.leftPaddle.beginFill(0xFFFF00)
-        this.leftPaddle.lineStyle(5, 0xFF0000)
-        this.leftPaddle.drawRect(0, 300, 100, 100)
-        this.pixiApp.stage.addChild(this.leftPaddle)
+        //ball
+        this.pixiScene.lineStyle(2, this.styleData.fgColor)
+        this.pixiScene.drawCircle(
+          this.gameData.ball.position.x,
+          this.gameData.ball.position.y,
+          this.gameData.ball.radius
+        )
 
-        this.rightPaddle = new PIXI.Graphics()
-        this.rightPaddle.beginFill(0xFFFF00)
-        this.rightPaddle.lineStyle(5, 0xFF0000)
-        this.rightPaddle.drawRect(500, 300, 100, 100)
-        this.pixiApp.stage.addChild(this.rightPaddle)
+        this.fps =  PIXI.Ticker.shared.FPS;
         
-        console.log("hi", this.pixiApp)
       },
   		drawPaddles() {
   			this.context.fillStyle = "#FFFFFF";
@@ -184,32 +193,17 @@
 					this.right = 0;
           return;
         }
-        // console.log(data)
 				this.finished = data.finished;
-				this.left = data.score.scoreLeft;
-				this.right = data.score.scoreRight;
-				// console.log(data);
-				this.ball = data.ball;
-				this.paddleLeft = data.paddleLeft;
-				this.paddleRight = data.paddleRight;
+				this.leftScore = data.score.scoreLeft;
+				this.rightScore = data.score.scoreRight;
+
+        if (this.leftScore > 4 || this.rightScore > 4)
+          this.styleData.fgColor = 0xFF0000
+
+				this.gameData.ball = data.ball;
+				this.gameData.paddleLeft = data.paddleLeft;
+				this.gameData.paddleRight = data.paddleRight;
       },
-			updateContext(now) {
-				// console.log(now)
-				if (this.finished)
-					return
-				now *= 0.001
-				let d = now - this.then
-				this.then = now
-				this.fps = 1/d
-				this.context = (this.$refs.game as any).getContext("2d");
-				this.context.fillStyle = "#FFFFFF";
-				this.context.clearRect(0, 0, (this.$refs.game as any).width, (this.$refs.game as any).height);
-				this.context.beginPath();
-				this.context.arc(this.ball.position.x, this.ball.position.y, this.ball.radius, 0, 2 * Math.PI);
-				this.context.fill();
-				this.drawPaddles();
-				requestAnimationFrame(this.updateContext)
-			},
       keyEvents(event) {
         if (this.side === "left" && !this.finished) {
   				if (event.key == 'w') {
@@ -255,20 +249,14 @@
 	text-align: center;
 }
 
-#scoreLeft {
-  transform-style: preserve-3d;
-  font-size:90px;
-  line-height: 90px;
-  float: left;
-  position: relative;
-}
-#scoreRight {
-  transform-style: preserve-3d;
-  font-size:90px;
-  line-height: 90px;
-  float: left;
-  position: relative;
-  left: 560px;
+.scoreCounter {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 90px;
+  width: 640px;
+  margin: auto;
+
 }
 
 </style>
