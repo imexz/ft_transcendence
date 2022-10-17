@@ -87,8 +87,18 @@ export default defineComponent({
       }
     },
     removeFriend(){
-      console.log("IMPLEMENT API TO REMOVE FRIEND")
-      this.$store.commit('removeFriend', this.user._id);
+      // console.log("IMPLEMENT API TO REMOVE FRIEND")
+     
+      VueAxios({
+        url: '/users/removeFriend',
+        baseURL: API_URL,
+        method: 'POST',
+        withCredentials: true,
+        data: {"id" : this.user?._id},
+      })
+        .then(this.$store.commit('removeFriend', this.user._id))
+        .catch()
+      // this.$store.commit('removeFriend', this.user._id);
     },
     viewProfile(id: number){
       this.show = false;
