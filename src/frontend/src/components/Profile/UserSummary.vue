@@ -4,7 +4,8 @@
       <img :src="user?.avatar_url" alt="Avatar">
       <div>
       <span>{{ user?.username }}</span>
-      <h6> {{user?.status}} </h6>
+      <!-- dis is fukking up the allignment -->
+      <!-- <h6> {{user?.status}} </h6> -->
       </div>
       <div class="toggleDropdown" @click="toggleDropdown">
         <font-awesome-icon icon="fa-solid fa-bars" />
