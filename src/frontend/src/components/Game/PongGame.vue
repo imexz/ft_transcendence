@@ -1,12 +1,14 @@
 <template>
-	<div>{{ fps }} fps</div>
   <div v-show="gameId">
-    <div class="scoreCounter">
+    <div class="matchInfo">
       <div id = "scoreLeft">
-        {{leftScore}}
+        <UserSummary :user=$store.state.user></UserSummary>
+      </div>
+      <div>
+        vs
       </div>
       <div id = "scoreRight">
-        {{rightScore}}
+        <UserSummary :user=$store.state.user></UserSummary>
       </div>
     </div>
     <div class="gameCanvas">
@@ -24,6 +26,8 @@
   import { API_URL } from '@/defines';
   import { defineComponent } from 'vue';
   import * as PIXI from 'pixi.js';
+  import UserSummary from '@/components/Profile/UserSummary.vue'
+import { throwStatement } from '@babel/types';
 
   export default defineComponent({
   	data () {
@@ -36,9 +40,13 @@
 			  leftScore: 0 as number,
 			  rightScore: 0 as number,
 			  finished: false as boolean,
+        fps: 0,
         pixiApp: null,
         pixiScene: null,
-        fps: 0,
+        pixiScore: {
+          left: null,
+          right: null,
+        },
         gameData: {
           ball: {
             position: {
@@ -65,13 +73,15 @@
           }
         },
         styleData: {
-          bgColor: 0x000000,
-          fgColor: 0x00FF00,
+          bgColor: 0x060317,
+          fgColor: 0x60fa31,
         }
   		}
   	},
   	components: {
   		// ScoreCounter
+      UserSummary,
+
   	},
   	created() { // always called when Component is initialized (e.g. on refresh)
   		console.log("in created");
@@ -99,6 +109,7 @@
   	mounted() {
       console.log("in mounted");
       this.initPixi();
+      //this is starting the drawing loop (rendering @60fps)
       this.pixiApp.ticker.add(this.updatePixi)
   		console.log("leaving mounted");
   	},
@@ -133,11 +144,37 @@
           view: canvas as HTMLCanvasElement,
           
         })
+
         this.pixiScene = new PIXI.Graphics()
         this.pixiApp.stage.addChild(this.pixiScene)
+
+        this.pixiScore.left = new PIXI.Text()
+        this.pixiApp.stage.addChild(this.pixiScore.left)
+
+        this.pixiScore.right = new PIXI.Text()
+        this.pixiApp.stage.addChild(this.pixiScore.right)
+
       },
       updatePixi(){
         this.pixiScene.clear();
+
+        this.pixiScene.lineStyle(2, this.styleData.fgColor)
+
+        //top whisker
+        this.pixiScene.moveTo(this.pixiApp.renderer.width/2 - 10, 1)
+        this.pixiScene.lineTo(this.pixiApp.renderer.width/2 + 10, 1)
+
+        //bottom whisker
+        this.pixiScene.moveTo(
+          this.pixiApp.renderer.width/2 - 10,
+          this.pixiApp.renderer.height - 1)
+        this.pixiScene.lineTo(
+          this.pixiApp.renderer.width/2 + 10,
+          this.pixiApp.renderer.height - 1)
+
+        //center line
+        this.pixiScene.moveTo(this.pixiApp.renderer.width/2, 0)
+        this.pixiScene.lineTo(this.pixiApp.renderer.width/2, this.pixiApp.renderer.height)
 
         //left Paddle
         this.pixiScene.lineStyle(2, this.styleData.fgColor)
@@ -159,31 +196,39 @@
 
         //ball
         this.pixiScene.lineStyle(2, this.styleData.fgColor)
+        this.pixiScene.beginFill(this.styleData.bgColor)
         this.pixiScene.drawCircle(
           this.gameData.ball.position.x,
           this.gameData.ball.position.y,
           this.gameData.ball.radius
         )
+        this.pixiScene.endFill()
 
-        this.fps =  PIXI.Ticker.shared.FPS;
-        
-      },
-  		drawPaddles() {
-  			this.context.fillStyle = "#FFFFFF";
-  			this.context.fillRect(
-					this.paddleLeft.position.x,
-					this.paddleLeft.position.y,
-					this.paddleLeft.width,
-					this.paddleLeft.height
-				);
-  			this.context.fillRect(
-					this.paddleRight.position.x,
-					this.paddleRight.position.y,
-					this.paddleRight.width,
-					this.paddleRight.height
-				);
+        //score
+        this.pixiScore.left.text = this.leftScore;
+        this.pixiScore.left.style = {
+          fill: this.styleData.fgColor,
+          fontFamily: 'Arial',
+          fontSize: 60,
+          align: 'center',
+        };
+        this.pixiScore.left.x =
+          this.pixiApp.renderer.width/4 - this.pixiScore.left.width/2;
+        this.pixiScore.left.y = 5;
+
+        this.pixiScore.right.text = this.rightScore;
+        this.pixiScore.right.style = {
+          fill: this.styleData.fgColor,
+          fontFamily: 'Arial',
+          fontSize: 60,
+          align: 'center',
+        };
+        this.pixiScore.right.x = 
+          this.pixiApp.renderer.width/4 * 3 - this.pixiScore.right.width/2;
+        this.pixiScore.right.y = 5;
       },
       updateData(data: any) {
+        //this is updating the Date-> independent of drawing loop
         // console.log("callback updateGame");
 				if (data === undefined) {
           // console.log("data undefined");
@@ -197,8 +242,19 @@
 				this.leftScore = data.score.scoreLeft;
 				this.rightScore = data.score.scoreRight;
 
-        if (this.leftScore > 4 || this.rightScore > 4)
-          this.styleData.fgColor = 0xFF0000
+        // if (this.leftScore > 4 || this.rightScore > 4)
+        //   this.styleData.fgColor = 0xFF0000
+
+        // if ()
+
+        switch(Math.max(this.leftScore, this.rightScore)) {
+          case 4:
+            this.styleData.fgColor = 0xf5ac0e
+            break;
+          case 8:
+            this.styleData.fgColor = 0xe70038
+            break;
+        }
 
 				this.gameData.ball = data.ball;
 				this.gameData.paddleLeft = data.paddleLeft;
@@ -249,14 +305,26 @@
 	text-align: center;
 }
 
-.scoreCounter {
+.matchInfo {
   display: flex;
   justify-content: space-between;
-  align-items: baseline;
-  font-size: 90px;
+  align-items: center;
+  font-size: 60px;
   width: 640px;
   margin: auto;
+  margin-bottom: 20px;
+  padding: 10px 20px 10px 20px;
+  border: 2px solid var(--ft_cyan);
+  border-radius: 10px;
 
+}
+
+.gameCanvas {
+  display: inline-block;
+  padding: 20px;
+  border: 2px solid var(--ft_cyan);
+  border-radius: 10px;
+  
 }
 
 </style>

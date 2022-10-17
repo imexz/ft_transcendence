@@ -30,6 +30,7 @@ export default defineComponent({
     --ft_blue: #0877E6;
 
     --ft_dark: #0c052e;
+    --ft_dark: #060317;
     --ft_dark_purple: #3b1356;
     --ft_purple: #802785;
     --ft_pink:#fe0efe;
@@ -65,7 +66,14 @@ body {
 }
 
 .content {
-  padding-bottom: 80px;
+  /* padding-bottom: 80px; */
+/* 
+  width: 840px;
+  min-height: 800px;
+  padding: 20px;
+  margin: auto;
+  border: 2px solid var(--ft_cyan);
+  border-radius: 10px; */
 }
 
 /* button, input, select {
