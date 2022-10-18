@@ -7,6 +7,12 @@ import { UsersService } from "src/users/users.service";
 
 @Injectable()
  export class TwofaService {
+    turnOffTwoFactorAuthentication(userId: number) {
+        this.usersService.turnOffTwoFactorAuthentication(userId)
+    }
+    turnOnTwoFactorAuthentication(userId: number) {
+        this.usersService.turnOnTwoFactorAuthentication(userId)
+    }
 
     constructor(private readonly usersService: UsersService) {}
 
@@ -28,15 +34,27 @@ import { UsersService } from "src/users/users.service";
         return toFileStream(stream, otpauthUrl);
     }
 
-    async isTwoFactorAuthenticationCodeValid(twoFactorAuthenticationCode: string, user: User) {
+    isTwoFactorAuthenticationCodeValid(twoFactorAuthenticationCode: string, user: User) {
         console.log('isTwoFactorAuthenticationCodeValid');
         // const tmp_user  = await this.usersService.getUser(user._id)
         
-        console.log(twoFactorAuthenticationCode);
-        return authenticator.verify({
-            token: twoFactorAuthenticationCode,
-            secret: user.twoFactorAuthenticationSecret
-        })
+        console.log(twoFactorAuthenticationCode, user.twoFactorAuthenticationSecret);
+        
+        try {
+
+            const ret = authenticator.check(
+                twoFactorAuthenticationCode,
+                user.twoFactorAuthenticationSecret
+            )
+            console.log("check=", ret);
+            
+            return ret
+        } catch (err) {
+            // Possible errors
+            // - options validation
+            // - "Invalid input - it is not base32 encoded string" (if thiry-two is used)
+            console.error(err);
+          }
 
     }
 

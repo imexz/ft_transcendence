@@ -32,12 +32,12 @@
     </div>
     <div class="section">
       <div class="sectionHeadline"> 
-        <h2>Enable 2FA</h2>
+        <h2>2FA</h2>
       </div>
       <hr class="break"/>
       <div class="sectionContent">
-        <p>Here will be a text explaining how to use the 2FA</p>
-        <EnableTwoFA/>
+        <!-- <EnableTwoFA/> -->
+        <twoFaSettings/>
       </div>
     </div>
     <div class="section">
@@ -66,8 +66,9 @@
 <script lang="ts">
 
 import ChangeUserName from '@/components/Settings/ChangeUserName.vue';
+import twoFaSettings from '@/components/Auth/2FA/twoFaSettings.vue';
 import ChangeUserAvatar from '@/components/Settings/ChangeUserAvatar.vue';
-import EnableTwoFA from '@/components/Auth/enable2fc.vue';
+import EnableTwoFA from '@/components/Auth/2FA/enable2fc.vue';
 import Toast from '@/components/Toast.vue'
 import { ref } from 'vue';
 import { defineComponent } from 'vue';
@@ -78,6 +79,7 @@ export default defineComponent({
     ChangeUserName,
     ChangeUserAvatar,
     EnableTwoFA,
+    twoFaSettings,
     Toast,
   },
   data() {

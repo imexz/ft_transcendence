@@ -4,9 +4,21 @@ import { Injectable } from "@nestjs/common";
 import { Repository } from "typeorm";
 import { fileEntity } from "../avatar/file.entitys"
 import { hostURL } from "../hostURL";
+import { FriendsService } from "./friends/friends.service";
 
 @Injectable()
 export class UsersService {
+	async getFriends(_id: any) {
+
+		const friends = await this.usersRepository.findOne({where:{
+			_id: _id
+		},
+		relations:{
+			friends: true
+		}})
+		console.log(friends);
+		return(friends.friends)
+	}
 
 
     async addClientId(id: number, clientId: string) {
@@ -16,20 +28,9 @@ export class UsersService {
     }
 	constructor(
 		@InjectRepository(User)
-		private usersRepository: Repository<User>,
+		private usersRepository: Repository<User>
 		){}
 
-	async getFriends(id: number) {
-		const user = await this.usersRepository.findOne({
-			where: {
-				_id: id
-			},
-			relations: {
-				friends: true,
-			}
-		})
-		return user.friends
-	}
 
 	async findAll(): Promise<User[]> {
 		// console.log("findAll");
@@ -38,16 +39,11 @@ export class UsersService {
 		return user
 	}
 
-	async getUser(id: number) {
+	async getUser(id: number): Promise<User> {
 		console.log(id);
 		
 		if(id != undefined) {
-			const user: User = await this.usersRepository.findOne({where: {_id: id}})
-			if(user == null) {
-				console.log("user == null");
-				return undefined
-			}
-			// console.log(user);
+			const user = this.usersRepository.findOne({where: {_id: id}})
 			return user
 		}
 		return undefined
@@ -100,33 +96,33 @@ export class UsersService {
 		return this.usersRepository.save(user)
 	}
 
-	async addfriend(user_id: number, friend_id: number) {
-		// console.log(user_id);
-		// console.log(friend_id);
+	// async addfriend(user_id: number, friend_id: number) {
+	// 	// console.log(user_id);
+	// 	// console.log(friend_id);
 
-		if(user_id && friend_id) {
-			try{
-				const user = await this.usersRepository.findOne({
-					where: {
-						_id: user_id
-					},
-					relations: {
-						friends: true,
-					}
-				});
-				const user_friend: User = await this.usersRepository.findOneBy({_id: friend_id});
+	// 	if(user_id && friend_id) {
+	// 		try{
+	// 			const user = await this.usersRepository.findOne({
+	// 				where: {
+	// 					_id: user_id
+	// 				},
+	// 				relations: {
+	// 					friends: true,
+	// 				}
+	// 			});
+	// 			const user_friend: User = await this.usersRepository.findOneBy({_id: friend_id});
 	
-				user.friends.push(user_friend);
-				this.usersRepository.save(user);
+	// 			user.friends.push(user_friend);
+	// 			this.usersRepository.save(user);
 	
-			} catch(exception: unknown) {
-				console.log(exception)
-				console.log("freind or user null");
-				return null;
-			}
-			return;
-		}
-	}
+	// 		} catch(exception: unknown) {
+	// 			console.log(exception)
+	// 			console.log("freind or user null");
+	// 			return null;
+	// 		}
+	// 		return;
+	// 	}
+	// }
 
 	async setTwoFactorAuthenticationSecret(secret: string, userId: number) {
 		return this.usersRepository.update(userId, {
@@ -134,7 +130,7 @@ export class UsersService {
 		});
 	  }
 
-	async turnOnTwoFactorAuthentication(userId: number) {
+	turnOnTwoFactorAuthentication(userId: number) {
 		return this.usersRepository.update(userId, {
 			isTwoFactorAuthenticationEnabled: true
 		});

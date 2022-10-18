@@ -2,14 +2,18 @@
   <div class="userSummary">
     <div class="normalView">
       <img :src="user?.avatar_url" alt="Avatar">
+      <div>
       <span>{{ user?.username }}</span>
+      <!-- dis is fukking up the allignment -->
+      <!-- <h6> {{user?.status}} </h6> -->
+      </div>
       <div class="toggleDropdown" @click="toggleDropdown">
         <font-awesome-icon icon="fa-solid fa-bars" />
       </div>
     </div>
     <div class="dropdownMenu" v-if="show">
       <button 
-        v-if="$store.getters.getFriends.some((us: User) => us._id == user._id)"
+        v-if="$store.getters.getFriends != '' && $store.getters.getFriends.some((us: User) => us._id == user._id)"
         class="dropdownElement"
         @click="removeFriend">
         <font-awesome-icon icon="fa-solid fa-user-minus" />
@@ -84,14 +88,25 @@ export default defineComponent({
       }
     },
     removeFriend(){
-      console.log("IMPLEMENT API TO REMOVE FRIEND")
-      this.$store.commit('removeFriend', this.user._id);
+      // console.log("IMPLEMENT API TO REMOVE FRIEND")
+     
+      VueAxios({
+        url: '/users/removeFriend',
+        baseURL: API_URL,
+        method: 'POST',
+        withCredentials: true,
+        data: {"id" : this.user?._id},
+      })
+        .then(this.$store.commit('removeFriend', this.user._id))
+        .catch()
+      // this.$store.commit('removeFriend', this.user._id);
     },
     viewProfile(id: number){
       this.show = false;
       this.$router.push('/profile/' + id.toString());
     },
     toggleDropdown() {
+      console.log("toggleDropdown");
       this.show = !this.show
     },
   },

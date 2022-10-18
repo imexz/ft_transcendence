@@ -28,6 +28,9 @@ export default createStore<State>({
     isLogged(state) {
       return state.validated
     },
+    // isTwoFA(state) {
+    //   return state.validated
+    // },
     getUser(state) {
       return state.user
     },
@@ -35,6 +38,8 @@ export default createStore<State>({
       return state.socket
     },
     getFriends(state) {
+      console.log(state);
+      
       return state.friendsList
     } 
   },
@@ -48,6 +53,9 @@ export default createStore<State>({
     },
     changeUserName(state, username) {
       state.user.username = username;
+    },
+    setTwoFa(state, enable) {
+      state.user.isTwoFactorAuthenticationEnabled = enable;
     },
     resetAvatar(state) {
       state.user.avatar_url = state.user.avatar_url_42intra;
