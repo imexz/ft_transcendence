@@ -70,7 +70,7 @@ export default defineComponent({
           this.triggerToast('vaildated', 'success')))
         .catch(error => (
           console.log(error),
-          this.$store.commit('logOut'),
+          this.$store.dispatch('logOut'),
           this.triggerToast('please log in', 'error')))
     }
   },
