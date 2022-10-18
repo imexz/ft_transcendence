@@ -59,7 +59,7 @@
           messages: [],
           messagesLoaded: true, // change this value to show a loading icon on the top of the chat
           messageActions: [
-            { name: 'delete' , title: 'delete message', onlyMe: true },
+            { name: 'deleteMessage' , title: 'delete message', onlyMe: true },
             { name: 'block', title: 'block user'}
           ],
           roomActions: [
@@ -248,18 +248,20 @@
 
               break;
 
-            case 'delete':
-              {
-                console.log("case delete")
-                delete-message(roomId, message);
-              }
-
             default:
               break;
           }
         },
-        deleteMessage({roomId, message}) {
+        deleteMessage({message}) {
           console.log("delete requested")
+          const messages = this.messages
+          const index = messages.findIndex(element => element._id == message._id)
+          if (index != -1)
+          {
+            messages.splice(index , 1)
+            this.messages = messages
+            this.$socketio.emit('deleteMessage', {messageId: message._id}, () => { console.log("success delete");})
+          }
         },
         addMessage(message) {
           console.log("addMessage");
