@@ -4,6 +4,8 @@ import { Socket, Server } from 'socket.io';
 import { JwtAuthGuard } from 'src/auth/jwt-two/jwt-auth.guard';
 import { message } from '../message/message.entity';
 import { ChatService } from './chat.service';
+import { JwtService } from '@nestjs/jwt';
+
 
 @WebSocketGateway({
   cors: {
@@ -11,7 +13,7 @@ import { ChatService } from './chat.service';
     origin: ['http://localhost:8080', 'http://localhost:3000'],
     credentials: true
   },
-  // namespace: 'chat'
+  namespace: 'chat'
 })
 
 export class ChatGateway {
@@ -29,7 +31,7 @@ export class ChatGateway {
 
   // server: Server;
 
-  constructor(private readonly chatService: ChatService) {}
+  constructor(private readonly chatService: ChatService, private jwtService: JwtService) {}
 
   @SubscribeMessage('message')
   handleMessage(client: any, payload: any): string {
@@ -45,11 +47,23 @@ export class ChatGateway {
 
   async handleConnection(socket) {
     console.log('====connected chat====')
+    console.log(socket.handshake);
+    console.log(socket.handshake.auth.id);
+    try {
+      console.log(this.jwtService.verify(socket.handshake.auth.id.replace('Authentication','')));
+    } catch (error) {
+      console.log("wrong token");
+      socket.disconnect()
+      return
+    }
+    
+		
 
     const rooms = await this.chatService.getUserRooms(socket.handshake.auth.id)
     if (socket.handshake.auth.id == undefined) {
       console.log("client not outorised diconnect");
       socket.disconnect()
+
     }
     
 
