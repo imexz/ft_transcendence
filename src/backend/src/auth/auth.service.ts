@@ -30,7 +30,7 @@ export class AuthService {
 	}
 
 	async addfriend(user_id: number, friend_id: number) {
-		this.usersService.addfriend(user_id, friend_id)
+		// this.usersService.addfriend(user_id, friend_id)
 
 
 	}
