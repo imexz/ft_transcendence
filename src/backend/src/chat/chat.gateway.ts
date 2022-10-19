@@ -4,38 +4,23 @@ import { Socket, Server } from 'socket.io';
 import { JwtAuthGuard } from 'src/auth/jwt-two/jwt-auth.guard';
 import { message } from '../message/message.entity';
 import { ChatService } from './chat.service';
+import { JwtService } from '@nestjs/jwt';
+import { hostURL } from 'src/hostURL';
+import { JwtStrategy } from 'src/auth/jwt-two/jwt.strategy';
+
 
 @WebSocketGateway({
   cors: {
     // origin: "*",
-    origin: ['http://localhost:8080', 'http://localhost:3000'],
+    origin: [hostURL + ':8080', hostURL + ':3000'],
     credentials: true
   },
-  // namespace: 'chat'
+  namespace: 'chat'
 })
 
 export class ChatGateway {
 
-  // @WebSocketServer()
-  // server: Server;
-
-  // server.use()
-
-  // @WebSocketServer()
-  // server = new Server({allowEIO3: true});
-  // server = require("socket.io")(httpServer, {
-  //   allowEIO2: true // false by default
-  // });
-
-  // server: Server;
-
-  constructor(private readonly chatService: ChatService) {}
-
-  @SubscribeMessage('message')
-  handleMessage(client: any, payload: any): string {
-    return 'Hello world!';
-  }
-
+  constructor(private readonly chatService: ChatService, private jwtService: JwtService, private jwtStrategy: JwtStrategy) {}
 
   afterInit(socket) {
     // console.log("afterInit chat ");
@@ -45,8 +30,39 @@ export class ChatGateway {
 
   async handleConnection(socket) {
     console.log('====connected chat====')
+    console.log(socket.handshake);
 
-    const rooms = await this.chatService.getUserRooms(socket.handshake.auth.id)
+
+    try {
+      socket.handshake.auth = this.jwtService.verify(socket.handshake.auth.id.replace('Authentication=',''));
+      console.log("socket handshake");
+      console.log(socket.handshake.auth);
+
+      socket.handshake.auth = await this.jwtStrategy.validate(socket.handshake.auth)
+      console.log("socket handshake1");
+      console.log(socket.handshake.auth);
+      if(socket.handshake.auth == undefined){
+        console.log("validation goes wrong");
+        socket.disconnect()
+        return
+      }
+      
+    } catch (error) {
+      console.log("wrong token");
+      socket.disconnect()
+      return
+    }
+    
+		
+// console.log(socket.handshake.auth._id);
+
+//     if (socket.handshake.auth._id == undefined) {
+//       console.log("client not outorised diconnect");
+//       socket.disconnect()
+
+//     }
+    const rooms = await this.chatService.getUserRooms(socket.handshake.auth._id)
+    
 
     // rooms.forEach(room => {
     //   socket.join(room.roomName)
@@ -78,10 +94,10 @@ export class ChatGateway {
     console.log("join");
     console.log(roomId);
     
-    console.log(client.handshake.auth.id);
+    console.log(client.handshake.auth);
     // const room_name = await this.chatService.getRoomName(roomId)
     
-    if (this.chatService.manageJoin(client.handshake.auth.id, roomId, password))
+    if (this.chatService.manageJoin(client.handshake.auth._id, roomId, password))
     {
       client.join(roomId.toString())
     }
@@ -97,7 +113,7 @@ export class ChatGateway {
     const room_name = await this.chatService.getRoomName(roomId)
     
     client.leave(room_name);
-    this.chatService.manageLeave(client.handshake.auth.id, room_name)
+    this.chatService.manageLeave(client.handshake.auth._id, room_name)
   }
 
   @SubscribeMessage('typing')
@@ -109,10 +125,10 @@ export class ChatGateway {
     console.log(roomId)
     console.log("roomId")
 
-    // const name = await this.chatService.getClientName(client.handshake.auth.id);
+    // const name = await this.chatService.getClientName(client.handshake.auth._id);
     // const room_name = await this.chatService.getRoomName(roomId)
-    // const name = client.id
-    const userId = client.handshake.auth.id
+    // const name = client.Id
+    const userId = client.handshake.auth._id
     client.to(roomId.toString()).emit('typing', { userId: userId , isTyping , roomId});
     // console.log("recive and emit typing");
 
@@ -123,10 +139,10 @@ export class ChatGateway {
     console.log('findAllMessages');
     console.log(roomId);
     console.log(client.handshake);
-    console.log(client.handshake.auth.id);
+    console.log(client.handshake.auth._id);
     
     
-    return await this.chatService.findAllMessages(roomId, client.handshake.auth.id);
+    return await this.chatService.findAllMessages(roomId, client.handshake.auth._id);
     // return {test};
   }
 
@@ -139,15 +155,16 @@ export class ChatGateway {
     console.log("createMessage");
     console.log(roomId);
     console.log(content);
+    console.log(client.handshake.auth._id);
     
     // const room_name = await this.chatService.getRoomName(roomId)
     
-    const message = await this.chatService.createMessage(client.handshake.auth.id, roomId, content);
+    const message = await this.chatService.createMessage(client.handshake.auth._id, roomId, content);
     
     // client.to(room_name).emit('message', message);
     if(message) {
       const tmp = {
-      senderId: client.handshake.auth.id.toString(),
+      senderId: client.handshake.auth._id.toString(),
       _id: message._id,
       content: content,
       avatar: message.user.avatar_url,

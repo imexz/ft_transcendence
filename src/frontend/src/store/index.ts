@@ -5,21 +5,26 @@ import User from '@/models/user';
 import router from '@/router';
 import VueAxios from 'axios';
 import { API_URL } from '@/defines';
+import { io, Socket } from 'socket.io-client'
+
 
 
 
 export interface State {
   validated: boolean
   user: User
-  socket: null
+  socket: Socket | null
   friendsList: User[] | null
+  NrMessages: number
+  NrFriendRequests: number
+  chatRequest: boolean
 }
 
 const storage = localStorage.getItem('user')
 const user = storage?JSON.parse(storage):null;
 const initialState = user?
-  {validated: true, user: user, socket: null, friendsList: null}:
-  {validated: false, user: null,  socket: null, friendsList: null};
+  {validated: true, user: user, socket: null, friendsList: null, NrMessages: 0, NrFriendRequests: 0, chatRequest: false}:
+  {validated: false, user: null,  socket: null, friendsList: null, NrMessages: 0, NrFriendRequests: 0, chatRequest: false};
 
 export default createStore<State>({
 
@@ -28,18 +33,13 @@ export default createStore<State>({
     isLogged(state) {
       return state.validated
     },
-    // isTwoFA(state) {
-    //   return state.validated
-    // },
     getUser(state) {
       return state.user
     },
     getSocket(state) {
       return state.socket
     },
-    getFriends(state) {
-      console.log(state);
-      
+    getFriends(state) {      
       return state.friendsList
     } 
   },
@@ -48,8 +48,25 @@ export default createStore<State>({
       state.validated = false;
     },
     logIn(state, user) {
+      console.log("logIn");
+      
       state.validated = true;
       state.user = user;
+      state.socket = io(API_URL, {
+          auth: {
+              id: document.cookie
+          }
+      });
+      console.log(document.cookie);
+      state.socket.on('message',() => {
+        state.NrMessages++
+      })
+      state.socket.on('friendRequest',() => {
+        state.NrFriendRequests++
+      })
+      state.socket.on('chatRequest',() => {
+        state.chatRequest = true;
+      })
     },
     changeUserName(state, username) {
       state.user.username = username;
@@ -75,9 +92,11 @@ export default createStore<State>({
   actions: {
     logOut({ commit }) {
       commit('logOut');
-      document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 GMT;SameSite=Lax"
+      document.cookie = "Authentication=; expires=Thu, 01 Jan 1970 00:00:00 GMT;SameSite=Lax"
       localStorage.removeItem('user');
-      router.push("/login");
+      console.log(router.currentRoute.value.path)
+      if (router.currentRoute.value.path != '/login/tfa')
+        router.push("/login");
     },
     logIn({ commit }, user) {
       commit('logIn', user);

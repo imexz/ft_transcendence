@@ -18,7 +18,7 @@ export class FriendsService {
 		return await this.friendRepository.createQueryBuilder("friend")
 			.innerJoin('friend.requester', 'requester', 'requester._id = :id1', { id1: user_id })
 			.leftJoinAndSelect('friend.accepter', 'accepter')
-			.select('status, accepter._id  AS "senderId", accepter.avatar_url AS avatar_url, accepter.username AS username, 1 AS test')
+			.select('status, accepter._id  AS "_id", accepter.avatar_url AS avatar_url, accepter.username AS username, 1 AS me')
 			.getRawMany()
 	}
 
@@ -26,7 +26,7 @@ export class FriendsService {
 		return await this.friendRepository.createQueryBuilder("friend")
 			.innerJoin('friend.accepter', 'accepter', 'accepter._id = :id', { id: user_id })
 			.leftJoinAndSelect('friend.requester', 'requester')
-			.select('status, requester._id  AS "senderId", requester.avatar_url AS avatar_url, requester.username AS username, 2 AS test')
+			.select('status, requester._id  AS "_id", requester.avatar_url AS avatar_url, requester.username AS username, 0 AS me')
 			.getRawMany()
 	}
 
@@ -41,6 +41,8 @@ export class FriendsService {
 
 	async remove_friendship(_id: any, id: number) {
 		console.log("remove_friendship");
+		console.log(_id, id);
+		
 		
 		const friends = await this.friendRepository.findOne({
 			relations: {
