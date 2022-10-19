@@ -46,61 +46,43 @@ export class ChatGateway {
         socket.disconnect()
         return
       }
-      
+      this.joinRoom(socket)
+
     } catch (error) {
       console.log("wrong token");
       socket.disconnect()
       return
     }
-    
-		
-// console.log(socket.handshake.auth._id);
 
-//     if (socket.handshake.auth._id == undefined) {
-//       console.log("client not outorised diconnect");
-//       socket.disconnect()
 
-//     }
-    const rooms = await this.chatService.getUserRooms(socket.handshake.auth._id)
-    
+  }
 
-    // rooms.forEach(room => {
-    //   socket.join(room.roomName)
-    //   console.log("joind");
-    //   console.log(room.roomName);
-      
-    // });
+
+  @SubscribeMessage('join')
+  async joinRoom(
+    @ConnectedSocket() client: Socket,
+    @MessageBody('roomId') roomId?: number,
+    @MessageBody('password') password?: string,)
+     {
+      console.log("join");
+
+      console.log(client.handshake);
+      console.log("join after");
+
+    const rooms = await this.chatService.getUserRooms(client.handshake.auth._id)
+
 
     var tmp = []
     for (let index = 0; index < rooms.length; index++) {
       tmp.push(rooms[index].roomId.toString())
     }
-    // console.log(tmp);
-    
-    socket.join(tmp)
-    // console.log(socket.handshake);
 
-    
-    // socket.emit('successfullConnected');
-
-  }
-
-  @SubscribeMessage('join')
-  async joinRoom(
-    @MessageBody('roomId') roomId: number,
-    @MessageBody('password') password: string,
-    @ConnectedSocket() client: Socket,
-  ) {
-    console.log("join");
-    console.log(roomId);
-    
-    console.log(client.handshake.auth);
-    // const room_name = await this.chatService.getRoomName(roomId)
-    
-    if (this.chatService.manageJoin(client.handshake.auth._id, roomId, password))
-    {
-      client.join(roomId.toString())
+    if (roomId != undefined && this.chatService.manageJoin(client.handshake.auth._id, roomId, password)) {
+      tmp.push(roomId.toString())
     }
+    // console.log(tmp);
+
+    client.join(tmp)
   }
 
   @SubscribeMessage('leave')
@@ -109,9 +91,9 @@ export class ChatGateway {
     @ConnectedSocket() client:Socket,
   ) {
     console.log("leave");
-    
+
     const room_name = await this.chatService.getRoomName(roomId)
-    
+
     client.leave(room_name);
     this.chatService.manageLeave(client.handshake.auth._id, room_name)
   }
@@ -140,8 +122,8 @@ export class ChatGateway {
     console.log(roomId);
     console.log(client.handshake);
     console.log(client.handshake.auth._id);
-    
-    
+
+
     return await this.chatService.findAllMessages(roomId, client.handshake.auth._id);
     // return {test};
   }
@@ -156,11 +138,11 @@ export class ChatGateway {
     console.log(roomId);
     console.log(content);
     console.log(client.handshake.auth._id);
-    
+
     // const room_name = await this.chatService.getRoomName(roomId)
-    
+
     const message = await this.chatService.createMessage(client.handshake.auth._id, roomId, content);
-    
+
     // client.to(room_name).emit('message', message);
     if(message) {
       const tmp = {
@@ -176,22 +158,35 @@ export class ChatGateway {
 
       // console.log(test);
       console.log({tmp, roomId});
-      
-      
+
+
       client.to(roomId.toString()).emit('message', {message: tmp, roomId});
       console.log("createMessage ende");
       return tmp;
     } else {
       console.log("message == empty");
-      
+
     }
-      
+
       // console.log(client.);
-      
+
       // console.log("emit mesage");
       // console.log(message);
       // console.log(tmp);
-      
+
+  }
+
+  @SubscribeMessage('deleteMessage')
+  async deleteMessage(
+    // @MessageBody('roomId') roomId : number,
+    @MessageBody('messageId') messageId : number,
+    @ConnectedSocket() client: Socket,
+  ) {
+      console.log("delete found");
+      console.log(messageId);
+      this.chatService.deleteMessage(messageId, client.handshake.auth._id);
+
+
   }
 
 
