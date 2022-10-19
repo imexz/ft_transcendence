@@ -5,12 +5,13 @@ import { JwtAuthGuard } from 'src/auth/jwt-two/jwt-auth.guard';
 import { message } from '../message/message.entity';
 import { ChatService } from './chat.service';
 import { JwtService } from '@nestjs/jwt';
+import { hostURL } from 'src/hostURL';
 
 
 @WebSocketGateway({
   cors: {
     // origin: "*",
-    origin: ['http://localhost:8080', 'http://localhost:3000'],
+    origin: [hostURL + ':8080', hostURL + ':3000'],
     credentials: true
   },
   namespace: 'chat'
