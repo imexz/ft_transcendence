@@ -2,9 +2,18 @@
   <vue-advanced-chat
       :current-user-id="currentUserId"
       :rooms="JSON.stringify(rooms)"
+      :rooms-loaded="true"
       :messages="JSON.stringify(messages)"
+      :messages-loaded="messagesLoaded"
+      :message-actions="JSON.stringify(messageActions)"
       :room-actions="JSON.stringify(roomActions)"
+      :show-audio="false"
+      :show-files="false"
+      :theme="chatTheme"
+      :show-reaction-emojis="true"
       @send-message="sendMessage($event.detail[0])"
+      @delete-message="deleteMessage($event.detail[0])"
+      @message-action-handler="messageActionHandler($event.detail[0])"
       @add-room="makePopupCreate()"
       @room-action-handler="roomActionHandler($event.detail[0])"
       @typing-message="emitTyping($event.detail[0])"
@@ -28,7 +37,7 @@
       <h2>Join Room</h2>
     </joinRoomPopup> -->
   </template>
-  
+
   <script >
   import { register } from 'vue-advanced-chat'
   import { io, Socket } from 'socket.io-client';
@@ -40,7 +49,7 @@
 
 
   register()
-  
+
     export default {
       data() {
         return {
@@ -48,16 +57,23 @@
           currentRoomId: '',
           rooms: [],
           messages: [],
+          messagesLoaded: true, // change this value to show a loading icon on the top of the chat
+          messageActions: [
+            { name: 'deleteMessage' , title: 'delete message', onlyMe: true },
+            { name: 'block', title: 'block user'}
+          ],
           roomActions: [
             { name: 'join', title: 'join Room' },
             { name: 'leave', title: 'leave Room' },
-            { name: 'deleteRoom', title: 'Delete Room' }
+            { name: 'delete', title: 'Delete Room' }
           ],
           PoppupCreate: ref(false),
           PoppupJoin: ref(false),
           password: '',
           timeout: 0,
           typing: false,
+          chatTheme: "dark",
+          showEmojis: true,
   		    socket: null
         }
       },
@@ -130,7 +146,7 @@
                 })
                 .catch(error => { this.$emit('error') })
         },
-      
+
         emitTyping({ roomId, message }) {
           console.log("emitTyping");
           console.log(roomId);
@@ -139,7 +155,7 @@
           {
             this.socket.emit('typing', {isTyping: true, roomId: roomId});
             this.typing = true
-          
+
             this.timeout = setTimeout(() => {
               if(this.typing == true) {
                 this.socket.emit('typing', { isTyping: false, roomId: roomId});
@@ -150,7 +166,7 @@
           console.log("emit typing ");
           // console.log("roomId");
           // console.log(roomId.roomId);
-          
+
         },
         getRooms(){
             VueAxios({
@@ -161,7 +177,7 @@
             })
                 .then(response => {
                 console.log(response.data);
-                
+
                 this.rooms = response.data
                 })
                 .catch()
@@ -198,11 +214,51 @@
               }
               this.updateMessages(roomId)
               break;
+              case 'delete':
+              {
+                console.log("case delete");
+                // consle.log(rooms.find(roomId))
+                break;
+              }
               case 'leave':
                 this.updateMessages(roomId)
               default:
                 this.socket.emit(action.name, roomId)
               break;
+          }
+        },
+        // showRoomInfo({ roomId, action, message }) {
+        //   console.log("room info clicked");
+        //   console.log(roomId)
+        //   console.log(action)
+        //   console.log(message)
+        // },
+        messageActionHandler({ roomId, action, message }) {
+          console.log("messageActionHandler")
+          console.log(roomId)
+          console.log(action)
+          console.log(message)
+          switch (action.name) {
+            case 'block':
+              {
+                console.log("case block");
+              }
+
+              break;
+
+            default:
+              break;
+          }
+        },
+        deleteMessage({message}) {
+          console.log("delete requested")
+          const messages = this.messages
+          const index = messages.findIndex(element => element._id == message._id)
+          if (index != -1)
+          {
+            messages.splice(index , 1)
+            this.messages = messages
+            this.$socketio.emit('deleteMessage', {messageId: message._id}, () => { console.log("success delete");})
           }
         },
         addMessage(message) {
@@ -230,7 +286,7 @@
         console.log("beforeMount");
       },
       mounted() {
-       
+
         this.socket.on('typing',({ userId, isTyping , roomId}) => {
           console.log('typing');
           const room = this.rooms.find((room) => {
@@ -284,13 +340,13 @@
 
         console.log("mounted CHAT");
         // console.log(this.currentUserId)
-      }      
+      }
     }
 </script>
 
 <!-- <script lang="ts">
     import { register } from 'vue-advanced-chat'
-    
+
       export default {
         data() {
           return {
