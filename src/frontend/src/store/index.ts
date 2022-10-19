@@ -17,14 +17,14 @@ export interface State {
   friendsList: User[] | null
   NrMessages: number
   NrFriendRequests: number
-  chatRequest: boolean
+  gameRequest: boolean
 }
 
 const storage = localStorage.getItem('user')
 const user = storage?JSON.parse(storage):null;
 const initialState = user?
-  {validated: true, user: user, socket: null, friendsList: null, NrMessages: 0, NrFriendRequests: 0, chatRequest: false}:
-  {validated: false, user: null,  socket: null, friendsList: null, NrMessages: 0, NrFriendRequests: 0, chatRequest: false};
+  {validated: true, user: user, socket: null, friendsList: null, NrMessages: 0, NrFriendRequests: 0, gameRequest: false}:
+  {validated: false, user: null,  socket: null, friendsList: null, NrMessages: 0, NrFriendRequests: 0, gameRequest: false};
 
 export default createStore<State>({
 
@@ -64,8 +64,8 @@ export default createStore<State>({
       state.socket.on('friendRequest',() => {
         state.NrFriendRequests++
       })
-      state.socket.on('chatRequest',() => {
-        state.chatRequest = true;
+      state.socket.on('gameRequest',() => {
+        state.gameRequest = true;
       })
     },
     changeUserName(state, username) {

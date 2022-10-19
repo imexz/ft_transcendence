@@ -41,8 +41,6 @@ export class ChatService {
             return this.chatroomService.userToRoom(user, roomId, password);
         }
         
-        
-        
         async findAllMessages(roomId: number, userId: number) {
           const rooms = await this.chatroomService.getAllwithUser(userId)
           for (let index = 0; index < rooms.length; index++) {
