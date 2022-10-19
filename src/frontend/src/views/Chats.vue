@@ -173,6 +173,7 @@
               }
             }
           )
+          console.log("initSocket")
         },
         roomActionHandler({ roomId, action }) {
           console.log("roomActionHandler");
