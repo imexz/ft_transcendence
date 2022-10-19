@@ -9,12 +9,6 @@ import { timestamp } from 'rxjs';
 
 @Injectable()
 export class MessageService {
-    userDeleteMessage(messageId: number, id: number) {
-        this.messageRepository.delete({
-            _id: messageId,
-            user: {_id: id}
-        })
-    }
     constructor(
         @InjectRepository(message)
         private messageRepository: Repository<message>
@@ -26,7 +20,7 @@ export class MessageService {
             return await this.messageRepository.save(new_message);
         } else {
             console.log("userAddMessageToRoom goes wrong");
-
+            
         }
     }
 
@@ -43,7 +37,7 @@ export class MessageService {
         console.log(roomId);
 
         console.log(messages);
-
+        
 
         return messages
     }
