@@ -115,6 +115,7 @@ export default defineComponent({
   .wrapper {
     width: 800px;
     margin: auto;
+    margin-bottom: 80px;
     display: flex;
     flex-direction: column;
     background-color: var(--ft_dark);
