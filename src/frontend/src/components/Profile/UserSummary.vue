@@ -39,6 +39,7 @@
       </button>
       <button
         class="dropdownElement">
+        @click="AskForMatch">
         <font-awesome-icon icon="fa-solid fa-table-tennis-paddle-ball" />
       </button>
     </div>
@@ -86,6 +87,9 @@ export default defineComponent({
       if (!this.$el.contains(e.target)){
         this.show = false;
       }
+    },
+    AskForMatch(){
+      this.$store.socket.emit('gameRequest', {id: this.user.id}, () => {})
     },
     removeFriend(){
       // console.log("IMPLEMENT API TO REMOVE FRIEND")
