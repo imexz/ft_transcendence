@@ -10,6 +10,7 @@ import { GameService } from './game.service';
 import { Socket, Server } from 'socket.io';
 import { Game } from './game.entities/game.entity';
 import { Observable, map, interval } from 'rxjs';
+import { hostURL } from 'src/hostURL';
 
 interface GameEvent {
   data: Game;
@@ -18,7 +19,7 @@ interface GameEvent {
 @WebSocketGateway({
   namespace: 'game',
 	cors: {
-		origin: ['http://localhost:8080', 'http://localhost:3000'],
+		origin: [hostURL + ':8080', hostURL +':3000'],
 		credentials: true
 	},
 })
