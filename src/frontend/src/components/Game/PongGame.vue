@@ -2,13 +2,13 @@
   <div v-show="gameId">
     <div class="matchInfo">
       <div id = "scoreLeft">
-        <UserSummary :userLeft=userLeft!></UserSummary>
+        <UserSummary :user=userLeft!></UserSummary>
       </div>
       <div>
         vs
       </div>
       <div id = "scoreRight">
-        <UserSummary :userRight=userRight!></UserSummary> 
+        <UserSummary :user=userRight!></UserSummary> 
         <!-- =$store.state.user -->
       </div>
     </div>
@@ -92,11 +92,12 @@ import { throwStatement } from '@babel/types';
   		console.log("in created");
   		this.gamesocket = io(API_URL + '/game', {
   			auth: (cb: any) => {
-  				cb ({id: this.$store.getters.getUser._id })
+  				cb ({id: document.cookie })
   			}
   		});
   		this.gamesocket.on('gameInfo', (data: any) => {
   			console.log("event gameInfo received");
+        console.log(data);
   			this.gameId = data.gameId;
   			this.side = data.side;
 			  this.finished = false;
@@ -300,21 +301,24 @@ import { throwStatement } from '@babel/types';
   			this.gamesocket.emit('moveRightDown');
   		},
       setUserSummary(data: any) {
+        console.log("setUserSummary");
         VueAxios({
-          url: '/users/find/' + data.playerLeft,
+          url: '/users/find/' + data.playerLeft.toString(),
           baseURL: API_URL,
           method: 'GET',
           withCredentials: true,
         })
-          .then(response => { this.userLeft = response.data })
-          .catch()
+          .then(response => { 
+            console.log("response data ", response.data);
+            this.userLeft = response.data })
+          .catch();
         VueAxios({
-          url: '/users/find/' + data.playerRight,
+          url: '/users/find/' + data.playerRight.toString(),
           baseURL: API_URL,
           method: 'GET',
           withCredentials: true,
         })
-          .then(response => { this.userLeft = response.data })
+          .then(response => { this.userRight = response.data })
           .catch()
       },
   	}

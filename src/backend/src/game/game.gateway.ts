@@ -40,12 +40,12 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     // console.log("client %s connected", client.handshake.auth.id);
     try {
       socket.handshake.auth  = this.jwtService.verify(socket.handshake.auth.id.replace('Authentication=',''));
-      console.log("socket handshake");
-      console.log(socket.handshake.auth);
+      // console.log("socket handshake");
+      // console.log(socket.handshake.auth);
 
       socket.handshake.auth = await this.jwtStrategy.validate(socket.handshake.auth as TokenPayload)
-      console.log("socket handshake1");
-      console.log(socket.handshake.auth);
+      // console.log("socket handshake1");
+      // console.log(socket.handshake.auth);
       if(socket.handshake.auth == undefined){
         console.log("validation goes wrong");
         socket.disconnect()

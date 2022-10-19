@@ -40,12 +40,16 @@ export class UsersService {
 	}
 
 	async getUser(id: number): Promise<User> {
-		console.log(id);
+		// console.log("getUser -> ", id);
 		
 		if(id != undefined) {
-			const user = this.usersRepository.findOne({where: {_id: id}})
+			const user = await this.usersRepository.findOne({where: {_id: id}})
+			// console.log("getUsers: ", user);
+			
 			return user
 		}
+		// console.log("getUser returns undefined");
+		
 		return undefined
 	}
 

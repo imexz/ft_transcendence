@@ -15,7 +15,11 @@ export class UsersController {
 	@Get('find/:id')
 	@UseGuards(JwtAuthGuard)
 	findOne(@Param('id') params: number){
-		return this.usersService.getUser(params)
+		// console.log("findOne");
+		const user = this.usersService.getUser(params);
+		// console.log("findOne", user);
+		
+		return user;
 	}
 
 	@Get('allUser')
