@@ -37,15 +37,15 @@ export class GameService {
 
 	checkForExistingGame(client: Socket): boolean {
 		var ret: boolean = false;
-		var gameid = this.users.get(client.handshake.auth.id);
+		var gameid = this.users.get(client.handshake.auth._id); //TODO: Spectator needs to be added to users map
 		if (gameid != undefined) {
 			ret = true;
-			console.log("client %d already is in users", client.handshake.auth.id);
+			console.log("client %d already is in users", client.handshake.auth._id);
 			client.emit('gameInfo', {
 					gameId: gameid,
-					side: this.#getSideFromGame(this.games.get(gameid), client.handshake.auth.id),
+					side: this.#getSideFromGame(this.games.get(gameid), client.handshake.auth._id),
 					playerLeft: this.games.get(gameid).playerLeft,
-					playerRight: this.games.get(gameid).paddleRight,
+					playerRight: this.games.get(gameid).playerRight,
 				});
 			client.join(gameid.toString());
 		}
@@ -54,18 +54,18 @@ export class GameService {
 
 	async	addClientIdToQueue(client: Socket, server: Server): Promise<void> {
 		var needle: QueueElem = {
-			id: client.handshake.auth.id,
+			id: client.handshake.auth._id,
 			socket: client,
 		}
 		// console.log(this.queue);
 		if (this.queue.find(({id}) => {return id === needle.id}) == undefined) {
-			console.log("add %s to queue", client.handshake.auth.id);
-			this.queue.push({id: client.handshake.auth.id, socket: client});
+			console.log("add %s to queue", client.handshake.auth._id);
+			this.queue.push({id: client.handshake.auth._id, socket: client});
 			while (this.queue.length > 1) {
 				await this.#initializeGame(server);
 			}
 		} else {
-			console.log("%s already is in queue", client.handshake.auth.id);
+			console.log("%s already is in queue", client.handshake.auth._id);
 		}
 	}
 	
@@ -87,7 +87,7 @@ export class GameService {
 		this.sockets.set(gamerepo.id, [firstPlayer.socket, secondPlayer.socket]);
 		const setup = new GameSetup;
 		console.log('leaving createGameInstance()');
-		return new Game(gamerepo.id, firstPlayer.socket.handshake.auth.id, secondPlayer.socket.handshake.auth.id, setup);
+		return new Game(gamerepo.id, firstPlayer.socket.handshake.auth._id, secondPlayer.socket.handshake.auth._id, setup);
 	}
 
 	#updateMaps(game: Game) {
@@ -102,8 +102,8 @@ export class GameService {
 	}
 
 	#emitGameInfoToFrontend(game: Game) {
-		this.sockets.get(game.id)[0].emit('gameInfo', {gameId: game.id, side: "left"});
-		this.sockets.get(game.id)[1].emit('gameInfo', {gameId: game.id, side: "right"});
+		this.sockets.get(game.id)[0].emit('gameInfo', {gameId: game.id, side: "left", playerLeft: game.playerLeft, playerRight: game.playerRight});
+		this.sockets.get(game.id)[1].emit('gameInfo', {gameId: game.id, side: "right", playerLeft: game.playerLeft, playerRight: game.playerRight});
 	}
 
 	async #emitGameData(gameId: number, server: Server) {
