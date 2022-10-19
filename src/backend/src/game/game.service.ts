@@ -44,6 +44,8 @@ export class GameService {
 			client.emit('gameInfo', {
 					gameId: gameid,
 					side: this.#getSideFromGame(this.games.get(gameid), client.handshake.auth.id),
+					playerLeft: this.games.get(gameid).playerLeft,
+					playerRight: this.games.get(gameid).paddleRight,
 				});
 			client.join(gameid.toString());
 		}
@@ -237,7 +239,7 @@ export class GameService {
 			game.ball.direction.x = game.ball.direction.speed * Math.cos(game.ball.direction.angle);
 			game.ball.direction.y = game.ball.direction.speed * Math.sin(game.ball.direction.angle); // * 0.1
 		}
-		while (game.ball.direction.x < 0.2 && );
+		while (game.ball.direction.x < 0.2 && game.ball.direction.y < 0.2);
 		// console.log("dir x: %d | dir y: %d | angle: %d", game.ball.direction.x, game.ball.direction.y, game.ball.direction.angle);
 		game.ball.radius = this.setup.ballRadius;
 

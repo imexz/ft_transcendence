@@ -2,13 +2,14 @@
   <div v-show="gameId">
     <div class="matchInfo">
       <div id = "scoreLeft">
-        <UserSummary :user=$store.state.user></UserSummary>
+        <UserSummary :userLeft=userLeft!></UserSummary>
       </div>
       <div>
         vs
       </div>
       <div id = "scoreRight">
-        <UserSummary :user=$store.state.user></UserSummary>
+        <UserSummary :userRight=userRight!></UserSummary> 
+        <!-- =$store.state.user -->
       </div>
     </div>
     <div class="gameCanvas">
@@ -27,6 +28,8 @@
   import { defineComponent } from 'vue';
   import * as PIXI from 'pixi.js';
   import UserSummary from '@/components/Profile/UserSummary.vue'
+  import VueAxios from 'axios';
+  import User from '@/models/user';
 import { throwStatement } from '@babel/types';
 
   export default defineComponent({
@@ -39,6 +42,8 @@ import { throwStatement } from '@babel/types';
   		  side: "" as string,
 			  leftScore: 0 as number,
 			  rightScore: 0 as number,
+        userLeft: null as User | null,
+        userRight: null as User | null,
 			  finished: false as boolean,
         fps: 0,
         pixiApp: null,
@@ -96,12 +101,13 @@ import { throwStatement } from '@babel/types';
   			this.side = data.side;
 			  this.finished = false;
 			  console.log("received GameId: %s, side: %s", this.gameId, this.side);
+        this.setUserSummary(data);
 			  document.addEventListener('keydown', this.keyEvents, false);
 		  });
 		  this.gamesocket.emit('checkGame', (res: boolean) => {
   			if (!res) {
   				console.log("calling checkQueue");
-  				this.gamesocket.emit('checkQueue');
+  				this.gamesocket.emit('checkQueue'); // TODO: do not join queue in case of private game
   			}
   		});
   		console.log("leaving created");
@@ -293,6 +299,24 @@ import { throwStatement } from '@babel/types';
   		paddleRightDown() {
   			this.gamesocket.emit('moveRightDown');
   		},
+      setUserSummary(data: any) {
+        VueAxios({
+          url: '/users/find/' + data.playerLeft,
+          baseURL: API_URL,
+          method: 'GET',
+          withCredentials: true,
+        })
+          .then(response => { this.userLeft = response.data })
+          .catch()
+        VueAxios({
+          url: '/users/find/' + data.playerRight,
+          baseURL: API_URL,
+          method: 'GET',
+          withCredentials: true,
+        })
+          .then(response => { this.userLeft = response.data })
+          .catch()
+      },
   	}
   })
 </script>
