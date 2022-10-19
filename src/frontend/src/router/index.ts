@@ -22,6 +22,13 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/login',
     name: 'login',
+    props: {tfa : false},
+    component: () => import('../views/LoginView.vue')
+  },
+  {
+    path: '/login/tfa',
+    name: 'tfa',
+    props: {tfa : true},
     component: () => import('../views/LoginView.vue')
   },
   {
@@ -52,7 +59,7 @@ const router = createRouter({
 })
 
 router.beforeEach(async (to) => {
-  const publicPages = ['/login'];
+  const publicPages = ['/login', '/login/tfa'];
   const authRequired = !publicPages.includes(to.path);
 
   if (authRequired && !store.getters.isLogged) {
