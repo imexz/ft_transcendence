@@ -94,40 +94,11 @@ import { throwStatement } from '@babel/types';
   			console.log("event gameInfo received");
   			this.gameId = data.gameId;
   			this.side = data.side;
-			this.finished = false;
-// <<<<<<< HEAD
-//   			console.log("received GameId: %s, side: %s", this.gameId, this.side);
-// 			if (this.side === "left" || this.side === "right") {
-// 				document.addEventListener('keydown', (event) => {
-// 					if (this.side === "left" && !this.finished) {
-// 						if (event.key == 'w') {
-// 							console.log(event.key);
-// 							this.paddleLeftUp();
-// 						}
-// 						else if (event.key == 's') {
-// 							console.log(event.key);
-// 							this.paddleLeftDown();
-// 						}
-// 					} else if (this.side === "right" && !this.finished) {
-// 						if (event.key == 'ArrowUp') {
-// 							console.log(event.key);
-// 							this.paddleRightUp();
-// 						}
-// 						else if (event.key == 'ArrowDown') {
-// 							console.log(event.key);
-// 							this.paddleRightDown();
-// 						}
-// 					}
-// 				}, false);
-// 			}
-//   		});
-//   		this.gamesocket.emit('checkGame', (res: boolean) => {
-// =======
-			console.log("received GameId: %s, side: %s", this.gameId, this.side);
-			document.addEventListener('keydown', this.keyEvents, false);
-		});
-		this.gamesocket.emit('checkGame', (res: boolean) => {
-// >>>>>>> master
+			  this.finished = false;
+			  console.log("received GameId: %s, side: %s", this.gameId, this.side);
+			  document.addEventListener('keydown', this.keyEvents, false);
+		  });
+		  this.gamesocket.emit('checkGame', (res: boolean) => {
   			if (!res) {
   				console.log("calling checkQueue");
   				this.gamesocket.emit('checkQueue');
