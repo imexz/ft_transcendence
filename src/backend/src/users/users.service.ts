@@ -14,10 +14,10 @@ export class UsersService {
 			_id: _id
 		},
 		relations:{
-			friends: true
+			myFriends: true
 		}})
 		console.log(friends);
-		return(friends.friends)
+		return(friends.myFriends)
 	}
 
 
