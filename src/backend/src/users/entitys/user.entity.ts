@@ -46,7 +46,10 @@ export class User {
 	avatar?:fileEntity;
 
 	@OneToMany(() => Friend, (friend) => friend.accepter)
-	friends?: Friend[];
+	myFriends?: Friend[];
+
+	@OneToMany(() => Friend, (friend) => friend.requester)
+	friendsOfMe?: Friend[];
 
 	@Column({nullable: true})
 	current_status: number;

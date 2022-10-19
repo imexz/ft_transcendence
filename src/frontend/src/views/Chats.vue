@@ -40,7 +40,7 @@
 
   <script >
   import { register } from 'vue-advanced-chat'
-  import { io } from 'socket.io-client';
+  import { io, Socket } from 'socket.io-client';
   import { ref } from 'vue';
   import VueAxios from 'axios';
   import { API_URL } from '@/defines';
@@ -67,7 +67,6 @@
             { name: 'leave', title: 'leave Room' },
             { name: 'delete', title: 'Delete Room' }
           ],
-          // socket: io,
           PoppupCreate: ref(false),
           PoppupJoin: ref(false),
           password: '',
@@ -75,6 +74,7 @@
           typing: false,
           chatTheme: "dark",
           showEmojis: true,
+  		    socket: null
         }
       },
       components:{
@@ -91,7 +91,7 @@
         async updateMessages(roomId) {
           console.log("updateMessages");
           console.log(roomId);
-          this.$socketio.emit('findAllMessages', {roomId: roomId}, (response) => {
+          this.socket.emit('findAllMessages', {roomId: roomId}, (response) => {
             console.log(response);
             this.messages = response;
           })
@@ -99,7 +99,7 @@
         sendMessage({ roomId, content, files, replyMessage, usersTag }) {
           console.log("createMessage");
           console.log(roomId);
-          this.$socketio.emit('createMessage', { roomId: roomId, content: content}, (response) =>
+          this.socket.emit('createMessage', { roomId: roomId, content: content}, (response) =>
           {
             console.log("createMessage response");
             console.log(response);
@@ -120,7 +120,7 @@
           console.log(roomId)
           this.PoppupJoin = !this.PoppupJoin
           if (this.PoppupJoin == false) {
-            this.$socketio.emit('join', {roomId: roomId, password: this.password})
+            this.$store.state.socket.emit('join', {roomId: roomId, password: this.password})
           }
           console.log(this.PoppupJoin);
         },
@@ -153,12 +153,12 @@
           console.log(this.timeout);
           if(this.typing == false)
           {
-            this.$socketio.emit('typing', {isTyping: true, roomId: roomId});
+            this.socket.emit('typing', {isTyping: true, roomId: roomId});
             this.typing = true
 
             this.timeout = setTimeout(() => {
               if(this.typing == true) {
-                this.$socketio.emit('typing', { isTyping: false, roomId: roomId});
+                this.socket.emit('typing', { isTyping: false, roomId: roomId});
                 this.typing = false
               }
             }, 2000);
@@ -183,15 +183,13 @@
                 .catch()
         },
         initSocket(){
-          // this.socket = io(API_URL, {
-          //   auth: (cb) => {
-          //           cb({ id: this.$store.getters.getUser._id })
-          //         }
-          //       })
-          this.$socketio.auth.id = this.$store.getters.getUser._id;
-          console.log("initSocket");
-          console.log(this.$store.getters.getUser._id);
-          this.$socketio.disconnect().connect()
+          this.socket = io(API_URL + "/chat", {
+              auth: {
+                  id: document.cookie
+              }
+            }
+          )
+          console.log("initSocket")
         },
         roomActionHandler({ roomId, action }) {
           console.log("roomActionHandler");
@@ -207,10 +205,10 @@
                   {
                     const result = prompt("This room is protected\n password", "password")
                     console.log(result);
-                      this.$socketio.emit('join', {roomId: roomId, password: result})
+                      this.socket.emit('join', {roomId: roomId, password: result})
                       // this.makePopupJoin(roomId)
                     } else {
-                      this.$socketio.emit('join', {roomId: roomId})
+                      this.socket.emit('join', {roomId: roomId})
                   }
                 }
               }
@@ -225,7 +223,7 @@
               case 'leave':
                 this.updateMessages(roomId)
               default:
-                this.$socketio.emit(action.name, roomId)
+                this.socket.emit(action.name, roomId)
               break;
           }
         },
@@ -289,7 +287,7 @@
       },
       mounted() {
 
-        this.$socketio.on('typing',({ userId, isTyping , roomId}) => {
+        this.socket.on('typing',({ userId, isTyping , roomId}) => {
           console.log('typing');
           const room = this.rooms.find((room) => {
             return room.roomId === roomId
@@ -320,7 +318,7 @@
           console.log("ende typing");
         });
 
-        this.$socketio.on('message',({message, roomId}) => {
+        this.socket.on('message',({message, roomId}) => {
           console.log('message');
           console.log(message);
           console.log(roomId);

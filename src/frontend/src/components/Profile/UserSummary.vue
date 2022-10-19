@@ -2,10 +2,10 @@
   <div class="userSummary">
     <div class="normalView">
       <img :src="user?.avatar_url" alt="Avatar">
-      <div>
       <span>{{ user?.username }}</span>
-      <!-- dis is fukking up the allignment -->
-      <!-- <h6> {{user?.status}} </h6> -->
+      <div v-if="user?.status == 0 && user?.me  == 0">
+        <button @click="accept"> accept  </button>
+        <button @click="removeFriend"> denide </button>
       </div>
       <div class="toggleDropdown" @click="toggleDropdown">
         <font-awesome-icon icon="fa-solid fa-bars" />
@@ -100,6 +100,9 @@ export default defineComponent({
         .then(this.$store.commit('removeFriend', this.user._id))
         .catch()
       // this.$store.commit('removeFriend', this.user._id);
+    },
+    accept() {
+      
     },
     viewProfile(id: number){
       this.show = false;

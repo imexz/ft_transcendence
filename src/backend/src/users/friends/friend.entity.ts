@@ -1,4 +1,5 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from "typeorm";
+import { message } from "src/message/message.entity";
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToMany } from "typeorm";
 import { User } from "../entitys/user.entity";
 
 
@@ -32,13 +33,13 @@ export class Friend {
     })
     public status!: Status
 
-	// @ManyToMany(() => User, (user) => user.friends)
-	// public user!: User[]
-
-	@ManyToOne(() => User, (user)=> user.friends)
+	@ManyToOne(() => User, (user)=> user.friendsOfMe)
 	public requester: User
 
-	@ManyToOne(() => User, (user)=> user.friends)
+	@ManyToOne(() => User, (user)=> user.myFriends)
 	public accepter: User
+
+	@OneToMany(() => message, (message) => message.chatroom)
+    messages: message[];
 	
 }
