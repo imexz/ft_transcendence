@@ -4,6 +4,8 @@ import { Socket, Server } from 'socket.io';
 import { JwtAuthGuard } from 'src/auth/jwt-two/jwt-auth.guard';
 import { message } from '../message/message.entity';
 import { ChatService } from './chat.service';
+import { JwtService } from '@nestjs/jwt';
+
 
 @WebSocketGateway({
   cors: {
@@ -11,31 +13,12 @@ import { ChatService } from './chat.service';
     origin: ['http://localhost:8080', 'http://localhost:3000'],
     credentials: true
   },
-  // namespace: 'chat'
+  namespace: 'chat'
 })
 
 export class ChatGateway {
 
-  // @WebSocketServer()
-  // server: Server;
-
-  // server.use()
-
-  // @WebSocketServer()
-  // server = new Server({allowEIO3: true});
-  // server = require("socket.io")(httpServer, {
-  //   allowEIO2: true // false by default
-  // });
-
-  // server: Server;
-
-  constructor(private readonly chatService: ChatService) {}
-
-  @SubscribeMessage('message')
-  handleMessage(client: any, payload: any): string {
-    return 'Hello world!';
-  }
-
+  constructor(private readonly chatService: ChatService, private jwtService: JwtService) {}
 
   afterInit(socket) {
     // console.log("afterInit chat ");
@@ -45,8 +28,31 @@ export class ChatGateway {
 
   async handleConnection(socket) {
     console.log('====connected chat====')
+    console.log(socket.handshake);
 
-    const rooms = await this.chatService.getUserRooms(socket.handshake.auth.id)
+
+    try {
+      socket.handshake.auth = this.jwtService.verify(socket.handshake.auth.id.replace('Authentication=',''));
+      console.log("socket handshake");
+      
+      console.log(socket.handshake.auth);
+      
+    } catch (error) {
+      console.log("wrong token");
+      socket.disconnect()
+      return
+    }
+    
+		
+// console.log(socket.handshake.auth.Id);
+
+//     if (socket.handshake.auth.Id == undefined) {
+//       console.log("client not outorised diconnect");
+//       socket.disconnect()
+
+//     }
+    const rooms = await this.chatService.getUserRooms(socket.handshake.auth.Id)
+    
 
     // rooms.forEach(room => {
     //   socket.join(room.roomName)
@@ -78,10 +84,10 @@ export class ChatGateway {
     console.log("join");
     console.log(roomId);
     
-    console.log(client.handshake.auth.id);
+    console.log(client.handshake.auth);
     // const room_name = await this.chatService.getRoomName(roomId)
     
-    if (this.chatService.manageJoin(client.handshake.auth.id, roomId, password))
+    if (this.chatService.manageJoin(client.handshake.auth.Id, roomId, password))
     {
       client.join(roomId.toString())
     }
@@ -97,7 +103,7 @@ export class ChatGateway {
     const room_name = await this.chatService.getRoomName(roomId)
     
     client.leave(room_name);
-    this.chatService.manageLeave(client.handshake.auth.id, room_name)
+    this.chatService.manageLeave(client.handshake.auth.Id, room_name)
   }
 
   @SubscribeMessage('typing')
@@ -109,10 +115,10 @@ export class ChatGateway {
     console.log(roomId)
     console.log("roomId")
 
-    // const name = await this.chatService.getClientName(client.handshake.auth.id);
+    // const name = await this.chatService.getClientName(client.handshake.auth.Id);
     // const room_name = await this.chatService.getRoomName(roomId)
-    // const name = client.id
-    const userId = client.handshake.auth.id
+    // const name = client.Id
+    const userId = client.handshake.auth.Id
     client.to(roomId.toString()).emit('typing', { userId: userId , isTyping , roomId});
     // console.log("recive and emit typing");
 
@@ -123,10 +129,10 @@ export class ChatGateway {
     console.log('findAllMessages');
     console.log(roomId);
     console.log(client.handshake);
-    console.log(client.handshake.auth.id);
+    console.log(client.handshake.auth.Id);
     
     
-    return await this.chatService.findAllMessages(roomId, client.handshake.auth.id);
+    return await this.chatService.findAllMessages(roomId, client.handshake.auth.Id);
     // return {test};
   }
 
@@ -142,12 +148,12 @@ export class ChatGateway {
     
     // const room_name = await this.chatService.getRoomName(roomId)
     
-    const message = await this.chatService.createMessage(client.handshake.auth.id, roomId, content);
+    const message = await this.chatService.createMessage(client.handshake.auth.Id, roomId, content);
     
     // client.to(room_name).emit('message', message);
     if(message) {
       const tmp = {
-      senderId: client.handshake.auth.id.toString(),
+      senderId: client.handshake.auth.Id.toString(),
       _id: message._id,
       content: content,
       avatar: message.user.avatar_url,
