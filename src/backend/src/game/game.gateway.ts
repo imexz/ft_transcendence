@@ -61,14 +61,14 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
   handleDisconnect(@ConnectedSocket() client: Socket) { console.log("client %s disconnected", client.handshake.auth._id); }
 
+  @SubscribeMessage('checkGame')
+  handleCheckGame(@ConnectedSocket() client: Socket): boolean {
+    return this.gameService.checkForExistingGame(client);
+  }
+
   @SubscribeMessage('checkQueue')
   handleCheckQueue(@ConnectedSocket() client: Socket) {
 	  this.gameService.addClientIdToQueue(client, this.server);
-  }
-
-  @SubscribeMessage('checkGame')
-  handleCheckGame(@ConnectedSocket() client: Socket): boolean {
-	  return this.gameService.checkForExistingGame(client);
   }
 
   @SubscribeMessage('moveLeftUp')
