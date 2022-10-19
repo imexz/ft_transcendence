@@ -14,13 +14,20 @@ export class MessageService {
         private messageRepository: Repository<message>
     ) {}
 
+    userDeleteMessage(messageId: number, id: number) {
+        this.messageRepository.delete({
+            _id: messageId,
+            user: {_id: id}
+        })
+    }
+
     async userAddMessageToRoom(user: User, conntent: string, chatroom: chatroom) {
         if (user != undefined && chatroom != undefined && conntent != undefined) {
             var new_message = this.messageRepository.create({user: user, chatroom: chatroom, content: conntent});
             return await this.messageRepository.save(new_message);
         } else {
             console.log("userAddMessageToRoom goes wrong");
-            
+
         }
     }
 
@@ -37,7 +44,7 @@ export class MessageService {
         console.log(roomId);
 
         console.log(messages);
-        
+
 
         return messages
     }
