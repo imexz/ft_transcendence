@@ -1,10 +1,7 @@
-import { Body, Controller, Delete, Get, Param, Post, Res, UseGuards, Request, UseInterceptors, ClassSerializerInterceptor, HttpCode, Req, UnauthorizedException } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { Body, Controller, Delete, Get, Param, Post, UseGuards, Request, UseInterceptors, ClassSerializerInterceptor } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { User } from './entitys/user.entity';
 import { JwtAuthGuard } from '../auth/jwt-two/jwt-auth.guard';
-import { response } from 'express';
-import TwoFactorAuthenticationCodeDto from 'src/auth/dto/turnOnTwoFactorAuthentication.dto';
 import { TwofaService } from 'src/twofa/twofa.service';
 import { FriendsService } from './friends/friends.service';
 
