@@ -37,6 +37,13 @@ export class AuthController{
 			false,
 		))
 
+    console.log(req.user.isTwoFactorAuthenticationEnabled)
+    if (req.user.isTwoFactorAuthenticationEnabled){
+      return {
+        url: "http://localhost" + ":8080/login/tfa"
+      }
+    }
+
 		return {
 			url: "http://localhost" + ":8080/login"
 		}
