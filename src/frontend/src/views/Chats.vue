@@ -1,5 +1,7 @@
 <template>
-  <vue-advanced-chat
+  <div class="chatWrapper">
+    <vue-advanced-chat
+      :height="height"
       :current-user-id="currentUserId"
       :rooms="JSON.stringify(rooms)"
       :messages="JSON.stringify(messages)"
@@ -26,12 +28,18 @@
     <!-- <div slot="room-list-item_1">
       This is a new room header
     </div> -->
-  </vue-advanced-chat>
-    <creatRoomPopup
+    </vue-advanced-chat>
+
+    <createRoomPopup
       v-if="PoppupCreate"
-      :TogglePopup="() => makePopupCreate()" >
-      <h2>Creat Room</h2>
-    </creatRoomPopup>
+      :TogglePopup="() => makePopupCreate()"
+    >
+      <h2>Create Room</h2>
+    </createRoomPopup>
+    
+    <div v-if="roomInfoPopUp" class="roomInfoPopUp">
+      hello
+    </div>
 
     <!-- <joinRoomPopup
       v-if="PoppupJoin"
@@ -40,15 +48,16 @@
       :roomId="">
       <h2>Join Room</h2>
     </joinRoomPopup> -->
+    </div>
   </template>
 
-  <script >
+  <script lang="ts">
   import { register } from 'vue-advanced-chat'
   import { io, Socket } from 'socket.io-client';
   import { ref } from 'vue';
   import VueAxios from 'axios';
   import { API_URL } from '@/defines';
-  import creatRoomPopup from '@/components/Chat/creatRoomPopup.vue';
+  import createRoomPopup from '@/components/Chat/createRoomPopup.vue';
   import joinRoomPopup from '@/components/Chat/joinRoomPopup.vue';
 
 
@@ -57,6 +66,7 @@
     export default {
       data() {
         return {
+          height: "800px",
           currentUserId: '',
           currentRoomId: '',
           rooms: [],
@@ -81,6 +91,7 @@
           // ],
           PoppupCreate: ref(false),
           PoppupJoin: ref(false),
+          roomInfoPopUp: ref(false),
           password: '',
           timeout: 0,
           typing: false,
@@ -90,7 +101,7 @@
         }
       },
       components:{
-        creatRoomPopup,
+        createRoomPopup,
         joinRoomPopup
       },
       methods: {
@@ -247,7 +258,21 @@
         roomInfo({ roomId }) {
           console.log("emiting roomInfo");
           console.log(roomId);
+          this.toggleRoomInfo();
           this.socket.emit('roomInfo', {roomId: roomId}, (room) => { console.log("output") && console.log(room);}); //TB talk to tobi/samuel how to receive new view
+        },
+        toggleRoomInfo() {
+          console.log(this.roomInfoPopUp)
+          if (this.roomInfoPopUp)
+            window.removeEventListener('click', this.hideRoomInfo)
+          else
+            window.addEventListener('click', this.hideRoomInfo)
+          this.roomInfoPopUp = !this.roomInfoPopUp
+        },
+        hideRoomInfo(e) {
+          if (!this.$el.contains(e.target)) {
+            this.toggleRoomInfo()
+          }
         },
         messageActionHandler({ roomId, action, message }) {
           console.log("messageActionHandler")
@@ -380,3 +405,28 @@
         }
       }
 </script> -->
+
+<style scoped>
+
+  .chatWrapper {
+    width: 800px;
+    margin: auto;
+    margin-bottom: 80px;
+    z-index: 1;
+  }
+  
+  .roomInfoPopUp {
+    position: absolute;
+    margin: auto;
+    left: 0;
+    right: 0;
+    top: 100px;
+    width: 100px;
+    height: 100px;
+    background-color: var(--ft_dark);
+    border: 1px solid var(--ft_cyan);
+    border-radius: 10px;
+    z-index: 11;
+  }
+
+</style>
