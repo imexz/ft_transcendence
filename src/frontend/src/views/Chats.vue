@@ -36,9 +36,9 @@
     >
       <h2>Create Room</h2>
     </createRoomPopup>
-    
+
     <div v-if="roomInfoPopUp" class="roomInfoPopUp">
-      hello
+      <roomInfoPopUp :roomInfo="roomInfoData"/>
     </div>
 
     <!-- <joinRoomPopup
@@ -59,7 +59,7 @@
   import { API_URL } from '@/defines';
   import createRoomPopup from '@/components/Chat/createRoomPopup.vue';
   import joinRoomPopup from '@/components/Chat/joinRoomPopup.vue';
-
+  import roomInfoPopUp from '@/components/Chat/RoomInfoPopUp.vue';
 
   register()
 
@@ -92,6 +92,7 @@
           PoppupCreate: ref(false),
           PoppupJoin: ref(false),
           roomInfoPopUp: ref(false),
+          roomInfoData: null as Object | null,
           password: '',
           timeout: 0,
           typing: false,
@@ -102,7 +103,8 @@
       },
       components:{
         createRoomPopup,
-        joinRoomPopup
+        joinRoomPopup,
+        roomInfoPopUp,
       },
       methods: {
         async putMessages({room}) {
@@ -259,7 +261,11 @@
           console.log("emiting roomInfo");
           console.log(roomId);
           this.toggleRoomInfo();
-          this.socket.emit('roomInfo', {roomId: roomId}, (room) => { console.log("output") && console.log(room);}); //TB talk to tobi/samuel how to receive new view
+          this.socket.emit(
+            'roomInfo',
+            {roomId: roomId},
+            data => { console.log(data), this.roomInfoData = data}
+          );
         },
         toggleRoomInfo() {
           console.log(this.roomInfoPopUp)
@@ -421,12 +427,13 @@
     left: 0;
     right: 0;
     top: 100px;
-    width: 100px;
-    height: 100px;
+    width: 400px;
+    height: 400px;
     background-color: var(--ft_dark);
     border: 1px solid var(--ft_cyan);
     border-radius: 10px;
-    z-index: 11;
+    z-index: 10;
+    overflow-y: auto;
   }
 
 </style>
