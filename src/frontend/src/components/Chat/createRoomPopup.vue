@@ -2,9 +2,9 @@
     <div class="popup">
         <div class="popup-inner">
             <slot />
-            <creatRoom
+            <createRoom
                 :TogglePopup="() => TogglePopup()" >
-            </creatRoom>
+            </createRoom>
             <button class="popup-close" @click="TogglePopup()">
                 Close Popup
             </button>
@@ -13,12 +13,12 @@
 </template>
 
 <script lang="ts">
-import creatRoom from './creatRoom.vue';
+import createRoom from './createRoom.vue';
 
 export default {
     props: ['TogglePopup'],
     components: {
-        creatRoom,
+        createRoom,
     }
 }
 </script>
