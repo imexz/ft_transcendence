@@ -5,24 +5,10 @@
         Statistics
       </div>
       <div>
-        Games Played: {{ matchData.length }}
-      </div>
-      <div>
-      Winrate: {{ 
-        (matchData.filter(obj => {
-        return obj.myScore > obj.opponentScore
-      }).length / matchData.length * 100).toFixed(2)}}%
-      </div>
-      <div>
-        W: {{ (matchData.filter(obj => {
-        return obj.myScore > obj.opponentScore
-        }).length) }}
-        L: {{ (matchData.filter(obj => {
-        return obj.myScore < obj.opponentScore
-        }).length) }}
-        D: {{ (matchData.filter(obj => {
-        return obj.myScore == obj.opponentScore
-        }).length) }}
+        <MatchStatistics
+          :totalGames="totalGames"
+          :winCount="winCount"
+          :lossCount="lossCount" />
       </div>
     </div>
     <div class="matchHistory" >
@@ -44,27 +30,39 @@ import { defineComponent } from 'vue';
 import MatchData from '@/models/matchData';
 import UserSummary from '@/components/Profile/UserSummary.vue';
 import MatchSummary from './MatchSummary.vue';
+import MatchStatistics from './MatchStatistics.vue';
 
 export default defineComponent({
   data() {
     return {
       matchData: [
+      { opponent: 1, myScore: 6, opponentScore: 10 },
+      { opponent: 1, myScore: 6, opponentScore: 10 },
+      { opponent: 1, myScore: 6, opponentScore: 10 },
+      { opponent: 1, myScore: 6, opponentScore: 10 },
+      { opponent: 1, myScore: 6, opponentScore: 10 },
+      { opponent: 1, myScore: 6, opponentScore: 10 },
+      { opponent: 1, myScore: 6, opponentScore: 10 },
+      { opponent: 1, myScore: 6, opponentScore: 10 },
+      { opponent: 1, myScore: 6, opponentScore: 10 },
+      { opponent: 1, myScore: 6, opponentScore: 10 },
+      { opponent: 1, myScore: 6, opponentScore: 10 },
+      { opponent: 1, myScore: 6, opponentScore: 10 },
+      { opponent: 1, myScore: 6, opponentScore: 10 },
+        { opponent: 2, myScore: 10, opponentScore: 3},
+        { opponent: 1, myScore: 6, opponentScore: 10 },
         { opponent: 1, myScore: 6, opponentScore: 10 },
         { opponent: 2, myScore: 10, opponentScore: 3},
-        { opponent: 2, myScore: 10, opponentScore: 10},
-        { opponent: 1, myScore: 6, opponentScore: 10 },
-        { opponent: 1, myScore: 6, opponentScore: 10 },
-        { opponent: 2, myScore: 10, opponentScore: 3},
-        { opponent: 2, myScore: 10, opponentScore: 10},
         { opponent: 1, myScore: 6, opponentScore: 10 },
         { opponent: 2, myScore: 10, opponentScore: 3},
         { opponent: 2, myScore: 10, opponentScore: 3},
-        { opponent: 2, myScore: 10, opponentScore: 10},
-        { opponent: 2, myScore: 10, opponentScore: 10},
         { opponent: 1, myScore: 6, opponentScore: 10 },
         { opponent: 2, myScore: 10, opponentScore: 3},
-        { opponent: 2, myScore: 10, opponentScore: 10},
       ] as MatchData[],
+      totalGames: 0 as number,
+      winCount: 0 as number,
+      lossCount: 0 as number, 
+
     }
   },
   props: {
@@ -75,8 +73,23 @@ export default defineComponent({
   },
   components: {
     UserSummary,
-    MatchSummary
+    MatchSummary,
+    MatchStatistics
+},
+  methods: {
+    initData() {
+      this.totalGames = this.matchData.length;
+      for (let i = 0; i < this.totalGames; ++i) {
+        if (this.matchData[i].myScore > this.matchData[i].opponentScore)
+          this.winCount++;
+        else if (this.matchData[i].myScore < this.matchData[i].opponentScore)
+          this.lossCount++;
+      }
+    }
   },
+  mounted() {
+    this.initData()
+  }
 })
 
 </script>
