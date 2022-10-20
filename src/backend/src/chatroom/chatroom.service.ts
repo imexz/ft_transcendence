@@ -9,9 +9,25 @@ import * as bcrypt from 'bcrypt';
 @Injectable()
 export class ChatroomService {
 
+
+  async createRoomInfo(roomId: number, _id: any){
+
+    console.log("createRoomInfoService");
+
+
+    const rooms = await this.getAll();
+
+    // const room = rooms.find(roomId)
+
+    // console.log(rooms[roomId])
+    // console.log(room);
+
+    // return room
+  }
+
      async getAllwithUser(id: number) {
         console.log("getAllwithUser");
-        
+
         const test = await this.chatroomRepository.createQueryBuilder("chatroom")
         // .leftJoinAndSelect('chatroom.users', 'users')
         // .select('chatroom.users')
@@ -25,16 +41,16 @@ export class ChatroomService {
 
             // console.log(test);
             return test
-            
+
     }
 
 
     async getRoomName(roomId: number): Promise<string> {
         console.log("getRoomName");
-        
+
        const room = await this.chatroomRepository.findOneBy({roomId: roomId})
        console.log(room.roomName);
-       
+
 
        return room.roomName
     }
@@ -55,7 +71,7 @@ export class ChatroomService {
             })
             if(chatroom == null && typeof room === 'string') {
                 console.log("chatroom == null");
-                
+
                 chatroom = this.chatroomRepository.create({roomName: room})
                 return {chatroom, bool: true};
             }
@@ -67,7 +83,7 @@ export class ChatroomService {
     async userToRoom(user: User, roomId: number, password?: string): Promise<boolean>
     {
         if(user != null) {
-            var ret: { chatroom: chatroom, bool: boolean } 
+            var ret: { chatroom: chatroom, bool: boolean }
             ret = await this.findOrCreat(roomId)
             console.log();
             if(ret != undefined) {
@@ -78,7 +94,7 @@ export class ChatroomService {
                 } else {
                     switch (ret.chatroom.access) {
                         case 'protected':
-                            // bcrypt.compare()                 
+                            // bcrypt.compare()
                             if(await bcrypt.compare(password, ret.chatroom.hash) == false) {
                                 console.log("result === false");
                                 return false
@@ -91,14 +107,14 @@ export class ChatroomService {
                                 console.log("result === true");
                                 // this.chatroomRepository.save(ret.chatroom)
                             }
-                            
+
                             case 'public':
-                                
+
                             default:
                                 if(ret.chatroom.users.indexOf(user) == -1)
                                     ret.chatroom.users.push(user)
                             break;
-                    }                   
+                    }
                 }
                 this.chatroomRepository.save(ret.chatroom)
                 return true
@@ -108,7 +124,7 @@ export class ChatroomService {
 
     async removeUserFromChatroom(user: User, room_name: string) {
         console.log("removeUserFromChatroom");
-        
+
         if(user != undefined && room_name != undefined) {
             const room = await this.chatroomRepository.findOne(
                 {where: {
@@ -124,7 +140,7 @@ export class ChatroomService {
             }
             console.log(user);
             console.log(room.owner);
-            
+
             var index = room.admins.findIndex(object => {
                 return object._id === user._id
             })
@@ -138,7 +154,7 @@ export class ChatroomService {
                 room.users.splice(index, 1)
             }
             console.log(index);
-            
+
             await this.chatroomRepository.save(room)
 
         }
@@ -152,46 +168,31 @@ export class ChatroomService {
     ){}
 
     async getAll() {
-        // const rooms = await this.chatroomRepository
-        //     .createQueryBuilder("chatroom")
-        //     // .select(['chatroom.id AS "roomId"', 'chatroom.name AS "roomName"'])
-        //     .leftJoinAndSelect("chatroom.users", 'users')
-        //     // .getRawMany()
-        // if(rooms != undefined)
-        //     console.log(rooms);
-        // else
-        //     console.log("no room");
 
-        // return rooms;
-
-         const rooms = await this.chatroomRepository.find({
-            where: {
-                access: Not("privat"),
-            },
-            relations: {
-            users: true,
-            messages: true
-            }
-        })
+        const rooms = await this.chatroomRepository.createQueryBuilder("chatroom")
+        .leftJoinAndSelect('chatroom.users', 'users')
+        .leftJoinAndSelect('chatroom.admins', 'admins')
+        .where("access IN (:...values)", { values: [ "protected", "public" ] })
+        .getMany()
 
         console.log(rooms);
 
         return rooms;
     }
-    
+
     async getRoom(room: string | number) {
         console.log("before");
         const test = typeof room === 'string' ? {roomName: room} : {roomId: room}
-        
+
         return await this.chatroomRepository.findOne({where: test})
         console.log("after");
     }
-    
+
     async addRoom(room_name: string, access: string,  user: User, password?: string) {
         const room = await this.getRoom(room_name)
         if(room == null) {
             console.log("room == null");
-            
+
             const room = this.chatroomRepository.create()
             room.roomName = room_name
             room.owner = user;
@@ -203,23 +204,23 @@ export class ChatroomService {
                 bcrypt.hash(password, 10, async (err, hash: string) => {
                     console.log("room hash");
                     if (err) {
-                        console.log("error hashing");                   
+                        console.log("error hashing");
                         return undefined
                     }
                     room.hash = hash
                     console.log("geht");
                     console.log(room.hash)
-                    return await this.chatroomRepository.save(room);     
-                })    
+                    return await this.chatroomRepository.save(room);
+                })
             } else {
                 console.log("no password set");
             }
             // console.log("room hash after")
-            return await this.chatroomRepository.save(room);     
+            return await this.chatroomRepository.save(room);
         }
         return undefined
     }
-    
+
     async removeRoom(room_name: string, user: User){
 
         const room = await this.chatroomRepository.findOne({
@@ -236,5 +237,5 @@ export class ChatroomService {
         }
     }
 
-    
+
 }
