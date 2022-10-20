@@ -21,8 +21,20 @@ export class ChatroomService {
     {
         if (rooms[i].roomId == roomId)
         {
-            const room = rooms[i];
+            let room = null
+            for(let k = 0; k < rooms[i].users.length; ++k)
+            {
+                if (rooms[i].users[k]._id == _id)
+                    room = rooms[i];
+            }
             let isAdmin : Boolean
+
+            if (room == null)
+            {
+                room = []
+                return {room, isAdmin}
+            }
+
             for(let j = 0; j < room.admins.length; ++j)
             {
                 if (room.admins[j]._id == _id)
