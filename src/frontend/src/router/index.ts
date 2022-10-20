@@ -50,7 +50,7 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/play/:id',
     name: 'playSpetate',
-    props: true,
+    props: {isCreated: true},
     component: () => import('../views/PlayView.vue')
   },
   {

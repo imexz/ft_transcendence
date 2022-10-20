@@ -1,5 +1,5 @@
 <template>
-  <div v-show="gameId || id">
+  <div v-show="gameExists">
     <div class="matchInfo">
       <div id = "scoreLeft">
         <UserSummary :user=userLeft!></UserSummary>
@@ -18,7 +18,7 @@
       <button @click="leaveGame"> Leave </button>
     </div>
 	</div>
-	<div class="queue" v-show="!gameId && !id">
+	<div class="queue" v-show="!gameExists">
 		Waiting for a match...
 	</div>
 </template>
@@ -35,8 +35,7 @@
   export default defineComponent({
   	data () {
   		return {
-			  isFirstCall: true as boolean,
-  		  gameId: "" as string,
+        gameExists: false as boolean,
   		  gamesocket: null as Socket,
   		  context: null as any,
   		  side: "" as string,
@@ -85,56 +84,53 @@
   	},
   	components: {
       UserSummary,
-
   	},
     props: {
-      id: String,
+      gameExists: Boolean,
     },
   	created() { // always called when Component is initialized (e.g. on refresh)
-  		console.log("in created");
+  		// console.log("in created");
   		this.gamesocket = io(API_URL + '/game', {
   			auth: (cb: any) => {
   				cb ({id: document.cookie })
   			}
   		});
   		this.gamesocket.on('gameInfo', (data: any) => {
-  			console.log("event gameInfo received");
-        console.log(data);
-  			this.gameId = data.gameId;
+  			// console.log("event gameInfo received");
+        // console.log(data);
+        this.gameExists = true;
   			this.side = data.side;
 			  this.finished = false;
-			  console.log("received GameId: %s, side: %s", this.gameId, this.side);
         this.setUserSummary(data);
 			  document.addEventListener('keydown', this.keyEvents, false);
 		  });
 		  this.gamesocket.emit('checkGame', (res: boolean) => {
   			if (!res) {
-  				console.log("calling checkQueue");
-  				this.gamesocket.emit('checkQueue'); // TODO: do not join queue in case of private game
+  				// console.log("calling checkQueue");
+  				this.gamesocket.emit('checkQueue');
   			}
   		});
-  		console.log("leaving created");
+  		// console.log("leaving created");
   	},
   	mounted() {
-      console.log("in mounted");
+      // console.log("in mounted");
       this.initPixi();
       //this is starting the drawing loop (rendering @60fps)
       this.pixiApp.ticker.add(this.updatePixi)
-  		console.log("leaving mounted");
+  		// console.log("leaving mounted");
   	},
 		beforeUpdate() {
 			// console.log("in beforeUpdate");
-			if (this.gameId && this.isFirstCall) {
+			if (this.gameExists) {
 				this.gamesocket.on('updateGame', this.updateData)
-			// this.isFirstCall = false;
-		}
+		  }
 		// console.log("leaving beforeUpdate");
 
 	},
 
   	beforeDestory() {
   		console.log("in beforeDestroy");
-  		delete this.eventSource;
+  		// delete this.eventSource;
   		this.gamesocket.close();
   		delete this.gamesocket;
   		// delete this.position;
@@ -241,7 +237,7 @@
         // console.log("callback updateGame");
 				if (data === undefined) {
           // console.log("data undefined");
-					this.gameId = "";
+          this.gameExists = false;
 					this.side = "";
 					this.left = 0;
 					this.right = 0;
@@ -310,9 +306,7 @@
           method: 'GET',
           withCredentials: true,
         })
-          .then(response => { 
-            console.log("response data ", response.data);
-            this.userLeft = response.data })
+          .then(response => { this.userLeft = response.data })
           .catch();
         VueAxios({
           url: '/users/find/' + data.playerRight.toString(),
