@@ -62,7 +62,7 @@ export default createStore<State>({
       state.socket.on('message',() => {
         state.NrMessages++
       })
-      state.socket.on('Request',(type: RequestEnum) => {
+      state.socket.on('Request',(id: number, type: RequestEnum) => {
         switch (type) {
           case RequestEnum.GAME:
             state.gameRequest = true;
@@ -73,11 +73,8 @@ export default createStore<State>({
           default:
             break;
         }
+          console.log("recive  request");
       })
-      // state.socket.on('gameRequest',() => {
-      //   console.log("recive Game request");
-        
-      // })
     },
     changeUserName(state, username) {
       state.user.username = username;
