@@ -26,7 +26,7 @@
       </button>
       <button 
         class="dropdownElement"
-        @click="viewProfile(user?._id)">
+        @click="viewProfile(user?._id)" >
         <font-awesome-icon icon="fa-solid fa-eye" />
       </button>
       <button
@@ -38,7 +38,7 @@
         <font-awesome-icon icon="fa-solid fa-ban" />
       </button>
       <button
-        class="dropdownElement">
+        class="dropdownElement"
         @click="AskForMatch">
         <font-awesome-icon icon="fa-solid fa-table-tennis-paddle-ball" />
       </button>
@@ -89,7 +89,9 @@ export default defineComponent({
       }
     },
     AskForMatch(){
-      this.$store.socket.emit('gameRequest', {id: this.user.id}, () => {})
+      this.$store.state.socket.emit('gameRequest', {id: this.user.id}, () => {})
+      console.log("AskForMatch");
+      
     },
     removeFriend(){
       // console.log("IMPLEMENT API TO REMOVE FRIEND")
