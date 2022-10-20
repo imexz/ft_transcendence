@@ -8,7 +8,6 @@ import { SubscribeMessage,
  } from '@nestjs/websockets';
 import { GameService } from './game.service';
 import { Socket, Server } from 'socket.io';
-import { Game } from './game.entities/game.entity';
 import { hostURL } from 'src/hostURL';
 import { JwtStrategy } from 'src/auth/jwt-two/jwt.strategy';
 import { JwtService } from '@nestjs/jwt';
