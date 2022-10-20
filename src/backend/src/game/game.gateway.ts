@@ -52,7 +52,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     }
   }
 
-  handleDisconnect(@ConnectedSocket() client: Socket) { console.log("client %s disconnected", client.handshake.auth._id); }
+  handleDisconnect(@ConnectedSocket() client: Socket) { console.log("client %s disconnected", client?.handshake.auth._id); }
 
   @SubscribeMessage('checkGame')
   handleCheckGame(@ConnectedSocket() client: Socket): boolean {
