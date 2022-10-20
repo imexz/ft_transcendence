@@ -18,16 +18,16 @@ export class ChatroomController {
         return await this.chatroomService.removeRoom(room_name, req.user)
     }
 
-    @Post('creat')
+    @Post('creat')//TB typo?
 	@UseGuards(JwtAuthGuard)
-    async CreatChatroon(@Request() req,
+    async CreatChatroon(@Request() req, //TB typo?
         @Body("room_name") room_name: string,
-        @Body("access") access: string, 
+        @Body("access") access: string,
         @Body("password") password: string)
     {
         console.log("password");
         console.log(password);
-        
+
         if(await this.chatroomService.addRoom(room_name, access, req.user, password) == undefined)
             throw new HttpException('Forbidden', HttpStatus.CONFLICT);
         return this.getAll()

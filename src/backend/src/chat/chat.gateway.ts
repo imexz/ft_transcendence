@@ -150,7 +150,8 @@ export class ChatGateway {
       _id: message._id,
       content: content,
       avatar: message.user.avatar_url,
-      timestamp: message.timestamp }
+      timestamp: message.timestamp,
+      username: message.user.username }
       // _id: 0,
       // indexId: 12092,
 
@@ -158,6 +159,10 @@ export class ChatGateway {
 
       // console.log(test);
       console.log({tmp, roomId});
+      console.log("timestamp before");
+      console.log(tmp.timestamp);
+      console.log("timestamp after");
+      // tmp.timestamp = tmp.timestamp. //TB resume work
 
 
       client.to(roomId.toString()).emit('message', {message: tmp, roomId});
@@ -178,13 +183,38 @@ export class ChatGateway {
 
   @SubscribeMessage('deleteMessage')
   async deleteMessage(
-    // @MessageBody('roomId') roomId : number,
     @MessageBody('messageId') messageId : number,
     @ConnectedSocket() client: Socket,
   ) {
       console.log("delete found");
       console.log(messageId);
       this.chatService.deleteMessage(messageId, client.handshake.auth._id);
+
+
+  }
+
+  @SubscribeMessage('createMessageReaction')
+  async createMessageReaction(
+    @MessageBody('messageId') messageId : number,
+    @MessageBody('reaction') reaction : any,
+    @MessageBody('remove') remove : boolean,
+    @ConnectedSocket() client: Socket,
+  ) {
+      console.log("createMessageReaction");
+      console.log(messageId);
+      this.chatService.createMessageReaction(messageId, reaction, remove);
+
+
+  }
+
+  @SubscribeMessage('roomInfo')
+  async createRoomInfo(
+    @MessageBody('roomId') roomId : number,
+    @ConnectedSocket() client: Socket,
+  ) {
+      console.log("createRoomInfo");
+      console.log(roomId);
+      return await this.chatService.createRoomInfo(roomId, client.handshake.auth._id);
 
 
   }

@@ -18,10 +18,10 @@ export class message {
     @Column()
     content: string;
 
-    @ManyToOne(() => User, (user) => user.messeges)
+    @ManyToOne(() => User, (user) => user.messeges) //TB typo?
     user: User;
 
     @ManyToOne(() => chatroom, (chatroom) => chatroom.messages )
     chatroom: chatroom;
-    
+
 }
