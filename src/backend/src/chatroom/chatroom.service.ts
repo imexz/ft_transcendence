@@ -16,10 +16,35 @@ export class ChatroomService {
 
 
     const rooms = await this.getAll();
+    console.log(rooms[0].roomId)
+    for(let i = 0; i < rooms.length; ++i)
+    {
+        if (rooms[i].roomId == roomId)
+        {
+            const room = rooms[i];
+            let isAdmin : Boolean
+            for(let j = 0; j < room.admins.length; ++j)
+            {
+                if (room.admins[j]._id == _id)
+                   isAdmin = true
+            }
+
+            if (isAdmin == undefined)
+                isAdmin = false
+            console.log("isAdmin:");
+            console.log(isAdmin);
+
+            console.log("end createRoomInfoService");
+            console.log(room);
+
+            return { room, isAdmin };
+        }
+    }
+    console.log("end createRoomInfoService with error");
+    throw new Error("room not found");
 
     // const room = rooms.find(roomId)
 
-    // console.log(rooms[roomId])
     // console.log(room);
 
     // return room
@@ -169,13 +194,15 @@ export class ChatroomService {
 
     async getAll() {
 
+        console.log("getAll");
+
         const rooms = await this.chatroomRepository.createQueryBuilder("chatroom")
         .leftJoinAndSelect('chatroom.users', 'users')
         .leftJoinAndSelect('chatroom.admins', 'admins')
         .where("access IN (:...values)", { values: [ "protected", "public" ] })
         .getMany()
 
-        console.log(rooms);
+        // console.log(rooms);
 
         return rooms;
     }
