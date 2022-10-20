@@ -1,6 +1,6 @@
 <template>
     <div class="room-input">
-      <form @submit.prevent="creatRoom">
+      <form @submit.prevent="createRoom">
         <input v-model="name" />
         <select v-model="access">
           <option>privat</option>
@@ -30,7 +30,7 @@ export default {
         }
     },
     methods: {
-        creatRoom(): void{
+        createRoom(): void{
             console.log("creatRoom");            
             VueAxios({
                 url: '/chatroom/creat',

@@ -66,7 +66,7 @@ export default defineComponent({
   --hot: var(--ft_pink);
   position: sticky;
   top: 0px;
-  z-index: 10;
+  z-index: 11;
   display: flex;
   flex-wrap: nowrap;
   height: 80px;

@@ -7,6 +7,16 @@ import { MessageService } from 'src/message/message.service';
 
 @Injectable()
 export class ChatService {
+  async createRoomInfo(roomId: number, _id: any) {
+    return await this.chatroomService.createRoomInfo(roomId, _id);
+  }
+
+  async createMessageReaction(messageId: number, reaction: any, remove: boolean) {
+    if (!remove)
+      return await this.messageService.addMessageReaction(messageId, reaction);
+    else
+      return await this.messageService.removeMessageReaction(messageId, reaction);
+  }
 
   deleteMessage(messageId: number, id: number) {
     this.messageService.userDeleteMessage(messageId, id);

@@ -1,5 +1,7 @@
 <template>
-  <vue-advanced-chat
+  <div class="chatWrapper">
+    <vue-advanced-chat
+      :height="height"
       :current-user-id="currentUserId"
       :rooms="JSON.stringify(rooms)"
       :messages="JSON.stringify(messages)"
@@ -7,13 +9,17 @@
       :rooms-loaded="true"
       :messages-loaded="messagesLoaded"
       :message-actions="JSON.stringify(messageActions)"
+      :username-options="JSON.stringify(usernameOptions)"
       :show-audio="false"
       :show-files="false"
       :theme="chatTheme"
       :show-reaction-emojis="true"
+      :room-info-enabled="true"
       @send-message="sendMessage($event.detail[0])"
+      @send-message-reaction="sendMessageReaction($event.detail[0])"
       @add-room="makePopupCreate()"
       @room-action-handler="roomActionHandler($event.detail[0])"
+      @room-info="roomInfo($event.detail[0])"
       @typing-message="emitTyping($event.detail[0])"
       @fetch-messages="putMessages($event.detail[0])"
       @delete-message="deleteMessage($event.detail[0])"
@@ -22,12 +28,18 @@
     <!-- <div slot="room-list-item_1">
       This is a new room header
     </div> -->
-  </vue-advanced-chat>
-    <creatRoomPopup
+    </vue-advanced-chat>
+
+    <createRoomPopup
       v-if="PoppupCreate"
-      :TogglePopup="() => makePopupCreate()" >
-      <h2>Creat Room</h2>
-    </creatRoomPopup>
+      :TogglePopup="() => makePopupCreate()"
+    >
+      <h2>Create Room</h2>
+    </createRoomPopup>
+
+    <div v-if="roomInfoPopUp" class="roomInfoPopUp">
+      <roomInfoPopUp :roomInfo="roomInfoData"/>
+    </div>
 
     <!-- <joinRoomPopup
       v-if="PoppupJoin"
@@ -36,39 +48,51 @@
       :roomId="">
       <h2>Join Room</h2>
     </joinRoomPopup> -->
+    </div>
   </template>
 
-  <script >
+  <script lang="ts">
   import { register } from 'vue-advanced-chat'
   import { io, Socket } from 'socket.io-client';
   import { ref } from 'vue';
   import VueAxios from 'axios';
   import { API_URL } from '@/defines';
-  import creatRoomPopup from '@/components/Chat/creatRoomPopup.vue';
+  import createRoomPopup from '@/components/Chat/createRoomPopup.vue';
   import joinRoomPopup from '@/components/Chat/joinRoomPopup.vue';
-
+  import roomInfoPopUp from '@/components/Chat/RoomInfoPopUp.vue';
 
   register()
 
     export default {
       data() {
         return {
+          height: "800px",
           currentUserId: '',
           currentRoomId: '',
           rooms: [],
           messages: [],
-          messagesLoaded: true, // change this value to show a loading icon on the top of the chat
+          messagesLoaded: false, //TB change this value to show a loading icon on the top of the chat
           messageActions: [
             { name: 'deleteMessage' , title: 'delete message', onlyMe: true },
-            { name: 'block', title: 'block user'}
+            { name: 'profile', title: 'show profile'},
+            // { name: 'block', title: 'block user'},
+            // { name: 'play', title: 'play with user' },
           ],
+          usernameOptions: { minUsers: 3, currentUser: false },
           roomActions: [
             { name: 'join', title: 'join Room' },
             { name: 'leave', title: 'leave Room' },
             { name: 'deleteRoom', title: 'Delete Room' }
           ],
+          // templatesText: [ //TB did not work as expected at first
+          //   { tag: 'help', text: 'shows all commands' },
+          //   { tag: 'ban', text: 'ban a user for x seconds' },
+          //   { tag: 'mute', text: 'mute a user for x seconds' }
+          // ],
           PoppupCreate: ref(false),
           PoppupJoin: ref(false),
+          roomInfoPopUp: ref(false),
+          roomInfoData: null as Object | null,
           password: '',
           timeout: 0,
           typing: false,
@@ -78,8 +102,9 @@
         }
       },
       components:{
-        creatRoomPopup,
-        joinRoomPopup
+        createRoomPopup,
+        joinRoomPopup,
+        roomInfoPopUp,
       },
       methods: {
         async putMessages({room}) {
@@ -94,14 +119,25 @@
           this.socket.emit('findAllMessages', {roomId: roomId}, (response) => {
             console.log(response);
             this.messages = response;
+            this.messagesLoaded = true;
           })
         },
-        sendMessage({ roomId, content, files, replyMessage, usersTag }) {
+        sendMessage({ roomId, content, files, replyMessage }) {
           console.log("createMessage");
           console.log(roomId);
           this.socket.emit('createMessage', { roomId: roomId, content: content}, (response) =>
           {
             console.log("createMessage response");
+            console.log(response);
+            this.addMessage(response)
+          })
+        },
+        sendMessageReaction({ roomId, messageId, reaction, remove }) {
+          console.log("createMessageReaction");
+          console.log(roomId);
+          this.socket.emit('createMessageReaction', { messageId: messageId, reaction: reaction, remove: remove}, (response) =>
+          {
+            console.log("createMessageReaction response");
             console.log(response);
             this.addMessage(response)
           })
@@ -219,6 +255,29 @@
               default:
                 this.socket.emit(action.name, roomId)
               break;
+          }
+        },
+        roomInfo({ roomId }) {
+          console.log("emiting roomInfo");
+          console.log(roomId);
+          this.toggleRoomInfo();
+          this.socket.emit(
+            'roomInfo',
+            {roomId: roomId},
+            data => { console.log(data), this.roomInfoData = data}
+          );
+        },
+        toggleRoomInfo() {
+          console.log(this.roomInfoPopUp)
+          if (this.roomInfoPopUp)
+            window.removeEventListener('click', this.hideRoomInfo)
+          else
+            window.addEventListener('click', this.hideRoomInfo)
+          this.roomInfoPopUp = !this.roomInfoPopUp
+        },
+        hideRoomInfo(e) {
+          if (!this.$el.contains(e.target)) {
+            this.toggleRoomInfo()
           }
         },
         messageActionHandler({ roomId, action, message }) {
@@ -352,3 +411,29 @@
         }
       }
 </script> -->
+
+<style scoped>
+
+  .chatWrapper {
+    width: 800px;
+    margin: auto;
+    margin-bottom: 80px;
+    z-index: 1;
+  }
+  
+  .roomInfoPopUp {
+    position: absolute;
+    margin: auto;
+    left: 0;
+    right: 0;
+    top: 100px;
+    width: 400px;
+    height: 400px;
+    background-color: var(--ft_dark);
+    border: 1px solid var(--ft_cyan);
+    border-radius: 10px;
+    z-index: 10;
+    overflow-y: auto;
+  }
+
+</style>

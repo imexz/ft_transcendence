@@ -65,17 +65,8 @@ body {
   background-repeat: no-repeat;
 }
 
-.content {
+/* .content {
   
-  /* transform: rotateX('90deg'); */
-
-
-  /* transform: rotate(90deg); */
-    /* transform-origin:bottom center; */
-    
-    /* position:absolute; */
-
-
   animation-name: example;
   animation-duration: 20s;
   animation-iteration-count: infinite;
@@ -97,6 +88,6 @@ body {
   100% {
     transform: rotate(360deg)
   }
-}
+} */
 
 </style>
