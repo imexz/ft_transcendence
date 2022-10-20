@@ -162,7 +162,7 @@ export class ChatGateway {
       console.log("timestamp before");
       console.log(tmp.timestamp);
       console.log("timestamp after");
-      // tmp.timestamp = tmp.timestamp.
+      // tmp.timestamp = tmp.timestamp. //TB resume work
 
 
       client.to(roomId.toString()).emit('message', {message: tmp, roomId});
@@ -183,7 +183,6 @@ export class ChatGateway {
 
   @SubscribeMessage('deleteMessage')
   async deleteMessage(
-    // @MessageBody('roomId') roomId : number,
     @MessageBody('messageId') messageId : number,
     @ConnectedSocket() client: Socket,
   ) {
@@ -215,7 +214,7 @@ export class ChatGateway {
   ) {
       console.log("createRoomInfo");
       console.log(roomId);
-      this.chatService.createRoomInfo(roomId, client.handshake.auth._id);
+      return await this.chatService.createRoomInfo(roomId, client.handshake.auth._id);
 
 
   }

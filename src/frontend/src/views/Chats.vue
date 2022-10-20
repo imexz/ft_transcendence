@@ -247,7 +247,7 @@
         roomInfo({ roomId }) {
           console.log("emiting roomInfo");
           console.log(roomId);
-          this.socket.emit('roomInfo', {roomId: roomId}, (room) => { console.log("output") && console.log(room);}); //TB talk to tobi/samuel how to receive new view
+          this.socket.emit('roomInfo', {roomId: roomId},  data => { console.log(data)} ); //TB talk to tobi/samuel how to receive new view
         },
         messageActionHandler({ roomId, action, message }) {
           console.log("messageActionHandler")
