@@ -5,9 +5,6 @@ import { User } from "src/users/entitys/user.entity";
 import { GameSetup } from "./setup.entity";
 import { Paddle } from "./paddle.entity";
 import { Score } from "./score.entity";
-import { PosXY } from "../game.interfaces/pos.interface";
-import { QueueElem } from "../game.interfaces/queueobj.interface";
-import { Socket } from "socket.io"
 
 @Entity()
 export class Game {

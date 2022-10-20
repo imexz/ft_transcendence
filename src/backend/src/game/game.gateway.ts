@@ -5,20 +5,14 @@ import { SubscribeMessage,
   OnGatewayInit,
   OnGatewayConnection,
   OnGatewayDisconnect,
-  MessageBody } from '@nestjs/websockets';
+ } from '@nestjs/websockets';
 import { GameService } from './game.service';
 import { Socket, Server } from 'socket.io';
 import { Game } from './game.entities/game.entity';
-import { Observable, map, interval } from 'rxjs';
 import { hostURL } from 'src/hostURL';
 import { JwtStrategy } from 'src/auth/jwt-two/jwt.strategy';
 import { JwtService } from '@nestjs/jwt';
 import { TokenPayload } from 'src/auth/tokenPayload.interface';
-
-
-interface GameEvent {
-  data: Game;
-}
 
 @WebSocketGateway({
   namespace: 'game',
@@ -73,25 +67,30 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
   @SubscribeMessage('moveLeftUp')
   handleMoveLeftUp(@ConnectedSocket() client: Socket): void {
-	let gameid = this.gameService.users.get(client.handshake.auth._id);
+	let gameid = this.gameService.users.get(client.handshake.auth._id.toString());
 	this.gameService.movePaddleUp(gameid, true);
   }
 
   @SubscribeMessage('moveRightUp')
   handleMoveRightUp(@ConnectedSocket() client: Socket): void {
-	let gameid = this.gameService.users.get(client.handshake.auth._id);
+	let gameid = this.gameService.users.get(client.handshake.auth._id.toString());
 	this.gameService.movePaddleUp(gameid, false);
   }
 
   @SubscribeMessage('moveLeftDown')
   handleMoveLeftDown(@ConnectedSocket() client: Socket): void {
-	let gameid = this.gameService.users.get(client.handshake.auth._id);
+	let gameid = this.gameService.users.get(client.handshake.auth._id.toString());
 	this.gameService.movePaddleDown(gameid, true);
   }
 
   @SubscribeMessage('moveRightDown')
   handleMoveRightDown(@ConnectedSocket() client: Socket): void {
-	let gameid = this.gameService.users.get(client.handshake.auth._id);
+	let gameid = this.gameService.users.get(client.handshake.auth._id.toString());
 	this.gameService.movePaddleDown(gameid, false);
+  }
+
+  @SubscribeMessage('leaveGame')
+  handleLeaveGame(@ConnectedSocket() client: Socket): void {
+    this.gameService.leaveGame(client);
   }
 }

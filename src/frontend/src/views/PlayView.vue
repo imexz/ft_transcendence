@@ -1,6 +1,6 @@
 <template>
   <div>
-    <PongGame />
+    <PongGame :id="id"/>
 	<!-- <GameMenu /> -->
   </div>
 </template>
@@ -16,6 +16,9 @@ export default defineComponent({
     PongGame,
     GameMenu
 },
+  props: {
+    id: String,
+  }
 })
 
 </script>
