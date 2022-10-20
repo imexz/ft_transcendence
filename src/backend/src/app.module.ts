@@ -16,28 +16,30 @@ import { TwofsModule } from './twofa/twofa.module';
 import { ChatroomModule } from './chatroom/chatroom.module';
 import { Friend } from './users/friends/friend.entity';
 import { FriendsModule } from './users/friends/friends.module';
+import { JwtModule } from '@nestjs/jwt';
+import { AppGateway } from './app.gateway';
+
 
 
 
 @Module({
   imports: [
-	AuthModule,
 	UsersModule,
 	TypeOrmModule.forRootAsync({
 		imports: [ConfigModule],
 		useFactory: (configService: ConfigService) => ({
-		type:'postgres',
-		host: 'database',
-		port: 5432,
-		username: process.env.POSTGRES_USER,
-		password: process.env.POSTGRES_PASSWORD,
-		database: process.env.PGDATABASE,
-		entities: [User, fileEntity, message, chatroom, Game, Friend],
-		ssl: false,
-		synchronize: true //  shouldn't be used in production
+			type:'postgres',
+			host: 'database',
+			port: 5432,
+			username: process.env.POSTGRES_USER,
+			password: process.env.POSTGRES_PASSWORD,
+			database: process.env.PGDATABASE,
+			entities: [User, fileEntity, message, chatroom, Game, Friend],
+			ssl: false,
+			synchronize: true //  shouldn't be used in production
+		}),
+		inject: [ConfigService],
 	}),
-	inject: [ConfigService],
-}),
 	AvatarModule,
 	// MessageModule,
 	ChatModule,
@@ -45,11 +47,17 @@ import { FriendsModule } from './users/friends/friends.module';
 	TwofsModule,
 	ChatroomModule,
 	FriendsModule,
+	AuthModule,
+	JwtModule.register({
+		// imports: [HttpModule, UsersModule, PassportModule, JwtModule.register({
+		  secret: process.env.JWT_PASSWORD,
+		  signOptions: { expiresIn: '600s'}
+		})
 ],
 	// controllers: [GameController],
 	// providers: [ChatGateway, MessageService, ChatroomService, GameService, GameGateway, ChatGateway, MessageService, ChatroomService],
 	// providers: [ChatGateway, MessageService, ChatroomService, GameService, MessageService, ChatroomService],
-	// providers: [ChatGateway],
+	providers: [AppGateway],
 })
 export class AppModule {
 	constructor(private dataSource: DataSource) {}

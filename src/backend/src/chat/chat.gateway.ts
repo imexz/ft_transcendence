@@ -1,12 +1,9 @@
-import { UseGuards } from '@nestjs/common';
 import { ConnectedSocket, MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Socket, Server } from 'socket.io';
-import { JwtAuthGuard } from 'src/auth/jwt-two/jwt-auth.guard';
-import { message } from '../message/message.entity';
 import { ChatService } from './chat.service';
-import { JwtService } from '@nestjs/jwt';
 import { hostURL } from 'src/hostURL';
 import { JwtStrategy } from 'src/auth/jwt-two/jwt.strategy';
+import { JwtService } from '@nestjs/jwt';
 
 
 @WebSocketGateway({
@@ -20,13 +17,18 @@ import { JwtStrategy } from 'src/auth/jwt-two/jwt.strategy';
 
 export class ChatGateway {
 
+  @WebSocketServer()
+  server: Server;
+
+  // Socket.use(() => {}) 
+
   constructor(private readonly chatService: ChatService, private jwtService: JwtService, private jwtStrategy: JwtStrategy) {}
 
   afterInit(socket) {
     // console.log("afterInit chat ");
 
-    // console.log(socket);
   }
+
 
   async handleConnection(socket) {
     console.log('====connected chat====')

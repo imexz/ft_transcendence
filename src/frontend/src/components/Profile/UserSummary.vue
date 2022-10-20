@@ -26,7 +26,7 @@
       </button>
       <button 
         class="dropdownElement"
-        @click="viewProfile(user?._id)">
+        @click="viewProfile(user?._id)" >
         <font-awesome-icon icon="fa-solid fa-eye" />
       </button>
       <button
@@ -37,9 +37,10 @@
         class="dropdownElement">
         <font-awesome-icon icon="fa-solid fa-ban" />
       </button>
+        <!-- @click="spectate(user?._id)"> -->
       <button
         class="dropdownElement"
-        @click="spectate(user?._id)">
+        @click="AskForMatch">
         <font-awesome-icon icon="fa-solid fa-table-tennis-paddle-ball" />
       </button>
     </div>
@@ -52,6 +53,7 @@ import VueAxios from 'axios';
 import User from '@/models/user'
 import { API_URL } from '@/defines';
 import { defineComponent } from 'vue';
+import { RequestEnum } from '@/enums/models/RequestEnum';
 
 export default defineComponent({
   data() {
@@ -88,6 +90,7 @@ export default defineComponent({
         this.show = false;
       }
     },
+
     removeFriend(){
       // console.log("IMPLEMENT API TO REMOVE FRIEND")
      
@@ -102,9 +105,6 @@ export default defineComponent({
         .catch()
       // this.$store.commit('removeFriend', this.user._id);
     },
-    accept() {
-      
-    },
     viewProfile(id: number){
       this.show = false;
       this.$router.push('/profile/' + id.toString());
@@ -113,17 +113,29 @@ export default defineComponent({
       console.log("toggleDropdown");
       this.show = !this.show
     },
-    spectate(id: number) {
-      this.show = false;
-      VueAxios({
-        url: '/game/spectate/' + id.toString(),
-        baseURL: API_URL,
-        method: 'GET',
-        withCredentials: true,
+    AskForMatch(){
+      console.log("AskForMatch b");
+      console.log(this.user._id);
+      console.log(this.user);
+      
+      this.$store.state.socket.emit('Request', {id: this.user._id, type: RequestEnum.GAME}, (r) => {
+        console.log(r)
+        this.$router.push('/play/' + r.toString())
       })
-        .then(r => {console.log(r), this.$router.push('/play/' + r.data.toString())})
-        .catch()
+      console.log("AskForMatch");
+      
     },
+    // spectate(id: number) {
+    //   this.show = false;
+    //   VueAxios({
+    //     url: '/game/spectate/' + id.toString(),
+    //     baseURL: API_URL,
+    //     method: 'GET',
+    //     withCredentials: true,
+    //   })
+    //     .then(r => {console.log(r), this.$router.push('/play/' + r.data.toString())})
+    //     .catch()
+    // },
   },
 })
 

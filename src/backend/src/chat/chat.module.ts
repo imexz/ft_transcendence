@@ -9,11 +9,13 @@ import { AuthModule } from 'src/auth/auth.module';
 
 
 @Module({
-	imports: [ChatroomModule, UsersModule, MessageModule, AuthModule, JwtModule.register({
+	imports: [ChatroomModule, UsersModule, MessageModule, AuthModule
+    , JwtModule.register({
     // imports: [HttpModule, UsersModule, PassportModule, JwtModule.register({
       secret: process.env.JWT_PASSWORD,
       signOptions: { expiresIn: '600s'}
-    })],
+    })
+  ],
   providers: [ChatService, ChatGateway],
   exports: [],
 })
