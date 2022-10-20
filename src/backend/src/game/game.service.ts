@@ -21,7 +21,7 @@ export class GameService {
 	private gameRepository: Repository<Game>
 
 	queue: Array<QueueElem> = [];
-	users = new Map<string, number>(); // Key: UserId, Value: GameId
+	users:  Map<string, number> = new Map<string, number>(); // Key: UserId, Value: GameId
 	games = new Map<number, Game>(); // Key: GameId, Value: Game
 	intervals = new Map<number, number>(); // Key: GameId, Value: IntervalId
 	sockets = new Map<number, Socket[]>(); // Key: GameId, Value: Array of Sockets
@@ -37,30 +37,32 @@ export class GameService {
 
 	checkForExistingGame(client: Socket): boolean {
 		var ret: boolean = false;
-		var gameid = this.users.get(client.handshake.auth._id); //TODO: Spectator needs to be added to users map
+		var gameid: number | undefined = this.users.get(client.handshake.auth._id.toString());
 		if (gameid != undefined) {
 			ret = true;
 			console.log("client %d already is in users", client.handshake.auth._id);
 			client.emit('gameInfo', {
 					gameId: gameid,
-					side: this.#getSideFromGame(this.games.get(gameid), client.handshake.auth._id),
+					side: this.#getSideFromGame(this.games.get(gameid), client.handshake.auth._id.toString()),
 					playerLeft: this.games.get(gameid).playerLeft,
 					playerRight: this.games.get(gameid).playerRight,
 				});
 			client.join(gameid.toString());
+		}
+		else {
+			console.log("no existing game available", client.handshake.auth._id);
 		}
 		return ret;
 	}
 
 	async	addClientIdToQueue(client: Socket, server: Server): Promise<void> {
 		var needle: QueueElem = {
-			id: client.handshake.auth._id,
+			id: client.handshake.auth._id.toString(),
 			socket: client,
 		}
-		// console.log(this.queue);
 		if (this.queue.find(({id}) => {return id === needle.id}) == undefined) {
 			console.log("add %s to queue", client.handshake.auth._id);
-			this.queue.push({id: client.handshake.auth._id, socket: client});
+			this.queue.push({id: client.handshake.auth._id.toString(), socket: client});
 			while (this.queue.length > 1) {
 				await this.#initializeGame(server);
 			}
@@ -87,7 +89,7 @@ export class GameService {
 		this.sockets.set(gamerepo.id, [firstPlayer.socket, secondPlayer.socket]);
 		const setup = new GameSetup;
 		console.log('leaving createGameInstance()');
-		return new Game(gamerepo.id, firstPlayer.socket.handshake.auth._id, secondPlayer.socket.handshake.auth._id, setup);
+		return new Game(gamerepo.id, firstPlayer.socket.handshake.auth._id.toString(), secondPlayer.socket.handshake.auth._id.toString(), setup);
 	}
 
 	#updateMaps(game: Game) {
@@ -124,7 +126,7 @@ export class GameService {
 		if (this.#scored(id)){
 			this.#reset(id);
 		}
-		await this.#isGameFinished(id);
+		// await this.#isGameFinished(id);
 		return this.games.get(id);
 	}
 
@@ -282,7 +284,7 @@ export class GameService {
 		}
 	}
 
-	movePaddleUp(id: number, b: boolean) {
+	movePaddleUp(id: number, b: boolean) {		
 		let game: Game = this.games.get(id);
 		if (b) {
 			if (game.paddleLeft.position.y > 0)
@@ -303,6 +305,22 @@ export class GameService {
 		else {
 			if (game.paddleRight.position.y < (480 - game.paddleRight.height))
 				game.paddleRight.position.y += game.paddleRight.speed;
+		}
+	}
+
+	leaveGame(client: Socket) {
+		const userId = client.handshake.auth._id.toString();
+		const gameId = this.users.get(userId);
+		const game = this.games.get(gameId);
+
+		if (userId === game.playerLeft || userId === game.playerRight) {
+			// this.intervals.delete(gameId);
+		} else {
+			this.users.delete(userId);
+			console.log("leaveGame gid", gameId, typeof gameId);
+			console.log("leaveGame uid", userId, typeof userId);
+			client.leave(gameId.toString());
+			client.disconnect();
 		}
 	}
 }

@@ -1,5 +1,5 @@
 <template>
-  <div v-show="gameId">
+  <div v-show="gameId || id">
     <div class="matchInfo">
       <div id = "scoreLeft">
         <UserSummary :user=userLeft!></UserSummary>
@@ -9,20 +9,21 @@
       </div>
       <div id = "scoreRight">
         <UserSummary :user=userRight!></UserSummary> 
-        <!-- =$store.state.user -->
       </div>
     </div>
     <div class="gameCanvas">
       <canvas id="pixi"></canvas>
     </div>
+    <div v-show="!side" class="leaveGame">
+      <button @click="leaveGame"> Leave </button>
+    </div>
 	</div>
-	<div class="queue" v-show="!gameId" >
+	<div class="queue" v-show="!gameId && !id">
 		Waiting for a match...
 	</div>
 </template>
 
 <script lang="ts">
-  import ScoreCounter from '@/components/Game/ScoreCounter.vue'
   import { io, Socket } from "socket.io-client";
   import { API_URL } from '@/defines';
   import { defineComponent } from 'vue';
@@ -30,7 +31,6 @@
   import UserSummary from '@/components/Profile/UserSummary.vue'
   import VueAxios from 'axios';
   import User from '@/models/user';
-import { throwStatement } from '@babel/types';
 
   export default defineComponent({
   	data () {
@@ -84,10 +84,12 @@ import { throwStatement } from '@babel/types';
   		}
   	},
   	components: {
-  		// ScoreCounter
       UserSummary,
 
   	},
+    props: {
+      id: String,
+    },
   	created() { // always called when Component is initialized (e.g. on refresh)
   		console.log("in created");
   		this.gamesocket = io(API_URL + '/game', {
@@ -321,6 +323,10 @@ import { throwStatement } from '@babel/types';
           .then(response => { this.userRight = response.data })
           .catch()
       },
+      leaveGame() {
+        this.gamesocket.emit('leaveGame');
+        this.$router.push("/");
+      }
   	}
   })
 </script>

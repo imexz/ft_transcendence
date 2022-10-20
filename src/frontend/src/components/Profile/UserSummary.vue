@@ -5,7 +5,7 @@
       <span>{{ user?.username }}</span>
       <div v-if="user?.status == 0 && user?.me  == 0">
         <button @click="accept"> accept  </button>
-        <button @click="removeFriend"> denide </button>
+        <button @click="removeFriend"> deny </button>
       </div>
       <div class="toggleDropdown" @click="toggleDropdown">
         <font-awesome-icon icon="fa-solid fa-bars" />
@@ -38,7 +38,8 @@
         <font-awesome-icon icon="fa-solid fa-ban" />
       </button>
       <button
-        class="dropdownElement">
+        class="dropdownElement"
+        @click="spectate(user?._id)">
         <font-awesome-icon icon="fa-solid fa-table-tennis-paddle-ball" />
       </button>
     </div>
@@ -111,6 +112,17 @@ export default defineComponent({
     toggleDropdown() {
       console.log("toggleDropdown");
       this.show = !this.show
+    },
+    spectate(id: number) {
+      this.show = false;
+      VueAxios({
+        url: '/game/spectate/' + id.toString(),
+        baseURL: API_URL,
+        method: 'GET',
+        withCredentials: true,
+      })
+        .then(r => {console.log(r), this.$router.push('/play/' + r.data.toString())})
+        .catch()
     },
   },
 })
