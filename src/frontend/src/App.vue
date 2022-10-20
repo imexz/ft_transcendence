@@ -66,24 +66,37 @@ body {
 }
 
 .content {
-  /* padding-bottom: 80px; */
-/* 
-  width: 840px;
-  min-height: 800px;
-  padding: 20px;
-  margin: auto;
-  border: 2px solid var(--ft_cyan);
-  border-radius: 10px; */
+  
+  /* transform: rotateX('90deg'); */
+
+
+  /* transform: rotate(90deg); */
+    /* transform-origin:bottom center; */
+    
+    /* position:absolute; */
+
+
+  animation-name: example;
+  animation-duration: 20s;
+  animation-iteration-count: infinite;
 }
 
-/* button, input, select {
-  background-color: var(--ft_black);
-  color: var(--ft_white);
-  padding: 15px 32px;
-  font-size: 20px;
-  font-weight: bold;
-  margin: auto;
-  border-image: linear-gradient(var(--ft_pink), var(--ft_blue)) 1;
-  box-sizing: border-box;
-} */
+@keyframes example {
+  0% {
+    transform: rotate(0deg)
+  }
+  25% {
+    transform: rotate(90deg)
+  }
+  50% {
+    transform: rotate(180deg)
+  }
+  75% {
+    transform: rotate(270deg)
+  }
+  100% {
+    transform: rotate(360deg)
+  }
+}
+
 </style>
