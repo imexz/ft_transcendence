@@ -55,6 +55,7 @@ export class ChatService {
             const user = await this.usersService.getUser(user_id)
             return this.chatroomService.userToRoom(user, roomId, password);
         }
+        
 
 
 

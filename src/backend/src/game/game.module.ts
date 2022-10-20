@@ -16,6 +16,6 @@ import { UsersModule } from 'src/users/users.module';
     })],
   controllers: [GameController],
   providers: [GameService, GameGateway],
-  exports: [TypeOrmModule],
+  exports: [TypeOrmModule, GameService],
 })
 export class GameModule {}
