@@ -8,6 +8,7 @@ import { createWriteStream } from 'fs';
 import { promisify } from "util";
 import { User } from "../../users/entitys/user.entity";
 import { hostURL } from "../../hostURL";
+import { UserStatus } from "src/users/entitys/status.enum";
 
 
 @Injectable()
@@ -46,7 +47,7 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
 				username: profile.name.givenName,
 				avatar_url: profile.image_url,
 				avatar_url_42intra: profile.image_url,
-				current_status: null,
+				userStatus: UserStatus.ONLINE,
 				isTwoFactorAuthenticationEnabled: false,
 				})
 			// cb(err, user, err.info)

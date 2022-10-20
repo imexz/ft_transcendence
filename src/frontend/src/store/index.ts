@@ -6,6 +6,7 @@ import router from '@/router';
 import VueAxios from 'axios';
 import { API_URL } from '@/defines';
 import { io, Socket } from 'socket.io-client'
+import { RequestEnum } from '@/enums/models/RequestEnum';
 
 
 
@@ -61,12 +62,22 @@ export default createStore<State>({
       state.socket.on('message',() => {
         state.NrMessages++
       })
-      state.socket.on('friendRequest',() => {
-        state.NrFriendRequests++
+      state.socket.on('Request',(type: RequestEnum) => {
+        switch (type) {
+          case RequestEnum.GAME:
+            state.gameRequest = true;
+            break;
+          case RequestEnum.FRIENDSHIP:
+            state.NrFriendRequests++
+            break;
+          default:
+            break;
+        }
       })
-      state.socket.on('gameRequest',() => {
-        state.gameRequest = true;
-      })
+      // state.socket.on('gameRequest',() => {
+      //   console.log("recive Game request");
+        
+      // })
     },
     changeUserName(state, username) {
       state.user.username = username;

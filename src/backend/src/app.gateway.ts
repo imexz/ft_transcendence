@@ -3,6 +3,11 @@ import { hostURL } from 'src/hostURL';
 import { Socket, Server } from 'socket.io';
 import { JwtStrategy } from 'src/auth/jwt-two/jwt.strategy';
 import { JwtService } from '@nestjs/jwt';
+import  { UserStatus }  from "./users/entitys/status.enum";
+import { UsersService } from './users/users.service';
+import { RequestEnum } from './request.enum';
+
+
 
 
 
@@ -16,8 +21,12 @@ import { JwtService } from '@nestjs/jwt';
 
 export class AppGateway {
 
+  constructor(  private jwtService: JwtService,
+                private jwtStrategy: JwtStrategy,
+                private usersService: UsersService) {}
 
-  constructor( private jwtService: JwtService, private jwtStrategy: JwtStrategy) {}
+  @WebSocketServer()
+  server: Server;
 
     async handleConnection(socket) {
         console.log('====connected chat====')
@@ -37,22 +46,50 @@ export class AppGateway {
             socket.disconnect()
             return
           }
+          this.usersService.setStatus(socket.handshake.auth._id, UserStatus.ONLINE)
         } catch (error) {
           console.log("wrong token");
           socket.disconnect()
           return
         }
       }
+      
+    async handleDisconnect(socket) {
+      console.log(socket.handshake.auth);
+      
+      this.usersService.setStatus(socket.handshake.auth._id, UserStatus.OFFLINE)
+    }
 
-    @SubscribeMessage('gameRequest')
+    @SubscribeMessage('Request')
     async gameRequest(
     @ConnectedSocket() client: Socket,
-    @MessageBody('id') id?: number,)
+    @MessageBody('id') id?: number,
+    @MessageBody('type') type?: RequestEnum    )
     {
         console.log("gameRequest");
-        console.log(client);
-        client.clients()
-        
+        // console.log(client);
+        // const test = Object.keys(this.server.sockets)
+        // console.log(test);
+        // console.log(client.fetchSockets());
+        // console.log(await this.server.fetchSockets());
+
+        const sockets = await this.server.fetchSockets();
+
+
+        for (const socket of sockets) {
+          console.log(socket.handshake.auth._id);
+          console.log(typeof socket.handshake.auth._id);
+          console.log(typeof id);
+          
+          
+          if(socket.handshake.auth._id == id)
+          {
+            console.log("gameRequest test");
+            socket.emit("Request", {id, type})
+            
+          }
+
+        }
         
     }
 }

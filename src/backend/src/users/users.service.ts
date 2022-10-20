@@ -5,13 +5,19 @@ import { Repository } from "typeorm";
 import { fileEntity } from "../avatar/file.entitys"
 import { hostURL } from "../hostURL";
 import { FriendsService } from "./friends/friends.service";
+import { UserStatus } from "./entitys/status.enum";
 
 @Injectable()
 export class UsersService {
-	async getFriends(_id: any) {
+
+	async setStatus(id: number , userStatus: UserStatus) {
+		this.usersRepository.update(id, {userStatus: userStatus})
+	}
+
+	async getFriends(id: any) {
 
 		const friends = await this.usersRepository.findOne({where:{
-			_id: _id
+			_id: id
 		},
 		relations:{
 			myFriends: true

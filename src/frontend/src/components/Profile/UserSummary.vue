@@ -52,6 +52,7 @@ import VueAxios from 'axios';
 import User from '@/models/user'
 import { API_URL } from '@/defines';
 import { defineComponent } from 'vue';
+import { RequestEnum } from '@/enums/models/RequestEnum';
 
 export default defineComponent({
   data() {
@@ -89,7 +90,11 @@ export default defineComponent({
       }
     },
     AskForMatch(){
-      this.$store.state.socket.emit('gameRequest', {id: this.user.id}, () => {})
+      console.log("AskForMatch b");
+      console.log(this.user._id);
+      console.log(this.user);
+      
+      this.$store.state.socket.emit('Request', {id: this.user._id, type: RequestEnum.GAME}, () => {})
       console.log("AskForMatch");
       
     },

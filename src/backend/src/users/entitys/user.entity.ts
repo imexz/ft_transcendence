@@ -5,6 +5,8 @@ import { fileEntity } from "../../avatar/file.entitys";
 import { Exclude } from 'class-transformer';
 import { Game } from '../../game/game.entities/game.entity';
 import { Friend } from "../friends/friend.entity";
+import { UserStatus } from "./status.enum";
+
 
 
 @Entity()
@@ -51,8 +53,12 @@ export class User {
 	@OneToMany(() => Friend, (friend) => friend.requester)
 	friendsOfMe?: Friend[];
 
-	@Column({nullable: true})
-	current_status: number;
+	@Column({
+        type: "enum",
+        enum: UserStatus,
+        default: UserStatus.OFFLINE,
+    })
+	userStatus: UserStatus;
 
 	@OneToMany(() => message, (message) => message.user)
 	messeges?: message[];
