@@ -113,7 +113,7 @@ export class GameService {
 	}
 
 	async #startGame(server: Server, gameid: number) {
-		var intervalId = setInterval(() => this.#emitGameData(gameid, server), 10) as unknown as number;
+		var intervalId = setInterval(() => this.#emitGameData(gameid, server), 16) as unknown as number;
 		this.intervals.set(gameid, intervalId);
 	}
 
