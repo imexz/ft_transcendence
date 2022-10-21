@@ -4,7 +4,7 @@
       <img :src="user?.avatar_url" alt="Avatar">
       <span>{{ user?.username }}</span>
       <div v-if="user?.status == 0 && user?.me  == 0">
-        <button @click="accept"> accept  </button>
+        <button @click="acceptFriend"> accept  </button>
         <button @click="removeFriend"> deny </button>
       </div>
       <div class="toggleDropdown" @click="toggleDropdown">
@@ -42,6 +42,12 @@
         @click="askForMatch">
         <font-awesome-icon icon="fa-solid fa-table-tennis-paddle-ball" />
       </button>
+      <button 
+        v-for="button in extraButtons"
+        class="dropdownElement"
+        @click="customEmit(button.emit)">
+        <font-awesome-icon :icon="button.icon"/>
+      </button>
     </div>
   </div>
 </template>
@@ -53,6 +59,7 @@ import User from '@/models/user'
 import { API_URL } from '@/defines';
 import { defineComponent } from 'vue';
 import { RequestEnum } from '@/enums/models/RequestEnum';
+
 
 export default defineComponent({
   data() {
@@ -70,9 +77,13 @@ export default defineComponent({
     user: {
       type: User,
       default: null
-    }
+    },
+    extraButtons: []
   },
   methods: {
+    customEmit(emitMsg){
+      this.$emit('action', emitMsg, this.user._id)
+    },
     addFriend(): void {
       VueAxios({
         url: '/users/addFriend',
@@ -89,7 +100,9 @@ export default defineComponent({
         this.show = false;
       }
     },
-
+    acceptFriend(){
+      console.log("Accepting FreindRequest", this.user._id)
+    },
     removeFriend(){
       // console.log("IMPLEMENT API TO REMOVE FRIEND")
      
@@ -165,7 +178,7 @@ export default defineComponent({
     z-index: 1;
   }
   .dropdownElement {
-    width: 17%;
+    /* width: 17%; */
     font-size: 25px;
     font-weight: bold;
     text-align: center;
