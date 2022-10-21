@@ -92,11 +92,9 @@
     },
   	created() { // always called when Component is initialized (e.g. on refresh)
   		console.log("in created");
-  		this.gamesocket = io(API_URL + '/game', {
-  			auth: (cb: any) => {
-  				cb ({id: document.cookie })
-  			}
-  		});
+      console.log(this.$store.state);
+      
+  		this.gamesocket = this.$store.state.socketGame
   		this.gamesocket.on('gameInfo', (data: any) => {
   			console.log("event gameInfo received");
         console.log(data);
@@ -132,14 +130,17 @@
 
 	},
 
-  	beforeDestory() {
-  		console.log("in beforeDestroy");
+  	unmount() {
+  		console.log("in unmount");
   		delete this.eventSource;
   		this.gamesocket.close();
   		delete this.gamesocket;
   		// delete this.position;
   		delete this.context;
   		// delete this.gameId;
+
+      this.gamesocket.off('gameInfo')
+      this.gamesocket.off('updateGame')
   	},
   	methods: {
       initPixi(){
@@ -148,7 +149,7 @@
         this.pixiApp = new PIXI.Application({
           width: 640,
           height: 480,
-          antialias: true,
+          antialias: false,
           backgroundColor: this.styleData.bgColor,
           view: canvas as HTMLCanvasElement,
 

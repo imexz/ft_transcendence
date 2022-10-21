@@ -15,6 +15,8 @@ export interface State {
   validated: boolean
   user: User
   socket: Socket | null
+  socketGame: Socket | null
+  socketChat: Socket | null
   friendsList: User[] | null
   NrMessages: number
   NrFriendRequests: number
@@ -24,8 +26,8 @@ export interface State {
 const storage = localStorage.getItem('user')
 const user = storage?JSON.parse(storage):null;
 const initialState = user?
-  {validated: true, user: user, socket: null, friendsList: null, NrMessages: 0, NrFriendRequests: 0, gameRequest: false}:
-  {validated: false, user: null,  socket: null, friendsList: null, NrMessages: 0, NrFriendRequests: 0, gameRequest: false};
+  {validated: true, user: user, socket: null,  socketChat: null,  socketGame: null, friendsList: null, NrMessages: 0, NrFriendRequests: 0, gameRequest: false}:
+  {validated: false, user: null,  socket: null,  socketChat: null,  socketGame: null, friendsList: null, NrMessages: 0, NrFriendRequests: 0, gameRequest: false};
 
 export default createStore<State>({
 
@@ -57,7 +59,21 @@ export default createStore<State>({
           auth: {
               id: document.cookie
           }
-      });
+      })
+      console.log("default socket init");
+      
+      state.socketChat = io(API_URL + "/chat", {
+        auth: {
+          id: document.cookie
+        }
+      })
+      console.log("chat socket init");
+      state.socketGame = io(API_URL + "/game", {
+        auth: {
+          id: document.cookie
+        }
+      })
+      console.log("game socket init");
       console.log(document.cookie);
       state.socket.on('message',() => {
         state.NrMessages++

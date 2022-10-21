@@ -31,24 +31,23 @@ export class AppGateway {
   server: Server;
 
     async handleConnection(socket) {
-        console.log('====connected chat====')
-        console.log(socket.handshake);
-    
-    
-        try {
-          socket.handshake.auth = this.jwtService.verify(socket.handshake.auth.id.replace('Authentication=',''));
-          console.log("socket handshake");
-          console.log(socket.handshake.auth);
-    
-          socket.handshake.auth = await this.jwtStrategy.validate(socket.handshake.auth)
-          console.log("socket handshake1");
-          console.log(socket.handshake.auth);
-          if(socket.handshake.auth == undefined){
-            console.log("validation goes wrong");
-            socket.disconnect()
-            return
-          }
-          this.usersService.setStatus(socket.handshake.auth._id, UserStatus.ONLINE)
+      
+      
+      try {
+        socket.handshake.auth = this.jwtService.verify(socket.handshake.auth.id.replace('Authentication=',''));
+        console.log("socket handshake");
+        console.log(socket.handshake.auth);
+        
+        socket.handshake.auth = await this.jwtStrategy.validate(socket.handshake.auth)
+        console.log("socket handshake1");
+        console.log(socket.handshake.auth);
+        if(socket.handshake.auth == undefined){
+          console.log("validation goes wrong");
+          socket.disconnect()
+          return
+        }
+        console.log('====connected chat====', socket.handshake.auth._id);
+        this.usersService.setStatus(socket.handshake.auth._id, UserStatus.ONLINE)
         } catch (error) {
           console.log("wrong token");
           socket.disconnect()
@@ -57,9 +56,16 @@ export class AppGateway {
       }
       
     async handleDisconnect(socket) {
-      console.log(socket.handshake.auth);
+      console.log("disconnected", socket.handshake.auth);
       
       this.usersService.setStatus(socket.handshake.auth._id, UserStatus.OFFLINE)
+    }
+
+
+    @SubscribeMessage('typing')
+    test(){
+      console.log("typing wrong ");
+      
     }
 
     @SubscribeMessage('Request')
@@ -68,38 +74,32 @@ export class AppGateway {
     @MessageBody('id') id?: number,
     @MessageBody('type') type?: RequestEnum    )
     {
+      console.log("Request to", id," type =", type);
+      
       switch (type) {
         case RequestEnum.GAME:
           const gameId: number = this.gameService.users.get(id.toString());
-          this.gameService.users.set(client.handshake.auth._id.toString(), gameId);
-          return gameId;
-          
-          break;
+          if(gameId != undefined)
+          {
+            this.gameService.users.set(client.handshake.auth._id.toString(), gameId);          
+            break;
+          }
         case RequestEnum.FRIENDSHIP:
           
-          break;
-
+          // break;
         default:
+          const sockets = await this.server.fetchSockets();
+          for (const socket of sockets) {
+            // console.log(socket.handshake.auth._id);
+            // console.log(typeof socket.handshake.auth._id);
+            // console.log(typeof id);
+            if(socket.handshake.auth._id == id)
+            {
+              console.log("gameRequest test");
+              socket.emit("Request", {id, type})
+            }
+          }
           break;
       }
-
-        const sockets = await this.server.fetchSockets();
-
-
-        for (const socket of sockets) {
-          console.log(socket.handshake.auth._id);
-          console.log(typeof socket.handshake.auth._id);
-          console.log(typeof id);
-          
-          
-          if(socket.handshake.auth._id == id)
-          {
-            console.log("gameRequest test");
-            socket.emit("Request", {id, type})
-            
-          }
-
-        }
-        
     }
 }

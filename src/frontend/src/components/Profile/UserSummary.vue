@@ -84,6 +84,7 @@ export default defineComponent({
       })
         .then(this.$store.commit('addFriend', this.user))
         .catch()
+      this.$store.state.socket.emit('Request', {id: this.user._id, type: RequestEnum.FRIENDSHIP})
     },
     hideOnClick(e) {
       if (!this.$el.contains(e.target)){

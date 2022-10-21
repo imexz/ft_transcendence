@@ -106,8 +106,8 @@ export class ChatGateway {
     @MessageBody('roomId') roomId: any,
     @ConnectedSocket() client:Socket,
   ) {
-    console.log(roomId)
-    console.log("roomId")
+    // console.log(roomId)
+    console.log("typing")
 
     // const name = await this.chatService.getClientName(client.handshake.auth._id);
     // const room_name = await this.chatService.getRoomName(roomId)

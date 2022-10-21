@@ -199,7 +199,7 @@
               }
             }, 2000);
           }
-          console.log("emit typing ");
+          console.log("emit typing ende");
           // console.log("roomId");
           // console.log(roomId.roomId);
 
@@ -219,12 +219,7 @@
                 .catch()
         },
         initSocket(){
-          this.socket = io(API_URL + "/chat", {
-              auth: {
-                  id: document.cookie
-              }
-            }
-          )
+          this.socket = this.$store.state.socketChat
           console.log("initSocket")
         },
         roomActionHandler({ roomId, action }) {
@@ -388,6 +383,10 @@
 
         console.log("mounted CHAT");
         // console.log(this.currentUserId)
+      },
+      beforeDestory() {
+        this.socket.off('typing')
+        this.socket.off('message')
       }
     }
 </script>

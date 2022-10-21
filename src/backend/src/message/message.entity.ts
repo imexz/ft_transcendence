@@ -21,7 +21,7 @@ export class message {
     @ManyToOne(() => User, (user) => user.messeges) //TB typo?
     user: User;
 
-    @ManyToOne(() => chatroom, (chatroom) => chatroom.messages )
+    @ManyToOne(() => chatroom, (chatroom) => chatroom.messages, {onDelete: 'CASCADE'} )
     chatroom: chatroom;
 
 }
