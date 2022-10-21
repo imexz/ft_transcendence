@@ -38,7 +38,7 @@
     </createRoomPopup>
 
     <div v-if="roomInfoPopUp" class="roomInfoPopUp">
-      <roomInfoPopUp :roomInfo="roomInfoData"/>
+      <roomInfoPopUp :roomInfo="roomInfoData" @action="roomInfoActions"/>
     </div>
 
     <!-- <joinRoomPopup
@@ -54,7 +54,7 @@
   <script lang="ts">
   import { register } from 'vue-advanced-chat'
   import { io, Socket } from 'socket.io-client';
-  import { ref } from 'vue';
+  import { defineComponent, ref } from 'vue';
   import VueAxios from 'axios';
   import { API_URL } from '@/defines';
   import createRoomPopup from '@/components/Chat/createRoomPopup.vue';
@@ -63,7 +63,7 @@
 
   register()
 
-    export default {
+    export default defineComponent({
       data() {
         return {
           height: "800px",
@@ -267,6 +267,22 @@
             data => { console.log(data), this.roomInfoData = data}
           );
         },
+        roomInfoActions(emitMsg, userId){
+          switch(emitMsg){
+            case "mute":
+              this.muteUser(userId);
+              break ;
+            case "ban":
+              this.banUser(userId);
+              break;
+          }
+        },
+        muteUser(userId){
+          console.log("Requesting mute of: ", userId)
+        },
+        banUser(userId){
+          console.log("Requesting ban of: ", userId)
+        },
         toggleRoomInfo() {
           console.log(this.roomInfoPopUp)
           if (this.roomInfoPopUp)
@@ -389,7 +405,7 @@
         console.log("mounted CHAT");
         // console.log(this.currentUserId)
       }
-    }
+    })
 </script>
 
 <!-- <script lang="ts">
