@@ -127,15 +127,15 @@ export default defineComponent({
       this.show = !this.show
     },
     askForMatch(){
-      // console.log("AskForMatch b");
+      console.log("AskForMatch b");
       // console.log(this.user._id);
       // console.log(this.user);
       
-      this.$store.state.socket.emit('Request', {id: this.user._id, type: RequestEnum.GAME}, (r) => {
+      this.$store.state.socketGame.emit('Request', {id: this.user._id}, (r) => {
         // console.log(r)
         this.$router.push('/play/' + r.toString())
       })
-      // console.log("AskForMatch");
+      console.log("AskForMatch");
       
     },
   },

@@ -78,11 +78,13 @@ export default createStore<State>({
       state.socket.on('message',() => {
         state.NrMessages++
       })
+      state.socketGame.on('Request',(id: number, type: RequestEnum) => {
+        state.gameRequest = true;
+        console.log("askformatch");
+      })
+
       state.socket.on('Request',(id: number, type: RequestEnum) => {
         switch (type) {
-          case RequestEnum.GAME:
-            state.gameRequest = true;
-            break;
           case RequestEnum.FRIENDSHIP:
             state.NrFriendRequests++
             break;

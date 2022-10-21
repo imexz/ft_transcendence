@@ -5,6 +5,7 @@ import { SubscribeMessage,
   OnGatewayInit,
   OnGatewayConnection,
   OnGatewayDisconnect,
+  MessageBody,
  } from '@nestjs/websockets';
 import { GameService } from './game.service';
 import { Socket, Server } from 'socket.io';
@@ -12,6 +13,7 @@ import { hostURL } from 'src/hostURL';
 import { JwtStrategy } from 'src/auth/jwt-two/jwt.strategy';
 import { JwtService } from '@nestjs/jwt';
 import { TokenPayload } from 'src/auth/tokenPayload.interface';
+
 
 @WebSocketGateway({
   namespace: 'game',
@@ -92,4 +94,30 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   handleLeaveGame(@ConnectedSocket() client: Socket): void {
     this.gameService.leaveGame(client);
   }
+
+  @SubscribeMessage('Request')
+  async gameRequest(
+  @ConnectedSocket() client: Socket,
+  @MessageBody('id') id?: number)
+  {
+    const gameId: number = this.gameService.users.get(id.toString());
+    if(gameId != undefined)
+    {
+      this.gameService.users.set(client.handshake.auth._id.toString(), gameId);
+    }
+    const socket = await this.findSocketOfUser(id)
+    socket.emit("Request", {id})
+
+  }
+  
+    async findSocketOfUser(userId: number) {
+      const sockets = await this.server.fetchSockets();
+      for (const socket of sockets) {
+        if(socket.handshake.auth._id == userId)
+        {
+          console.log("gameRequest test");
+          return socket
+        }
+      }
+    }
 }

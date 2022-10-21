@@ -77,13 +77,6 @@ export class AppGateway {
       console.log("Request to", id," type =", type);
       
       switch (type) {
-        case RequestEnum.GAME:
-          const gameId: number = this.gameService.users.get(id.toString());
-          if(gameId != undefined)
-          {
-            this.gameService.users.set(client.handshake.auth._id.toString(), gameId);          
-            break;
-          }
         case RequestEnum.FRIENDSHIP:
           
           // break;
