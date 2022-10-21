@@ -6,7 +6,7 @@
 
     <h1>Users</h1>
     <div v-for="user in roomInfo?.room.users">
-      <UserSummary :user=user></UserSummary>
+      <UserSummary :user=user :extraButtons="extraButtons" @action="reEmit"></UserSummary>
     </div>
     <h1>Admins</h1>
     <div v-for="user in roomInfo?.room.admins">
@@ -25,11 +25,26 @@ export default defineComponent({
     return {
       room: null,
       admin: false as boolean,
+      extraButtons: [
+        {
+          icon: "fa-solid fa-comment-slash",
+          emit: "mute"
+        },
+        {
+          icon: "fa-solid fa-gavel",
+          emit: "ban"
+        }
+      ]
     }
   },
   updated() {
     this.room = this.roomInfo?.room;
     this.admin = this.roomInfo?.isAdmin;
+  },
+  methods: {
+    reEmit(emitMsg, userId){
+      this.$emit("action", emitMsg, userId)
+    }
   },
   components: {
     UserSummary,
