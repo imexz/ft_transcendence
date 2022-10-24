@@ -62,12 +62,6 @@ export class AppGateway {
     }
 
 
-    @SubscribeMessage('typing')
-    test(){
-      console.log("typing wrong ");
-      
-    }
-
     @SubscribeMessage('Request')
     async gameRequest(
     @ConnectedSocket() client: Socket,

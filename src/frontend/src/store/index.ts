@@ -76,7 +76,6 @@ export default createStore<State>({
       console.log("game socket init");
       console.log(document.cookie);
       state.socketChat.on('message',() => {
-        if (router.currentRoute.value.fullPath != "/chat")
         state.NrMessages++
       })
       state.socketGame.on('Request',(id: number, type: RequestEnum) => {

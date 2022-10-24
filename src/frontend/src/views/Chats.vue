@@ -251,6 +251,7 @@
         initSocket(){
           this.socket = this.$store.state.socketChat
           console.log("initSocket")
+          this.socket.off('message')
         },
         roomActionHandler({ roomId, action }) {
           console.log("roomActionHandler");
@@ -453,9 +454,13 @@
         console.log("mounted CHAT");
         // console.log(this.currentUserId)
       },
-      beforeDestory() {
+      unmounted() {
         this.socket.off('typing')
         this.socket.off('message')
+        this.socket.on('message',() => {
+          this.$store.state.NrMessages++
+         console.log("mrmessiges", this.$store.state.NrMessages)
+        })
       }
     })
 </script>
