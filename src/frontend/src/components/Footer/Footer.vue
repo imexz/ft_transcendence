@@ -27,9 +27,9 @@ export default defineComponent({
     z-index: 11;
     position: fixed;
     bottom: 0px;
-    height: 62px;
+    /* height: 62px; */
     width: 100%;
-    background-color: var(--dark);
-    border-top: 2px solid var(--hot);
+    /* background-color: var(--dark);
+    border-top: 2px solid var(--hot); */
   }
 </style>

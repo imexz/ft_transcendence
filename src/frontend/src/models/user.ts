@@ -12,8 +12,31 @@ export default class User {
   _id: number
   username: string
   avatar_url: string
+  
   current_status: any
   avatar_url_42intra: string
   clientId: any
   isTwoFactorAuthenticationEnabled: boolean
 }
+//   constructor(_id: number, username: string, avatar_url: string, 
+//     status: string, me: number
+//     // , isTwoFactorAuthenticationEnabled: boolean,
+//     // twoFactorAuthenticationSecret: null
+//     ){
+//     this._id = _id
+//     this.username = username
+//     this.avatar_url = avatar_url
+//     this.status = status
+//     this.me = me
+//     // this.isTwoFactorAuthenticationEnabled = isTwoFactorAuthenticationEnabled
+//     // this.twoFactorAuthenticationSecret = twoFactorAuthenticationSecret
+//   }
+//   _id: number
+//   username: string
+//   avatar_url: string
+  
+//   status: string
+//   me: number
+//   // isTwoFactorAuthenticationEnabled: boolean
+//   // twoFactorAuthenticationSecret: any
+// }

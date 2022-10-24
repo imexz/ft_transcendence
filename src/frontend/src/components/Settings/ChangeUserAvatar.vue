@@ -25,6 +25,10 @@ export default defineComponent({
       selectedFile: null as File | null,
     }
   },
+  emits: {
+    error: null,
+    success: null,
+  },
   methods: {
     ChangeUserAvatar(): void {
       if (this.selectedFile == null) {

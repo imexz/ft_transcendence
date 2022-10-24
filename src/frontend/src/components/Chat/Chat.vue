@@ -27,8 +27,9 @@ import { io } from 'socket.io-client';
 import { API_URL } from '@/defines';
 import Message from './Message.vue';
 import { ref, Ref } from 'vue'
+import { defineComponent  } from 'vue';
 
-export default{
+export default defineComponent({
 
   data(): unknown {
     return {
@@ -36,7 +37,7 @@ export default{
       messageText: '',
       messages: [],
       timeout: 0,
-      user_id!: Number,
+      user_id: 0 as Number,
     }
   },
   props: {
@@ -108,7 +109,7 @@ export default{
   beforeMount(){
     console.log("beforeMounted");
   }
-}
+})
 
 </script>
 
