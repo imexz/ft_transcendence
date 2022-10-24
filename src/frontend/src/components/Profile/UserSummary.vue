@@ -78,7 +78,7 @@ export default defineComponent({
       type: Object,
       default: null
     },
-    extraButtons: {
+    extraButtons<Button>: {
       type: Array,
       default: []
     },
