@@ -221,6 +221,7 @@
         initSocket(){
           this.socket = this.$store.state.socketChat
           console.log("initSocket")
+          this.socket.off('message')
         },
         roomActionHandler({ roomId, action }) {
           console.log("roomActionHandler");
