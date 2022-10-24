@@ -400,9 +400,13 @@
         console.log("mounted CHAT");
         // console.log(this.currentUserId)
       },
-      beforeDestory() {
+      unmounted() {
         this.socket.off('typing')
         this.socket.off('message')
+        this.socket.on('message',() => {
+          this.$store.state.NrMessages++
+         console.log("mrmessiges", this.$store.state.NrMessages)
+        })
       }
     })
 </script>
