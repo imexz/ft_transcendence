@@ -26,7 +26,7 @@ import UserSummary from '@/components/Profile/UserSummary.vue';
 export default defineComponent({
   props: {
     match: {
-      type: MatchData,
+      type: Object,
       default: null,
     },
   },

@@ -18,6 +18,10 @@ export default defineComponent({
       newName : ref(''),
     }
   },
+  emits: {
+    error: null,
+    success: null,
+  },
   methods: {
     changeUserName(): void {
       console.log(this.newName.length, maxLenUserName)

@@ -60,7 +60,6 @@ import { API_URL } from '@/defines';
 import { defineComponent } from 'vue';
 import { RequestEnum } from '@/enums/models/RequestEnum';
 
-
 export default defineComponent({
   data() {
     return {
@@ -75,10 +74,16 @@ export default defineComponent({
   },
   props : {
     user: {
-      type: User,
+      type: Object,
       default: null
     },
-    extraButtons: []
+    extraButtons: {
+      type: Array,
+      default: []
+    },
+  },
+  mounted() {
+    console.log(this.user)
   },
   methods: {
     customEmit(emitMsg){

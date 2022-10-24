@@ -75,16 +75,20 @@ export default createStore<State>({
       })
       console.log("game socket init");
       console.log(document.cookie);
-      state.socket.on('message',() => {
+      state.socketChat.on('message',() => {
+        if (router.currentRoute.value.fullPath != "/chat")
         state.NrMessages++
       })
       state.socketGame.on('Request',(id: number, type: RequestEnum) => {
         state.gameRequest = true;
+        console.log("id", id, "type", type)
         console.log("askformatch");
       })
 
-      state.socket.on('Request',(id: number, type: RequestEnum) => {
-        switch (type) {
+      state.socket.on('Request',(data) => {
+        //id:number + type:RequestEnum
+        console.log("the type is", data.type, "the id is" , data.id)
+        switch (data.type) {
           case RequestEnum.FRIENDSHIP:
             state.NrFriendRequests++
             break;

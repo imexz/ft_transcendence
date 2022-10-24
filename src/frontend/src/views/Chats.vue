@@ -339,13 +339,18 @@
       },
       created() {
         console.log("created");
+        this.$store.state.NrMessages = 0;
         this.initSocket();
       },
       beforeMount() {
         console.log("beforeMount");
       },
       mounted() {
-
+        if (this.socket == null){
+          this.$router.push('/login')
+          return ;
+        }
+        this.$store.state.NrMessages = 0;
         this.socket.on('typing',({ userId, isTyping , roomId}) => {
           console.log('typing');
           const room = this.rooms.find((room) => {
@@ -378,6 +383,7 @@
         });
 
         this.socket.on('message',({message, roomId}) => {
+          console.warn("CHAT EVENT")
           console.log('message');
           console.log(message);
           console.log(roomId);
