@@ -64,6 +64,7 @@ export class ChatroomService {
 
      async getAllwithUser(id: number) {
         console.log("getAllwithUser");
+        console.log("id = ", id);
 
         const test = await this.chatroomRepository.createQueryBuilder("chatroom")
         // .leftJoinAndSelect('chatroom.users', 'users')
@@ -76,7 +77,7 @@ export class ChatroomService {
             // }, "name")
             // .where(users )
 
-            // console.log(test);
+            console.log(test);
             return test
 
     }

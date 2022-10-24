@@ -388,10 +388,10 @@
       created() {
         console.log("created");
         this.$store.state.NrMessages = 0;
-        this.initSocket();
       },
       beforeMount() {
         console.log("beforeMount");
+        this.initSocket();
       },
       mounted() {
         if (this.socket == null){

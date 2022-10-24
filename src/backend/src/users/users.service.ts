@@ -60,6 +60,17 @@ export class UsersService {
 	}
 
 
+	async getUserSocket(server, id: number){
+		const sockets = await server.fetchSockets();
+		for (const socket of sockets) {
+            if(socket.handshake.auth._id == id)
+            {
+              return socket
+            }
+          }		
+	}
+
+
 	async remove(id: number): Promise<void> {
 		await this.usersRepository.delete(id);
 	}

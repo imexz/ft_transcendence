@@ -25,8 +25,9 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     }
 
     async validate(payload: TokenPayload) {
-        // console.log(payload);
-        // console.log("validate jwt")
+    // async validate(payload: any) {
+      console.log("validate jwt")
+        console.log(payload);
         const user = await this.userService.getUser(payload.Id)
         // console.log(user);
         if (user != undefined) {
@@ -39,7 +40,6 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
               console.log("return null");
               return
             }
-  
           }
         } else {
           console.log("user not found");

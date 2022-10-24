@@ -2,8 +2,7 @@ import { ConnectedSocket, MessageBody, SubscribeMessage, WebSocketGateway, WebSo
 import { Socket, Server } from 'socket.io';
 import { ChatService } from './chat.service';
 import { hostURL } from 'src/hostURL';
-import { JwtStrategy } from 'src/auth/jwt-two/jwt.strategy';
-import { JwtService } from '@nestjs/jwt';
+import { AuthService } from 'src/auth/auth.service';
 
 
 @WebSocketGateway({
@@ -22,9 +21,9 @@ export class ChatGateway {
 
   // Socket.use(() => {}) 
 
-  constructor(private readonly chatService: ChatService, private jwtService: JwtService, private jwtStrategy: JwtStrategy) {}
+  constructor(private readonly chatService: ChatService, private authService: AuthService) {}
 
-  afterInit(socket) {
+  afterInit() {
     // console.log("afterInit chat ");
 
   }
@@ -32,33 +31,14 @@ export class ChatGateway {
 
   async handleConnection(socket) {
     console.log('====connected chat====')
-    console.log(socket.handshake);
+    if (await this.authService.validateSocket(socket)) {
+      console.log("validate chat succes full");
 
+// console.log(socket.handshake);
 
-    try {
-      socket.handshake.auth = this.jwtService.verify(socket.handshake.auth.id.replace('Authentication=',''));
-      console.log("socket handshake");
-      console.log(socket.handshake.auth);
-
-      socket.handshake.auth = await this.jwtStrategy.validate(socket.handshake.auth)
-      console.log("socket handshake1");
-      console.log(socket.handshake.auth);
-      if(socket.handshake.auth == undefined){
-        console.log("validation goes wrong");
-        socket.disconnect()
-        return
-      }
       this.joinRoom(socket)
-
-    } catch (error) {
-      console.log("wrong token");
-      socket.disconnect()
-      return
     }
-
-
   }
-
 
   @SubscribeMessage('join')
   async joinRoom(
@@ -71,7 +51,10 @@ export class ChatGateway {
       console.log(client.handshake);
       console.log("join after");
 
-    const rooms = await this.chatService.getUserRooms(client.handshake.auth._id)
+      const rooms = await this.chatService.getUserRooms(client.handshake.auth._id)
+
+      console.log(rooms);
+    
 
 
     var tmp = []
@@ -82,7 +65,7 @@ export class ChatGateway {
     if (roomId != undefined && this.chatService.manageJoin(client.handshake.auth._id, roomId, password)) {
       tmp.push(roomId.toString())
     }
-    // console.log(tmp);
+    console.log("tmp = ", tmp);
 
     client.join(tmp)
   }
@@ -147,6 +130,7 @@ export class ChatGateway {
 
     // client.to(room_name).emit('message', message);
     if(message) {
+
       const tmp = {
       senderId: client.handshake.auth._id.toString(),
       _id: message._id,
@@ -157,7 +141,6 @@ export class ChatGateway {
       // _id: 0,
       // indexId: 12092,
 
-      const test = roomId.toString()
 
       // console.log(test);
       console.log({tmp, roomId});
@@ -200,7 +183,6 @@ export class ChatGateway {
     @MessageBody('messageId') messageId : number,
     @MessageBody('reaction') reaction : any,
     @MessageBody('remove') remove : boolean,
-    @ConnectedSocket() client: Socket,
   ) {
       console.log("createMessageReaction");
       console.log(messageId);

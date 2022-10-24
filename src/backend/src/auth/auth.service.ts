@@ -3,10 +3,13 @@ import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { User } from '../users/entitys/user.entity';
 import {TokenPayload} from './tokenPayload.interface';
+import { Socket, Server } from 'socket.io';
+import { UserStatus } from 'src/users/entitys/status.enum';
+import { JwtStrategy } from './jwt-two/jwt.strategy';
 
 @Injectable()
 export class AuthService {
-	constructor(private usersService: UsersService, private jwtService: JwtService) {}
+	constructor(private usersService: UsersService, private jwtService: JwtService, private jwtStrategy: JwtStrategy) {}
 	
 	async validateUser(id: number) {
 
@@ -20,24 +23,24 @@ export class AuthService {
 	}
 
 
-	async findAll() {
-		return await this.usersService.findAll();
-	}
+	// async findAll() {
+	// 	return await this.usersService.findAll();
+	// }
 
 	login(user: any) {
 		const payload = {sub: user._id};
 		return this.jwtService.sign(payload);
 	}
 
-	async addfriend(user_id: number, friend_id: number) {
-		// this.usersService.addfriend(user_id, friend_id)
+	// async addfriend(user_id: number, friend_id: number) {
+	// 	// this.usersService.addfriend(user_id, friend_id)
 
 
-	}
+	// }
 
-	async deleteUser(user_id: number) {
-		this.usersService.remove(user_id);
-	}
+	// async deleteUser(user_id: number) {
+	// 	this.usersService.remove(user_id);
+	// }
 
 	public getCookieWithJwtAccessToken(Id: number, isSecondFactorAuthenticated = false) {
 		const payload: TokenPayload = {Id, isSecondFactorAuthenticated };
@@ -46,4 +49,33 @@ export class AuthService {
 		// return `Authentication=${token}; HttpOnly; Path=/; Max-Age=600`;
 		return `Authentication=${token}; Path=/; Max-Age=6000`;
 	}
+
+	public async validateSocket(socket: Socket){
+		try {
+			socket.handshake.auth = this.jwtService.verify(socket.handshake.auth.id.replace('Authentication=',''));
+			console.log("socket handshake");
+			console.log(socket.handshake.auth);
+			
+			socket.handshake.auth = await this.jwtStrategy.validate(socket.handshake.auth as TokenPayload)
+			console.log("socket handshake1");
+			console.log(socket.handshake.auth);
+			if(await socket.handshake.auth === undefined){
+			  console.log("validation goes wrong");
+			  socket.disconnect()
+			  return false
+			}else{
+				this.usersService.setStatus(socket.handshake.auth._id, UserStatus.ONLINE)
+				// console.log(socket.handshake.auth);
+				
+				return true
+
+			}
+			} catch (error) {
+			  console.log("wrong token");
+			  socket.disconnect()
+			  return false
+			}
+	}
+
+
 }

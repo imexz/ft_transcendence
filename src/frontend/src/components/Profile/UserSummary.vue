@@ -5,7 +5,7 @@
       <span>{{ user?.username }}</span>
       <div v-if="user?.status == 0 && user?.me  == 0">
         <button @click="acceptFriend"> accept  </button>
-        <button @click="removeFriend"> deny </button>
+        <button @click="denideFriend"> deny </button>
       </div>
       <div class="toggleDropdown" @click="toggleDropdown">
         <font-awesome-icon icon="fa-solid fa-bars" />
@@ -59,6 +59,7 @@ import User from '@/models/user'
 import { API_URL } from '@/defines';
 import { defineComponent } from 'vue';
 import { RequestEnum } from '@/enums/models/RequestEnum';
+import { Status } from '@/enums/models/ResponseEnum';
 
 export default defineComponent({
   data() {
@@ -90,38 +91,23 @@ export default defineComponent({
       this.$emit('action', emitMsg, this.user._id)
     },
     addFriend(): void {
-      VueAxios({
-        url: '/users/addFriend',
-        baseURL: API_URL,
-        method: 'POST',
-        withCredentials: true,
-        data: {"id" : this.user?._id},
-      })
-        .then(this.$store.commit('addFriend', this.user))
-        .catch()
       this.$store.state.socket.emit('Request', {id: this.user._id, type: RequestEnum.FRIENDSHIP})
+    },
+    acceptFriend(){
+      this.$store.state.socket.emit('Response', {id: this.user._id, status: Status.accepted})
+      console.log("Accepting FreindRequest", this.user._id)
+    },
+    denideFriend(){
+      this.$store.state.socket.emit('Response', {id: this.user._id, status: Status.denide})
+      console.log("Accepting FreindRequest", this.user._id)
+    },
+    removeFriend(){
+      this.$store.state.socket.emit('Remove', {id: this.user._id})
     },
     hideOnClick(e) {
       if (!this.$el.contains(e.target)){
         this.show = false;
       }
-    },
-    acceptFriend(){
-      console.log("Accepting FreindRequest", this.user._id)
-    },
-    removeFriend(){
-      // console.log("IMPLEMENT API TO REMOVE FRIEND")
-     
-      VueAxios({
-        url: '/users/removeFriend',
-        baseURL: API_URL,
-        method: 'POST',
-        withCredentials: true,
-        data: {"id" : this.user?._id},
-      })
-        .then(this.$store.commit('removeFriend', this.user._id))
-        .catch()
-      // this.$store.commit('removeFriend', this.user._id);
     },
     viewProfile(id: number){
       this.show = false;
@@ -132,16 +118,10 @@ export default defineComponent({
       this.show = !this.show
     },
     askForMatch(){
-      console.log("AskForMatch b");
-      // console.log(this.user._id);
-      // console.log(this.user);
-      
       this.$store.state.socketGame.emit('Request', {id: this.user._id}, (r) => {
-        // console.log(r)
         this.$router.push('/play/' + r.toString())
       })
       console.log("AskForMatch");
-      
     },
   },
 })

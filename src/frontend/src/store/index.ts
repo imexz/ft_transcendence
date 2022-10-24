@@ -133,7 +133,7 @@ export default createStore<State>({
     },
     getFriendsList({ commit }) {
       VueAxios({
-        url: '/users/friends',
+        url: 'friends',
         baseURL: API_URL,
         method: 'GET',
         withCredentials: true,

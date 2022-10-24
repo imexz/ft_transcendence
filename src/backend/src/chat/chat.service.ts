@@ -22,7 +22,7 @@ export class ChatService {
     this.messageService.userDeleteMessage(messageId, id);
   }
 
-  async getUserRooms(id: any) {
+  async getUserRooms(id: number) {
     return await this.chatroomService.getAllwithUser(id)
   }
 

@@ -10,9 +10,7 @@ import { SubscribeMessage,
 import { GameService } from './game.service';
 import { Socket, Server } from 'socket.io';
 import { hostURL } from 'src/hostURL';
-import { JwtStrategy } from 'src/auth/jwt-two/jwt.strategy';
-import { JwtService } from '@nestjs/jwt';
-import { TokenPayload } from 'src/auth/tokenPayload.interface';
+import { AuthService } from 'src/auth/auth.service';
 
 
 @WebSocketGateway({
@@ -24,7 +22,7 @@ import { TokenPayload } from 'src/auth/tokenPayload.interface';
 })
 export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
 
-  constructor (private readonly gameService: GameService, private jwtService: JwtService, private jwtStrategy: JwtStrategy) {};
+  constructor (private readonly gameService: GameService, private authService: AuthService) {};
 
   @WebSocketServer()
 	server: Server;
@@ -32,26 +30,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   afterInit() { console.log("GameGateway: After init"); }
 
   async handleConnection(@ConnectedSocket() socket: Socket) {
-    // console.log("client %s connected", client.handshake.auth.id);
-    try {
-      socket.handshake.auth  = this.jwtService.verify(socket.handshake.auth.id.replace('Authentication=',''));
-      // console.log("socket handshake");
-      // console.log(socket.handshake.auth);
-
-      socket.handshake.auth = await this.jwtStrategy.validate(socket.handshake.auth as TokenPayload)
-      // console.log("socket handshake1");
-      // console.log(socket.handshake.auth);
-      if(socket.handshake.auth == undefined){
-        console.log("validation goes wrong");
-        socket.disconnect()
-        return
-      }
-      
-    } catch (error) {
-      console.log("wrong token");
-      socket.disconnect()
-      return
-    }
+    this.authService.validateSocket(socket)
   }
 
   handleDisconnect(@ConnectedSocket() client: Socket) { console.log("client %s disconnected", client?.handshake.auth._id); }

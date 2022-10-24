@@ -35,28 +35,21 @@ export class UsersController {
 		return  this.usersService.addUser(user);
 	}
 
-	@Post('addFriend')
-	@UseGuards(JwtAuthGuard)
-	requestFriend(@Request() req, @Body("id") id: number){
-		return this.friendsService.request_friendship(req.user._id, id)
-		// console.log(id);
-		// return  this.usersService.addfriend(req.user._id, id);
-	}
+	// @Post('addFriend')
+	// @UseGuards(JwtAuthGuard)
+	// requestFriend(@Request() req, @Body("id") id: number){
+	// 	return this.friendsService.request_friendship(req.user._id, id)
+	// 	// console.log(id);
+	// 	// return  this.usersService.addfriend(req.user._id, id);
+	// }
 
-	@Post('removeFriend')
-	@UseGuards(JwtAuthGuard)
-	removeFriend(@Request() req, @Body("id") id: number){
-		this.friendsService.remove_friendship(req.user._id, id)
-		// console.log(id);
-		// return  this.usersService.addfriend(req.user._id, id);
-	}
-
-	@Get('friends')
-	@UseGuards(JwtAuthGuard)
-	getFriends(@Request() req): any {
-		return this.friendsService.getFriends(req.user._id)
-		// return this.usersService.getFriends(req.user._id)
-	}
+	// @Post('removeFriend')
+	// @UseGuards(JwtAuthGuard)
+	// removeFriend(@Request() req, @Body("id") id: number){
+	// 	this.friendsService.remove_friendship(req.user._id, id)
+	// 	// console.log(id);
+	// 	// return  this.usersService.addfriend(req.user._id, id);
+	// }
 
 	@Get('validate')
 	@UseGuards(JwtAuthGuard)

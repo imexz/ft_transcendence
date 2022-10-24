@@ -13,6 +13,10 @@ interface friend {
 
 @Injectable()
 export class FriendsService {
+	constructor(
+	@InjectRepository(Friend)
+	private friendRepository: Repository<Friend>,
+	private readonly usersService: UsersService){}
 
 	async getRequestedFriends(user_id): Promise<friend[]> {
 		return await this.friendRepository.createQueryBuilder("friend")
@@ -43,31 +47,29 @@ export class FriendsService {
 		console.log("remove_friendship");
 		console.log(_id, id);
 		
-		
-		const friends = await this.friendRepository.findOne({
-			relations: {
-				requester: true,
-				accepter: true
-			},
-			where: [
-				{requester:{ _id: _id }, accepter:{	_id: id }},
-				{accepter:{	_id: _id }, requester:{ _id: id }},
-			]
-		})
+		const friends = await this.findFriendShip(_id, id)
+
 		console.log(friends);
 		
 		// const test: FindOptionsWhere<Friend> = 
 		return await this.friendRepository.remove(friends)
 	}
 
-	constructor(
-    @InjectRepository(Friend)
-    private friendRepository: Repository<Friend>,
-    private readonly usersService: UsersService){}
+	async findFriendShip(user_id: number, friend_id: number) {
+		return await this.friendRepository.findOne({
+			relations: {
+				requester: true,
+				accepter: true
+			},
+			where: [
+				{requester:{ _id: user_id }, accepter:{	_id: friend_id }},
+				{accepter:{	_id: user_id }, requester:{ _id: friend_id }},
+			]
+		})
+	}
+
 
     async request_friendship(user_id: number, friend_id: number) {
-		// console.log(user_id);
-		// console.log(friend_id);
 		if(user_id && friend_id) {
 			const user1 = this.usersService.getUser(user_id)
 			const user2 = this.usersService.getUser(friend_id)
@@ -77,6 +79,17 @@ export class FriendsService {
 			return friend
 		}
 	}
+	
+    async response_friendship(user_id: number, friend_id: number, status: Status ) {
+		if(user_id && friend_id) {
+			var friendship = await this.findFriendShip(user_id, friend_id)
+			
+			if (friendship != undefined) {
+				await this.friendRepository.update(friendship.id, {status: status})
+			}
+		}
+	}
+
 
     // async getFriends(id: number) {
 	// 	const user = await this.friendRepository.findOne({

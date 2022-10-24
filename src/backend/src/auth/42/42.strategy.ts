@@ -20,7 +20,7 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
 			clientSecret: process.env.CLIENT_SECRET,
 			callbackURL: process.env.HOST + ":3000/auth/login/callback",
 			profileFields: {
-				'name.givenName': 'first_name',
+				'name.givenName': 'first_name', //username
 				'id': function (obj) { return String(obj.id); },
 				'image_url': 'image_url',
 			}
