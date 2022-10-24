@@ -1,5 +1,5 @@
 <template>
-  <div class="chatWrapper">
+  <div v-if="socket" class="chatWrapper">
     <vue-advanced-chat
       :height="height"
       :current-user-id="currentUserId"
@@ -12,12 +12,12 @@
       :username-options="JSON.stringify(usernameOptions)"
       :show-audio="false"
       :show-files="false"
-      :theme="chatTheme"
       :show-reaction-emojis="true"
       :room-info-enabled="true"
+      :styles="JSON.stringify(style)"
       @send-message="sendMessage($event.detail[0])"
       @send-message-reaction="sendMessageReaction($event.detail[0])"
-      @add-room="makePopupCreate()"
+      @add-room="toggleCreateRoom"
       @room-action-handler="roomActionHandler($event.detail[0])"
       @room-info="roomInfo($event.detail[0])"
       @typing-message="emitTyping($event.detail[0])"
@@ -29,13 +29,10 @@
       This is a new room header
     </div> -->
     </vue-advanced-chat>
-
-    <createRoomPopup
-      v-if="PoppupCreate"
-      :TogglePopup="() => makePopupCreate()"
-    >
-      <h2>Create Room</h2>
-    </createRoomPopup>
+    <Toast v-if="showToast" :msg=toastMsg :mode=toastMode />
+    <div v-if="createRoomPopUp" class="createRoomPopUp">
+      <createRoomPopup @actions="createRoomActions"/>
+    </div>
 
     <div v-if="roomInfoPopUp" class="roomInfoPopUp">
       <roomInfoPopUp :roomInfo="roomInfoData" @action="roomInfoActions"/>
@@ -60,12 +57,15 @@
   import createRoomPopup from '@/components/Chat/createRoomPopup.vue';
   import joinRoomPopup from '@/components/Chat/joinRoomPopup.vue';
   import roomInfoPopUp from '@/components/Chat/RoomInfoPopUp.vue';
+  import { customChatStyle } from "@/styles/chatStyle";
+  import Toast from "@/components/Toast.vue";
 
   register()
 
     export default defineComponent({
       data() {
         return {
+          style: customChatStyle,
           height: "800px",
           currentUserId: '',
           currentRoomId: '',
@@ -80,8 +80,8 @@
           ],
           usernameOptions: { minUsers: 3, currentUser: false },
           roomActions: [
-            { name: 'join', title: 'join Room' },
-            { name: 'leave', title: 'leave Room' },
+            { name: 'join', title: 'Join Room' },
+            { name: 'leave', title: 'Leave Room' },
             { name: 'deleteRoom', title: 'Delete Room' }
           ],
           // templatesText: [ //TB did not work as expected at first
@@ -89,7 +89,7 @@
           //   { tag: 'ban', text: 'ban a user for x seconds' },
           //   { tag: 'mute', text: 'mute a user for x seconds' }
           // ],
-          PoppupCreate: ref(false),
+          createRoomPopUp: ref(false),
           PoppupJoin: ref(false),
           roomInfoPopUp: ref(false),
           roomInfoData: null as Object | null,
@@ -99,14 +99,30 @@
   		    socket: null,
           chatTheme: "dark",
           showEmojis: true,
+          showToast : ref<boolean | null>(false),
+          toastMsg : ref<string>(''),
+          toastMode : ref<string>(''),
         }
       },
       components:{
         createRoomPopup,
         joinRoomPopup,
         roomInfoPopUp,
+        Toast,
       },
       methods: {
+        changeSuccess(msg: string) {
+          this.showToast = true;
+          this.toastMsg = msg;
+          this.toastMode = 'success';
+          setTimeout(() => this.showToast = false, 2000);
+        },
+        changeError(errorMsg: string) {
+          this.showToast = true;
+          this.toastMsg = errorMsg;
+          this.toastMode = 'error';
+          setTimeout(() => this.showToast = false, 2000);
+        },
         async putMessages({room}) {
           console.log("putMessages");
           this.currentRoomId = room.roomId
@@ -142,6 +158,20 @@
             this.addMessage(response)
           })
         },
+        toggleCreateRoom() {
+          console.log(this.createRoomPopUp)
+          if (this.createRoomPopUp)
+            window.removeEventListener('click', this.hideCreateRoom)
+          else
+            window.addEventListener('click', this.hideCreateRoom)
+          this.createRoomPopUp = !this.createRoomPopUp
+        },
+        hideCreateRoom(e) {
+          console.log("hi")
+          if (!this.$el.contains(e.target)) {
+            this.toggleCreateRoom()
+          }
+        },
         makePopupCreate() {
           console.log("makePopupCreate");
           this.PoppupCreate = !this.PoppupCreate
@@ -160,28 +190,28 @@
           }
           console.log(this.PoppupJoin);
         },
-        creatRoom(){
-            VueAxios({
-                url: '/chatroom/creat',
-                baseURL: API_URL,
-                method: 'POST',
-                withCredentials: true,
-                data: { room_name: "test", access: "public"}
-            })
-                .then(response => {
-                  console.log(response);
-                  if(response != null) {
-                    const rooms = []
-                    for (let i = 0; i < response.length; i++) {
-                      rooms.push(response)
-                    }
-                    this.rooms = rooms
-                    this.$emit('success', 'creat Room')
-                    console.log("succes");
-                  }
-                })
-                .catch(error => { this.$emit('error') })
-        },
+        // creatRoom(){
+        //     VueAxios({
+        //         url: '/chatroom/creat',
+        //         baseURL: API_URL,
+        //         method: 'POST',
+        //         withCredentials: true,
+        //         data: { room_name: "test", access: "public"}
+        //     })
+        //         .then(response => {
+        //           console.log(response);
+        //           if(response != null) {
+        //             const rooms = []
+        //             for (let i = 0; i < response.length; i++) {
+        //               rooms.push(response)
+        //             }
+        //             this.rooms = rooms
+        //             this.$emit('success', 'creat Room')
+        //             console.log("succes");
+        //           }
+        //         })
+        //         .catch(error => { this.$emit('error') })
+        // },
 
         emitTyping({ roomId, message }) {
           console.log("emitTyping");
@@ -254,8 +284,6 @@
           }
         },
         roomInfo({ roomId }) {
-          console.log("emiting roomInfo");
-          console.log(roomId);
           this.toggleRoomInfo();
           this.socket.emit(
             'roomInfo',
@@ -263,24 +291,43 @@
             data => { console.log(data), this.roomInfoData = data}
           );
         },
-        roomInfoActions(emitMsg, userId){
+        roomInfoActions(emitMsg, userId, room){
           switch(emitMsg){
             case "mute":
-              this.muteUser(userId);
+              this.muteUser(userId, room);
               break ;
             case "ban":
-              this.banUser(userId);
+              this.banUser(userId, room);
               break;
           }
         },
-        muteUser(userId){
-          console.log("Requesting mute of: ", userId)
+        createRoomActions(emitMsg) {
+          switch(emitMsg){
+            case "success":
+              this.getRooms();
+              this.toggleCreateRoom();
+              this.changeSuccess("Room created")
+              break;
+            case "error":
+              this.toggleCreateRoom();
+              this.changeError("Room could not be created")
+              break;
+            case "exit":
+              this.toggleCreateRoom();
+              break;
+            case "success":
+
+            default:
+              break;
+          }
         },
-        banUser(userId){
-          console.log("Requesting ban of: ", userId)
+        muteUser(userId, roomId){
+          console.log("Requesting mute of:", userId, "in room:", roomId)
+        },
+        banUser(userId, roomId){
+          console.log("Requesting ban of:", userId, "in room:", roomId)
         },
         toggleRoomInfo() {
-          console.log(this.roomInfoPopUp)
           if (this.roomInfoPopUp)
             window.removeEventListener('click', this.hideRoomInfo)
           else

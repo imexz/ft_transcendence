@@ -2,8 +2,7 @@
   <div>
     <h1 v-if="admin">You are Admin</h1>
     <h1 v-else>You are User</h1>
-
-
+    
     <h1>Users</h1>
     <div v-for="user in roomInfo?.room.users">
       <UserSummary :user=user :extraButtons="extraButtons" @action="reEmit"></UserSummary>
@@ -43,7 +42,7 @@ export default defineComponent({
   },
   methods: {
     reEmit(emitMsg, userId){
-      this.$emit("action", emitMsg, userId)
+      this.$emit("action", emitMsg, userId, this.room.roomId)
     }
   },
   components: {
