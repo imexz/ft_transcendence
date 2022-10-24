@@ -60,7 +60,6 @@ import { API_URL } from '@/defines';
 import { defineComponent } from 'vue';
 import { RequestEnum } from '@/enums/models/RequestEnum';
 
-
 export default defineComponent({
   data() {
     return {
@@ -78,7 +77,7 @@ export default defineComponent({
       type: Object,
       default: null
     },
-    extraButtons<Button>: {
+    extraButtons: {
       type: Array,
       default: []
     },
