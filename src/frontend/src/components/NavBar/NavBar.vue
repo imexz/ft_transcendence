@@ -23,6 +23,9 @@
       <div class="topElement rightSideElement">
         <router-link :to="'/chat'" class="navButton">
           <font-awesome-icon icon="fa-solid fa-message" />
+          <div v-if="$store.state.NrMessages" class="notificationCount">
+            {{ $store.state.NrMessages }}
+          </div>
         </router-link>
       </div>
       <div class="topElement rightSideElement">
@@ -143,6 +146,7 @@ export default defineComponent({
 }
 
 .navButton {
+  position: relative;
   cursor: default;
   font-weight: bold;
   color: var(--cold);
@@ -184,4 +188,18 @@ export default defineComponent({
   padding: 14px 24px;
   border-radius: 10px;
 }
+
+.notificationCount {
+    position: absolute;
+    left: -10px;
+    top: -10px;
+    width: 25px;
+    height: 25px;
+    padding: auto;
+    border-radius: 50%;
+    font-size: 20px;
+    color: var(--ft_dark);
+    background-color: var(--ft_pink);
+    border: 1px solid var(--ft_pink);
+  }
 </style>
