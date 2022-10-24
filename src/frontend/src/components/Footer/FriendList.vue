@@ -135,7 +135,6 @@ export default defineComponent({
     top: -10px;
     width: 25px;
     height: 25px;
-    padding: auto;
     border-radius: 50%;
     font-size: 20px;
     color: var(--ft_dark);
@@ -166,8 +165,6 @@ export default defineComponent({
     background-color: var(--ft_cyan);
     border-radius: 50%;
     font-size: 25px;
-    padding: auto;
-
     height: 30px;
     width: 30px;
     margin-left: 10px;
