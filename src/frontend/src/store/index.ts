@@ -80,11 +80,14 @@ export default createStore<State>({
       })
       state.socketGame.on('Request',(id: number, type: RequestEnum) => {
         state.gameRequest = true;
+        console.log("id", id, "type", type)
         console.log("askformatch");
       })
 
-      state.socket.on('Request',(id: number, type: RequestEnum) => {
-        switch (type) {
+      state.socket.on('Request',(data) => {
+        //id:number + type:RequestEnum
+        console.log("the type is", data.type, "the id is" , data.id)
+        switch (data.type) {
           case RequestEnum.FRIENDSHIP:
             state.NrFriendRequests++
             break;

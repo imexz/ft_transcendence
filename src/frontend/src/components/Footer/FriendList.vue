@@ -10,12 +10,31 @@
       v-else
       @click="toggleFriendList"
       class="friendListButtonPassive friendListButton">
-      Friends({{ $store.getters.getFriends?.length }})</button>
+      <div class="text">
+          <div>
+            Friends
+          </div>
+          <div class="countBubble">
+            {{ $store.getters.getFriends?.length }}
+          </div>
+        </div>
+      <div v-if="$store.state.NrFriendRequests" class="notificationCount">
+        {{ $store.state.NrFriendRequests }}
+      </div>
+    </button>
     <div v-show="!isCollapsed" class="friendList">
       <button
         @click="toggleFriendList"
         class="friendListButton friendListButtonActive">
-      Friends({{ $store.getters.getFriends?.length }})</button>
+        <div class="text">
+          <div>
+            Friends
+          </div>
+          <div class="countBubble">
+            {{ $store.getters.getFriends?.length }}
+          </div>
+        </div>
+      </button>
       <div class="friends">
         <UserSummary
         v-for="user in $store.getters.getFriends"
@@ -37,6 +56,7 @@ export default defineComponent({
   },
   methods: {
     toggleFriendList(): void {
+      this.$store.state.NrFriendRequests = 0;
       this.isCollapsed = !this.isCollapsed;
     },
   },
@@ -58,7 +78,7 @@ export default defineComponent({
     --hot: var(--ft_pink);
     position: absolute;
     right: 0px;
-    top: 0px;
+    top: -62px;
     height: 0px;
   }
   .friendList {
@@ -108,6 +128,20 @@ export default defineComponent({
     font-weight: bold;
     border-bottom: 2px solid var(--cold);
   }
+
+  .notificationCount {
+    position: absolute;
+    left: -10px;
+    top: -10px;
+    width: 25px;
+    height: 25px;
+    padding: auto;
+    border-radius: 50%;
+    font-size: 20px;
+    color: var(--ft_dark);
+    background-color: var(--ft_pink);
+    border: 1px solid var(--ft_pink);
+  }
   .friends {
     overflow-y: auto;
     margin-top: -2px;
@@ -122,4 +156,21 @@ export default defineComponent({
       transform: scaleY(1)
     }
   }
+  .text {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .countBubble {
+    color: var(--ft_dark);
+    background-color: var(--ft_cyan);
+    border-radius: 50%;
+    font-size: 25px;
+    padding: auto;
+
+    height: 30px;
+    width: 30px;
+    margin-left: 10px;
+  }
+
 </style>
