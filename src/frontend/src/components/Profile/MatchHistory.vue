@@ -50,6 +50,14 @@ export default defineComponent({
       { opponent: 1, myScore: 6, opponentScore: 10 },
       { opponent: 1, myScore: 6, opponentScore: 10 },
       { opponent: 2, myScore: 10, opponentScore: 3},
+      { opponent: 2, myScore: 10, opponentScore: 3},
+      { opponent: 2, myScore: 10, opponentScore: 3},
+      { opponent: 2, myScore: 10, opponentScore: 3},
+      { opponent: 2, myScore: 10, opponentScore: 3},
+      { opponent: 2, myScore: 10, opponentScore: 3},
+      { opponent: 2, myScore: 10, opponentScore: 3},
+      { opponent: 2, myScore: 10, opponentScore: 3},
+      { opponent: 2, myScore: 10, opponentScore: 3},
       { opponent: 1, myScore: 6, opponentScore: 10 },
       { opponent: 1, myScore: 6, opponentScore: 10 },
       { opponent: 2, myScore: 10, opponentScore: 3},
@@ -104,7 +112,7 @@ export default defineComponent({
 }
 
 .headLine {
-  border-bottom: 1px solid var(--ft_cyan);
+  border-bottom: 2px solid var(--ft_cyan);
   /* border-radius: 10px; */
   font-size: 32px;
   font-weight: bold;
@@ -114,14 +122,14 @@ export default defineComponent({
 
 .matchHistory {
   overflow: hidden;
-  border: 1px solid var(--ft_cyan);
+  border: 2px solid var(--ft_cyan);
   border-radius: 10px;
   margin-left: 5px;
   width: 66%;
 }
 
 .statistics {
-  border: 1px solid var(--ft_cyan);
+  border: 2px solid var(--ft_cyan);
   border-radius: 10px;
   margin-right: 5px;
   width: 34%;

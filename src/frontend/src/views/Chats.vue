@@ -1,5 +1,6 @@
 <template>
   <div v-if="socket" class="chatWrapper">
+    <h1>Chat</h1>
     <vue-advanced-chat
       :height="height"
       :current-user-id="currentUserId"

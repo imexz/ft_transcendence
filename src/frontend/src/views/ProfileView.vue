@@ -32,8 +32,9 @@ export default defineComponent({
   .wrapper {
     display: block;
     margin: auto;
-    padding: 30px;
     width: 800px;
+    margin-top: 70px;
+    margin-bottom: 80px;
     background-color: var(--ft_dark);
     margin-bottom: 80px;
     /* border: 2px solid var(--ft_cyan); */

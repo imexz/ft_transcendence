@@ -38,7 +38,7 @@ export class AvatarController {
   @Delete()
 	@UseGuards(JwtAuthGuard)
   async deleteAvatar(@Request() req) {
-    await this.avatarService.delete(req.user._id)
+    return await this.avatarService.delete(req.user._id)
   }
 
 

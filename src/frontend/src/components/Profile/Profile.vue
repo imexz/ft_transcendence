@@ -63,15 +63,15 @@ export default defineComponent({
 
   .profile {
     position: relative;
-    top: 30px;
-    margin-bottom: 40px;
+    top: 10px;
     display: flex;
     justify-content: flex-start;
     align-items: center;
     width: 100%;
     height: 170px;
-    /* background-color: var(--ft_red); */
-    background: linear-gradient(-90deg, var(--ft_pink), var(--ft_dark));
+    background: url(@/assets/profileBackground.png);
+    background-size: cover;
+    background-position: 100px 800px;
     border: 2px solid var(--ft_cyan);
     border-radius: 0px 10px 10px 10px;
     border-left: none;
@@ -84,6 +84,7 @@ export default defineComponent({
     font-weight: bold;
     padding-left: 10px;
     text-align: start;
+    overflow: hidden;
   }
 
   .Avatar {
