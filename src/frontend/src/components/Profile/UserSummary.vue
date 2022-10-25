@@ -145,9 +145,10 @@ export default defineComponent({
     },
     sendDm(){
       console.log(this.msgText)
-      this.msgText = ""
       this.toggleDm()
       this.toggleDropdown()
+      this.$store.state.socketChat.emit('DM', {content: this.msgText, id: this.user._id})
+      this.msgText = ""
     }
 
   },

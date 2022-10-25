@@ -21,6 +21,8 @@ export interface State {
   NrMessages: number
   NrFriendRequests: number
   gameRequest: boolean
+  rooms: []
+
 }
 
 const storage = localStorage.getItem('user')

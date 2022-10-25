@@ -1,6 +1,6 @@
 <template>
     <div @click="resetNumber">
-        <span>{{room.name}}</span>
+        <span>{{room.roomName}}</span>
         <button @click="switchState" > {{button_text}}</button>
         <span> {{ number }}</span>
     </div>

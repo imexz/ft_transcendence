@@ -1,7 +1,18 @@
+import  User  from "./user";
+import  Message  from "./message";
+
 export default class Room {
     constructor(name: string) {
-        this.name = name
+        this.roomName = name
     }
 
-    name: string
+    roomId: number
+    roomName: string
+
+    users: User[]
+
+    messages: Message[]
+
+
 }
+

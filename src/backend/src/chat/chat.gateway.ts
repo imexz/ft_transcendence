@@ -130,7 +130,6 @@ export class ChatGateway {
 
     // client.to(room_name).emit('message', message);
     if(message) {
-
       const tmp = {
       senderId: client.handshake.auth._id.toString(),
       _id: message._id,
@@ -199,7 +198,13 @@ export class ChatGateway {
       console.log("createRoomInfo");
       console.log(roomId);
       return await this.chatService.createRoomInfo(roomId, client.handshake.auth._id);
+  }
 
+  @SubscribeMessage('DM')
+  async creatRoomDM(
+    @ConnectedSocket() client: Socket,
+
+  ) {
 
   }
 
