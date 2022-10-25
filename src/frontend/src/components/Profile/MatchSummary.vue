@@ -58,7 +58,7 @@ export default defineComponent({
   color: var(--ft_cyan);
 }
 .loss {
-  color: var(--ft_pink);
+  color: var(--ft_red);
 }
 .draw {
   color: var(--ft_yellow);

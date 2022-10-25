@@ -60,19 +60,25 @@ body {
   padding: 0;
   width: 100%;
   height: 100%;
-  background-color: var(--ft_dark);
-  /* background: linear-gradient(var(--ft_dark_purple),var(--ft_dark)); */
-  background-repeat: no-repeat;
+  background: var(--ft_dark);
+  /* background: linear-gradient( var(--ft_dark),var(--ft_dark_purple));
+  background-attachment: fixed;  */
 }
 
 /* .content {
+
+  width: 840px;
+  margin: auto;
+  border: 2px solid var(--ft_cyan);
+  border-radius: 5px;
+} */
   
-  animation-name: example;
+  /* animation-name: example;
   animation-duration: 20s;
   animation-iteration-count: infinite;
-}
+} */
 
-@keyframes example {
+/* @keyframes example {
   0% {
     transform: rotate(0deg)
   }
