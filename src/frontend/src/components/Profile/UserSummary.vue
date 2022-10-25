@@ -1,5 +1,13 @@
 <template>
   <div class="userSummary">
+    <div v-if="showDm" class="dmPopUp">
+      <div class="txt">Write DM</div>
+      <form @submit.prevent="sendDm">
+        <textarea class="dmText" v-model="msgText" placeholder="your message" rows="4">
+        </textarea>
+        <button class="dmButton">Send</button>
+      </form>
+    </div>
     <div class="normalView">
       <img :src="user?.avatar_url" alt="Avatar">
       <span>{{ user?.username }}</span>
@@ -30,7 +38,8 @@
         <font-awesome-icon icon="fa-solid fa-eye" />
       </button>
       <button
-        class="dropdownElement">
+        class="dropdownElement"
+        @click="toggleDm">
         <font-awesome-icon icon="fa-solid fa-message" />
       </button>
       <button
@@ -65,13 +74,9 @@ export default defineComponent({
   data() {
     return {
       show: false as boolean,
+      showDm: false as boolean,
+      msgText: "" as string,
     }
-  },
-  created() {
-    window.addEventListener('click', this.hideOnClick)  
-  },
-  unmounted() {
-    window.removeEventListener('click', this.hideOnClick)
   },
   props : {
     user: {
@@ -82,9 +87,6 @@ export default defineComponent({
       type: Array,
       default: []
     },
-  },
-  mounted() {
-    console.log(this.user)
   },
   methods: {
     customEmit(emitMsg){
@@ -104,17 +106,20 @@ export default defineComponent({
     removeFriend(){
       this.$store.state.socket.emit('Remove', {id: this.user._id})
     },
-    hideOnClick(e) {
-      if (!this.$el.contains(e.target)){
-        this.show = false;
-      }
-    },
     viewProfile(id: number){
       this.show = false;
       this.$router.push('/profile/' + id.toString());
     },
+    hideDropDown(e){
+      console.log("hi")
+      if (!this.$el.contains(e.target))
+        this.toggleDropdown()
+    },
     toggleDropdown() {
-      console.log("toggleDropdown");
+      if (this.show)
+        window.removeEventListener('click', this.hideDropDown)
+      else
+        window.addEventListener('click', this.hideDropDown)
       this.show = !this.show
     },
     askForMatch(){
@@ -123,6 +128,24 @@ export default defineComponent({
       })
       console.log("AskForMatch");
     },
+    toggleDm(){
+      if (this.showDm)
+        window.removeEventListener('click', this.hideDm)
+      else
+        window.addEventListener('click', this.hideDm)
+      this.showDm = !this.showDm
+    },
+    hideDm(e){
+      if (!this.$el.contains(e.target))
+        this.toggleDm()
+    },
+    sendDm(){
+      console.log(this.msgText)
+      this.msgText = ""
+      this.toggleDm()
+      this.toggleDropdown()
+    }
+
   },
 })
 
@@ -195,5 +218,53 @@ export default defineComponent({
   .dropdownElement:hover {
     background-color: var(--ft_dark_purple);
     
+  }
+  .dmPopUp {
+    position: absolute;
+    top: 100px;
+    width: 100%;
+    /* height: 350px; */
+    color: var(--ft_cyan);
+    background-color: var(--ft_dark);
+    border: 1px solid var(--ft_cyan);
+    border-radius: 5px;
+    z-index: 11;
+  }
+  .txt {
+    font-size: 25px;
+    font-weight: bold;
+    width: 100%;
+    border-bottom: 1px solid var(--ft_cyan);
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+
+  .dmButton {
+    color: var(--ft_cyan);
+    border: 1px solid var(--ft_cyan);
+    border-radius: 5px;
+    background-color: var(--ft_dark);
+    padding: 5px 8px;
+    font-size: 15px;
+    margin: 10px 0px 10px 0px;
+  }
+  .dmButton:active {
+    transform: translateY(1px);
+  }
+  .dmButton:hover {
+    color: var(--ft_dark);
+    background-color: var(--ft_cyan);
+  }
+
+  .dmText {
+    font-family: Avenir, Helvetica, Arial, sans-serif;
+    resize: none;
+    color: var(--ft_cyan);
+    background-color: var(--ft_dark);
+    padding: 5px 8px;
+    border-color: var(--ft_cyan);
+    border-radius: 5px;
+    margin-top: 10px;
+    width: 85%;
   }
 </style>
