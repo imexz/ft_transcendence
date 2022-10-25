@@ -45,7 +45,9 @@ export default defineComponent({
           withCredentials: true,
           data: fd
         })
-        .then(response => { this.$emit('success', 'avatar changed')})
+        .then(response => { 
+          this.$emit('success', 'avatar changed'),
+          this.$store.state.user.avatar_url = API_URL + response.data})
         .catch(error => { this.$emit('error', error)})
       }
     },
@@ -61,7 +63,7 @@ export default defineComponent({
         withCredentials: true,
       })
       .then(response => {
-        this.$store.commit('resetAvatar'),
+        this.$store.state.user.avatar_url = response.data
         this.$emit('success', 'avatar was reset')})
       .catch(error => {  this.$emit('error', error) })
     }
