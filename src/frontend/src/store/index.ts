@@ -96,9 +96,6 @@ export default createStore<State>({
     setTwoFa(state, enable) {
       state.user.isTwoFactorAuthenticationEnabled = enable;
     },
-    resetAvatar(state) {
-      state.user.avatar_url = state.user.avatar_url_42intra;
-    },
     setFriendsList(state, friendsList) {
       console.log(friendsList);
       
