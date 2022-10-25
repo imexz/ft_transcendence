@@ -250,8 +250,10 @@
         },
         initSocket(){
           this.socket = this.$store.state.socketChat
+          if (this.socket){
+            this.socket.off('message')
+          }
           console.log("initSocket")
-          this.socket.off('message')
         },
         roomActionHandler({ roomId, action }) {
           console.log("roomActionHandler");
@@ -390,11 +392,12 @@
         this.$store.state.NrMessages = 0;
       },
       beforeMount() {
-        console.log("beforeMount");
+        console.log("beforeMount", this.socket);
         this.initSocket();
       },
       mounted() {
-        if (this.socket == null){
+        console.log("MOUNT", this.socket)
+        if (this.socket === null){
           this.$router.push('/login')
           return ;
         }
@@ -431,7 +434,6 @@
         });
 
         this.socket.on('message',({message, roomId}) => {
-          console.warn("CHAT EVENT")
           console.log('message');
           console.log(message);
           console.log(roomId);
@@ -455,12 +457,14 @@
         // console.log(this.currentUserId)
       },
       unmounted() {
-        this.socket.off('typing')
-        this.socket.off('message')
-        this.socket.on('message',() => {
-          this.$store.state.NrMessages++
-         console.log("mrmessiges", this.$store.state.NrMessages)
-        })
+        if (this.socket) {
+          this.socket.off('typing')
+          this.socket.off('message')
+          this.socket.on('message',() => {
+            this.$store.state.NrMessages++
+           console.log("mrmessiges", this.$store.state.NrMessages)
+          })
+        }
       }
     })
 </script>
