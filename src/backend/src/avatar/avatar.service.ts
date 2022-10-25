@@ -43,5 +43,6 @@ export class AvatarService {
         )
         this.fileRepository.delete({id: avatar.id})
         await this.usersService.updateAvatar(id, null)
+        return (await this.usersService.getUser(id)).avatar_url_42intra
     }
 }
