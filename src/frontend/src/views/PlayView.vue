@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="gameWrapper">
     <PongGame :gameExists="isCreated"/>
 	<!-- <GameMenu /> -->
   </div>
@@ -22,3 +22,10 @@ export default defineComponent({
 })
 
 </script>
+
+<style scoped>
+
+.gameWrapper {
+  margin-top: 80px;
+}
+</style>
