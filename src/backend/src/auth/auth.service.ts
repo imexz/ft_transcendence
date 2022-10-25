@@ -52,7 +52,7 @@ export class AuthService {
 
 	public async validateSocket(socket: Socket){
 		try {
-			socket.handshake.auth = this.jwtService.verify(socket.handshake.auth.id.replace('Authentication=',''));
+			socket.handshake.auth =  await this.jwtService.verify(socket.handshake.auth.id.replace('Authentication=',''));
 			console.log("socket handshake");
 			console.log(socket.handshake.auth);
 			
@@ -63,15 +63,13 @@ export class AuthService {
 			  console.log("validation goes wrong");
 			  socket.disconnect()
 			  return false
-			}else{
+			} else {
 				this.usersService.setStatus(socket.handshake.auth._id, UserStatus.ONLINE)
 				// console.log(socket.handshake.auth);
-				
 				return true
-
 			}
 			} catch (error) {
-			  console.log("wrong token");
+			  console.log("wrong token", error);
 			  socket.disconnect()
 			  return false
 			}

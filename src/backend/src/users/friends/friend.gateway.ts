@@ -10,6 +10,7 @@ import { Socket, Server } from 'socket.io';
 import { AuthService } from 'src/auth/auth.service';
 import { FriendsService } from './friends.service';
 import { Status } from './friend.entity';
+import { User } from '../entitys/user.entity';
 
 
 
@@ -32,32 +33,43 @@ export class FriendGateway {
     server: Server;
 
   async handleConnection(socket) {
-    this.authService.validateSocket(socket)
+    await this.authService.validateSocket(socket)
   }
 
     async handleDisconnect(socket) {
-      console.log("disconnected", socket.handshake.auth);
+      console.log("disconnected", socket.handshake);
       
-      this.usersService.setStatus(socket.handshake.auth._id, UserStatus.OFFLINE)
+      if (socket.handshake.auth != undefined)
+        this.usersService.setStatus(socket.handshake.auth._id, UserStatus.OFFLINE)
     }
 
     @SubscribeMessage('Request')
     async gameRequest(
     @ConnectedSocket() client: Socket,
-    @MessageBody('id') id?: number,
-    @MessageBody('type') type?: RequestEnum    )
+    @MessageBody('id') id?: number )
     {
-      (await this.usersService.getUserSocket(this.server, id))?.emit("Request", {id, type})
-      this.friendsService.request_friendship(client.handshake.auth._id, id)
+      console.log("Request");
+      
+      if(id != client.handshake.auth._id) {
+        if(await this.friendsService.findFriendShip(client.handshake.auth._id, id) == undefined){
+          client.handshake.auth.friendStatus = Status.requsted;
+          (await this.usersService.getUserSocket(this.server, id))?.emit("Request", client.handshake.auth)
+          this.friendsService.request_friendship(client.handshake.auth._id, id)
+        } else {
+        console.log("friendship alredy exist");
+        
+        }
+      }
+     
     }
     
     @SubscribeMessage('Response')
     async response(
     @ConnectedSocket() client: Socket,
     @MessageBody('id') id?: number,
-    @MessageBody('status ') status?: Status    )
+    @MessageBody('status') status?: Status    )
     {
-      (await this.usersService.getUserSocket(this.server, id))?.emit("Request", {id, status})
+      // (await this.usersService.getUserSocket(this.server, id))?.emit("Request", {id, status})
       this.friendsService.response_friendship(client.handshake.auth._id, id, status)
     }
 
@@ -68,5 +80,4 @@ export class FriendGateway {
     {
   		this.friendsService.remove_friendship(client.handshake.auth._id, id)
     }
-
 }

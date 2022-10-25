@@ -53,6 +53,8 @@ export class User {
 	@OneToMany(() => Friend, (friend) => friend.requester)
 	friendsOfMe?: Friend[];
 
+	friendStatus: any
+
 	@Column({
         type: "enum",
         enum: UserStatus,

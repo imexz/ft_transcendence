@@ -3,9 +3,9 @@
     <div class="normalView">
       <img :src="user?.avatar_url" alt="Avatar">
       <span>{{ user?.username }}</span>
-      <div v-if="user?.status == 0 && user?.me  == 0">
-        <button @click="acceptFriend"> accept  </button>
-        <button @click="denideFriend"> deny </button>
+      <div v-if="user?.friendStatus == 1" >
+        <button @click="response(2)"> accept  </button>
+        <button @click="response(3)"> deny </button>
       </div>
       <div class="toggleDropdown" @click="toggleDropdown">
         <font-awesome-icon icon="fa-solid fa-bars" />
@@ -91,18 +91,22 @@ export default defineComponent({
       this.$emit('action', emitMsg, this.user._id)
     },
     addFriend(): void {
-      this.$store.state.socket.emit('Request', {id: this.user._id, type: RequestEnum.FRIENDSHIP})
+      this.$store.state.socket.emit('Request', {id: this.user._id})
+      this.user.friendStatus = Status.pending
+      this.$store.commit("addFriend", this.user)
     },
-    acceptFriend(){
-      this.$store.state.socket.emit('Response', {id: this.user._id, status: Status.accepted})
-      console.log("Accepting FreindRequest", this.user._id)
-    },
-    denideFriend(){
-      this.$store.state.socket.emit('Response', {id: this.user._id, status: Status.denide})
-      console.log("Accepting FreindRequest", this.user._id)
+    response(status: Status){
+      if(status == Status.accepted){
+        this.user.friendStatus = null
+      } else {
+        this.$store.commit("removeFriend", this.user._id)
+      }
+      this.$store.state.socket.emit('Response', {id: this.user._id, status: status})
+      console.log("response", status)
     },
     removeFriend(){
       this.$store.state.socket.emit('Remove', {id: this.user._id})
+      this.$store.commit("removeFriend", this.user._id)
     },
     hideOnClick(e) {
       if (!this.$el.contains(e.target)){

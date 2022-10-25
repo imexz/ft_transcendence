@@ -86,14 +86,7 @@ export default createStore<State>({
 
       state.socket.on('Request',(data) => {
         //id:number + type:RequestEnum
-        console.log("the type is", data.type, "the id is" , data.id)
-        switch (data.type) {
-          case RequestEnum.FRIENDSHIP:
-            state.NrFriendRequests++
-            break;
-          default:
-            break;
-        }
+        state.friendsList.push(data)
           console.log("recive  request");
       })
     },
@@ -107,6 +100,8 @@ export default createStore<State>({
       state.user.avatar_url = state.user.avatar_url_42intra;
     },
     setFriendsList(state, friendsList) {
+      console.log(friendsList);
+      
       state.friendsList = friendsList;
     },
     addFriend(state, user) {
@@ -145,4 +140,3 @@ export default createStore<State>({
   modules: {
   }
 })
-

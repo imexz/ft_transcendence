@@ -10,7 +10,7 @@ export class FriendsController {
     @Get()
 	@UseGuards(JwtAuthGuard)
 	getFriends(@Request() req): any {
-		return this.friendsService.getFriends(req.user._id)
+		return this.friendsService.getFriendst(req.user._id)
 		// return this.usersService.getFriends(req.user._id)
 	}
 }

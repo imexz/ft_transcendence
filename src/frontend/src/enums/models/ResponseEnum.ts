@@ -1,5 +1,6 @@
 export enum Status {
-	requsted,
+	requsted = 1,
 	accepted,
-	denide
+	denide,
+	pending
 }

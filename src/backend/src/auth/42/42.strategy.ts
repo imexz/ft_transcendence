@@ -49,6 +49,7 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
 				avatar_url_42intra: profile.image_url,
 				userStatus: UserStatus.ONLINE,
 				isTwoFactorAuthenticationEnabled: false,
+				friendStatus: null
 				})
 			// cb(err, user, err.info)
 			this.logger.log("return validate")

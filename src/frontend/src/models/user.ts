@@ -1,3 +1,10 @@
+export enum UserStatus {
+	ONLINE,
+	OFFLINE,
+  PLAYING,
+  SPECTATING,    
+}
+
 export default class User {
   constructor(_id: number, username: string, avatar_url: string,
     avatar_url_42intra: string, current_status: any, clientId: any, isTwoFactorAuthenticationEnabled: boolean) {

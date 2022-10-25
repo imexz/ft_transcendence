@@ -393,8 +393,8 @@
         this.$store.state.NrMessages = 0;
       },
       beforeMount() {
-        console.log("beforeMount", this.socket);
         this.initSocket();
+        console.log("beforeMount", this.socket);
       },
       mounted() {
         console.log("MOUNT", this.socket)

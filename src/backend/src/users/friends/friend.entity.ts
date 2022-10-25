@@ -4,7 +4,7 @@ import { User } from "../entitys/user.entity";
 
 
 export enum Status {
-	requsted,
+	requsted = 1,
 	accepted,
 	denide
 }
@@ -19,7 +19,6 @@ export class Friend {
 	// 	this.avatar = avatar
 	// 	this.friends = friends
 	// }
-
 	constructor(partial: Partial<Friend>) {
 		Object.assign(this, partial);
 	  }

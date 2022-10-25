@@ -24,8 +24,8 @@ export class UsersController {
 
 	@Get('allUser')
 	@UseGuards(JwtAuthGuard)
-	findAll(){
-		return this.usersService.findAll()
+	findAll(@Request() req){
+		return this.usersService.findAll(req.user._id)
 	}
 
 	@Post('addUser')

@@ -1,4 +1,5 @@
 import { InjectRepository } from "@nestjs/typeorm";
+import { Not } from "typeorm"
 import { User } from './entitys/user.entity';
 import { Injectable } from "@nestjs/common";
 import { Repository } from "typeorm";
@@ -38,9 +39,9 @@ export class UsersService {
 		){}
 
 
-	async findAll(): Promise<User[]> {
+	async findAll(id: number): Promise<User[]> {
 		// console.log("findAll");
-		const user = await this.usersRepository.find();
+		const user = await this.usersRepository.find({ where: {_id: Not(id)}});
 		// console.log(user);
 		return user
 	}
@@ -62,11 +63,17 @@ export class UsersService {
 
 	async getUserSocket(server, id: number){
 		const sockets = await server.fetchSockets();
+		console.log("getUserSocket");
+		
 		for (const socket of sockets) {
             if(socket.handshake.auth._id == id)
             {
+				console.log("found socket");
+				
               return socket
             }
+			console.log(socket.handshake.auth._id);
+			
           }		
 	}
 
@@ -79,11 +86,11 @@ export class UsersService {
 
 		if(user.avatar_url == null)
 		{
-			user.avatar_url = "https://cdn.intra.42.fr/users/juan.jpg"
+			user.avatar_url = "https://cdn.intra.42.fr/users/0f2f1b9f30116d06e1e55bed9cf2cb46/casian.png"
 		}
 		if(user.avatar_url_42intra == null)
 		{
-			user.avatar_url_42intra = "https://cdn.intra.42.fr/users/juan.jpg"
+			user.avatar_url_42intra = "https://cdn.intra.42.fr/users/0f2f1b9f30116d06e1e55bed9cf2cb46/casian.png"
 		}
 		const tmp = this.usersRepository.create(user);
 		return this.usersRepository.save(tmp);
