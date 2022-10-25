@@ -63,9 +63,7 @@ export default defineComponent({
 
   .profile {
     position: relative;
-    top: 30px;
-    margin-top: 60px;
-
+    top: 10px;
     display: flex;
     justify-content: flex-start;
     align-items: center;

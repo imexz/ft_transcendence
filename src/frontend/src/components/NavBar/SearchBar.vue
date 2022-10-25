@@ -114,7 +114,7 @@ export default defineComponent({
     margin: auto;
     left: 0;
     right: 0;
-    top: 100px;
+    top: 120px;
     border: 2px solid var(--ft_cyan);
     width: 440px;
     height: 600px;

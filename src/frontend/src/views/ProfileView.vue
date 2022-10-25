@@ -33,6 +33,7 @@ export default defineComponent({
     display: block;
     margin: auto;
     width: 800px;
+    margin-top: 60px;
     margin-bottom: 80px;
     background-color: var(--ft_dark);
   }
