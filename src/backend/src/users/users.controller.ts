@@ -25,6 +25,8 @@ export class UsersController {
 	@Get('allUser')
 	@UseGuards(JwtAuthGuard)
 	findAll(@Request() req){
+		console.log(req);
+		
 		return this.usersService.findAll(req.user._id)
 	}
 
@@ -54,19 +56,25 @@ export class UsersController {
 	@Get('validate')
 	@UseGuards(JwtAuthGuard)
 	@UseInterceptors(ClassSerializerInterceptor)
-	validate(@Request() req): Promise<User> {
-		// console.log("inside validate");
-		// console.log(req.user);
+	async validate(@Request() req): Promise<User> {
 
-		const user = this.usersService.getUser(req.user._id)
+		console.log("inside validate");
+		console.log(req.user);
+		console.log("inside validate1");
+		
+		
 		// console.log(user);
-		return user
+		return await this.usersService.getUser(req.user._id)
 	}
-
+	
 	@Post('update_name')
 	@UseGuards(JwtAuthGuard)
 	update_name(@Body("name") name, @Request() req) {
-		this.usersService.updateName(req.user._id, name);
+		console.log("inside update_name");
+		console.log(req.user);
+		console.log("inside update_name1");
+		
+		this.usersService.updateName(req._id, name);
 	}
 
 	@Delete()

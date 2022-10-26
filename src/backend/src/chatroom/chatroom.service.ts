@@ -235,18 +235,17 @@ export class ChatroomService {
         }
     }
 
-
-
     constructor(
         @InjectRepository(chatroom)
         private chatroomRepository: Repository<chatroom>,
         private usersService: UsersService
-
     ){}
 
     async getAll(user: User) {
 
         console.log("getAll");
+        console.log(user);
+        
 
         const rooms = await this.chatroomRepository.createQueryBuilder("chatroom")
         .leftJoinAndSelect('chatroom.users', 'us')
