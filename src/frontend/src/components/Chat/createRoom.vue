@@ -7,7 +7,7 @@
           <option>public</option> 
           <option>protected</option> 
         </select>
-        <input v-if="access === 'protected'"  v-model="password" placeholder="Enter your password">
+        <input v-if="access == Access.public"  v-model="password" placeholder="Enter your password">
         <button type="submit">Create Room</button>
       </form>
     </div>    
@@ -17,15 +17,16 @@
 import VueAxios from 'axios';
 import { API_URL } from '@/defines';
 import { ref, defineComponent } from 'vue'
-
+import { Access } from '@/models/room';
 
 
 export default defineComponent({
   data() {
       return {
           name: '',
-          access: 'public',
-          password: ''
+          access: Access.public,
+          password: '',
+          Access
       }
   },
   methods: {

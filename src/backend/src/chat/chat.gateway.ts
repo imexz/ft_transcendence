@@ -3,6 +3,7 @@ import { Socket, Server } from 'socket.io';
 import { ChatService } from './chat.service';
 import { hostURL } from 'src/hostURL';
 import { AuthService } from 'src/auth/auth.service';
+import User from 'src/users/entitys/user.entity';
 
 
 @WebSocketGateway({
@@ -203,9 +204,10 @@ export class ChatGateway {
   @SubscribeMessage('DM')
   async creatRoomDM(
     @ConnectedSocket() client: Socket,
-
+    @MessageBody('content') content: string,
+    @MessageBody('id') id: number,
   ) {
-
+    this.chatService.creatRoomDM(client.handshake.auth as User, id, content)
   }
 
 

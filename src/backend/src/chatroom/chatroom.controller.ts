@@ -1,5 +1,6 @@
 import { Controller, Delete, Get, UseGuards, Request, Body, Post, HttpException, HttpStatus } from "@nestjs/common";
 import { JwtAuthGuard } from "src/auth/jwt-two/jwt-auth.guard";
+import { Access } from "./chatroom.entity";
 import { ChatroomService } from "./chatroom.service";
 
 @Controller('chatroom')
@@ -8,8 +9,8 @@ export class ChatroomController {
 
     @Get('all')
 	@UseGuards(JwtAuthGuard)
-    async getAll(){
-        return await this.chatroomService.getAll()
+    async getAll(@Request() req){
+        return await this.chatroomService.getAll(req.user)
     }
 
     @Delete()
@@ -22,7 +23,7 @@ export class ChatroomController {
 	@UseGuards(JwtAuthGuard)
     async CreatChatroon(@Request() req, //TB typo?
         @Body("room_name") room_name: string,
-        @Body("access") access: string,
+        @Body("access") access: Access,
         @Body("password") password: string)
     {
         console.log("password");
@@ -30,6 +31,6 @@ export class ChatroomController {
 
         if(await this.chatroomService.addRoom(room_name, access, req.user, password) == undefined)
             throw new HttpException('Forbidden', HttpStatus.CONFLICT);
-        return this.getAll()
+        return this.getAll(req.user)
     }
 }

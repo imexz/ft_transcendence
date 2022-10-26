@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
-import { User } from '../users/entitys/user.entity';
+import User from '../users/entitys/user.entity';
 import {TokenPayload} from './tokenPayload.interface';
 import { Socket, Server } from 'socket.io';
 import { UserStatus } from 'src/users/entitys/status.enum';
@@ -21,11 +21,6 @@ export class AuthService {
 	addUser(user: User) {
 		return  this.usersService.addUser(user);
 	}
-
-
-	// async findAll() {
-	// 	return await this.usersService.findAll();
-	// }
 
 	login(user: any) {
 		const payload = {sub: user._id};
@@ -74,6 +69,5 @@ export class AuthService {
 			  return false
 			}
 	}
-
 
 }

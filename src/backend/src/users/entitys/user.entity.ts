@@ -10,7 +10,7 @@ import { UserStatus } from "./status.enum";
 
 
 @Entity()
-export class User {
+export default class User {
 	// constructor(id: number, unique_name: string, avatar_url_42intra: string, avatar: fileEntity, friends: User[]){
 	// 	this.id = id
 	// 	this.unique_name = unique_name
@@ -77,9 +77,11 @@ export class User {
 	@JoinTable()
 	games?: Game[];
 
+	@Exclude()
 	@Column({ nullable: true })
   	twoFactorAuthenticationSecret?: string;
 
+	@Exclude()
 	@Column({ default: false })
 	isTwoFactorAuthenticationEnabled: boolean;
 

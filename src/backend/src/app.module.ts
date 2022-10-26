@@ -3,7 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
-import { User } from './users/entitys/user.entity'
+import User from './users/entitys/user.entity'
 import { fileEntity } from './avatar/file.entitys'
 import { AvatarModule } from './avatar/avatar.module';
 import { UsersModule } from './users/users.module';

@@ -1,6 +1,6 @@
 import { message } from "src/message/message.entity";
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToMany } from "typeorm";
-import { User } from "../entitys/user.entity";
+import User from "../entitys/user.entity";
 
 
 export enum Status {

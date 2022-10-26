@@ -1,7 +1,7 @@
 import { Ball } from "./ball.entity";
 import { Column, Entity, ManyToMany } from "typeorm";
 import { PrimaryGeneratedColumn } from "typeorm";
-import { User } from "src/users/entitys/user.entity";
+import User from "src/users/entitys/user.entity";
 import { GameSetup } from "./setup.entity";
 import { Paddle } from "./paddle.entity";
 import { Score } from "./score.entity";

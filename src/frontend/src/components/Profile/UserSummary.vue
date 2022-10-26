@@ -11,7 +11,7 @@
     <div class="normalView">
       <img :src="user?.avatar_url" alt="Avatar">
       <span>{{ user?.username }}</span>
-      <div v-if="user?.friendStatus == 1" >
+      <div v-if="user?.friendStatus == Status.requsted" >
         <button @click="response(2)"> accept  </button>
         <button @click="response(3)"> deny </button>
       </div>
@@ -64,7 +64,6 @@
 <script lang="ts">
 
 import VueAxios from 'axios';
-import User from '@/models/user'
 import { API_URL } from '@/defines';
 import { defineComponent } from 'vue';
 import { RequestEnum } from '@/enums/models/RequestEnum';
@@ -76,6 +75,7 @@ export default defineComponent({
       show: false as boolean,
       showDm: false as boolean,
       msgText: "" as string,
+      Status
     }
   },
   props : {

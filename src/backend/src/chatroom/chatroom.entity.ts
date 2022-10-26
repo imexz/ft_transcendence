@@ -1,13 +1,20 @@
-import { User } from "../users/entitys/user.entity";
+import User from "../users/entitys/user.entity";
 import { Column, Entity, JoinTable, ManyToMany, ManyToOne, OneToMany, OneToOne, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
 import { message } from "../message/message.entity";
+
+export enum Access {
+    public,
+    private,
+    protected,
+    dm,
+}
 
 @Entity()
 export class chatroom{
     @PrimaryGeneratedColumn()
     roomId: number;
 
-    @Column({ unique: true })
+    @Column({ unique: true, nullable: true})
     roomName: string;
 
     @ManyToOne(() => User, (User) => User.owner_of)
@@ -24,7 +31,7 @@ export class chatroom{
     messages: message[];
 
     @Column()
-    access: string;
+    access: Access;
 
     @Column({nullable: true})
     hash: string

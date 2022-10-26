@@ -1,10 +1,12 @@
 import { Get, Injectable } from '@nestjs/common';
-import { User } from '../users/entitys/user.entity';
+import User from '../users/entitys/user.entity';
 import { Column, FindOptionsWhere, ManyToMany, Not, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { chatroom } from './chatroom.entity';
+import { Access, chatroom } from './chatroom.entity';
 import { message } from 'src/message/message.entity';
 import * as bcrypt from 'bcrypt';
+import { Status } from 'src/users/status_enum';
+import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class ChatroomService {
@@ -85,13 +87,11 @@ export class ChatroomService {
 
     async getRoomName(roomId: number): Promise<string> {
         console.log("getRoomName");
-
        const room = await this.chatroomRepository.findOneBy({roomId: roomId})
        console.log(room.roomName);
-
-
        return room.roomName
     }
+
     async findOrCreat(room: string | number): Promise<{ chatroom: chatroom; bool: boolean; }> {
         if (room != undefined && room != '')
         {
@@ -118,6 +118,37 @@ export class ChatroomService {
         return undefined
     }
 
+    async findOrCreatDM(user: User, user1: User): Promise<{ chatroom: chatroom; bool: boolean; }> {
+        if (user != undefined && user1 != undefined)
+        {
+
+            var chatroom = await this.chatroomRepository.findOne({
+                relations: {
+                    admins: true,
+                    users: true,
+                    owner: true,
+                    messages: true
+                },
+                where: {
+                    users: [{_id: user._id}, {_id: user1._id}],
+                    access: Access.dm
+                }
+            })
+            if(chatroom == null) {
+                console.log("chatroom == null");
+                chatroom = await this.chatroomRepository.create()
+                chatroom.users = [user, user1]
+                chatroom.admins = [user, user1]
+                // chatroom.owner = user
+                chatroom.access = Access.dm
+                await this.chatroomRepository.save(chatroom)
+                return {chatroom, bool: true};
+            }
+            return {chatroom, bool: false};
+        }
+        return undefined
+    }
+
     async userToRoom(user: User, roomId: number, password?: string): Promise<boolean>
     {
         if(user != null) {
@@ -131,7 +162,7 @@ export class ChatroomService {
                     ret.chatroom.owner = user
                 } else {
                     switch (ret.chatroom.access) {
-                        case 'protected':
+                        case Access.protected:
                             // bcrypt.compare()
                             if(await bcrypt.compare(password, ret.chatroom.hash) == false) {
                                 console.log("result === false");
@@ -146,7 +177,7 @@ export class ChatroomService {
                                 // this.chatroomRepository.save(ret.chatroom)
                             }
 
-                            case 'public':
+                            case Access.public:
 
                             default:
                                 if(ret.chatroom.users.indexOf(user) == -1)
@@ -202,21 +233,35 @@ export class ChatroomService {
 
     constructor(
         @InjectRepository(chatroom)
-        private chatroomRepository: Repository<chatroom>
+        private chatroomRepository: Repository<chatroom>,
+        private usersService: UsersService
+
     ){}
 
-    async getAll() {
+    async getAll(user?: User) {
 
         console.log("getAll");
 
         const rooms = await this.chatroomRepository.createQueryBuilder("chatroom")
-        .leftJoinAndSelect('chatroom.users', 'users')
+        .leftJoinAndSelect('chatroom.users', 'us')
         .leftJoinAndSelect('chatroom.admins', 'admins')
-        .where("access IN (:...values)", { values: [ "protected", "public" ] })
+        .where("access IN (:...values)", { values: [ Access.protected, Access.public ] })
+        .orWhere("us._id = :test", {test: user._id})
+        .leftJoinAndSelect('chatroom.users', 'users')
         .getMany()
 
-        // console.log(rooms);
-
+        console.log(rooms);
+        rooms.forEach(element => {
+            console.log("test");
+            if(element.access == Access.dm) {
+                var room_name: string = '';
+                console.log(element.users);
+                element.users.forEach(element1 => {
+                    room_name += element1._id == user._id ? '' :  element1.username + " "
+                });
+                element.roomName = room_name;
+            }
+        });
         return rooms;
     }
 
@@ -228,7 +273,7 @@ export class ChatroomService {
         console.log("after");
     }
 
-    async addRoom(room_name: string, access: string,  user: User, password?: string) {
+    async addRoom(room_name: string, access: Access,  user: User, password?: string) {
         const room = await this.getRoom(room_name)
         if(room == null) {
             console.log("room == null");
@@ -239,7 +284,7 @@ export class ChatroomService {
             room.admins = [user]
             room.users = [user]
             room.access = access
-            if (access == 'protected' && password) {
+            if (access == Access.protected && password) {
                 console.log("password set");
                 bcrypt.hash(password, 10, async (err, hash: string) => {
                     console.log("room hash");

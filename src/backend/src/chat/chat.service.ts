@@ -4,9 +4,22 @@ import { message } from '../message/message.entity';
 import { UsersService } from 'src/users/users.service';
 import { ChatroomService } from 'src/chatroom/chatroom.service';
 import { MessageService } from 'src/message/message.service';
+import User from 'src/users/entitys/user.entity';
 
 @Injectable()
 export class ChatService {
+
+  async creatRoomDM(user: User, id: number, content: string) {
+    if(user != undefined && id != undefined)
+    {
+      console.log(content);
+      
+      const user1 = await this.usersService.getUser(id)
+      const chatroom = await this.chatroomService.findOrCreatDM(user, user1)
+      this.messageService.userAddMessageToRoom(user, content, chatroom.chatroom)
+    }
+  }
+
   async createRoomInfo(roomId: number, _id: any) {
     return await this.chatroomService.createRoomInfo(roomId, _id);
   }

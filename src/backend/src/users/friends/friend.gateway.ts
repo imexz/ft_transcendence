@@ -10,7 +10,7 @@ import { Socket, Server } from 'socket.io';
 import { AuthService } from 'src/auth/auth.service';
 import { FriendsService } from './friends.service';
 import { Status } from './friend.entity';
-import { User } from '../entitys/user.entity';
+import User from '../entitys/user.entity';
 
 
 

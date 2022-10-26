@@ -6,7 +6,7 @@ import { HttpService } from '@nestjs/axios'
 import { readFile } from 'fs';
 import { createWriteStream } from 'fs';
 import { promisify } from "util";
-import { User } from "../../users/entitys/user.entity";
+import User from "../../users/entitys/user.entity";
 import { hostURL } from "../../hostURL";
 import { UserStatus } from "src/users/entitys/status.enum";
 

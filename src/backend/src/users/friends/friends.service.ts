@@ -3,7 +3,7 @@ import { Friend, Status } from './friend.entity';
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository, FindOptionsWhere } from "typeorm";
 import { UsersService } from '../users.service';
-import { User } from '../entitys/user.entity';
+import User from '../entitys/user.entity';
 import { Not } from "typeorm"
 
 
