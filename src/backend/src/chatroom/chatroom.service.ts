@@ -17,42 +17,48 @@ export class ChatroomService {
     console.log("createRoomInfoService");
 
 
-    const rooms = await this.getAll();
-    console.log(rooms[0].roomId)
-    for(let i = 0; i < rooms.length; ++i)
-    {
-        if (rooms[i].roomId == roomId)
-        {
-            let room = null
-            for(let k = 0; k < rooms[i].users.length; ++k)
-            {
-                if (rooms[i].users[k]._id == _id)
-                    room = rooms[i];
-            }
-            let isAdmin : Boolean
-
-            if (room == null)
-            {
-                room = []
-                return {room, isAdmin}
-            }
-
-            for(let j = 0; j < room.admins.length; ++j)
-            {
-                if (room.admins[j]._id == _id)
-                   isAdmin = true
-            }
-
-            if (isAdmin == undefined)
-                isAdmin = false
-            console.log("isAdmin:");
-            console.log(isAdmin);
-
-            console.log("end createRoomInfoService");
-            console.log(room);
-
-            return { room, isAdmin };
+    const Room = await this.chatroomRepository.findOne({
+        where: {
+            roomId: roomId
+        },
+        relations: {
+            users: true,
+            admins: true
         }
+    })
+    console.log(Room)
+
+    if (Room != null)
+    {
+        let room = null
+        for(let k = 0; k < Room.users.length; ++k)
+        {
+            if (Room.users[k]._id == _id)
+            room = Room;
+        }
+        let isAdmin : Boolean
+
+        if (room == null)
+        {
+            room = []
+            return {room, isAdmin}
+        }
+
+        for(let j = 0; j < room.admins.length; ++j)
+        {
+            if (room.admins[j]._id == _id)
+                isAdmin = true
+        }
+
+        if (isAdmin == undefined)
+            isAdmin = false
+        console.log("isAdmin:");
+        console.log(isAdmin);
+
+        console.log("end createRoomInfoService");
+        console.log(room);
+
+        return { room, isAdmin };
     }
     console.log("end createRoomInfoService with error");
     throw new Error("room not found");
@@ -238,7 +244,7 @@ export class ChatroomService {
 
     ){}
 
-    async getAll(user?: User) {
+    async getAll(user: User) {
 
         console.log("getAll");
 

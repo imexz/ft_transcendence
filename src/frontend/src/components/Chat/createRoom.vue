@@ -2,12 +2,12 @@
     <div class="room-input">
       <form @submit.prevent="createRoom">
         <input v-model="name" />
-        <select v-model="access">
-          <option>privat</option>
-          <option>public</option> 
-          <option>protected</option> 
+        <select v-model="access" >
+          <option :value="Access.private"  >privat</option>
+          <option :value="Access.public" selected>public</option> 
+          <option :value="Access.protected" >protected</option> 
         </select>
-        <input v-if="access == Access.public"  v-model="password" placeholder="Enter your password">
+        <input v-if="access == Access.protected"  v-model="password" placeholder="Enter your password">
         <button type="submit">Create Room</button>
       </form>
     </div>    
@@ -24,7 +24,7 @@ export default defineComponent({
   data() {
       return {
           name: '',
-          access: Access.public,
+          access: Access.public as Access,
           password: '',
           Access
       }

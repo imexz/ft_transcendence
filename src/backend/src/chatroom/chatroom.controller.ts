@@ -33,4 +33,5 @@ export class ChatroomController {
             throw new HttpException('Forbidden', HttpStatus.CONFLICT);
         return this.getAll(req.user)
     }
+    
 }
