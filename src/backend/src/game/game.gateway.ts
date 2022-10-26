@@ -33,7 +33,9 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     this.authService.validateSocket(socket)
   }
 
-  handleDisconnect(@ConnectedSocket() client: Socket) { console.log("client %s disconnected", client?.handshake.auth._id); }
+  handleDisconnect(@ConnectedSocket() client: Socket) {
+    console.log("client %s disconnected", client?.handshake.auth);
+  }
 
   @SubscribeMessage('checkGame')
   handleCheckGame(@ConnectedSocket() client: Socket): boolean {

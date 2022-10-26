@@ -235,19 +235,13 @@ export class ChatroomService {
         }
     }
 
-
-
     constructor(
         @InjectRepository(chatroom)
         private chatroomRepository: Repository<chatroom>,
         private usersService: UsersService
-
     ){}
 
     async getAll(user: User) {
-
-        console.log("getAll");
-
         const rooms = await this.chatroomRepository.createQueryBuilder("chatroom")
         .leftJoinAndSelect('chatroom.users', 'us')
         .leftJoinAndSelect('chatroom.admins', 'admins')
@@ -258,7 +252,6 @@ export class ChatroomService {
 
         console.log(rooms);
         rooms.forEach(element => {
-            console.log("test");
             if(element.access == Access.dm) {
                 var room_name: string = '';
                 console.log(element.users);
