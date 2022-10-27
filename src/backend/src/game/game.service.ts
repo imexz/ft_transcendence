@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Game } from './game.entities/game.entity';
+import { Game, Side } from './game.entities/game.entity';
 import { Paddle } from './game.entities/paddle.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -11,6 +11,7 @@ import User from 'src/users/entitys/user.entity';
 
 @Injectable()
 export class GameService {
+  // }
 
 	constructor(
 		private userService: UsersService,
@@ -21,118 +22,127 @@ export class GameService {
 	@InjectRepository(Game)
 	private gameRepository: Repository<Game>
 
-	queue: Array<QueueElem> = [];
-	users:  Map<string, number> = new Map<string, number>(); // Key: UserId, Value: GameId
-	games = new Map<number, Game>(); // Key: GameId, Value: Game
+	// queue: Array<QueueElem> = [];
+	// SamuelQueue: Array<number> = [];
+	Samuel: Array<Game> = []
+	// users:  Map<string, number> = new Map<string, number>(); // Key: UserId, Value: GameId
+	// games = new Map<number, Game>(); // Key: GameId, Value: Game
 	intervals = new Map<number, number>(); // Key: GameId, Value: IntervalId
-	sockets = new Map<number, Socket[]>(); // Key: GameId, Value: Array of Sockets
+	// sockets = new Map<number, Socket[]>(); // Key: GameId, Value: Array of Sockets
 
-	#getSideFromGame(game: Game, playerid: string): string {
-		if (game.playerLeft === playerid) {
-			return "left";
-		} else if (game.playerRight === playerid) {
-			return "right";
-		} else
-			return "";
+
+	getGame(user_id: number | undefined): Game {
+		return this.Samuel.find((value: Game) => { value.playerLeft._id == user_id || value.playerRight._id == user_id})
 	}
 
-	checkForExistingGame(client: Socket): boolean {
-		var ret: boolean = false;
-		var gameid: number | undefined = this.users.get(client.handshake.auth._id.toString());
-		if (gameid != undefined) {
-			ret = true;
-			console.log("client %d already is in users", client.handshake.auth._id);
-			client.emit('gameInfo', {
-					gameId: gameid,
-					side: this.#getSideFromGame(this.games.get(gameid), client.handshake.auth._id.toString()),
-					playerLeft: this.games.get(gameid).playerLeft,
-					playerRight: this.games.get(gameid).playerRight,
-				});
-			client.join(gameid.toString());
-		}
-		else {
-			console.log("no existing game available", client.handshake.auth._id);
-		}
-		return ret;
-	}
-
-	async	addClientIdToQueue(client: Socket, server: Server): Promise<void> {
-		var needle: QueueElem = {
-			id: client.handshake.auth._id.toString(),
-			socket: client,
-		}
-		if (this.queue.find(({id}) => {return id === needle.id}) == undefined) {
-			console.log("add %s to queue", client.handshake.auth._id);
-			this.queue.push({id: client.handshake.auth._id.toString(), socket: client});
-			while (this.queue.length > 1) {
-				await this.#initializeGame(server);
+	getPlayerSide(user_id: number) {
+		const game = this.getGame(user_id)
+		if (game != undefined) {
+			if (game.playerLeft._id == user_id) {
+				return Side.left
+			} else {
+				return Side.right
 			}
-		} else {
-			console.log("%s already is in queue", client.handshake.auth._id);
 		}
+	}
+
+	handelKeypress(user_id: number, key: string){
+		if (key == "ArrowUp" || key == "w") {
+			this.movePaddleUp()			
+		} else if (key == "ArrowDown" || key == "s") {
+			
+		}
+	}
+
+	
+
+	async JoinGameOrCreatGame(user: User, server: Server): Promise<Game> {
+		let game = this.getGame(undefined)
+		if (game == undefined) {
+			game = await this.#createGameInstance()
+			game.playerLeft = user
+			this.Samuel.push(game)
+		} else {
+			game.playerRight = user
+			this.#startGame(server, game)
+		}
+		return game
 	}
 	
-	async #initializeGame(server: Server) {
-		let game: Game = await this.#createGameInstance();
-		this.#updateMaps(game);
-		this.#joinSocketsToDedicatedRoom(game);
-		this.#emitGameInfoToFrontend(game);
-		this.#startGame(server, game.id);
-	}
+	// async	addClientIdToQueue(client: Socket, server: Server): Promise<void> {
+	// 	var needle: QueueElem = {
+	// 		id: client.handshake.auth._id.toString(),
+	// 		socket: client,
+	// 	}
+	// 	if (this.queue.find(({id}) => {return id === needle.id}) == undefined) {
+	// 		console.log("add %s to queue", client.handshake.auth._id);
+	// 		this.queue.push({id: client.handshake.auth._id.toString(), socket: client});
+	// 		while (this.queue.length > 1) {
+	// 			await this.#initializeGame(server);
+	// 		}
+	// 	} else {
+	// 		console.log("%s already is in queue", client.handshake.auth._id);
+	// 	}
+	// }
+	
+	// async #initializeGame(server: Server) {
+	// 	let game: Game = await this.#createGameInstance();
+	// 	this.#updateMaps(game);
+	// 	this.#joinSocketsToDedicatedRoom(game);
+	// 	this.#emitGameInfoToFrontend(game);
+	// 	this.#startGame(server, game.id);
+	// }
 
 	async #createGameInstance(): Promise<Game> {
 		console.log('inside createGameInstance()');
-		var gamerepo = this.gameRepository.create();
-		console.log("after repo create");
-		gamerepo = await this.gameRepository.save(gamerepo);
-		var firstPlayer: QueueElem = this.queue.shift();
-		var secondPlayer: QueueElem = this.queue.shift();
-		this.sockets.set(gamerepo.id, [firstPlayer.socket, secondPlayer.socket]);
 		const setup = new GameSetup;
-		console.log('leaving createGameInstance()');
-		return new Game(gamerepo.id, firstPlayer.socket.handshake.auth._id.toString(), secondPlayer.socket.handshake.auth._id.toString(), setup);
+		var game = this.gameRepository.create();
+		console.log("after repo create");
+		game = await this.gameRepository.save(game);
+		// console.log('leaving createGameInstance()');
+		return new Game(game.id, setup);
 	}
 
-	#updateMaps(game: Game) {
-		this.games.set(game.id, game);
-		this.users.set(game.playerRight, game.id);
-		this.users.set(game.playerLeft, game.id);
+	// #updateMaps(game: Game) {
+	// 	this.games.set(game.id, game);
+	// 	this.users.set(game.playerRight, game.id);
+	// 	this.users.set(game.playerLeft, game.id);
+	// }
+
+	// #joinSocketsToDedicatedRoom(game: Game) {
+	// 	this.sockets.get(game.id)[0].join(game.id.toString());
+	// 	this.sockets.get(game.id)[1].join(game.id.toString());
+	// }
+
+	// #emitGameInfoToFrontend(game: Game) {
+	// 	this.sockets.get(game.id)[0].emit('gameInfo', {gameId: game.id, side: "left", playerLeft: game.playerLeft, playerRight: game.playerRight});
+	// 	this.sockets.get(game.id)[1].emit('gameInfo', {gameId: game.id, side: "right", playerLeft: game.playerLeft, playerRight: game.playerRight});
+	// }
+
+	async #emitGameData(game: Game, server: Server) {
+		server.to(game.id.toString()).emit('updateGame', await this.getData(game));
 	}
 
-	#joinSocketsToDedicatedRoom(game: Game) {
-		this.sockets.get(game.id)[0].join(game.id.toString());
-		this.sockets.get(game.id)[1].join(game.id.toString());
+	async #startGame(server: Server, game: Game) {
+		server.to(game.id.toString()).emit("Game", )
+		game.interval = setInterval(() => this.#emitGameData(game, server), 16) as unknown as number;
 	}
 
-	#emitGameInfoToFrontend(game: Game) {
-		this.sockets.get(game.id)[0].emit('gameInfo', {gameId: game.id, side: "left", playerLeft: game.playerLeft, playerRight: game.playerRight});
-		this.sockets.get(game.id)[1].emit('gameInfo', {gameId: game.id, side: "right", playerLeft: game.playerLeft, playerRight: game.playerRight});
-	}
-
-	async #emitGameData(gameId: number, server: Server) {
-		server.to(gameId.toString()).emit('updateGame', await this.getData(gameId));
-	}
-
-	async #startGame(server: Server, gameid: number) {
-		var intervalId = setInterval(() => this.#emitGameData(gameid, server), 16) as unknown as number;
-		this.intervals.set(gameid, intervalId);
-	}
-
-	async getData(id: number): Promise<Game | undefined> {
-		if (this.games.get(id) === undefined) {
+	async getData(game: Game): Promise<Game | undefined> {
+		if (game == undefined) {
 			return undefined;
 		}
-		this.#updateData(id);
-		this.#collisionControl(id);
-		if (this.#scored(id)){
-			this.#reset(id);
+		this.#updateData(game)
+		this.#collisionControl(game);
+		if (this.#scored(game)){
+			this.#reset(game);
 		}
-		// await this.#isGameFinished(id);
-		return this.games.get(id);
+		await this.#isGameFinished(game);
+		return game
 	}
 
-	#updateData(id: number) {
-		let game: Game = this.games.get(id);
+	#updateData(game: Game) {
+		// let game: Game = this.games.get(id);
 		game.ball.position.x += game.ball.direction.x;
 		game.ball.position.y += game.ball.direction.y;
 		// if (this.ball.direction.x > 0) {
@@ -163,14 +173,14 @@ export class GameService {
 		// console.log("gameid: %d | ball: x %d, y %d", id, game.ball.position.x, game.ball.position.y);
 	}
 
-	#isBallWithinPaddleRange(id: number, paddle: Paddle): boolean {
-		return (this.games.get(id).ball.position.y >= paddle.position.y &&
-			this.games.get(id).ball.position.y <= paddle.position.y + paddle.height)
+	#isBallWithinPaddleRange(game: Game, paddle: Paddle): boolean {
+		return (game.ball.position.y >= paddle.position.y &&
+			game.ball.position.y <= paddle.position.y + paddle.height)
 	}
 
-	#isBallAtPaddle(id: number, paddle: Paddle): boolean {
+	#isBallAtPaddle(game: Game, paddle: Paddle): boolean {
 		let ret: boolean = false;
-		let game: Game = this.games.get(id);
+		// let game: Game = this.games.get(id);
 		if (paddle.id == "left") {
 			ret = game.ball.position.x - game.ball.radius <= paddle.position.x + paddle.width;
 		} else if (paddle.id == "right") {
@@ -179,12 +189,12 @@ export class GameService {
 		return ret;
 	}
 
-	#calcAngle(id: number, paddle: Paddle) {
+	#calcAngle(game: Game, paddle: Paddle) {
 		var section: number;
-		let game: Game = this.games.get(id);
+		// let game: Game = this.games.get(id);
 
 		section = paddle.height / 8;
-		if (this.#isBallWithinPaddleRange(id, paddle)) {
+		if (this.#isBallWithinPaddleRange(game, paddle)) {
 			var i: number = 1;
 			while (game.ball.position.y > (paddle.position.y + i * section)) {
 				i++;
@@ -193,32 +203,32 @@ export class GameService {
 		}
 	}
 
-	#updateBallDirection(id: number, paddle: Paddle) {
-		this.#calcAngle(id, paddle);
-		let game: Game = this.games.get(id);
+	#updateBallDirection(game: Game, paddle: Paddle) {
+		this.#calcAngle(game, paddle);
+		// let game: Game = this.games.get(id);
 		game.ball.direction.x = game.ball.direction.speed * Math.cos(game.ball.direction.angle * (Math.PI / 180));
 		game.ball.direction.y = game.ball.direction.speed * Math.sin(game.ball.direction.angle * (Math.PI / 180));
 	}
 
-	#collisionControl(id: number) {
-		var game: Game = this.games.get(id);
+	#collisionControl(game: Game) {
+		// var game: Game = this.games.get(id);
 		if (game.ball.direction.x > 0) {
-			if (this.#isBallAtPaddle(id, game.paddleRight) &&
-				this.#isBallWithinPaddleRange(id, game.paddleRight)) {
-					this.#updateBallDirection(id, game.paddleRight);
+			if (this.#isBallAtPaddle(game, game.paddleRight) &&
+				this.#isBallWithinPaddleRange(game, game.paddleRight)) {
+					this.#updateBallDirection(game, game.paddleRight);
 			}
 		}
 		else {
-			if (this.#isBallAtPaddle(id, game.paddleLeft) &&
-				this.#isBallWithinPaddleRange(id, game.paddleLeft)) {
-					this.#updateBallDirection(id, game.paddleLeft);
+			if (this.#isBallAtPaddle(game, game.paddleLeft) &&
+				this.#isBallWithinPaddleRange(game, game.paddleLeft)) {
+					this.#updateBallDirection(game, game.paddleLeft);
 			}
 		}
 	}
 
-	#scored(id: number): boolean {
+	#scored(game: Game): boolean {
 		var ret: boolean = false;
-		let game: Game = this.games.get(id);
+		// let game: Game = this.games.get(id);
 		if (game.ball.position.x - game.ball.radius <= 0) {
 			game.score.scoreRight += game.score.increaseRight;
 			game.scoreRight += game.score.increaseRight;
@@ -232,8 +242,8 @@ export class GameService {
 		return ret;
 	}
 
-	#reset(id: number) {
-		let game: Game = this.games.get(id);
+	#reset(game: Game) {
+		// let game: Game = this.games.get(id);
 		game.ball.position.x = this.setup.ballPos.x;
 		game.ball.position.y = this.setup.ballPos.y;
 		game.ball.direction.speed = this.setup.ballDir.speed;
@@ -257,24 +267,19 @@ export class GameService {
 		game.score.increaseRight = this.setup.scoreIncrease;
 	}
 
-	async #isGameFinished(id: number) {
-		var game: Game | undefined = this.games.get(id);
+	async #isGameFinished(game: Game) {
+		// var game: Game | undefined = this.games.get(id);
 		if (game != undefined && game.finished) {
 			// const gameEntry = this.gameRepository.create({scoreLeft: game.scoreLeft, scoreRight: game.scoreRight});
-			game.player = await Promise.all([
-				this.userService.getUser(game.playerLeft as unknown as number), 
-				this.userService.getUser(game.playerRight as unknown as number),
-				]);
+			game.playerLeft = await this.userService.getUser(game.playerLeft._id)
+			game.playerRight = await this.userService.getUser(game.playerRight._id)
 			await this.gameRepository.save(game);
-			clearInterval(this.intervals.get(id));
-			this.intervals.delete(id);
-			this.users.delete(game.playerLeft);
-			this.users.delete(game.playerRight);
-			this.games.delete(id);
+			clearInterval(game.interval);
+			const index = this.Samuel.indexOf(game, 0);
+			if (index > -1) {
+				this.Samuel.splice(index, 1);
+			}
 			console.log("in isGameFinished");
-			this.sockets.get(id)[0].leave(id.toString());
-			this.sockets.get(id)[1].leave(id.toString());
-			this.sockets.delete(id);
 			game.finished = false;
 			console.log("game finished, keys removed");
 			// TODO: delete room (?)
@@ -285,9 +290,9 @@ export class GameService {
 		}
 	}
 
-	movePaddleUp(id: number, b: boolean) {		
-		let game: Game = this.games.get(id);
-		if (b) {
+	movePaddleUp(game: Game, side: Side) {		
+		// let game: Game = this.games.get(id);
+		if (side = Side.left) {
 			if (game.paddleLeft.position.y > 0)
 				game.paddleLeft.position.y -= game.paddleLeft.speed;
 		}
@@ -297,9 +302,9 @@ export class GameService {
 		}
 	}
 
-	movePaddleDown(id: number, b: boolean) {
-		let game: Game = this.games.get(id);
-		if (b) {
+	movePaddleDown(game: Game, side: Side) {
+		// let game: Game = this.games.get(id);
+		if (side = Side.left) {
 			if (game.paddleLeft.position.y < (480 - game.paddleLeft.height))
 				game.paddleLeft.position.y += game.paddleLeft.speed;
 		}
@@ -309,19 +314,13 @@ export class GameService {
 		}
 	}
 
-	leaveGame(client: Socket) {
-		const userId = client.handshake.auth._id.toString();
-		const gameId = this.users.get(userId);
-		const game = this.games.get(gameId);
+	leaveGame(user_id: number, game: Game) {
 
-		if (userId === game.playerLeft || userId === game.playerRight) {
+		if (user_id === game.playerLeft._id || user_id === game.playerRight._id) {
 			// this.intervals.delete(gameId);
 		} else {
-			this.users.delete(userId);
-			console.log("leaveGame gid", gameId, typeof gameId);
-			console.log("leaveGame uid", userId, typeof userId);
-			client.leave(gameId.toString());
-			client.disconnect();
+			console.log("leaveGame gid", game.id, typeof game.id);
+			console.log("leaveGame uid", user_id, typeof user_id);
 		}
 	}
 
@@ -343,6 +342,7 @@ export class GameService {
 		.innerJoin("game.player", "tmp")
 		.where("tmp._id = :te", {te: user._id})
 		.innerJoinAndSelect("game.player", "player", "player._id != :id", { id: user._id})
+		// .select("'scoreLeft'")
 		.getMany()
 	}
 }

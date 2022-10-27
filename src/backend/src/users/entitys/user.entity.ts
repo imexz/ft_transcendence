@@ -73,9 +73,15 @@ export default class User {
 	@JoinTable()
 	admin_of?: chatroom[];
 
-	@ManyToMany(() => Game, (game) => game.player)
-	@JoinTable()
-	games?: Game[];
+	// @ManyToMany(() => Game, (game) => game.player)
+	// @JoinTable()
+	// games?: Game[];
+
+	@OneToMany(() => Game, (game) => game.playerRight)
+	gamesAsRight?: Game[]
+
+	@OneToMany(() => Game, (game) => game.playerLeft)
+	gamesAsLeft?: Game[]
 
 	@Exclude()
 	@Column({ nullable: true })

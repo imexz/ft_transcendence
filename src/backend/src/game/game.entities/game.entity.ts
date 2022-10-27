@@ -1,5 +1,5 @@
 import { Ball } from "./ball.entity";
-import { Column, Entity, ManyToMany } from "typeorm";
+import { Column, Entity, ManyToOne } from "typeorm";
 import { PrimaryGeneratedColumn } from "typeorm";
 import User from "src/users/entitys/user.entity";
 import { GameSetup } from "./setup.entity";
@@ -8,18 +8,27 @@ import { Score } from "./score.entity";
 import { Exclude } from 'class-transformer';
 
 
+export enum Side{
+	left,
+	right
+}
+
+
 @Entity()
 export class Game {
 
 	@Exclude()
 	@PrimaryGeneratedColumn()
 	id: number;
-	@ManyToMany(() => User, (User) => User.games)
-	player: User[];
-	@Exclude()
-	playerRight: string;
-	@Exclude()
-	playerLeft: string;
+	// @ManyToMany(() => User, (User) => User.games)
+	// player: User[];
+
+	@ManyToOne(() => User, (User) => User.gamesAsRight)
+	playerRight: User;
+
+	@ManyToOne(() => User, (User) => User.gamesAsLeft)
+	playerLeft: User;
+
 	@Exclude()
 	ball = new Ball;
 	@Exclude()
@@ -30,18 +39,21 @@ export class Game {
 	score = new Score;
 	@Exclude()
 	finished: boolean = false;
+	@Exclude()
+	interval: number;
 	@Column()
 	scoreLeft: number = 0;
-
 	@Column()
 	scoreRight: number = 0;
 
+
+
 	// constructor(gameid: number, p1: string, p2: string, p1s: Socket, p2s: Socket, gsetup: GameSetup) {
-	constructor(gameid: number, p1: string, p2: string, gsetup: GameSetup) {
+	constructor(gameid: number, gsetup: GameSetup) {
 		// console.log("in Game constructor");
 		this.id = gameid;
-		this.playerLeft = p1;
-		this.playerRight = p2;
+		// this.playerLeft = p1;
+		// this.playerRight = p2;
 
 		if (gsetup == undefined) {
 			// console.log("gsetup undefined");

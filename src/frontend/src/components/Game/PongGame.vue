@@ -31,14 +31,15 @@
   import UserSummary from '@/components/Profile/UserSummary.vue'
   import VueAxios from 'axios';
   import User from '@/models/user';
+  import Game from '@/models/game';
+  import {Side} from'@/enums/models/SideEnum';
 
   export default defineComponent({
   	data () {
   		return {
         gameExists: false as boolean,
   		  gamesocket: null as Socket,
-  		  context: null as any,
-  		  side: "" as string,
+  		  // side: null as Side,
 			  leftScore: 0 as number,
 			  rightScore: 0 as number,
         userLeft: null as User | null,
@@ -93,11 +94,11 @@
       // console.log(this.$store.state);
       
   		this.gamesocket = this.$store.state.socketGame
-  		this.gamesocket.on('gameInfo', (data: any) => {
+  		this.gamesocket.on('Game', (data: any) => {
   			// console.log("event gameInfo received");
         // console.log(data);
         this.gameExists = true;
-  			this.side = data.side;
+  			// this.side = data.side;
 			  this.finished = false;
         this.setUserSummary(data);
 			  document.addEventListener('keydown', this.keyEvents, false);
@@ -239,7 +240,7 @@
 				if (data === undefined) {
           // console.log("data undefined");
           this.gameExists = false;
-					this.side = "";
+					this.side = null;
 					this.left = 0;
 					this.right = 0;
           return;
@@ -267,38 +268,10 @@
 				this.gameData.paddleRight = data.paddleRight;
       },
       keyEvents(event) {
-        if (this.side === "left" && !this.finished) {
-  				if (event.key == 'w') {
-  					console.log(event.key);
-  					this.paddleLeftUp();
-  				}
-  				else if (event.key == 's') {
-  					console.log(event.key);
-  					this.paddleLeftDown();
-  				}
-  			} else if (this.side === "right" && !this.finished) {
-  				if (event.key == 'ArrowUp') {
-  					console.log(event.key);
-  					this.paddleRightUp();
-  				}
-  				else if (event.key == 'ArrowDown') {
-  					console.log(event.key);
-  					this.paddleRightDown();
-  				}
-  			}
+        if (!this.finished) {
+          this.gamesocket.emit('key', event.key)
+        }
       },
-  		paddleLeftUp() {
-  			this.gamesocket.emit('moveLeftUp');
-  		},
-  		paddleLeftDown() {
-  			this.gamesocket.emit('moveLeftDown');
-  		},
-  		paddleRightUp() {
-  			this.gamesocket.emit('moveRightUp');
-  		},
-  		paddleRightDown() {
-  			this.gamesocket.emit('moveRightDown');
-  		},
       setUserSummary(data: any) {
         console.log("setUserSummary");
         VueAxios({

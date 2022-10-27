@@ -11,6 +11,8 @@ import { GameService } from './game.service';
 import { Socket, Server } from 'socket.io';
 import { hostURL } from 'src/hostURL';
 import { AuthService } from 'src/auth/auth.service';
+import { Game, Side } from './game.entities/game.entity';
+import User from 'src/users/entitys/user.entity';
 
 
 @WebSocketGateway({
@@ -38,42 +40,57 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   }
 
   @SubscribeMessage('checkGame')
-  handleCheckGame(@ConnectedSocket() client: Socket): boolean {
-    return this.gameService.checkForExistingGame(client);
+  async handleCheckGame(@ConnectedSocket() client: Socket): Promise<Game> {
+		var game: Game | undefined = this.gameService.getGame(client.handshake.auth._id);
+		if (game == undefined) {
+			// console.log("client %d already is in users", client.handshake.auth._id);
+			// client.join(game.id.toString());
+			console.log("no existing game available", client.handshake.auth._id);
+      game = await this.gameService.JoinGameOrCreatGame(client.handshake.auth as User, this.server)
+		}
+    client.join(game.id.toString());
+    return game
   }
 
-  @SubscribeMessage('checkQueue')
-  handleCheckQueue(@ConnectedSocket() client: Socket) {
-	  this.gameService.addClientIdToQueue(client, this.server);
-  }
+  // @SubscribeMessage('checkQueue')
+  // async handleCheckQueue(@ConnectedSocket() client: Socket) {
+	//   // this.gameService.addClientIdToQueue(client, this.server);
+  //   if(!this.gameService.getGame(client.handshake.auth._id)) {
+  //     const game = await this.gameService.JoinGameOrCreatGame(client.handshake.auth as User, this.server)
+  //     client.join(game.id.toString());
+  //   }
+  // }
 
-  @SubscribeMessage('moveLeftUp')
-  handleMoveLeftUp(@ConnectedSocket() client: Socket): void {
-	let gameid = this.gameService.users.get(client.handshake.auth._id.toString());
-	this.gameService.movePaddleUp(gameid, true);
-  }
+  @SubscribeMessage('key')
+  handleMoveLeftUp(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() key?: string ): void {
+  this.gameService.handelKeypress(client.handshake.auth._id, key)
+}
 
-  @SubscribeMessage('moveRightUp')
-  handleMoveRightUp(@ConnectedSocket() client: Socket): void {
-	let gameid = this.gameService.users.get(client.handshake.auth._id.toString());
-	this.gameService.movePaddleUp(gameid, false);
-  }
+@SubscribeMessage('moveRightUp')
+handleMoveRightUp(@ConnectedSocket() client: Socket): void {
+  let game = this.gameService.getGame(client.handshake.auth._id);
+	this.gameService.movePaddleUp(game, false);
+}
 
-  @SubscribeMessage('moveLeftDown')
-  handleMoveLeftDown(@ConnectedSocket() client: Socket): void {
-	let gameid = this.gameService.users.get(client.handshake.auth._id.toString());
-	this.gameService.movePaddleDown(gameid, true);
-  }
+@SubscribeMessage('moveLeftDown')
+handleMoveLeftDown(@ConnectedSocket() client: Socket): void {
+  let game = this.gameService.getGame(client.handshake.auth._id);
+	this.gameService.movePaddleDown(game, true);
+}
 
-  @SubscribeMessage('moveRightDown')
-  handleMoveRightDown(@ConnectedSocket() client: Socket): void {
-	let gameid = this.gameService.users.get(client.handshake.auth._id.toString());
-	this.gameService.movePaddleDown(gameid, false);
-  }
+@SubscribeMessage('moveRightDown')
+handleMoveRightDown(@ConnectedSocket() client: Socket): void {
+  let game = this.gameService.getGame(client.handshake.auth._id);
+	this.gameService.movePaddleDown(game, false);
+}
 
-  @SubscribeMessage('leaveGame')
-  handleLeaveGame(@ConnectedSocket() client: Socket): void {
-    this.gameService.leaveGame(client);
+@SubscribeMessage('leaveGame')
+handleLeaveGame(@ConnectedSocket() client: Socket): void {
+    let game = this.gameService.getGame(client.handshake.auth._id);
+    this.gameService.leaveGame(client.handshake.auth._id, game);
+    client.leave(client.handshake.auth._id.toString())
   }
 
   @SubscribeMessage('Request')
@@ -81,13 +98,15 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   @ConnectedSocket() client: Socket,
   @MessageBody('id') id?: number)
   {
-    const gameId: number = this.gameService.users.get(id.toString());
-    if(gameId != undefined)
+    const game: Game = this.gameService.getGame(id)
+    if(game == undefined)
     {
       this.gameService.users.set(client.handshake.auth._id.toString(), gameId);
+      const socket = await this.findSocketOfUser(id)
+      socket.emit("Request", {id})
+    } else {
+      client.join(game.id)
     }
-    const socket = await this.findSocketOfUser(id)
-    socket.emit("Request", {id})
 
   }
   
