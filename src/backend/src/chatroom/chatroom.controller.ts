@@ -11,6 +11,9 @@ export class ChatroomController {
     @Get('all')
 	@UseGuards(JwtAuthGuard)
     async getAll(@Request() req){
+        console.log("all");
+        console.log(req.user);
+        console.log("all1");
         return await this.chatroomService.getAll(req.user)
     }
 
