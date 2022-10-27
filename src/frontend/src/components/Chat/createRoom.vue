@@ -19,7 +19,6 @@ import { API_URL } from '@/defines';
 import { ref, defineComponent } from 'vue'
 import { Access } from '@/models/room';
 
-
 export default defineComponent({
   data() {
       return {

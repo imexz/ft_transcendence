@@ -124,6 +124,8 @@ export class UsersService {
 		return this.usersRepository.save(user)
 	}
 
+	
+
 	// async addfriend(user_id: number, friend_id: number) {
 	// 	// console.log(user_id);
 	// 	// console.log(friend_id);

@@ -31,6 +31,9 @@ import MatchData from '@/models/matchData';
 import UserSummary from '@/components/Profile/UserSummary.vue';
 import MatchSummary from './MatchSummary.vue';
 import MatchStatistics from './MatchStatistics.vue';
+import { API_URL } from '@/defines';
+import VueAxios from 'axios';
+
 
 export default defineComponent({
   data() {
@@ -86,6 +89,18 @@ export default defineComponent({
 },
   methods: {
     initData() {
+      VueAxios({
+        url: '/game',
+        baseURL: API_URL,
+        method: 'Get',
+        withCredentials: true,
+      })
+        .then(response => {
+        console.log(response);
+        if(response != null)
+          console.log("match Data", response.data);
+        })
+        .catch(error => { this.$emit('actions', 'error') }) 
       this.totalGames = this.matchData.length;
       for (let i = 0; i < this.totalGames; ++i) {
         if (this.matchData[i].myScore > this.matchData[i].opponentScore)

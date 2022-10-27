@@ -54,8 +54,6 @@ export class MessageService {
         console.log(roomId);
 
         console.log(messages);
-
-
         return messages
     }
 

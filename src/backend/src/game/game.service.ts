@@ -7,6 +7,7 @@ import { Socket, Server } from 'socket.io';
 import { GameSetup } from './game.entities/setup.entity';
 import { QueueElem } from './game.interfaces/queueobj.interface'
 import { UsersService } from 'src/users/users.service';
+import User from 'src/users/entitys/user.entity';
 
 @Injectable()
 export class GameService {
@@ -322,5 +323,26 @@ export class GameService {
 			client.leave(gameId.toString());
 			client.disconnect();
 		}
+	}
+
+	async getMatchHistory(user: User){
+	// 	return await this.gameRepository.find({ 
+	// 		where: {
+	// 			player: {
+	// 				_id: user._id
+	// 			}
+	// 		},
+	// 		relations: {
+	// 			player: true
+	// 		}
+	// 	})
+	// }
+
+		return await this.gameRepository.createQueryBuilder("game")
+		// .innerJoinAndSelect("game.player", "player", "player._id = :id", { id: user._id})
+		.innerJoin("game.player", "tmp")
+		.where("tmp._id = :te", {te: user._id})
+		.innerJoinAndSelect("game.player", "player", "player._id != :id", { id: user._id})
+		.getMany()
 	}
 }

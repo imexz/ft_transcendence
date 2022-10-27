@@ -5,22 +5,31 @@ import User from "src/users/entitys/user.entity";
 import { GameSetup } from "./setup.entity";
 import { Paddle } from "./paddle.entity";
 import { Score } from "./score.entity";
+import { Exclude } from 'class-transformer';
+
 
 @Entity()
 export class Game {
 
+	@Exclude()
 	@PrimaryGeneratedColumn()
 	id: number;
 	@ManyToMany(() => User, (User) => User.games)
 	player: User[];
+	@Exclude()
 	playerRight: string;
+	@Exclude()
 	playerLeft: string;
+	@Exclude()
 	ball = new Ball;
+	@Exclude()
 	paddleLeft = new Paddle;
+	@Exclude()
 	paddleRight = new Paddle;
+	@Exclude()
 	score = new Score;
+	@Exclude()
 	finished: boolean = false;
-
 	@Column()
 	scoreLeft: number = 0;
 
