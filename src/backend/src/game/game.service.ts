@@ -8,9 +8,15 @@ import { GameSetup } from './game.entities/setup.entity';
 import { QueueElem } from './game.interfaces/queueobj.interface'
 import { UsersService } from 'src/users/users.service';
 import User from 'src/users/entitys/user.entity';
+import { GameData } from './game.entities/gameData';
 
 @Injectable()
 export class GameService {
+  startGame(server: Server, game: Game) {
+    if (game.playerLeft != undefined && game.playerRight != undefined) {
+		this.#startGame(server, game)	
+	}
+  }
   // }
 
 	constructor(
@@ -32,11 +38,15 @@ export class GameService {
 
 
 	getGame(user_id: number | undefined): Game {
-		return this.Samuel.find((value: Game) => { value.playerLeft._id == user_id || value.playerRight._id == user_id})
-	}
+		// console.log("getGame b");
+		// console.log(this.Samuel);
 
-	getPlayerSide(user_id: number) {
-		const game = this.getGame(user_id)
+		return this.Samuel.find((value: Game) =>  value.playerLeft?._id == user_id || value.playerRight?._id == user_id)
+	}
+	
+	getPlayerSide(game: Game, user_id: number) {
+		// console.log(game.playerLeft._id, user_id);
+		
 		if (game != undefined) {
 			if (game.playerLeft._id == user_id) {
 				return Side.left
@@ -47,52 +57,35 @@ export class GameService {
 	}
 
 	handelKeypress(user_id: number, key: string){
-		if (key == "ArrowUp" || key == "w") {
-			this.movePaddleUp()			
-		} else if (key == "ArrowDown" || key == "s") {
-			
+		const game = this.getGame(user_id)
+		if(game != undefined) {
+			if (key == "ArrowUp" || key == "w") {
+				this.movePaddleUp(game, this.getPlayerSide(game, user_id))			
+			} else if (key == "ArrowDown" || key == "s") {
+				this.movePaddleDown(game, this.getPlayerSide(game, user_id))			
+			}
 		}
 	}
 
-	
-
-	async JoinGameOrCreatGame(user: User, server: Server): Promise<Game> {
+	async JoinGameOrCreatGame(user: User, server: Server, user_id?: number): Promise<Game> {
 		let game = this.getGame(undefined)
+		// console.log("getGame", game);
+		
 		if (game == undefined) {
 			game = await this.#createGameInstance()
 			game.playerLeft = user
 			this.Samuel.push(game)
+			console.log("game created", game);
+			if(user_id != undefined) {
+				const player = await this.userService.getUser(user_id)
+				game.playerRight = player
+			}
 		} else {
 			game.playerRight = user
-			this.#startGame(server, game)
 		}
 		return game
 	}
 	
-	// async	addClientIdToQueue(client: Socket, server: Server): Promise<void> {
-	// 	var needle: QueueElem = {
-	// 		id: client.handshake.auth._id.toString(),
-	// 		socket: client,
-	// 	}
-	// 	if (this.queue.find(({id}) => {return id === needle.id}) == undefined) {
-	// 		console.log("add %s to queue", client.handshake.auth._id);
-	// 		this.queue.push({id: client.handshake.auth._id.toString(), socket: client});
-	// 		while (this.queue.length > 1) {
-	// 			await this.#initializeGame(server);
-	// 		}
-	// 	} else {
-	// 		console.log("%s already is in queue", client.handshake.auth._id);
-	// 	}
-	// }
-	
-	// async #initializeGame(server: Server) {
-	// 	let game: Game = await this.#createGameInstance();
-	// 	this.#updateMaps(game);
-	// 	this.#joinSocketsToDedicatedRoom(game);
-	// 	this.#emitGameInfoToFrontend(game);
-	// 	this.#startGame(server, game.id);
-	// }
-
 	async #createGameInstance(): Promise<Game> {
 		console.log('inside createGameInstance()');
 		const setup = new GameSetup;
@@ -103,32 +96,31 @@ export class GameService {
 		return new Game(game.id, setup);
 	}
 
-	// #updateMaps(game: Game) {
-	// 	this.games.set(game.id, game);
-	// 	this.users.set(game.playerRight, game.id);
-	// 	this.users.set(game.playerLeft, game.id);
-	// }
-
-	// #joinSocketsToDedicatedRoom(game: Game) {
-	// 	this.sockets.get(game.id)[0].join(game.id.toString());
-	// 	this.sockets.get(game.id)[1].join(game.id.toString());
-	// }
-
-	// #emitGameInfoToFrontend(game: Game) {
-	// 	this.sockets.get(game.id)[0].emit('gameInfo', {gameId: game.id, side: "left", playerLeft: game.playerLeft, playerRight: game.playerRight});
-	// 	this.sockets.get(game.id)[1].emit('gameInfo', {gameId: game.id, side: "right", playerLeft: game.playerLeft, playerRight: game.playerRight});
-	// }
 
 	async #emitGameData(game: Game, server: Server) {
-		server.to(game.id.toString()).emit('updateGame', await this.getData(game));
+		// console.log("emitGameData");
+		const hi: Game = await this.getData(game)
+		const test: GameData = {
+			ball: hi.ball,
+			paddleLeft: hi.paddleLeft,
+			paddleRight: hi.paddleRight,
+			score: hi.score,
+			finished: hi.finished,
+		}		
+		server.to(game.id.toString()).emit('updateGame', test);
 	}
 
 	async #startGame(server: Server, game: Game) {
-		server.to(game.id.toString()).emit("Game", )
+		server.to(game.id.toString()).emit("Game", game)
+		console.log("startGame");
+		
 		game.interval = setInterval(() => this.#emitGameData(game, server), 16) as unknown as number;
+		console.log("startGame end");
 	}
 
 	async getData(game: Game): Promise<Game | undefined> {
+		// console.log("getData");
+		
 		if (game == undefined) {
 			return undefined;
 		}
@@ -138,6 +130,7 @@ export class GameService {
 			this.#reset(game);
 		}
 		await this.#isGameFinished(game);
+		// console.log("getData ende");
 		return game
 	}
 
@@ -271,8 +264,8 @@ export class GameService {
 		// var game: Game | undefined = this.games.get(id);
 		if (game != undefined && game.finished) {
 			// const gameEntry = this.gameRepository.create({scoreLeft: game.scoreLeft, scoreRight: game.scoreRight});
-			game.playerLeft = await this.userService.getUser(game.playerLeft._id)
-			game.playerRight = await this.userService.getUser(game.playerRight._id)
+			// game.playerLeft = await this.userService.getUser(game.playerLeft._id)
+			// game.playerRight = await this.userService.getUser(game.playerRight._id)
 			await this.gameRepository.save(game);
 			clearInterval(game.interval);
 			const index = this.Samuel.indexOf(game, 0);
@@ -291,8 +284,9 @@ export class GameService {
 	}
 
 	movePaddleUp(game: Game, side: Side) {		
-		// let game: Game = this.games.get(id);
-		if (side = Side.left) {
+		// console.log("movePaddleUp", side);
+		
+		if (side == Side.left) {
 			if (game.paddleLeft.position.y > 0)
 				game.paddleLeft.position.y -= game.paddleLeft.speed;
 		}
@@ -303,8 +297,9 @@ export class GameService {
 	}
 
 	movePaddleDown(game: Game, side: Side) {
-		// let game: Game = this.games.get(id);
-		if (side = Side.left) {
+		// console.log("movePaddleDown", side);
+
+		if (side == Side.left) {
 			if (game.paddleLeft.position.y < (480 - game.paddleLeft.height))
 				game.paddleLeft.position.y += game.paddleLeft.speed;
 		}

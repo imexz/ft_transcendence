@@ -37,7 +37,7 @@ export class FriendGateway {
   }
 
     async handleDisconnect(socket) {
-      console.log("disconnected", socket.handshake);
+      // console.log("disconnected", socket.handshake);
       
       if (socket.handshake.auth != undefined)
         this.usersService.setStatus(socket.handshake.auth._id, UserStatus.OFFLINE)

@@ -20,7 +20,7 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
 			clientSecret: process.env.CLIENT_SECRET,
 			callbackURL: process.env.HOST + ":3000/auth/login/callback",
 			profileFields: {
-				'name.givenName': 'first_name', //username
+				'name.givenName': 'login', //username
 				'id': function (obj) { return String(obj.id); },
 				'image_url': 'image_url',
 			}
@@ -30,7 +30,8 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
 	async validate(accessToken, refreshToken, profile, cb): Promise<any> {
 
 		this.logger.log("validate")
-		// this.logger.log(cb)
+		this.logger.log(profile.name)
+		
 
 		var user = await this.authService.validateUser(profile.id);
 		// this.logger.log("try")

@@ -49,7 +49,7 @@ export class ChatGateway {
      {
       console.log("join");
 
-      console.log(client.handshake);
+      // console.log(client.handshake);
       console.log("join after");
 
       const rooms = await this.chatService.getUserRooms(client.handshake.auth._id)
@@ -106,7 +106,7 @@ export class ChatGateway {
   async findAllMessages(@MessageBody('roomId') roomId: number, @ConnectedSocket() client:Socket,) {
     console.log('findAllMessages');
     console.log(roomId);
-    console.log(client.handshake);
+    // console.log(client.handshake);
     console.log(client.handshake.auth._id);
 
 

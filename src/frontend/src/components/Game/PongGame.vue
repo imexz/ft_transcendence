@@ -1,20 +1,20 @@
 <template>
   <div v-show="gameExists">
     <div class="matchInfo">
-      <div id = "scoreLeft">
-        <UserSummary :user=userLeft!></UserSummary>
+      <div id = "gameData?.score.scoreLeft">
+        <UserSummary :user=game?.playerLeft></UserSummary>
       </div>
       <div>
         vs
       </div>
-      <div id = "scoreRight">
-        <UserSummary :user=userRight!></UserSummary> 
+      <div id = "gameData?.score.scoreRight">
+        <UserSummary :user=game?.playerRight></UserSummary> 
       </div>
     </div>
     <div class="gameCanvas">
       <canvas id="pixi"></canvas>
     </div>
-    <div v-show="!side" class="leaveGame">
+    <div v-show="this.$store.state.user._id!=game?.playerRight?._id && this.$store.state.user._id!=game?.playerLeft?._id"  class="leaveGame">
       <button @click="leaveGame"> Leave </button>
     </div>
 	</div>
@@ -39,11 +39,7 @@
   		return {
         gameExists: false as boolean,
   		  gamesocket: null as Socket,
-  		  // side: null as Side,
-			  leftScore: 0 as number,
-			  rightScore: 0 as number,
-        userLeft: null as User | null,
-        userRight: null as User | null,
+        game: null as Game,
 			  finished: false as boolean,
         fps: 0,
         pixiApp: null,
@@ -75,6 +71,10 @@
             },
             width: 0,
             height: 0
+          },
+          score: {
+            scoreLeft: 0,
+	          scoreRight: 0
           }
         },
         styleData: {
@@ -93,21 +93,15 @@
   		console.log("in created");
       // console.log(this.$store.state);
       
-  		this.gamesocket = this.$store.state.socketGame
-  		this.gamesocket.on('Game', (data: any) => {
-  			// console.log("event gameInfo received");
-        // console.log(data);
-        this.gameExists = true;
-  			// this.side = data.side;
-			  this.finished = false;
-        this.setUserSummary(data);
-			  document.addEventListener('keydown', this.keyEvents, false);
+  		this.$store.state.socketGame.on('Game', (game: Game) => {
+        console.log(game);
+        this.gameExists = true
+        this.asigneGame(game)
 		  });
-		  this.gamesocket.emit('checkGame', (res: boolean) => {
-  			if (!res) {
-  				// console.log("calling checkQueue");
-  				this.gamesocket.emit('checkQueue');
-  			}
+		  this.$store.state.socketGame.emit('checkGame', (game: Game) => {
+        console.log(game);
+        // this.asigneGame(game)
+        
   		});
   		// console.log("leaving created");
   	},
@@ -117,29 +111,28 @@
       //this is starting the drawing loop (rendering @60fps)
       this.pixiApp.ticker.add(this.updatePixi)
   		// console.log("leaving mounted");
+      this.$store.state.socketGame.on('updateGame', this.updateData)
   	},
 		beforeUpdate() {
 			// console.log("in beforeUpdate");
-			if (this.gameExists) {
-				this.gamesocket.on('updateGame', this.updateData)
-		  }
-		// console.log("leaving beforeUpdate");
+			// if (this.gameExists) {
+		  // }
+		console.log("leaving beforeUpdate");
 
 	},
-
   	unmount() {
   		console.log("in unmount");
-  		// delete this.eventSource;
-  		// this.gamesocket.close();
-  		// delete this.gamesocket;
-  		// delete this.position;
-  		// delete this.context;
-  		// delete this.gameId;
-
-      this.gamesocket.off('gameInfo')
-      this.gamesocket.off('updateGame')
+      this.$store.state.socketGame.off('Game')
+      this.$store.state.socketGame.off('updateGame')
   	},
   	methods: {
+      asigneGame(game: Game) {
+        this.game = game
+        if (game.playerRight != undefined) {
+          // this.gameExists = true;
+  			  document.addEventListener('keydown', this.keyEvents, false);
+        }
+      },
       initPixi(){
         let canvas: HTMLElement = document.getElementById('pixi')
 
@@ -212,7 +205,7 @@
         this.pixiScene.endFill()
 
         //score
-        this.pixiScore.left.text = this.leftScore;
+        this.pixiScore.left.text = this.gameData?.score.scoreLeft;
         this.pixiScore.left.style = {
           fill: this.styleData.fgColor,
           fontFamily: 'Arial',
@@ -223,7 +216,7 @@
           this.pixiApp.renderer.width/4 - this.pixiScore.left.width/2;
         this.pixiScore.left.y = 5;
 
-        this.pixiScore.right.text = this.rightScore;
+        this.pixiScore.right.text = this.gameData?.score.scoreRight;
         this.pixiScore.right.style = {
           fill: this.styleData.fgColor,
           fontFamily: 'Arial',
@@ -239,22 +232,21 @@
         // console.log("callback updateGame");
 				if (data === undefined) {
           // console.log("data undefined");
-          this.gameExists = false;
-					this.side = null;
+          // this.gameExists = false;
 					this.left = 0;
 					this.right = 0;
           return;
         }
 				this.finished = data.finished;
-				this.leftScore = data.score.scoreLeft;
-				this.rightScore = data.score.scoreRight;
+				this.gameData.score.scoreLeft = data.score.scoreLeft;
+				this.gameData.score.scoreRight = data.score.scoreRight;
 
         // if (this.leftScore > 4 || this.rightScore > 4)
         //   this.styleData.fgColor = 0xFF0000
 
         // if ()
 
-        switch(Math.max(this.leftScore, this.rightScore)) {
+        switch(Math.max(this.gameData.score.scoreLeft, this.gameData.score.scoreRight)) {
           case 4:
             this.styleData.fgColor = 0xf5ac0e
             break;
@@ -262,37 +254,19 @@
             this.styleData.fgColor = 0xe70038
             break;
         }
-
 				this.gameData.ball = data.ball;
 				this.gameData.paddleLeft = data.paddleLeft;
 				this.gameData.paddleRight = data.paddleRight;
       },
       keyEvents(event) {
         if (!this.finished) {
-          this.gamesocket.emit('key', event.key)
+          console.log(event.key);
+          
+          this.$store.state.socketGame.emit('key', event.key)
         }
       },
-      setUserSummary(data: any) {
-        console.log("setUserSummary");
-        VueAxios({
-          url: '/users/find/' + data.playerLeft.toString(),
-          baseURL: API_URL,
-          method: 'GET',
-          withCredentials: true,
-        })
-          .then(response => { this.userLeft = response.data })
-          .catch();
-        VueAxios({
-          url: '/users/find/' + data.playerRight.toString(),
-          baseURL: API_URL,
-          method: 'GET',
-          withCredentials: true,
-        })
-          .then(response => { this.userRight = response.data })
-          .catch()
-      },
       leaveGame() {
-        this.gamesocket.emit('leaveGame');
+        this.$store.state.socketGame.emit('leaveGame');
         this.$router.push("/");
       }
   	}
