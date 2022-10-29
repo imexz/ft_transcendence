@@ -66,9 +66,11 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
 @SubscribeMessage('leaveGame')
 handleLeaveGame(@ConnectedSocket() client: Socket): void {
-    let game = this.gameService.getGame(client.handshake.auth._id);
-    this.gameService.leaveGame(client.handshake.auth._id, game);
-    client.leave(client.handshake.auth._id.toString())
+    console.log(client.rooms);
+     
+    // let game = this.gameService.getGame(client.handshake.auth._id);
+    // this.gameService.leaveGame(client.handshake.auth._id, game);
+    // client.leave()
   }
 
   @SubscribeMessage('Request')
@@ -82,21 +84,32 @@ handleLeaveGame(@ConnectedSocket() client: Socket): void {
       this.gameService.JoinGameOrCreatGame(client.handshake.auth as User, this.server, id)
       const socket = await this.findSocketOfUser(id)
       socket.emit("Request", {id})
-    } else {
-      client.join(game.id.toString())
-      client.emit("Game", {playerLeft: game.playerLeft, playerRight: game.playerRight})
     }
-    return game.id
+    return {playerLeft: game.playerLeft, playerRight: game.playerRight}
   }
+
+  @SubscribeMessage('ViewGame')
+  async viewRequest(
+  @ConnectedSocket() client: Socket,
+  @MessageBody('id') id?: number)
+  {
+    const game: Game = this.gameService.getGame(id)
+    if(game != undefined) {
+      client.join(game.id.toString())
+    }
+    return {playerLeft: game.playerLeft, playerRight: game.playerRight}
+  }
+
+
   
-    async findSocketOfUser(userId: number) {
-      const sockets = await this.server.fetchSockets();
-      for (const socket of sockets) {
-        if(socket.handshake.auth._id == userId)
-        {
-          console.log("gameRequest test");
-          return socket
-        }
+  async findSocketOfUser(userId: number) {
+    const sockets = await this.server.fetchSockets();
+    for (const socket of sockets) {
+      if(socket.handshake.auth._id == userId)
+      {
+        console.log("gameRequest test");
+        return socket
       }
     }
+  }
 }

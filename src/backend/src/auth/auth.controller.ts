@@ -59,7 +59,7 @@ export class AuthController{
 			false,
 		) + '; Max-Age=0')
 	}
-
+	
 	// @Get('protected')
 	// @UseGuards(JwtAuthGuard)
 	// getusers(@Request() req): string {
@@ -77,7 +77,6 @@ export class AuthController{
 	// deleteUser(@Param('id') id: number) {
 	// 	return this.authService.deleteUser(id);
 	// }
-
 
 	// @Get(':id')
 	// @UseGuards(JwtAuthGuard)

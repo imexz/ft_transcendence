@@ -8,6 +8,9 @@
         <button class="dmButton">Send</button>
       </form>
     </div>
+    <div v-if="showGame" class="dmPopUp">
+      <ViewGamePopup @actions="viewGame" :game="game" />
+    </div>
     <div class="normalView">
       <img :src="user?.avatar_url" alt="Avatar">
       <span>{{ user?.username }}</span>
@@ -63,19 +66,28 @@
 
 <script lang="ts">
 
-import VueAxios from 'axios';
-import { API_URL } from '@/defines';
 import { defineComponent } from 'vue';
-import { RequestEnum } from '@/enums/models/RequestEnum';
 import { Status } from '@/enums/models/ResponseEnum';
+import ViewGamePopup from '../Game/ViewGamePopup.vue';
+import GamePlayers from '../Game/GamePlayers.vue';
+import { defineAsyncComponent } from 'vue'
+
+import Game from '@/models/game';
 
 export default defineComponent({
+  components: {
+    ViewGamePopup: defineAsyncComponent(()=> import('../Game/ViewGamePopup.vue'))
+    // ViewGamePopup: () => import('../Game/ViewGamePopup.vue')
+    // ViewGamePopup
+  },
   data() {
     return {
       show: false as boolean,
       showDm: false as boolean,
       msgText: "" as string,
-      Status
+      Status,
+      showGame: false as boolean,
+      game: null as Game,
     }
   },
   props : {
@@ -128,9 +140,20 @@ export default defineComponent({
     },
     askForMatch(){
       this.$store.state.socketGame.emit('Request', {id: this.user._id}, (r) => {
-        this.$router.push('/play/' + r.toString())
+        // this.$router.push('/play/')
+        this.showGame = !this.showGame
+        this.game = r 
       })
       console.log("AskForMatch");
+    },
+    viewGame(){      
+      this.$store.state.socketGame.emit('ViewGame', {id: this.user._id}, () => {
+        this.showGame = !this.showGame
+        console.log(this.game);
+        
+        this.$router.push({name: 'playSpetate', params: this.game})
+      })
+      console.log("viewGame");
     },
     toggleDm(){
       if (this.showDm)
@@ -168,6 +191,7 @@ export default defineComponent({
     position: relative;
     /* width: 316px; */
     min-width: 253px;
+    /* width: 253px; */
     border: 2px solid;
     border-image: linear-gradient(90deg, var(--ft_cyan), var(--ft_pink)) 1;
   }

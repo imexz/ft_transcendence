@@ -309,15 +309,15 @@ export class GameService {
 		}
 	}
 
-	leaveGame(user_id: number, game: Game) {
+	// leaveGame(user_id: number, game: Game) {
 
-		if (user_id === game.playerLeft._id || user_id === game.playerRight._id) {
-			// this.intervals.delete(gameId);
-		} else {
-			console.log("leaveGame gid", game.id, typeof game.id);
-			console.log("leaveGame uid", user_id, typeof user_id);
-		}
-	}
+	// 	if (user_id === game.playerLeft._id || user_id === game.playerRight._id) {
+	// 		// this.intervals.delete(gameId);
+	// 	} else {
+	// 		console.log("leaveGame gid", game.id, typeof game.id);
+	// 		console.log("leaveGame uid", user_id, typeof user_id);
+	// 	}
+	// }
 
 	async getMatchHistory(user: User){
 	// 	return await this.gameRepository.find({ 

@@ -48,9 +48,12 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import('../views/PlayView.vue')
   },
   {
-    path: '/play/:id',
+    path: '/play/',
     name: 'playSpetate',
-    props: {isCreated: true},
+    props: (route) => ({
+      game: route.params,
+      gameExists: true
+    }),
     component: () => import('../views/PlayView.vue')
   },
   {

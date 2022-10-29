@@ -1,16 +1,6 @@
 <template>
   <div v-show="gameExists">
-    <div class="matchInfo">
-      <div id = "gameData?.score.scoreLeft">
-        <UserSummary :user=game?.playerLeft></UserSummary>
-      </div>
-      <div>
-        vs
-      </div>
-      <div id = "gameData?.score.scoreRight">
-        <UserSummary :user=game?.playerRight></UserSummary> 
-      </div>
-    </div>
+      <GamePlayers :game="game" />
     <div class="gameCanvas">
       <canvas id="pixi"></canvas>
     </div>
@@ -24,15 +14,12 @@
 </template>
 
 <script lang="ts">
-  import { io, Socket } from "socket.io-client";
-  import { API_URL } from '@/defines';
+  import { Socket } from "socket.io-client";
   import { defineComponent } from 'vue';
   import * as PIXI from 'pixi.js';
-  import UserSummary from '@/components/Profile/UserSummary.vue'
-  import VueAxios from 'axios';
-  import User from '@/models/user';
   import Game from '@/models/game';
-  import {Side} from'@/enums/models/SideEnum';
+  import GamePlayers from './GamePlayers.vue'
+
 
   export default defineComponent({
   	data () {
@@ -84,8 +71,8 @@
   		}
   	},
   	components: {
-      UserSummary,
-  	},
+      GamePlayers
+    },
     props: {
       gameExists: Boolean,
     },
@@ -98,11 +85,13 @@
         this.gameExists = true
         this.asigneGame(game)
 		  });
-		  this.$store.state.socketGame.emit('checkGame', (game: Game) => {
-        console.log(game);
-        // this.asigneGame(game)
-        
-  		});
+      if (this.gameExists == false) {
+        this.$store.state.socketGame.emit('checkGame', (game: Game) => {
+          console.log(game);
+          // this.asigneGame(game)
+          
+        });
+      }
   		// console.log("leaving created");
   	},
   	mounted() {
@@ -129,7 +118,6 @@
       asigneGame(game: Game) {
         this.game = game
         if (game.playerRight != undefined) {
-          // this.gameExists = true;
   			  document.addEventListener('keydown', this.keyEvents, false);
         }
       },
@@ -240,6 +228,11 @@
 				this.finished = data.finished;
 				this.gameData.score.scoreLeft = data.score.scoreLeft;
 				this.gameData.score.scoreRight = data.score.scoreRight;
+        console.log(this.gameData.score.scoreLeft, this.gameData.score.scoreRight);
+        if (this.gameData.score.scoreLeft == 10 ||  this.gameData.score.scoreRight == 10) {
+          this.gameExists = false
+        }
+        
 
         // if (this.leftScore > 4 || this.rightScore > 4)
         //   this.styleData.fgColor = 0xFF0000
