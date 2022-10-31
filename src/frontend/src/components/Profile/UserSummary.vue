@@ -140,9 +140,8 @@ export default defineComponent({
     },
     askForMatch(){
       this.$store.state.socketGame.emit('Request', {id: this.user._id}, (r) => {
-        // this.$router.push('/play/')
+        // this.$router.push('/play/')    
         this.showGame = !this.showGame
-        this.game = r
         this.$store.state.game = r
       })
       console.log("AskForMatch");
@@ -150,8 +149,6 @@ export default defineComponent({
     viewGame(){      
       this.$store.state.socketGame.emit('ViewGame', {id: this.user._id}, () => {
         this.showGame = !this.showGame
-        console.log(this.game);
-        this.$store.state.game = this.game
         this.$router.push('/play')
       })
       console.log("viewGame");

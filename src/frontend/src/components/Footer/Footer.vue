@@ -1,8 +1,7 @@
 <template>
   <div class="footer">
-    <div class="dropUp">
+      <AskForGame v-if="this.$store.state.gameRequest != null"/>
       <FriendList></FriendList>
-    </div>
   </div>
 </template>
 
@@ -10,13 +9,14 @@
 
 import { defineComponent } from 'vue';
 import FriendList from '@/components/Footer/FriendList.vue';
+import AskForGame from '@/components/Game/AskForGame.vue'
 
 export default defineComponent({
   components: {
     FriendList,
+    AskForGame
   }
 })
-
 </script>
 
 <style scoped>

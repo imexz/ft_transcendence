@@ -15,7 +15,6 @@ import { Game, Side } from './game.entities/game.entity';
 import User from 'src/users/entitys/user.entity';
 import { GameData } from './game.entities/gameData';
 
-
 @WebSocketGateway({
   namespace: 'game',
 	cors: {
@@ -85,16 +84,47 @@ handleLeaveGame(@ConnectedSocket() client: Socket): void {
   @SubscribeMessage('Request')
   async gameRequest(
   @ConnectedSocket() client: Socket,
-  @MessageBody('id') id?: number)
+  @MessageBody('id') id?: number
+  )
   {
-    const game: Game = this.gameService.getGame(id)
+    var game: Game = this.gameService.getGame(id)
     if(game == undefined)
     {
-      this.gameService.JoinGameOrCreatGame(client.handshake.auth as User, this.server, id)
       const socket = await this.findSocketOfUser(id)
-      socket.emit("Request", {id})
+      socket.emit("Request", client.handshake.auth as User)
+      game = await this.gameService.JoinGameOrCreatGame(client.handshake.auth as User, this.server, id)
+      client.emit("NowInGame", {playerLeft: game.playerLeft, playerRight: game.playerRight})
     }
-    return {playerLeft: game.playerLeft, playerRight: game.playerRight}
+  return {playerLeft: game.playerLeft, playerRight: game.playerRight}
+  }
+
+  @SubscribeMessage('accept')
+  creatGame(
+    @ConnectedSocket() client: Socket,
+  ) {
+    var game: Game = this.gameService.getGame(client.handshake.auth._id)
+    if(game != undefined && game.interval == null) {
+      this.gameService.startGame(this.server, game)
+      console.log("game strated");
+      
+    }
+  }
+
+  @SubscribeMessage('denide')
+  removeGame(
+    @ConnectedSocket() client: Socket,
+  ) {
+    var game: Game = this.gameService.getGame(client.handshake.auth._id)
+    if(game != undefined && game.interval == null)
+      this.gameService.removeGame(game)
+  }
+
+
+  @SubscribeMessage('Quit')
+  quitGame(
+  @ConnectedSocket() client: Socket,
+  ) {
+      this.gameService.removePlayerFromWaiting(client.handshake.auth._id)
   }
 
   @SubscribeMessage('ViewGame')
@@ -108,8 +138,6 @@ handleLeaveGame(@ConnectedSocket() client: Socket): void {
     }
     return {playerLeft: game.playerLeft, playerRight: game.playerRight}
   }
-
-
   
   async findSocketOfUser(userId: number) {
     const sockets = await this.server.fetchSockets();

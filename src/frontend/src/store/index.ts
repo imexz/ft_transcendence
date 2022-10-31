@@ -21,7 +21,7 @@ export interface State {
   friendsList: User[] | null
   NrMessages: number
   NrFriendRequests: number
-  gameRequest: boolean
+  gameRequest: User | null
   rooms: []
   game: Game | null
 }
@@ -29,8 +29,8 @@ export interface State {
 const storage = localStorage.getItem('user')
 const user = storage?JSON.parse(storage):null;
 const initialState = user?
-  {validated: true, user: user, socket: null,  socketChat: null,  socketGame: null, friendsList: null, NrMessages: 0, NrFriendRequests: 0, gameRequest: false, game: null}:
-  {validated: false, user: null,  socket: null,  socketChat: null,  socketGame: null, friendsList: null, NrMessages: 0, NrFriendRequests: 0, gameRequest: false, game: null};
+  {validated: true, user: user, socket: null,  socketChat: null,  socketGame: null, friendsList: null, NrMessages: 0, NrFriendRequests: 0, gameRequest: null, game: null}:
+  {validated: false, user: null,  socket: null,  socketChat: null,  socketGame: null, friendsList: null, NrMessages: 0, NrFriendRequests: 0, gameRequest: null, game: null};
 
 export default createStore<State>({
 
@@ -81,10 +81,15 @@ export default createStore<State>({
       state.socketChat.on('message',() => {
         state.NrMessages++
       })
-      state.socketGame.on('Request',(id: number, type: RequestEnum) => {
-        state.gameRequest = true;
-        console.log("id", id, "type", type)
+      state.socketGame.on('Request',(user: User) => {
+        state.gameRequest = user;
+        console.log("id", state.gameRequest)
         console.log("askformatch");
+      })
+      state.socketGame.on('NowInGame', (game: Game) => {
+        state.game = game;
+        console.log("NowInGame");
+        router.push('/play')
       })
 
       state.socket.on('Request',(data) => {

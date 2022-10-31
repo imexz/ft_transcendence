@@ -48,15 +48,6 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import('../views/PlayView.vue')
   },
   {
-    path: '/play/',
-    name: 'playSpetate',
-    props: (route) => ({
-      game: route.params,
-      gameExists: true
-    }),
-    component: () => import('../views/PlayView.vue')
-  },
-  {
     path: '/chat',
     name: 'Chats',
     component: () => import('../views/Chats.vue')

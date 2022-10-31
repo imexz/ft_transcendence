@@ -39,7 +39,7 @@ export class GameData {
             this.score.increaseLeft = gsetup.scoreIncrease;
             this.score.increaseRight = gsetup.scoreIncrease;
 
-            this.finished = false;
+            // this.finished = false;
         }
     }
 	@Exclude()
@@ -50,6 +50,6 @@ export class GameData {
 	paddleRight: Paddle;
 	@Exclude()
 	score: Score;
-	@Exclude()
-	finished: boolean = false;
+	// @Exclude()
+	// finished: boolean = false;
 }

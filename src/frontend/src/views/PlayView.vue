@@ -1,6 +1,6 @@
 <template>
   <div class="gameWrapper">
-    <PongGame :gameExists="isCreated"/>
+    <PongGame />
 	<!-- <GameMenu /> -->
   </div>
 </template>
@@ -15,10 +15,7 @@ export default defineComponent({
   components: {
     PongGame,
     GameMenu
-},
-  props: {
-    isCreated: Boolean,
-  }
+}
 })
 
 </script>
