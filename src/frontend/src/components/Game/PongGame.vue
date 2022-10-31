@@ -1,14 +1,14 @@
 <template>
-  <div v-show="gameExists">
-      <GamePlayers :game="game" />
+  <div v-show="this.$store.state.game != null">
+      <GamePlayers/>
     <div class="gameCanvas">
       <canvas id="pixi"></canvas>
     </div>
-    <div v-show="this.$store.state.user._id!=game?.playerRight?._id && this.$store.state.user._id!=game?.playerLeft?._id"  class="leaveGame">
+    <div v-show="this.$store.state.user._id!=this.$store.state.game?.playerRight?._id && this.$store.state.user._id!=this.$store.state.game?.playerLeft?._id"  class="leaveGame">
       <button @click="leaveGame"> Leave </button>
     </div>
 	</div>
-	<div class="queue" v-show="!gameExists">
+	<div class="queue" v-show="this.$store.state.game == null">
 		Waiting for a match...
 	</div>
 </template>
@@ -24,9 +24,9 @@
   export default defineComponent({
   	data () {
   		return {
-        gameExists: false as boolean,
+        // gameExists: false as boolean,
   		  gamesocket: null as Socket,
-        game: null as Game,
+        // game: null as Game,
 			  finished: false as boolean,
         fps: 0,
         pixiApp: null,
@@ -73,19 +73,19 @@
   	components: {
       GamePlayers
     },
-    props: {
-      gameExists: Boolean,
-    },
+    // props: {
+    //   gameExists: Boolean,
+    // },
   	created() { // always called when Component is initialized (e.g. on refresh)
   		console.log("in created");
       // console.log(this.$store.state);
       
   		this.$store.state.socketGame.on('Game', (game: Game) => {
         console.log(game);
-        this.gameExists = true
+        // this.gameExists = true
         this.asigneGame(game)
 		  });
-      if (this.gameExists == false) {
+      if (this.$store.state.game == null) {
         this.$store.state.socketGame.emit('checkGame', (game: Game) => {
           console.log(game);
           // this.asigneGame(game)
@@ -116,8 +116,8 @@
   	},
   	methods: {
       asigneGame(game: Game) {
-        this.game = game
-        if (game.playerRight != undefined) {
+        this.$store.state.game = game
+        if (this.$store.state.game.playerRight != undefined) {
   			  document.addEventListener('keydown', this.keyEvents, false);
         }
       },
@@ -230,7 +230,7 @@
 				this.gameData.score.scoreRight = data.score.scoreRight;
         console.log(this.gameData.score.scoreLeft, this.gameData.score.scoreRight);
         if (this.gameData.score.scoreLeft == 10 ||  this.gameData.score.scoreRight == 10) {
-          this.gameExists = false
+          this.$store.state.game = null
         }
         
 
@@ -260,6 +260,7 @@
       },
       leaveGame() {
         this.$store.state.socketGame.emit('leaveGame');
+        this.$store.state.game = null
         this.$router.push("/");
       }
   	}

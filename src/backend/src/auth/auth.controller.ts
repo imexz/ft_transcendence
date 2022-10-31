@@ -66,7 +66,6 @@ export class AuthController{
 	// 	return "test"
 	// }
 
-
 	// @Get('getall')
 	// @UseGuards(JwtAuthGuard)
 	// getall(@Request() req) {

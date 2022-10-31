@@ -7,6 +7,7 @@ import VueAxios from 'axios';
 import { API_URL } from '@/defines';
 import { io, Socket } from 'socket.io-client'
 import { RequestEnum } from '@/enums/models/RequestEnum';
+import Game from '@/models/game';
 
 
 
@@ -22,14 +23,14 @@ export interface State {
   NrFriendRequests: number
   gameRequest: boolean
   rooms: []
-
+  game: Game | null
 }
 
 const storage = localStorage.getItem('user')
 const user = storage?JSON.parse(storage):null;
 const initialState = user?
-  {validated: true, user: user, socket: null,  socketChat: null,  socketGame: null, friendsList: null, NrMessages: 0, NrFriendRequests: 0, gameRequest: false}:
-  {validated: false, user: null,  socket: null,  socketChat: null,  socketGame: null, friendsList: null, NrMessages: 0, NrFriendRequests: 0, gameRequest: false};
+  {validated: true, user: user, socket: null,  socketChat: null,  socketGame: null, friendsList: null, NrMessages: 0, NrFriendRequests: 0, gameRequest: false, game: null}:
+  {validated: false, user: null,  socket: null,  socketChat: null,  socketGame: null, friendsList: null, NrMessages: 0, NrFriendRequests: 0, gameRequest: false, game: null};
 
 export default createStore<State>({
 

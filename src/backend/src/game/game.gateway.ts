@@ -50,7 +50,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
       console.log("handleCheckGame");
       client.join(game.id.toString());
       this.gameService.startGame(this.server, game)
-		} else {
+		} else if(game.playerRight != undefined) {
       client.join(game.id.toString());
       client.emit("Game", {playerLeft: game.playerLeft, playerRight: game.playerRight})
     }
@@ -66,7 +66,16 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
 @SubscribeMessage('leaveGame')
 handleLeaveGame(@ConnectedSocket() client: Socket): void {
-    console.log(client.rooms);
+  console.log("leaveGame");
+  client.rooms.forEach(element => {
+    if(element != client.id)
+      client.leave(element)
+    
+  });
+  console.log(client.rooms);
+  console.log(client.id);
+  
+  console.log("leaveGame ende");
      
     // let game = this.gameService.getGame(client.handshake.auth._id);
     // this.gameService.leaveGame(client.handshake.auth._id, game);
