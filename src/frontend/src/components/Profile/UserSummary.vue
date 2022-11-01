@@ -13,7 +13,12 @@
     </div>
     <div class="normalView">
       <img :src="user?.avatar_url" alt="Avatar">
-      <span>{{ user?.username }}</span>
+      <div>
+        <span>{{ user?.username }}</span>
+      <div>
+        <text class="status"> {{ UserStatus[user?.userStatus] }} </text>
+      </div>
+      </div>
       <div v-if="user?.friendStatus == Status.requsted" >
         <button @click="response(2)"> accept  </button>
         <button @click="response(3)"> deny </button>
@@ -71,6 +76,7 @@ import { Status } from '@/enums/models/ResponseEnum';
 import ViewGamePopup from '../Game/ViewGamePopup.vue';
 import GamePlayers from '../Game/GamePlayers.vue';
 import { defineAsyncComponent } from 'vue'
+import{ UserStatus }from '@/models/user'
 
 import Game from '@/models/game';
 
@@ -85,7 +91,8 @@ export default defineComponent({
       show: false as boolean,
       showDm: false as boolean,
       msgText: "" as string,
-      Status,
+      Status: Status,
+      UserStatus: UserStatus,
       showGame: false as boolean,
       game: null as Game,
     }
@@ -293,5 +300,13 @@ export default defineComponent({
     border-radius: 5px;
     margin-top: 10px;
     width: 85%;
+  }
+
+  .status {
+    font-family: Avenir, Helvetica, Arial, sans-serif;
+    resize: none;
+    color: var(--ft_cyan);
+    background-color: var(--ft_dark);
+    font-size: 10px
   }
 </style>

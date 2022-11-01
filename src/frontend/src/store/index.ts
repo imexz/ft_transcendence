@@ -93,7 +93,6 @@ export default createStore<State>({
       })
 
       state.socket.on('Request',(data) => {
-        //id:number + type:RequestEnum
         state.friendsList.push(data)
           console.log("recive  request");
       })

@@ -41,9 +41,9 @@ export class UsersService {
 
 	async findAll(id: number): Promise<User[]> {
 		// console.log("findAll");
-		const user = await this.usersRepository.find({ where: {_id: Not(id)}});
+		const users = await this.usersRepository.find({ where: {_id: Not(id)}});
 		// console.log(user);
-		return user
+		return users
 	}
 
 	async getUser(id: number): Promise<User> {

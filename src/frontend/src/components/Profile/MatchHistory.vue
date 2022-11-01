@@ -6,7 +6,7 @@
       </div>
       <div>
         <MatchStatistics
-          :totalGames="totalGames"
+          :totalGames="matchData.length"
           :winCount="winCount"
           :lossCount="lossCount" />
       </div>
@@ -38,39 +38,7 @@ import VueAxios from 'axios';
 export default defineComponent({
   data() {
     return {
-      matchData: [
-      { opponent: 1, myScore: 6, opponentScore: 10 },
-      { opponent: 1, myScore: 6, opponentScore: 10 },
-      { opponent: 1, myScore: 6, opponentScore: 10 },
-      { opponent: 1, myScore: 6, opponentScore: 10 },
-      { opponent: 1, myScore: 6, opponentScore: 10 },
-      { opponent: 1, myScore: 6, opponentScore: 10 },
-      { opponent: 1, myScore: 6, opponentScore: 10 },
-      { opponent: 1, myScore: 6, opponentScore: 10 },
-      { opponent: 1, myScore: 6, opponentScore: 10 },
-      { opponent: 1, myScore: 6, opponentScore: 10 },
-      { opponent: 1, myScore: 6, opponentScore: 10 },
-      { opponent: 1, myScore: 6, opponentScore: 10 },
-      { opponent: 1, myScore: 6, opponentScore: 10 },
-      { opponent: 2, myScore: 10, opponentScore: 3},
-      { opponent: 2, myScore: 10, opponentScore: 3},
-      { opponent: 2, myScore: 10, opponentScore: 3},
-      { opponent: 2, myScore: 10, opponentScore: 3},
-      { opponent: 2, myScore: 10, opponentScore: 3},
-      { opponent: 2, myScore: 10, opponentScore: 3},
-      { opponent: 2, myScore: 10, opponentScore: 3},
-      { opponent: 2, myScore: 10, opponentScore: 3},
-      { opponent: 2, myScore: 10, opponentScore: 3},
-      { opponent: 1, myScore: 6, opponentScore: 10 },
-      { opponent: 1, myScore: 6, opponentScore: 10 },
-      { opponent: 2, myScore: 10, opponentScore: 3},
-      { opponent: 1, myScore: 6, opponentScore: 10 },
-      { opponent: 2, myScore: 10, opponentScore: 3},
-      { opponent: 2, myScore: 10, opponentScore: 3},
-      { opponent: 1, myScore: 6, opponentScore: 10 },
-      { opponent: 2, myScore: 10, opponentScore: 3},
-      ] as MatchData[],
-      totalGames: 0 as number,
+      matchData: [] as MatchData[],
       winCount: 0 as number,
       lossCount: 0 as number, 
 
@@ -99,15 +67,16 @@ export default defineComponent({
         console.log(response);
         if(response != null)
           console.log("match Data", response.data);
+          this.matchData = response.data
+          this.matchData.forEach(match => {
+            if (match?.scoreLeft > match?.scoreRight && match?.playerLeft == null ||
+                match?.scoreLeft < match?.scoreRight && match?.playerRight == null)
+              this.winCount++;
+            else
+              this.lossCount++;
+          });
         })
         .catch(error => { this.$emit('actions', 'error') }) 
-      this.totalGames = this.matchData.length;
-      for (let i = 0; i < this.totalGames; ++i) {
-        if (this.matchData[i].myScore > this.matchData[i].opponentScore)
-          this.winCount++;
-        else if (this.matchData[i].myScore < this.matchData[i].opponentScore)
-          this.lossCount++;
-      }
     }
   },
   mounted() {

@@ -1,15 +1,14 @@
 <template>
   <div class="matchSummary">
     <div>
-      <span class="win" v-if="match?.myScore > match?.opponentScore">Win</span>
-      <span class="loss" v-else-if="match?.myScore < match?.opponentScore">Loss</span>
-      <span class="draw" v-else>Draw</span>
+      <span class="win" v-if="win">Win</span>
+      <span class="loss" v-else>Loss</span>
     </div>
     <div>
-      <span>{{ match.myScore }} : {{ match.opponentScore }}</span>
+      <span>{{ match.scoreLeft }} : {{ match.scoreRight }}</span>
     </div>
     <div>
-      <UserSummary :user=user! ></UserSummary>
+      <UserSummary :user=get ></UserSummary>
     </div>
   </div>
 </template>
@@ -30,23 +29,26 @@ export default defineComponent({
       default: null,
     },
   },
-  data() {
-    return {
-      user: null as User | null,
-    }
-  },
   components: {
     UserSummary,
   },
   created() {
-    VueAxios({
-      url: '/users/find/' + this.match?.opponent,
-      baseURL: API_URL,
-      method: 'GET',
-      withCredentials: true,
-    })
-      .then(response => { this.user = response.data })
-      .catch()
+    // console.log(this.match);
+    
+  },
+  computed: {
+      get() {
+        console.log("compute");
+        return this.match.playerLeft != null ? this.match.playerLeft : this.match.playerRight;
+      },
+      win() {
+        if (this.match?.scoreLeft > this.match?.scoreRight && this.match?.playerLeft == null ||
+        this.match?.scoreLeft < this.match?.scoreRight && this.match?.playerRight == null) {
+          return true
+      }
+      return false
+      }
+
   }
 })
 

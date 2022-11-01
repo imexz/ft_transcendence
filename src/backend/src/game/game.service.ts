@@ -237,7 +237,11 @@ export class GameService {
 			game.ball.direction.x = game.ball.direction.speed * Math.cos(game.ball.direction.angle);
 			game.ball.direction.y = game.ball.direction.speed * Math.sin(game.ball.direction.angle); // * 0.1
 		}
-		while (game.ball.direction.x < 0.2 + 0.5 && game.ball.direction.y < 0.2 + 0.5 && game.ball.direction.y < game.ball.direction.x * 0.1);
+		while (game.ball.direction.x > 0.2 && game.ball.direction.x < -0.2 &&
+		 - 0.2 > game.ball.direction.y && game.ball.direction.y > 0.2 &&
+		 game.ball.direction.y > game.ball.direction.x * 10);
+		console.log(game.ball.direction.x, game.ball.direction.y);
+		
 		// console.log("dir x: %d | dir y: %d | angle: %d", game.ball.direction.x, game.ball.direction.y, game.ball.direction.angle);
 		game.ball.radius = this.setup.ballRadius;
 
@@ -324,12 +328,23 @@ export class GameService {
 	// 		}
 	// 	})
 	// }
+	if (user == undefined) {
+		console.log("user == undefind");
+		
+	}
+	console.log("user._id", user._id, typeof(user._id));
+	
 
 		return await this.gameRepository.createQueryBuilder("game")
 		// .innerJoinAndSelect("game.player", "player", "player._id = :id", { id: user._id})
-		.innerJoin("game.player", "tmp")
-		.where("tmp._id = :te", {te: user._id})
-		.innerJoinAndSelect("game.player", "player", "player._id != :id", { id: user._id})
+		.leftJoin('game.playerRight', 'tmp', 'tmp._id = :id', { id: user._id as number} )
+		.leftJoin('game.playerLeft', 'tmp1', 'tmp1._id = :idd', { idd: user._id  as number})
+		.leftJoinAndSelect('game.playerRight', 'playerRight', 'playerRight._id != :iid', { iid: user._id} )
+		.leftJoinAndSelect('game.playerLeft', 'playerLeft', 'playerLeft._id != :iidd', { iidd: user._id})
+		.where("game.playerRight._id = :te", {te: user._id})
+		.orWhere("game.playerLeft._id = :te1", {te1: user._id})
+		// .innerJoinAndSelect("game.playerRight", "playerRight", "playerRight._id != :id", { id: user._id} )
+		// .innerJoinAndSelect("game.player", "player", "player._id != :id", { id: user._id})
 		// .select("'scoreLeft'")
 		.getMany()
 	}
