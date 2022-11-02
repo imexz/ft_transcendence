@@ -4,6 +4,14 @@
       <font-awesome-icon icon="fa-solid fa-magnifying-glass" />
     </button>
     <div v-if="show" class="searchPopUp">
+      <div class="topLine">
+        <div class="name">
+          Search
+        </div>
+        <div class="exitButton" @click="toggleSearchBar">
+          <font-awesome-icon icon="fa-solid fa-x" />
+        </div>
+      </div>
       <input 
         type="text"
         class="searchInput"
@@ -122,9 +130,34 @@ export default defineComponent({
     border-radius: 10px;
   }
   
+  .topLine{
+    margin: 20px 20px 15px 20px;
+    padding-bottom: 5px;
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--ft_cyan);
+    align-content: center;
+  }
+  .name {
+    text-align: center;
+    font-size: 25px;
+    font-weight: bold;
+  }
+  .exitButton {
+    width: 20px;
+    height: 20px;
+    padding: 3px;
+    border-radius: 50%;
+    border: 2px solid var(--ft_pink);
+    color: var(--ft_pink);
+  }
+  .exitButton:hover {
+    color: var(--ft_dark);
+    background-color: var(--ft_pink);
+  }
   
   .searchInput {
-    display: inline-block;
+    /* display: inline-block; */
     height: 60px;
     width: 380px; 
     color: var(--ft_cyan);
@@ -132,13 +165,12 @@ export default defineComponent({
     font-size: 25px;
     font-weight: bold;
     border: 1px solid var(--ft_cyan);
-    margin-top: 18px;
     padding: 0px 10px 0px 10px;
   }
 
   .searchResults{
     display: inline-block;
-    height: calc(600px - 60px - 20px - 18px - 18px);
+    height: calc(600px - 60px - 20px - 18px - 18px - 60px);
     width: 404px;
     margin-top: 18px;
     border: 1px solid var(--ft_cyan);

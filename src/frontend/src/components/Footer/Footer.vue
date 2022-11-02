@@ -1,7 +1,7 @@
 <template>
   <div class="footer">
       <AskForGame v-if="this.$store.state.gameRequest != null"/>
-      <FriendList></FriendList>
+      <FriendList v-if="$store.state.validated"></FriendList>
   </div>
 </template>
 
