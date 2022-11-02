@@ -87,9 +87,6 @@ import{ UserStatus }from '@/models/user'
 import Game from '@/models/game';
 
 export default defineComponent({
-  // components: {
-  //   ViewGamePopup: defineAsyncComponent(()=> import('../Game/ViewGamePopup.vue'))
-  // },
   components: {
     ViewGamePopup,
   },
@@ -156,6 +153,7 @@ export default defineComponent({
       this.show = !this.show
     },
     askForMatch(){
+      this.closeDmPopUp()
       this.$store.state.socketGame.emit('Request', {id: this.user._id}, (r) => { 
         this.showGame = !this.showGame
         this.$store.state.game = r
@@ -179,6 +177,7 @@ export default defineComponent({
     openDmPopUp(){
       window.addEventListener('click', this.hideDm)
       this.showDm = true;
+      this.showGame = false;
     },
     closeDmPopUp(){
       window.removeEventListener('click', this.hideDm)
@@ -278,7 +277,8 @@ export default defineComponent({
   }
   .dmPopUp {
     position: absolute;
-    top: 100px;
+    top: 108px;
+    left: -2px;
     width: 100%;
     /* height: 350px; */
     color: var(--ft_cyan);

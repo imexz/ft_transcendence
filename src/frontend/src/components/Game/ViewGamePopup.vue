@@ -1,12 +1,11 @@
 <template>
   <div class="popUp1">
-    <!-- {{userId}} -->
     <div v-if="$store.state.game != null">
       <div v-if="userId != $store.state.game.playerRight._id">
-        {{$store.state.game.playerRight.username}}
+        Playing against {{$store.state.game.playerRight.username}}
       </div>
       <div v-if="userId != $store.state.game.playerLeft._id">
-        {{$store.state.game.playerLeft.username}}
+        Playing against {{$store.state.game.playerLeft.username}}
       </div>
     </div>
     <div>
@@ -39,7 +38,7 @@ export default defineComponent({
     },
     reEmit() {
       // console.log("COM", emitMsg)
-      this.$emit('actions', "test")
+      this.$emit('actions', "view")
     }
   }
 })
