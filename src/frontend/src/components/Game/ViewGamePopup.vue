@@ -1,7 +1,13 @@
 <template>
   <div class="popUp1">
-    <div>
-      <GamePlayers :game="game" />
+    <!-- {{userId}} -->
+    <div v-if="$store.state.game != null">
+      <div v-if="userId != $store.state.game.playerRight._id">
+        {{$store.state.game.playerRight.username}}
+      </div>
+      <div v-if="userId != $store.state.game.playerLeft._id">
+        {{$store.state.game.playerLeft.username}}
+      </div>
     </div>
     <div>
       <button @click="reEmit" >
@@ -15,22 +21,18 @@
 </template>
 
 <script lang="ts">
-import GamePlayers from './GamePlayers.vue'
 import Game from '@/models/game';
+import User from '@/models/user';
+import { defineComponent } from 'vue';
 
-export default {
+export default defineComponent({
   props: {
-      // game: Game
-        game: {
-            type: Object,
-            default: null,
+        userId: {
+          type: Number,
+          default: 0
         }
 
   },
-  components: {
-    // GamePlayers: () => import('./GamePlayers.vue')
-    GamePlayers
-  },  
   methods: {
     closePopUp() {
       this.$emit('actions', 'exit')
@@ -40,7 +42,7 @@ export default {
       this.$emit('actions', "test")
     }
   }
-}
+})
 </script>
 
 <style scoped>

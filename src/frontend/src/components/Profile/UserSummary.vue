@@ -9,19 +9,25 @@
       </form>
     </div>
     <div v-if="showGame" class="dmPopUp">
-      <ViewGamePopup @actions="viewGame" :game="game" />
+      <ViewGamePopup @actions="viewGame" :game="game" :userId="user._id" />
     </div>
     <div class="normalView">
       <img :src="user?.avatar_url" alt="Avatar">
       <div>
-        <span>{{ user?.username }}</span>
-      <div>
-        <text class="status"> {{ UserStatus[user?.userStatus] }} </text>
-      </div>
+        <div>
+          <span>{{ user?.username }}</span>
+        </div>
+        <div style="margin-top: -15px">
+          <text class="status"> {{ UserStatus[user?.userStatus] }} </text>
+        </div>
       </div>
       <div v-if="user?.friendStatus == Status.requsted" >
-        <button @click="response(2)"> accept  </button>
-        <button @click="response(3)"> deny </button>
+        <button @click="response(2)" class="friendButton">
+          <font-awesome-icon icon="fa-solid fa-check" />
+        </button>
+        <button @click="response(3)" class="friendButton">
+          <font-awesome-icon icon="fa-solid fa-x" />
+        </button>
       </div>
       <div class="toggleDropdown" @click="toggleDropdown">
         <font-awesome-icon icon="fa-solid fa-bars" />
@@ -47,7 +53,7 @@
       </button>
       <button
         class="dropdownElement"
-        @click="toggleDm">
+        @click="toggleDmPopUp">
         <font-awesome-icon icon="fa-solid fa-message" />
       </button>
       <button
@@ -81,10 +87,11 @@ import{ UserStatus }from '@/models/user'
 import Game from '@/models/game';
 
 export default defineComponent({
+  // components: {
+  //   ViewGamePopup: defineAsyncComponent(()=> import('../Game/ViewGamePopup.vue'))
+  // },
   components: {
-    ViewGamePopup: defineAsyncComponent(()=> import('../Game/ViewGamePopup.vue'))
-    // ViewGamePopup: () => import('../Game/ViewGamePopup.vue')
-    // ViewGamePopup
+    ViewGamePopup,
   },
   data() {
     return {
@@ -139,41 +146,57 @@ export default defineComponent({
         this.toggleDropdown()
     },
     toggleDropdown() {
-      if (this.show)
+      if (this.show){
         window.removeEventListener('click', this.hideDropDown)
+        this.closeDmPopUp();
+        this.showGame = false;
+      }
       else
         window.addEventListener('click', this.hideDropDown)
       this.show = !this.show
     },
     askForMatch(){
-      this.$store.state.socketGame.emit('Request', {id: this.user._id}, (r) => {
-        // this.$router.push('/play/')    
+      this.$store.state.socketGame.emit('Request', {id: this.user._id}, (r) => { 
         this.showGame = !this.showGame
         this.$store.state.game = r
       })
       console.log("AskForMatch");
     },
-    viewGame(){      
-      this.$store.state.socketGame.emit('ViewGame', {id: this.user._id}, () => {
-        this.showGame = !this.showGame
-        this.$router.push('/play')
-      })
-      console.log("viewGame");
+    viewGame(status){
+      switch (status) {
+        case 'exit':
+          this.showGame = false;
+          break;
+        case 'view':
+          this.$store.state.socketGame.emit('ViewGame', {id: this.user._id}, () => {
+            this.showGame = !this.showGame
+            this.$router.push('/play')
+          });
+          console.log("viewGame");
+          break;
+      }
     },
-    toggleDm(){
+    openDmPopUp(){
+      window.addEventListener('click', this.hideDm)
+      this.showDm = true;
+    },
+    closeDmPopUp(){
+      window.removeEventListener('click', this.hideDm)
+      this.showDm = false;
+    },
+    toggleDmPopUp(){
       if (this.showDm)
-        window.removeEventListener('click', this.hideDm)
+        this.closeDmPopUp()
       else
-        window.addEventListener('click', this.hideDm)
-      this.showDm = !this.showDm
+        this.openDmPopUp()
     },
     hideDm(e){
       if (!this.$el.contains(e.target))
-        this.toggleDm()
+        this.closePopUp()
     },
     sendDm(){
       console.log(this.msgText)
-      this.toggleDm()
+      this.closeDmPopUp()
       this.toggleDropdown()
       this.$store.state.socketChat.emit('DM', {content: this.msgText, id: this.user._id})
       this.msgText = ""
@@ -308,5 +331,19 @@ export default defineComponent({
     color: var(--ft_cyan);
     background-color: var(--ft_dark);
     font-size: 10px
+  }
+
+  .friendButton {
+    color: var(--ft_cyan);
+    border: 1px solid var(--ft_cyan);
+    background-color: var(--ft_dark);
+    border-radius: 5px;
+    width: 30px;
+    height: 30px;
+    margin: 1px;
+  }
+  .friendButton:hover {
+    background-color: var(--ft_cyan);
+    color: var(--ft_dark);
   }
 </style>
