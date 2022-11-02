@@ -24,7 +24,7 @@ export class chatroom{
     @ManyToMany(() => User, (User) => User.admin_of)
     admins: User[];
 
-    @ManyToMany(() => banMute, (banMute) => banMute.chatroom)
+    @OneToMany(() => banMute, (banMute) => banMute.chatroom)
     muted: banMute[];
 
 

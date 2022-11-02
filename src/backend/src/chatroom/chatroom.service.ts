@@ -81,13 +81,15 @@ export class ChatroomService {
     }
 
     async getAllwithUserWriteAccess(id: number) {
-        // console.log("getAllwithUser");
+        console.log("getAllwithUserWriteAccess");
         // console.log("id = ", id);
         // const mute = this.banMuteService.test()
 
        return await this.chatroomRepository.createQueryBuilder("chatroom")
         .leftJoin('chatroom.muted', 'muted')
-        .innerJoinAndSelect('chatroom.users', 'user', 'user._id = :id && muted_id != :id', { id: id })
+        .innerJoinAndSelect('chatroom.users', 'user', 'user._id = :id', { id: id })
+        .where('muted.user._id != :iid', {iid: id})
+        // .innerJoinAndSelect('chatroom.users', 'user', 'user._id = :id && muted._id != :id', { id: id })
         .getMany()
     }
 
