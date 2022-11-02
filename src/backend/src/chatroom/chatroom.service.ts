@@ -7,6 +7,7 @@ import { message } from 'src/message/message.entity';
 import * as bcrypt from 'bcrypt';
 import { Status } from 'src/users/status_enum';
 import { UsersService } from 'src/users/users.service';
+import { BanMuteService } from './banMute/banMute.service';
 
 @Injectable()
 export class ChatroomService {
@@ -71,23 +72,23 @@ export class ChatroomService {
   }
 
      async getAllwithUser(id: number) {
-        console.log("getAllwithUser");
-        console.log("id = ", id);
+        // console.log("getAllwithUser");
+        // console.log("id = ", id);
 
-        const test = await this.chatroomRepository.createQueryBuilder("chatroom")
-        // .leftJoinAndSelect('chatroom.users', 'users')
-        // .select('chatroom.users')
+       return await this.chatroomRepository.createQueryBuilder("chatroom")
         .innerJoinAndSelect('chatroom.users', 'user', 'user._id = :id', { id: id })
         .getMany()
-            // .where("chatroom.users._id")
-            // .addSelect((subQuery) => {
-            //     return subQuery.select("user._id", "_id").from("chatroom.users", "user").where({_id: id})
-            // }, "name")
-            // .where(users )
+    }
 
-            console.log(test);
-            return test
+    async getAllwithUserWriteAccess(id: number) {
+        // console.log("getAllwithUser");
+        // console.log("id = ", id);
+        // const mute = this.banMuteService.test()
 
+       return await this.chatroomRepository.createQueryBuilder("chatroom")
+        .leftJoin('chatroom.muted', 'muted')
+        .innerJoinAndSelect('chatroom.users', 'user', 'user._id = :id && muted_id != :id', { id: id })
+        .getMany()
     }
 
 
@@ -238,7 +239,8 @@ export class ChatroomService {
     constructor(
         @InjectRepository(chatroom)
         private chatroomRepository: Repository<chatroom>,
-        private usersService: UsersService
+        private usersService: UsersService,
+        private banMuteService: BanMuteService
     ){}
 
     async getAll(user: User) {

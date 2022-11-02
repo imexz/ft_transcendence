@@ -52,9 +52,10 @@ export class ChatService {
         }
 
 
-        async createMessage(user_id: number, roomId:number, content: string) {
-            const user = await this.usersService.getUser(user_id)
-            const rooms = await this.chatroomService.getAllwithUser(user_id)
+        async createMessage(user: User, roomId:number, content: string) {
+            const rooms = await this.chatroomService.getAllwithUserWriteAccess(user._id)
+            console.log(rooms);
+            
             for (let index = 0; index < rooms.length; index++) {
               if(rooms[index].roomId == roomId) {
                 return await this.messageService.userAddMessageToRoom(user, content, rooms[index])

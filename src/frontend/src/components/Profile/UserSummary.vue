@@ -146,12 +146,10 @@ export default defineComponent({
       this.show = !this.show
     },
     askForMatch(){
-      this.$store.state.socketGame.emit('Request', {id: this.user._id}, (r) => {
-        // this.$router.push('/play/')    
+        this.$store.dispatch('askForMatch')
         this.showGame = !this.showGame
-        this.$store.state.game = r
-      })
-      console.log("AskForMatch");
+        console.log("AskForMatch");
+      }
     },
     viewGame(){      
       this.$store.state.socketGame.emit('ViewGame', {id: this.user._id}, () => {

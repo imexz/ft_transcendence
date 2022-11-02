@@ -2,7 +2,7 @@
     <h1> The winner is </h1>
     <user-summary :user=winner />
     <div>
-        <button @click=""> ask for rematch </button>
+        <button @click="rematch"> ask for rematch </button>
         <button @click="newGame"> new game</button>
     </div>
 </template>
@@ -25,7 +25,8 @@ export default defineComponent({
             console.log("newGame");
             
             this.$emit('newGame')
-        }
+        },
+        
     }
 })
 </script>

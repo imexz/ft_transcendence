@@ -127,7 +127,7 @@ export class ChatGateway {
 
     // const room_name = await this.chatService.getRoomName(roomId)
 
-    const message = await this.chatService.createMessage(client.handshake.auth._id, roomId, content);
+    const message = await this.chatService.createMessage(client.handshake.auth as User, roomId, content);
 
     // client.to(room_name).emit('message', message);
     if(message) {

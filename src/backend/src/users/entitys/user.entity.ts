@@ -6,6 +6,7 @@ import { Exclude } from 'class-transformer';
 import { Game } from '../../game/game.entities/game.entity';
 import { Friend } from "../friends/friend.entity";
 import { UserStatus } from "./status.enum";
+import { banMute } from "src/chatroom/banMute/banMute.entity";
 
 
 
@@ -42,6 +43,10 @@ export default class User {
 	@OneToMany(() => chatroom, (chatroom) => chatroom.owner)
 	@JoinColumn()
     owner_of?: chatroom[];
+
+	@OneToMany(() => banMute, (banMute) => banMute.user)
+	@JoinColumn()
+    banMute?: banMute[];
 
 	@OneToOne(() => fileEntity, (avatar) => avatar.user, {onDelete: 'SET NULL'}) //{ onDelete: 'CASCADE' }
 	@JoinColumn()

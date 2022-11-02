@@ -21,8 +21,6 @@ export class Game extends GameData{
 	@Exclude()
 	@PrimaryGeneratedColumn()
 	id: number;
-	// @ManyToMany(() => User, (User) => User.games)
-	// player: User[];
 
 	@ManyToOne(() => User, (User) => User.gamesAsRight)
 	playerRight: User;
