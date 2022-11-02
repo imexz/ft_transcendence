@@ -18,6 +18,7 @@ import {
   faChevronUp,
   faGavel,
   faCommentSlash,
+  faX,
 
   } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
@@ -37,7 +38,8 @@ library.add(
   faXmark,
   faChevronUp,
   faGavel,
-  faCommentSlash
+  faCommentSlash,
+  faX
 )
 
 
