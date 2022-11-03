@@ -13,7 +13,7 @@
         </div>
         <div class="elem">
           <input v-if="access == Access.protected"  v-model="password" placeholder="Enter your password">
-          <input v-else v-model="password" placeholder="Not password protected" disabled>
+          <!-- <input v-else v-model="password" placeholder="Not password protected" disabled> -->
         </div>
         <div class="btn">
           <button class="elem2" type="submit">Create Room</button>
@@ -63,6 +63,7 @@ export default defineComponent({
 
 .elem {
   margin-top: 2px;
+  height: 28px;
 }
 
 .elem2 {

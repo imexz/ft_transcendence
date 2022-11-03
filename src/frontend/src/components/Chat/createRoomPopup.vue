@@ -2,7 +2,7 @@
   <div class="popUp">
     <div class="headLineWrapper">
       <div class="headLine">Create a Chatroom</div>
-      <button class="exitButton">
+      <button class="exitButton" @click="closePopUp">
         <font-awesome-icon icon="fa-solid fa-x" />
       </button>
     </div>
