@@ -30,10 +30,10 @@ export class BanMuteService {
         this.banMuteRepository.save(mute)
     }
 
-    async test(chatroom_id: number) {
-        return await this.banMuteRepository.createQueryBuilder("mute")
-        .innerJoinAndSelect('mute.chatroom', 'chatroom', 'chatroom._id = :id', {id: chatroom_id} )
-    }
+    // async test(chatroom_id: number) {
+    //     return await this.banMuteRepository.createQueryBuilder("mute")
+    //     .innerJoinAndSelect('mute.chatroom', 'chatroom', 'chatroom._id = :id', {id: chatroom_id} )
+    // }
     
 
 

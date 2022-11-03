@@ -12,7 +12,7 @@ import { ChatroomService } from "./chatroom.service";
     imports: [TypeOrmModule.forFeature([chatroom, banMute]), UsersModule, AuthModule],
     controllers: [ChatroomController],
     providers: [ChatroomService, BanMuteService],
-    exports: [TypeOrmModule, ChatroomService]
+    exports: [TypeOrmModule, ChatroomService, BanMuteService]
 
 })
 export class ChatroomModule {}

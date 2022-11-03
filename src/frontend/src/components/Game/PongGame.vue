@@ -42,6 +42,10 @@
     },
   	created() { // always called when Component is initialized (e.g. on refresh)
   		console.log("in created");
+      if (this.$store.state.socketGame === null){
+        this.$router.push('/login')
+        return ;
+      }
       
   		this.$store.state.socketGame.on('Game', (game: Game) => {
         console.log(game);

@@ -5,9 +5,16 @@ import { UsersService } from 'src/users/users.service';
 import { ChatroomService } from 'src/chatroom/chatroom.service';
 import { MessageService } from 'src/message/message.service';
 import User from 'src/users/entitys/user.entity';
+import { BanMuteService } from 'src/chatroom/banMute/banMute.service';
 
 @Injectable()
 export class ChatService {
+  async ban(roomId: number, muteUserId: number, userId: number) {
+    const room = this.chatroomService.getRoom(roomId)
+    const user = await this.usersService.getUser(muteUserId)
+    const chatroom = await this.chatroomService.getRoom(roomId)
+    this.banMuteService.Ban(user, chatroom)
+  }
 
   async creatRoomDM(user: User, id: number, content: string) {
     if(user != undefined && id != undefined)
@@ -43,6 +50,7 @@ export class ChatService {
     constructor(
         private chatroomService: ChatroomService,
         private usersService: UsersService,
+        private banMuteService: BanMuteService,
         private messageService: MessageService,
         ){}
 

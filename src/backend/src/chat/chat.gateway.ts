@@ -15,6 +15,7 @@ import User from 'src/users/entitys/user.entity';
   namespace: 'chat'
 })
 
+
 export class ChatGateway {
 
   @WebSocketServer()
@@ -92,24 +93,32 @@ export class ChatGateway {
   ) {
     // console.log(roomId)
     console.log("typing")
-
-    // const name = await this.chatService.getClientName(client.handshake.auth._id);
-    // const room_name = await this.chatService.getRoomName(roomId)
-    // const name = client.Id
     const userId = client.handshake.auth._id
     client.to(roomId.toString()).emit('typing', { userId: userId , isTyping , roomId});
     // console.log("recive and emit typing");
 
   }
 
+  @SubscribeMessage('ban')
+  async ban(
+    @MessageBody('roomId') roomId: number,
+    @MessageBody('userId') muteUserId: number,
+    @ConnectedSocket() client:Socket,
+  ) {
+    // console.log(roomId)
+    console.log("ban")
+    const userId = client.handshake.auth._id
+    this.chatService.ban(roomId, muteUserId, userId)
+    // console.log("recive and emit typing");
+
+  }
+
+
   @SubscribeMessage('findAllMessages')
   async findAllMessages(@MessageBody('roomId') roomId: number, @ConnectedSocket() client:Socket,) {
     console.log('findAllMessages');
     console.log(roomId);
-    // console.log(client.handshake);
     console.log(client.handshake.auth._id);
-
-
     return await this.chatService.findAllMessages(roomId, client.handshake.auth._id);
     // return {test};
   }
@@ -124,12 +133,7 @@ export class ChatGateway {
     console.log(roomId);
     console.log(content);
     console.log(client.handshake.auth._id);
-
-    // const room_name = await this.chatService.getRoomName(roomId)
-
     const message = await this.chatService.createMessage(client.handshake.auth as User, roomId, content);
-
-    // client.to(room_name).emit('message', message);
     if(message) {
       const tmp = {
       senderId: client.handshake.auth._id.toString(),
@@ -138,17 +142,11 @@ export class ChatGateway {
       avatar: message.user.avatar_url,
       timestamp: message.timestamp,
       username: message.user.username }
-      // _id: 0,
-      // indexId: 12092,
-
-
-      // console.log(test);
       console.log({tmp, roomId});
       console.log("timestamp before");
       console.log(tmp.timestamp);
       console.log("timestamp after");
       // tmp.timestamp = tmp.timestamp. //TB resume work
-
 
       client.to(roomId.toString()).emit('message', {message: tmp, roomId});
       console.log("createMessage ende");
@@ -157,13 +155,6 @@ export class ChatGateway {
       console.log("message == empty");
 
     }
-
-      // console.log(client.);
-
-      // console.log("emit mesage");
-      // console.log(message);
-      // console.log(tmp);
-
   }
 
   @SubscribeMessage('deleteMessage')
