@@ -154,6 +154,7 @@ export default defineComponent({
     },
     askForMatch(){
       this.closeDmPopUp()
+      this.$store.state.pendingRequest = true;
       this.$store.state.socketGame.emit('Request', {id: this.user._id}, (r) => { 
         this.showGame = !this.showGame
         this.$store.state.game = r

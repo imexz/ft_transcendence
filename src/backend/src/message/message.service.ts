@@ -33,10 +33,10 @@ export class MessageService {
         if (user != undefined && chatroom != undefined && conntent != undefined) {
             
             var new_message = this.messageRepository.create({user: user, chatroom: chatroom, content: conntent});
-            console.log(conntent);
+            // console.log(conntent);
             return await this.messageRepository.save(new_message);
         } else {
-            console.log("userAddMessageToRoom goes wrong");
+            // console.log("userAddMessageToRoom goes wrong");
 
         }
     }
@@ -50,10 +50,10 @@ export class MessageService {
             .orderBy('timestamp')
             .getRawMany()
 
-        console.log("getAllMessagesOfRoom");
-        console.log(roomId);
+        // console.log("getAllMessagesOfRoom");
+        // console.log(roomId);
 
-        console.log(messages);
+        // console.log(messages);
         return messages
     }
 

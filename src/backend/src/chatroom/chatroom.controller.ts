@@ -11,9 +11,9 @@ export class ChatroomController {
     @Get('all')
 	@UseGuards(JwtAuthGuard)
     async getAll(@Request() req){
-        console.log("all");
-        console.log(req.user);
-        console.log("all1");
+        // console.log("all");
+        // console.log(req.user);
+        // console.log("all1");
         return await this.chatroomService.getAll(req.user)
     }
 
@@ -30,12 +30,12 @@ export class ChatroomController {
         @Body("access") access: Access,
         @Body("password") password: string)
     {
-        console.log("password");
-        console.log(password);
+        // console.log("password");
+        // console.log(password);
         if(await this.chatroomService.addRoom(room_name, access, req.user, password) == undefined)
             throw new HttpException('Forbidden', HttpStatus.CONFLICT);
-        console.log("creat");
-        console.log(req.user);
+        // console.log("creat");
+        // console.log(req.user);
         
         return await this.chatroomService.getAll(req.user)
     }

@@ -14,7 +14,7 @@ export class AuthService {
 	async validateUser(id: number) {
 
 			const user = await this.usersService.getUser(id);
-			console.log("all good");
+			// console.log("all good");
 			return user;
 	}
 
@@ -48,14 +48,14 @@ export class AuthService {
 	public async validateSocket(socket: Socket){
 		try {
 			socket.handshake.auth =  await this.jwtService.verify(socket.handshake.auth.id.replace('Authentication=',''));
-			console.log("socket handshake");
-			console.log(socket.handshake.auth);
+			// console.log("socket handshake");
+			// console.log(socket.handshake.auth);
 			
 			socket.handshake.auth = await this.jwtStrategy.validate(socket.handshake.auth as TokenPayload)
-			console.log("socket handshake1");
-			console.log(socket.handshake.auth);
+			// console.log("socket handshake1");
+			// console.log(socket.handshake.auth);
 			if(await socket.handshake.auth === undefined){
-			  console.log("validation goes wrong");
+			//   console.log("validation goes wrong");
 			  socket.disconnect()
 			  return false
 			} else {
@@ -64,7 +64,7 @@ export class AuthService {
 				return true
 			}
 			} catch (error) {
-			  console.log("wrong token", error);
+			//   console.log("wrong token", error);
 			  socket.disconnect()
 			  return false
 			}

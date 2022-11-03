@@ -61,8 +61,8 @@ export class FriendsService {
 				tmp.push(element.requester)
 			}
 		});
-		console.log("getFriendst");
-		console.log(tmp);
+		// console.log("getFriendst");
+		// console.log(tmp);
 		
 		return tmp
 	}
@@ -78,12 +78,12 @@ export class FriendsService {
 	// }
 
 	async remove_friendship(_id: any, id: number) {
-		console.log("remove_friendship");
-		console.log(_id, id);
+		// console.log("remove_friendship");
+		// console.log(_id, id);
 		
 		const friends = await this.findFriendShip(_id, id)
 
-		console.log(friends);
+		// console.log(friends);
 		
 		// const test: FindOptionsWhere<Friend> = 
 		if(friends != null)
@@ -106,7 +106,7 @@ export class FriendsService {
 
     async request_friendship(user_id: number, friend_id: number) {
 		if(user_id && friend_id) {
-			console.log("request_friendship");
+			// console.log("request_friendship");
 			
 			const user1 = this.usersService.getUser(user_id)
 			const user2 = this.usersService.getUser(friend_id)
@@ -120,8 +120,8 @@ export class FriendsService {
     async response_friendship(user_id: number, friend_id: number, status: Status ) {
 		if(user_id && friend_id) {
 			var friendship = await this.findFriendShip(user_id, friend_id)
-			console.log("response_friendship", friendship, status);
-			console.log(user_id, friend_id);
+			// console.log("response_friendship", friendship, status);
+			// console.log(user_id, friend_id);
 			
 			
 			if (friendship != undefined) {

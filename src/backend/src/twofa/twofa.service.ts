@@ -35,10 +35,10 @@ import { UsersService } from "src/users/users.service";
     }
 
     isTwoFactorAuthenticationCodeValid(twoFactorAuthenticationCode: string, user: User) {
-        console.log('isTwoFactorAuthenticationCodeValid');
+        // console.log('isTwoFactorAuthenticationCodeValid');
         // const tmp_user  = await this.usersService.getUser(user._id)
         
-        console.log(twoFactorAuthenticationCode, user.twoFactorAuthenticationSecret);
+        // console.log(twoFactorAuthenticationCode, user.twoFactorAuthenticationSecret);
         
         try {
 
@@ -46,7 +46,7 @@ import { UsersService } from "src/users/users.service";
                 twoFactorAuthenticationCode,
                 user.twoFactorAuthenticationSecret
             )
-            console.log("check=", ret);
+            // console.log("check=", ret);
             
             return ret
         } catch (err) {

@@ -3,8 +3,9 @@
       <GamePlayers/>
     <div v-if="this.winner == null" class="gameCanvas">
       <div>
-        <Field @asigneWinner="asigneWinner"/>
+        <Field @assignWinner="assignWinner"/>
       </div>
+      <!-- TODO: check if leave button is still needed -->
       <div v-show="this.$store.state.user._id!=this.$store.state.game?.playerRight?._id && this.$store.state.user._id!=this.$store.state.game?.playerLeft?._id"  class="leaveGame">
         <button @click="leaveGame"> Leave </button>
       </div>
@@ -40,16 +41,15 @@
       Result,
       Field
     },
-  	created() { // always called when Component is initialized (e.g. on refresh)
-  		console.log("in created");
-      
+  	created() {
+  		console.log("in created"); 
   		this.$store.state.socketGame.on('Game', (game: Game) => {
-        console.log(game);
-        this.asigneGame(game)
+        console.log(game)
+        this.assignGame(game)
 		  });
       if (this.$store.state.game == null && this.winner == null) {
         this.$store.state.socketGame.emit('checkGame', (game: Game) => {
-          console.log(game);
+          console.log(game)
         });
       }
   	},
@@ -58,14 +58,13 @@
   	},
 		beforeUpdate() {
   		console.log("beforeUpdate");
-    if (this.$store.state.game == null && this.winner == null) {
-      this.$store.state.socketGame.emit('checkGame', (game: Game) => {
-        console.log(game);
-      });
-    }
-		console.log("leaving beforeUpdate");
-
-	},
+      if (this.$store.state.game == null && this.winner == null) {
+        this.$store.state.socketGame.emit('checkGame', (game: Game) => {
+          console.log(game);
+        });
+      }
+		  console.log("leaving beforeUpdate");
+	  },
   	unmounted() {
   		console.log("in unmount");
       this.$store.state.socketGame.emit('Quit')
@@ -76,12 +75,11 @@
         console.log("newGame");
         this.winner = null
       },
-      asigneWinner(winner: User) {
-        console.log("asigneWinner");
-        
+      assignWinner(winner: User) {
+        console.log("assignWinner");
         this.winner = winner
       },
-      asigneGame(game: Game) {
+      assignGame(game: Game) {
         this.$store.state.game = game
         if (this.$store.state.game.playerRight != undefined) {
   			  document.addEventListener('keydown', this.keyEvents, false);

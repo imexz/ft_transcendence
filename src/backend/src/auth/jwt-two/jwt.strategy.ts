@@ -37,12 +37,12 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
             if (payload.isSecondFactorAuthenticated) {
               return user;
             } else {
-              console.log("return null");
+              // console.log("return null");
               return
             }
           }
         } else {
-          console.log("user not found");
+          // console.log("user not found");
           
         }
     }

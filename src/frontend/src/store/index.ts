@@ -24,13 +24,14 @@ export interface State {
   gameRequest: User | null
   rooms: []
   game: Game | null
+  pendingRequest: boolean
 }
 
 const storage = localStorage.getItem('user')
 const user = storage?JSON.parse(storage):null;
 const initialState = user?
-  {validated: true, user: user, socket: null,  socketChat: null,  socketGame: null, friendsList: null, NrMessages: 0, NrFriendRequests: 0, gameRequest: null, game: null}:
-  {validated: false, user: null,  socket: null,  socketChat: null,  socketGame: null, friendsList: null, NrMessages: 0, NrFriendRequests: 0, gameRequest: null, game: null};
+  {validated: true, user: user, socket: null,  socketChat: null,  socketGame: null, friendsList: null, NrMessages: 0, NrFriendRequests: 0, gameRequest: null, game: null, pendingRequest: false}:
+  {validated: false, user: null,  socket: null,  socketChat: null,  socketGame: null, friendsList: null, NrMessages: 0, NrFriendRequests: 0, gameRequest: null, game: null, pendingRequest: false};
 
 export default createStore<State>({
 
@@ -54,7 +55,7 @@ export default createStore<State>({
       state.validated = false;
     },
     logIn(state, user) {
-      console.log("logIn");
+      // console.log("logIn");
       
       state.validated = true;
       state.user = user;
@@ -63,38 +64,43 @@ export default createStore<State>({
               id: document.cookie
           }
       })
-      console.log("default socket init");
+      // console.log("default socket init");
       
       state.socketChat = io(API_URL + "/chat", {
         auth: {
           id: document.cookie
         }
       })
-      console.log("chat socket init");
+      // console.log("chat socket init");
       state.socketGame = io(API_URL + "/game", {
         auth: {
           id: document.cookie
         }
       })
-      console.log("game socket init");
-      console.log(document.cookie);
+      // console.log("game socket init");
+      // console.log(document.cookie);
       state.socketChat.on('message',() => {
         state.NrMessages++
       })
       state.socketGame.on('Request',(user: User) => {
         state.gameRequest = user;
-        console.log("id", state.gameRequest)
-        console.log("askformatch");
+        // console.log("id", state.gameRequest)
+        console.log("receive askformatch");
       })
-      state.socketGame.on('NowInGame', (game: Game) => {
-        state.game = game;
-        console.log("NowInGame");
+      state.socketGame.on('NowInGame', () => {
+        // state.game = game;
+        console.log("receive NowInGame");
         router.push('/play')
       })
+      state.socketGame.on('GameRequestDenied', () => {
+        state.game = null;
+        state.pendingRequest = false;
+        router.push('/');
+      }) 
 
       state.socket.on('Request',(data) => {
         state.friendsList.push(data)
-          console.log("recive  request");
+          console.log("receive  request");
       })
     },
     changeUserName(state, username) {
@@ -104,7 +110,7 @@ export default createStore<State>({
       state.user.isTwoFactorAuthenticationEnabled = enable;
     },
     setFriendsList(state, friendsList) {
-      console.log(friendsList);
+      // console.log(friendsList);
       
       state.friendsList = friendsList;
     },
@@ -122,7 +128,7 @@ export default createStore<State>({
       commit('logOut');
       document.cookie = "Authentication=; expires=Thu, 01 Jan 1970 00:00:00 GMT;SameSite=Lax"
       localStorage.removeItem('user');
-      console.log(router.currentRoute.value.path)
+      // console.log(router.currentRoute.value.path)
       if (router.currentRoute.value.path != '/login/tfa')
         router.push("/login");
     },

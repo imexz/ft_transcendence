@@ -12,34 +12,31 @@ import { GameData } from './game.entities/gameData';
 
 @Injectable()
 export class GameService {
-  startGame(server: Server, game: Game) {
-    if (game.playerLeft != undefined && game.playerRight != undefined) {
-		this.#startGame(server, game)	
-	}
-  }
-
 	constructor(
 		private userService: UsersService,
-	){}
+		){}
 
 	setup = new GameSetup;
-
+	
 	@InjectRepository(Game)
 	private gameRepository: Repository<Game>
-	Samuel: Array<Game> = []
-
+	
+	gamesArr: Array<Game> = []
+	
 	removePlayerFromWaiting(user_id: number) {
 		const game = this.getGame(user_id)
-		if(game != undefined && game.playerRight == undefined)
-		{
+		if(game != undefined && game.playerRight == undefined) {
 			this.removeGame(game)			
 		}
 	}
-
-	getGame(user_id: number | undefined): Game {
-		return this.Samuel.find((value: Game) =>  value.playerLeft?._id == user_id || value.playerRight?._id == user_id)
+	startGame(server: Server, game: Game) {
+	  if (game.playerLeft != undefined && game.playerRight != undefined) {
+		  this.#startGame(server, game)	
+	  }
 	}
-	
+	getGame(user_id: number | undefined): Game {
+		return this.gamesArr.find((value: Game) =>  value.playerLeft?._id == user_id || value.playerRight?._id == user_id)
+	}
 	getPlayerSide(game: Game, user_id: number) {
 		if (game != undefined) {
 			if (game.playerLeft._id == user_id) {
@@ -49,8 +46,7 @@ export class GameService {
 			}
 		}
 	}
-
-	handelKeypress(user_id: number, key: string){
+	handleKeypress(user_id: number, key: string){
 		const game = this.getGame(user_id)
 		if(game != undefined) {
 			if (key == "ArrowUp" || key == "w") {
@@ -60,24 +56,24 @@ export class GameService {
 			}
 		}
 	}
-
-	async JoinGameOrCreatGame(user: User, server: Server, user_id?: number): Promise<Game> {
-		let game = this.getGame(undefined)
+	async joinGameOrCreatGame(user: User, server: Server, opponent_user_id?: number): Promise<Game> {
+		let game = this.getGame(undefined) // checking for first game with missing (undefined) opponent
 		if (game == undefined) {
+			console.log("joinGameOrCreateGame game == undefined");
 			game = await this.#createGameInstance()
 			game.playerLeft = user
-			this.Samuel.push(game)
+			this.gamesArr.push(game)
 			console.log("game created", game);
-			if(user_id != undefined) {
-				const player = await this.userService.getUser(user_id)
-				game.playerRight = player
+			if(opponent_user_id != undefined) {
+				const opponent = await this.userService.getUser(opponent_user_id)
+				game.playerRight = opponent
 			}
-		} else {
+		} else { // game exists, join user and set as opponent
+			console.log("joinGameOrCreateGame: join existing game");
 			game.playerRight = user
 		}
 		return game
 	}
-	
 	async #createGameInstance(): Promise<Game> {
 		console.log('inside createGameInstance()');
 		const setup = new GameSetup;
@@ -87,21 +83,18 @@ export class GameService {
 		// console.log('leaving createGameInstance()');
 		return new Game(game.id, setup);
 	}
-
-
 	async #emitGameData(game: Game, server: Server) {
 		// console.log("emitGameData");
-		const hi: Game = await this.getData(game)
-		const test: GameData = {
-			ball: hi.ball,
-			paddleLeft: hi.paddleLeft,
-			paddleRight: hi.paddleRight,
-			score: hi.score,
-			// finished: hi.finished,
+		const tmpGame: Game = await this.getData(game)
+		const updatedGameData: GameData = {
+			ball: tmpGame.ball,
+			paddleLeft: tmpGame.paddleLeft,
+			paddleRight: tmpGame.paddleRight,
+			score: tmpGame.score,
+			// finished: tmpGame.finished,
 		}		
-		server.to(game.id.toString()).emit('updateGame', test);
+		server.to(game.id.toString()).emit('updateGame', updatedGameData);
 	}
-
 	async #startGame(server: Server, game: Game) {
 		server.to(game.id.toString()).emit("Game", game)
 		console.log("startGame");
@@ -109,7 +102,6 @@ export class GameService {
 		game.interval = setInterval(() => this.#emitGameData(game, server), 16) as unknown as number;
 		console.log("startGame end");
 	}
-
 	async getData(game: Game): Promise<Game | undefined> {
 		// console.log("getData");
 		
@@ -125,7 +117,6 @@ export class GameService {
 		// console.log("getData ende");
 		return game
 	}
-
 	#updateData(game: Game) {
 		// let game: Game = this.games.get(id);
 		game.ball.position.x += game.ball.direction.x;
@@ -157,12 +148,10 @@ export class GameService {
 		}
 		// console.log("gameid: %d | ball: x %d, y %d", id, game.ball.position.x, game.ball.position.y);
 	}
-
 	#isBallWithinPaddleRange(game: Game, paddle: Paddle): boolean {
 		return (game.ball.position.y >= paddle.position.y &&
 			game.ball.position.y <= paddle.position.y + paddle.height)
 	}
-
 	#isBallAtPaddle(game: Game, paddle: Paddle): boolean {
 		let ret: boolean = false;
 		// let game: Game = this.games.get(id);
@@ -173,7 +162,6 @@ export class GameService {
 		}
 		return ret;
 	}
-
 	#calcAngle(game: Game, paddle: Paddle) {
 		var section: number;
 		// let game: Game = this.games.get(id);
@@ -187,14 +175,12 @@ export class GameService {
 			game.ball.direction.angle = paddle.reboundAngles[i - 1];
 		}
 	}
-
 	#updateBallDirection(game: Game, paddle: Paddle) {
 		this.#calcAngle(game, paddle);
 		// let game: Game = this.games.get(id);
 		game.ball.direction.x = game.ball.direction.speed * Math.cos(game.ball.direction.angle * (Math.PI / 180));
 		game.ball.direction.y = game.ball.direction.speed * Math.sin(game.ball.direction.angle * (Math.PI / 180));
 	}
-
 	#collisionControl(game: Game) {
 		// var game: Game = this.games.get(id);
 		if (game.ball.direction.x > 0) {
@@ -210,7 +196,6 @@ export class GameService {
 			}
 		}
 	}
-
 	#scored(game: Game): boolean {
 		var ret: boolean = false;
 		// let game: Game = this.games.get(id);
@@ -226,7 +211,6 @@ export class GameService {
 		}
 		return ret;
 	}
-
 	#reset(game: Game) {
 		// let game: Game = this.games.get(id);
 		game.ball.position.x = this.setup.ballPos.x;
@@ -255,7 +239,6 @@ export class GameService {
 		game.score.increaseLeft = this.setup.scoreIncrease;
 		game.score.increaseRight = this.setup.scoreIncrease;
 	}
-
 	async #isGameFinished(game: Game) {
 		// var game: Game | undefined = this.games.get(id);
 		if (game != undefined && (game.score.scoreLeft == 10 || game.score.scoreRight == 10)) {
@@ -273,14 +256,15 @@ export class GameService {
 			// TODO: reset frontend variables
 		}
 	}
-
-	removeGame(game: Game){
-		const index = this.Samuel.indexOf(game, 0);
+	removeGame(game: Game): boolean {
+		const index = this.gamesArr.indexOf(game, 0);
 		if (index > -1) {
-			this.Samuel.splice(index, 1);
+			this.gamesArr.splice(index, 1);
+			// inform opponent about denied game request
+			return true;
 		}
+		return false;
 	}
-
 	movePaddleUp(game: Game, side: Side) {		
 		// console.log("movePaddleUp", side);
 		
@@ -293,7 +277,6 @@ export class GameService {
 				game.paddleRight.position.y -= game.paddleRight.speed;
 		}
 	}
-
 	movePaddleDown(game: Game, side: Side) {
 		// console.log("movePaddleDown", side);
 
@@ -315,7 +298,6 @@ export class GameService {
 	// 		console.log("leaveGame uid", user_id, typeof user_id);
 	// 	}
 	// }
-
 	async getMatchHistory(user: User){
 	// 	return await this.gameRepository.find({ 
 	// 		where: {
