@@ -1,6 +1,8 @@
 <template>
   <div v-if="socket" class="chatWrapper">
     <h1>Chat</h1>
+    <div class="chatBanner"></div>
+    <div>
     <vue-advanced-chat
       :height="height"
       :current-user-id="currentUserId"
@@ -26,28 +28,18 @@
       @delete-message="deleteMessage($event.detail[0])"
       @message-action-handler="messageActionHandler($event.detail[0])"
     >
-    <!-- <div slot="room-list-item_1">
-      This is a new room header
-    </div> -->
     </vue-advanced-chat>
+  </div>
+    <div class="chatFooter"></div>
     <Toast v-if="showToast" :msg=toastMsg :mode=toastMode />
     <div v-if="createRoomPopUp" class="createRoomPopUp">
       <createRoomPopup @actions="createRoomActions"/>
     </div>
-
     <div v-if="roomInfoPopUp" class="roomInfoPopUp">
       <roomInfoPopUp :roomInfo="roomInfoData" @action="roomInfoActions"/>
     </div>
-
-    <!-- <joinRoomPopup
-      v-if="PoppupJoin"
-      :TogglePopup="() => makePopupJoin()"
-      :password="password"
-      :roomId="">
-      <h2>Join Room</h2>
-    </joinRoomPopup> -->
-    </div>
-  </template>
+  </div>
+</template>
 
   <script lang="ts">
   import { register } from 'vue-advanced-chat'
@@ -191,29 +183,6 @@
           }
           console.log(this.PoppupJoin);
         },
-        // creatRoom(){
-        //     VueAxios({
-        //         url: '/chatroom/creat',
-        //         baseURL: API_URL,
-        //         method: 'POST',
-        //         withCredentials: true,
-        //         data: { room_name: "test", access: "public"}
-        //     })
-        //         .then(response => {
-        //           console.log(response);
-        //           if(response != null) {
-        //             const rooms = []
-        //             for (let i = 0; i < response.length; i++) {
-        //               rooms.push(response)
-        //             }
-        //             this.rooms = rooms
-        //             this.$emit('success', 'creat Room')
-        //             console.log("succes");
-        //           }
-        //         })
-        //         .catch(error => { this.$emit('error') })
-        // },
-
         emitTyping({ roomId, message }) {
           console.log("emitTyping");
           console.log(roomId);
@@ -231,9 +200,6 @@
             }, 2000);
           }
           console.log("emit typing ende");
-          // console.log("roomId");
-          // console.log(roomId.roomId);
-
         },
         getRooms(){
             VueAxios({
@@ -480,6 +446,27 @@
     margin: auto;
     margin-bottom: 80px;
     z-index: 1;
+  }
+
+  .chatBanner {
+    width: 100%;
+    height: 170px;
+    background: url(@/assets/chatBanner.png);
+    background-size: cover;
+    background-position: 0px 420px;
+    border: 2px solid var(--ft_cyan);
+    border-bottom: none;
+    border-radius: 10px 10px 0px 0px ;
+  }
+  .chatFooter {
+    width: 100%;
+    height: 100px;
+    /* /* background: url(@/assets/chatBanner.png);
+    background-size: cover;
+    background-position: 0px 1000px; */
+    border: 2px solid var(--ft_cyan);
+    border-radius: 0px 0px 10px 10px;
+    border-top: none;
   }
 
 </style>
