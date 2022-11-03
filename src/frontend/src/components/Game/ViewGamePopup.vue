@@ -1,6 +1,12 @@
 <template>
-  <div class="popUp1">
-    <div v-if="$store.state.game != null">
+  <div>
+    <div class="headLineWrapper">
+      <div class="headLine">Spectate</div>
+      <button class="exitButton" @click="closePopUp">
+        <font-awesome-icon icon="fa-solid fa-x" />
+      </button>
+    </div>
+    <div v-if="$store.state.game != null" class="txt">
       <div v-if="userId != $store.state.game.playerRight._id">
         Playing against {{$store.state.game.playerRight.username}}
       </div>
@@ -9,11 +15,8 @@
       </div>
     </div>
     <div>
-      <button @click="reEmit" >
+      <button class="btn" @click="reEmit" >
         View Game
-      </button>
-      <button @click="closePopUp" >
-        Close Popup
       </button>
     </div>
   </div>
@@ -45,39 +48,57 @@ export default defineComponent({
 </script>
 
 <style scoped>
-  .popUp {    
-    position: absolute;
-    margin: auto;
-    left: 0;
-    right: 0;
-    top: 30px;
-    width: 40px;
-    height: 20px;
-    background-color: var(--ft_dark);
-    border: 1px solid var(--ft_cyan);
-    border-radius: 10px;
-    z-index: 10;
-
-    /* display: flex; */
-    align-items: center;
-    justify-content: center;
-  }
-  div {
-    margin-top: 20px
-  }
-  button {
+  .btn {
     color: var(--ft_cyan);
     border: 1px solid var(--ft_cyan);
     border-radius: 5px;
     background-color: var(--ft_dark);
     padding: 5px 8px;
+    margin-bottom: 10px;
   }
-  button:active {
+  .btn:active {
     transform: translateY(1px);
   }
-  button:hover {
+  .btn:hover {
     color: var(--ft_dark);
     background-color: var(--ft_cyan);
+  }
+
+  .headLineWrapper {
+    margin-top: 15px;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    padding-left: 15px;
+    padding-right: 15px;
+    border-bottom: 1px solid var(--ft_cyan);
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .headLine {
+    font-size: 25px;
+    font-weight: bold;
+  }
+
+  .exitButton {
+    height: 30px;
+    width: 30px;
+    font-weight: bold;
+    padding: 3px;
+    border-radius: 50%;
+    border: 2px solid var(--ft_pink);
+    color: var(--ft_pink);
+    background-color: var(--ft_dark);
+  }
+  .exitButton:hover {
+    color: var(--ft_dark);
+    background-color: var(--ft_pink);
+  }
+
+  .txt {
+    font-size: 15px;
+    font-weight: normal;
+    margin-bottom: 10px;
   }
 
 </style>

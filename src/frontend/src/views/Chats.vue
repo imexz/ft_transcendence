@@ -302,6 +302,9 @@
             case "ban":
               this.banUser(userId, room);
               break;
+            case "exit":
+              this.toggleRoomInfo();
+              break;
           }
         },
         createRoomActions(emitMsg) {
@@ -470,26 +473,6 @@
     })
 </script>
 
-<!-- <script lang="ts">
-    import { register } from 'vue-advanced-chat'
-
-      export default {
-        data() {
-          return {
-            register: register,
-            currentUserId: '1234',
-            rooms: [],
-            messages: [],
-            roomActions: [
-              { name: 'inviteUser', title: 'Invite User' },
-              { name: 'removeUser', title: 'Remove User' },
-              { name: 'deleteRoom', title: 'Delete Room' }
-            ]
-          }
-        }
-      }
-</script> -->
-
 <style scoped>
 
   .chatWrapper {
@@ -497,21 +480,6 @@
     margin: auto;
     margin-bottom: 80px;
     z-index: 1;
-  }
-  
-  .roomInfoPopUp {
-    position: absolute;
-    margin: auto;
-    left: 0;
-    right: 0;
-    top: 100px;
-    width: 400px;
-    height: 400px;
-    background-color: var(--ft_dark);
-    border: 1px solid var(--ft_cyan);
-    border-radius: 10px;
-    z-index: 10;
-    overflow-y: auto;
   }
 
 </style>

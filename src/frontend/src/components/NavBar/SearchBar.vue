@@ -4,13 +4,11 @@
       <font-awesome-icon icon="fa-solid fa-magnifying-glass" />
     </button>
     <div v-if="show" class="searchPopUp">
-      <div class="topLine">
-        <div class="name">
-          Search
-        </div>
-        <div class="exitButton" @click="toggleSearchBar">
+      <div class="headLineWrapper">
+        <div class="headLine">Search</div>
+        <button class="exitButton" @click="toggleSearchBar">
           <font-awesome-icon icon="fa-solid fa-x" />
-        </div>
+        </button>
       </div>
       <input 
         type="text"
@@ -91,15 +89,6 @@ export default defineComponent({
 
 <style scoped>
 
-  .wrapper {
-  }
-  .searchBar {
-    display: flex;
-    border: 2px solid;
-    border-color: var(--ft_cyan);
-    border-radius: 10px;
-    padding: 0px 10px 0px 10px;
-  }
   .searchButton {
     align-items: center;
     height: 64px;
@@ -130,26 +119,31 @@ export default defineComponent({
     border-radius: 10px;
   }
   
-  .topLine{
-    margin: 20px 20px 15px 20px;
-    padding-bottom: 5px;
+  .headLineWrapper {
+    margin-top: 15px;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    padding-left: 22px;
+    padding-right: 22px;
+    border-bottom: 1px solid var(--ft_cyan);
     display: flex;
     justify-content: space-between;
-    border-bottom: 1px solid var(--ft_cyan);
-    align-content: center;
   }
-  .name {
-    text-align: center;
+
+  .headLine {
     font-size: 25px;
     font-weight: bold;
   }
+
   .exitButton {
-    width: 20px;
-    height: 20px;
+    height: 30px;
+    width: 30px;
+    font-weight: bold;
     padding: 3px;
     border-radius: 50%;
     border: 2px solid var(--ft_pink);
     color: var(--ft_pink);
+    background-color: var(--ft_dark);
   }
   .exitButton:hover {
     color: var(--ft_dark);
@@ -157,7 +151,6 @@ export default defineComponent({
   }
   
   .searchInput {
-    /* display: inline-block; */
     height: 60px;
     width: 380px; 
     color: var(--ft_cyan);
@@ -178,15 +171,6 @@ export default defineComponent({
     background-color: var(--ft_dark);
     animation: slideDown 200ms ease-in-out forwards;
     transform-origin: top center;
-  }
-
-  @keyframes slideOut {
-    0% {
-      transform: scaleX(0%);
-    }
-    100% {
-      transform: scaleX(100%);
-    }
   }
 
   @keyframes slideDown {
