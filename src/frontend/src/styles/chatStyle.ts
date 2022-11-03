@@ -14,7 +14,7 @@ export const customChatStyle = {
 
 container: {
   border: '2px solid #0cfbfe',
-  borderRadius: '4px',
+  borderRadius: '0px',
   boxShadow:
     '0px 1px 2px 0px rgba(0, 0, 0, 0.14), 0px 1px 5px 0px rgba(0, 0, 0, 0.12)'
 },
