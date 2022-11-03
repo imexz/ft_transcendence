@@ -1,7 +1,12 @@
 <template>
   <div class="userSummary">
     <div v-if="showDm" class="dmPopUp">
-      <div class="txt">Write DM</div>
+      <div class="headLineWrapper">
+        <div class="headLine">Direct Message</div>
+        <button class="exitButton" @click="closeDmPopUp">
+          <font-awesome-icon icon="fa-solid fa-x" />
+        </button>
+      </div>
       <form @submit.prevent="sendDm">
         <textarea class="dmText" v-model="msgText" placeholder="your message" rows="4">
         </textarea>
@@ -345,5 +350,36 @@ export default defineComponent({
   .friendButton:hover {
     background-color: var(--ft_cyan);
     color: var(--ft_dark);
+  }
+
+  .headLineWrapper {
+    margin-top: 15px;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    padding-left: 15px;
+    padding-right: 15px;
+    border-bottom: 1px solid var(--ft_cyan);
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .headLine {
+    font-size: 25px;
+    font-weight: bold;
+  }
+
+  .exitButton {
+    height: 30px;
+    width: 30px;
+    font-weight: bold;
+    padding: 3px;
+    border-radius: 50%;
+    border: 2px solid var(--ft_pink);
+    color: var(--ft_pink);
+    background-color: var(--ft_dark);
+  }
+  .exitButton:hover {
+    color: var(--ft_dark);
+    background-color: var(--ft_pink);
   }
 </style>
