@@ -79,6 +79,7 @@
     </div>
   </div>
 </template>
+
 <script lang="ts">
 
 import { defineComponent } from 'vue';
@@ -158,10 +159,10 @@ export default defineComponent({
     },
     askForMatch(){
       this.closeDmPopUp()
-      this.$store.state.socketGame.emit('Request', {id: this.user._id}, (r) => { 
+      this.$store.state.socketGame.emit('Request', {id: this.user._id}, (r) => {
         this.showGame = !this.showGame
-        console.log("AskForMatch");
-      }
+        console.log("AskForMatch")
+      })
     },
     viewGame(status){
       switch (status) {

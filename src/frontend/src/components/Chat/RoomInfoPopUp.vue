@@ -28,6 +28,10 @@ import Room from '@/models/room';
 import User from '@/models/user';
 
 
+  enum Silance {
+      muted,
+      baned
+  }
 export default defineComponent({
   data() {
     return {
@@ -36,13 +40,14 @@ export default defineComponent({
       extraButtons: [
         {
           icon: "fa-solid fa-comment-slash",
-          emit: "mute"
+          emit: Silance.muted
         },
         {
           icon: "fa-solid fa-gavel",
-          emit: "ban"
+          emit: Silance.baned
         }
-      ]
+      ],
+      Silance
     }
   },
   updated() {
@@ -64,8 +69,10 @@ export default defineComponent({
     }
   },
   methods: {
-    reEmit(emitMsg, userId){
-      this.$emit("action", emitMsg, userId, this.room.roomId)
+    reEmit(emiType: Silance, userId){
+      console.log(emiType, userId);
+      
+      this.$store.state.socketChat.emit('action', {emiType, userId, roomId: this.room.roomId})
     },
     closePopUp(){
       this.$emit("action", "exit")
