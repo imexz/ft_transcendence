@@ -124,12 +124,12 @@
 
 }
 
-.gameCanvas {
+/* .gameCanvas {
   display: inline-block;
   padding: 20px;
   border: 2px solid var(--ft_cyan);
   border-radius: 10px;
 
-}
+} */
 
 </style>

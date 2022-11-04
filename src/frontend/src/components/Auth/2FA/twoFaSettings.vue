@@ -3,14 +3,17 @@
     <div>
         <div v-if="showQr == false && $store.getters.getUser.isTwoFactorAuthenticationEnabled == false">
             <div> With 2-factor authentication, an extra layer of security is added to your account to prevent someone from logging in, even if they have your password. This extra security measure requires you to verify your identity using a randomized 6-digit code Google Authenticator generate to log in.</div>
+            <br/><br/>
             <button @click="toggleQr"> Enable two factor authentication</button>
         </div>
         <!-- <div v-else-if="showQr == true && $store.getters.getUser.isTwoFactorAuthenticationEnabled == false" >  -->
         <div v-else-if="showQr == true" > 
             <div>
                 <div> scann QR code and Enter the code to enable 2-factor Authentication</div>
+                <br/>
                 <img id="image" :src=QR  alt='hostURL' >
             </div>
+            <br/>
             <input v-model="twoFactorAuthenticationCode" placeholder="Enter Code"/>
             <button @click="on">turn on two factor </button>
 

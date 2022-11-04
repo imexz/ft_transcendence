@@ -3,7 +3,7 @@
     <button class="searchButton" @click="toggleSearchBar">
       <font-awesome-icon icon="fa-solid fa-magnifying-glass" />
     </button>
-    <div v-if="show" class="searchPopUp">
+    <div v-show="show" class="searchPopUp">
       <div class="headLineWrapper">
         <div class="headLine">Search</div>
         <button class="exitButton" @click="toggleSearchBar">
@@ -14,7 +14,8 @@
         type="text"
         class="searchInput"
         placeholder="username"
-        v-model="searchQuery" />
+        v-model="searchQuery"
+        ref="searchInput" />
       <div class="searchResults"
         v-if="searchQuery != ''">
         <UserSummary
@@ -68,6 +69,9 @@ export default defineComponent({
         window.addEventListener('click', this.hideOnClick)
       }
       this.show = !this.show
+      this.$nextTick(() => {
+        this.$refs.searchInput.focus()
+      })
     },
     getData() {
       VueAxios({
