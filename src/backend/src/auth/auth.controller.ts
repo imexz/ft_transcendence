@@ -18,22 +18,22 @@ export class AuthController{
 	@UseGuards(LocalAuthGuard)
 	@Get('login/callback')
 	@Redirect("", 302)
-	callback(@Request() req, @Res({ passthrough: true }) res ) { 
+	callback(@Request() req, @Res({ passthrough: true }) res ) {
 		console.log('login/callback');
 
 		// res.cookie("token", this.authService.login(req.user));
 
-		
+
 		// res.setHeader('Set-Cookie', [this.authService.getCookieWithJwtAccessToken(
-		// 	req.user._id,
+		// 	req.user.id,
 		// 	req.user.isTwoFactorAuthenticationEnabled,
 		// )]);
 		// res.cookie("token", [this.authService.getCookieWithJwtAccessToken(
-		// 	req.user._id,
+		// 	req.user.id,
 		// 	req.user.isTwoFactorAuthenticationEnabled,
 		// )]);
 		res.setHeader('Set-Cookie', this.authService.getCookieWithJwtAccessToken(
-			req.user._id,
+			req.user.id,
 			false,
 		))
 
@@ -53,13 +53,13 @@ export class AuthController{
 	@UseGuards(JwtAuthGuard)
 	logout(@Request() req, @Res({ passthrough: true }) res) {
 		console.log("logout");
-		
+
 		res.setHeader('Set-Cookie', this.authService.getCookieWithJwtAccessToken(
-			req.user._id,
+			req.user.id,
 			false,
 		) + '; Max-Age=0')
 	}
-	
+
 	// @Get('protected')
 	// @UseGuards(JwtAuthGuard)
 	// getusers(@Request() req): string {
@@ -83,6 +83,6 @@ export class AuthController{
 	// 	console.log(id);
 	// 	// console.log(req);
 
-	// 	return	this.authService.addfriend(req.user._id, id);
+	// 	return	this.authService.addfriend(req.user.id, id);
 	// }
 }

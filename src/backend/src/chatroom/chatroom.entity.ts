@@ -1,6 +1,7 @@
 import User from "../users/entitys/user.entity";
 import { Column, Entity, JoinTable, ManyToMany, ManyToOne, OneToMany, OneToOne, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
 import { message } from "../message/message.entity";
+import { Exclude } from 'class-transformer';
 
 export enum Access {
     public,
@@ -10,7 +11,7 @@ export enum Access {
 }
 
 @Entity()
-export class chatroom{
+export default class chatroom{
     @PrimaryGeneratedColumn()
     roomId: number;
 
@@ -33,6 +34,7 @@ export class chatroom{
     @Column()
     access: Access;
 
+    @Exclude()
     @Column({nullable: true})
     hash: string
 

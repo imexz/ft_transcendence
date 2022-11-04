@@ -1,4 +1,4 @@
-import { chatroom } from "../../chatroom/chatroom.entity";
+import chatroom from "../../chatroom/chatroom.entity";
 import { message } from "../../message/message.entity";
 import { Entity, Column, PrimaryGeneratedColumn, JoinColumn, OneToOne, PrimaryColumn, OneToMany, ManyToMany, JoinTable, ManyToOne } from "typeorm";
 import { fileEntity } from "../../avatar/file.entitys";
@@ -26,7 +26,7 @@ export default class User {
 	  }
 
 	@PrimaryColumn({unique: true})
-	_id: number;
+	id: number;
 
 	// @Column()
 	@Column({unique: true}) //finall
@@ -62,7 +62,7 @@ export default class User {
     })
 	userStatus: UserStatus;
 
-	@OneToMany(() => message, (message) => message.user)
+	@OneToMany(() => message, (message) => message.sender)
 	messeges?: message[];
 
 	@ManyToMany(() => chatroom, (chatroom) => chatroom.users)

@@ -41,10 +41,10 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
   @SubscribeMessage('checkGame')
   async handleCheckGame(@ConnectedSocket() client: Socket) {
-		var game: Game | undefined = this.gameService.getGame(client.handshake.auth._id);
+		var game: Game | undefined = this.gameService.getGame(client.handshake.auth.id);
 		if (game == undefined) {
-			// console.log("client %d already is in users", client.handshake.auth._id);
-			console.log("no existing game available", client.handshake.auth._id);
+			// console.log("client %d already is in users", client.handshake.auth.id);
+			console.log("no existing game available", client.handshake.auth.id);
       game = await this.gameService.JoinGameOrCreatGame(client.handshake.auth as User, this.server)
       console.log("handleCheckGame");
       client.join(game.id.toString());
@@ -60,7 +60,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   handleMoveLeftUp(
     @ConnectedSocket() client: Socket,
     @MessageBody() key?: string ): void {
-  this.gameService.handelKeypress(client.handshake.auth._id, key)
+  this.gameService.handelKeypress(client.handshake.auth.id, key)
 }
 
 @SubscribeMessage('leaveGame')
@@ -69,15 +69,15 @@ handleLeaveGame(@ConnectedSocket() client: Socket): void {
   client.rooms.forEach(element => {
     if(element != client.id)
       client.leave(element)
-    
+
   });
   console.log(client.rooms);
   console.log(client.id);
-  
+
   console.log("leaveGame ende");
-     
-    // let game = this.gameService.getGame(client.handshake.auth._id);
-    // this.gameService.leaveGame(client.handshake.auth._id, game);
+
+    // let game = this.gameService.getGame(client.handshake.auth.id);
+    // this.gameService.leaveGame(client.handshake.auth.id, game);
     // client.leave()
   }
 
@@ -102,11 +102,11 @@ handleLeaveGame(@ConnectedSocket() client: Socket): void {
   creatGame(
     @ConnectedSocket() client: Socket,
   ) {
-    var game: Game = this.gameService.getGame(client.handshake.auth._id)
+    var game: Game = this.gameService.getGame(client.handshake.auth.id)
     if(game != undefined && game.interval == null) {
       this.gameService.startGame(this.server, game)
       console.log("game strated");
-      
+
     }
   }
 
@@ -114,7 +114,7 @@ handleLeaveGame(@ConnectedSocket() client: Socket): void {
   removeGame(
     @ConnectedSocket() client: Socket,
   ) {
-    var game: Game = this.gameService.getGame(client.handshake.auth._id)
+    var game: Game = this.gameService.getGame(client.handshake.auth.id)
     if(game != undefined && game.interval == null)
       this.gameService.removeGame(game)
   }
@@ -124,7 +124,7 @@ handleLeaveGame(@ConnectedSocket() client: Socket): void {
   quitGame(
   @ConnectedSocket() client: Socket,
   ) {
-      this.gameService.removePlayerFromWaiting(client.handshake.auth._id)
+      this.gameService.removePlayerFromWaiting(client.handshake.auth.id)
   }
 
   @SubscribeMessage('ViewGame')
@@ -138,11 +138,11 @@ handleLeaveGame(@ConnectedSocket() client: Socket): void {
     }
     return {playerLeft: game.playerLeft, playerRight: game.playerRight}
   }
-  
+
   async findSocketOfUser(userId: number) {
     const sockets = await this.server.fetchSockets();
     for (const socket of sockets) {
-      if(socket.handshake.auth._id == userId)
+      if(socket.handshake.auth.id == userId)
       {
         console.log("gameRequest test");
         return socket
