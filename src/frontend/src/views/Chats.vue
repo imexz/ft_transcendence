@@ -1,7 +1,9 @@
 <template>
   <div v-if="socket" class="chatWrapper">
-    <h1>Chat</h1>
     <div class="chatBanner"></div>
+    <div class="headLine">
+      <span>Chat</span>
+    </div>
     <div>
     <vue-advanced-chat
       :height="height"
@@ -52,6 +54,7 @@
   import roomInfoPopUp from '@/components/Chat/RoomInfoPopUp.vue';
   import { customChatStyle } from "@/styles/chatStyle";
   import Toast from "@/components/Toast.vue";
+import Room from '@/models/room';
 
   register()
 
@@ -62,7 +65,7 @@
           height: "800px",
           currentUserId: '',
           currentRoomId: '',
-          rooms: [],
+          rooms: [] as Room[],
           messages: [],
           messagesLoaded: false, //TB change this value to show a loading icon on the top of the chat
           messageActions: [
@@ -209,8 +212,8 @@
                 withCredentials: true,
             })
                 .then(response => {
-                console.log(response.data);
-
+                // console.log(response.data, typeof(response.data));
+                // let r : Room[] = response.data;
                 this.rooms = response.data
                 })
                 .catch()
@@ -442,10 +445,26 @@
 <style scoped>
 
   .chatWrapper {
+    position: relative;
     width: 800px;
     margin: auto;
+    margin-top: 80px;
     margin-bottom: 80px;
     z-index: 1;
+  }
+
+  .headLine {
+    position: absolute;
+    top: 129px;
+    left: 325px;
+    width: 150px;
+    height: 41px;
+    font-size: 30px;
+    font-weight: bold;
+    background-color: var(--ft_dark);
+    border: 2px solid var(--ft_cyan);
+    border-radius: 10px 10px 0px 0px;
+    border-bottom: none;
   }
 
   .chatBanner {
@@ -460,10 +479,7 @@
   }
   .chatFooter {
     width: 100%;
-    height: 100px;
-    /* /* background: url(@/assets/chatBanner.png);
-    background-size: cover;
-    background-position: 0px 1000px; */
+    height: 20px;
     border: 2px solid var(--ft_cyan);
     border-radius: 0px 0px 10px 10px;
     border-top: none;
