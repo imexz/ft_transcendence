@@ -40,5 +40,4 @@ export class chatroom{
 
     @Column({nullable: true})
     hash: string
-
 }

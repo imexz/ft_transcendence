@@ -271,9 +271,18 @@ export class ChatroomService {
     async getRoom(room: string | number) {
         console.log("before");
         const test = typeof room === 'string' ? {roomName: room} : {roomId: room}
-
         return await this.chatroomRepository.findOne({where: test})
-        console.log("after");
+    }
+
+    async getRoomAdmins(room: number)  {
+        console.log("roomId", room);
+        
+        return await this.chatroomRepository.createQueryBuilder('room')
+        .where("room.roomId = :roo", {roo: room})
+        .leftJoinAndSelect('room.admins', 'admins')
+        .select('admins._id AS id')
+        .getRawMany()
+        // .where()
     }
 
     async addRoom(room_name: string, access: Access,  user: User, password?: string) {

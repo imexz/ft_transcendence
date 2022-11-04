@@ -4,6 +4,7 @@ import { ChatService } from './chat.service';
 import { hostURL } from 'src/hostURL';
 import { AuthService } from 'src/auth/auth.service';
 import User from 'src/users/entitys/user.entity';
+import { Silance } from 'src/chatroom/banMute/banMute.entity';
 
 
 @WebSocketGateway({
@@ -56,8 +57,6 @@ export class ChatGateway {
       const rooms = await this.chatService.getUserRooms(client.handshake.auth._id)
 
       console.log(rooms);
-    
-
 
     var tmp = []
     for (let index = 0; index < rooms.length; index++) {
@@ -99,20 +98,23 @@ export class ChatGateway {
 
   }
 
-  @SubscribeMessage('ban')
+  @SubscribeMessage('action')
   async ban(
-    @MessageBody('roomId') roomId: number,
+    @MessageBody('emiType') emiType: Silance,
     @MessageBody('userId') muteUserId: number,
+    @MessageBody('roomId') roomId: number,
     @ConnectedSocket() client:Socket,
   ) {
     // console.log(roomId)
     console.log("ban")
-    const userId = client.handshake.auth._id
-    this.chatService.ban(roomId, muteUserId, userId)
+    // const userId = client.handshake.auth._id
+    if(await this.chatService.adminAction(emiType, roomId, muteUserId, client.handshake.auth._id) == true) {
+      const socket = await this.findSocketOfUser(muteUserId)
+      socket.leave(roomId.toString())
+    }
     // console.log("recive and emit typing");
 
   }
-
 
   @SubscribeMessage('findAllMessages')
   async findAllMessages(@MessageBody('roomId') roomId: number, @ConnectedSocket() client:Socket,) {
@@ -199,6 +201,17 @@ export class ChatGateway {
     @MessageBody('id') id: number,
   ) {
     this.chatService.creatRoomDM(client.handshake.auth as User, id, content)
+  }
+
+  async findSocketOfUser(userId: number) {
+    const sockets = await this.server.fetchSockets();
+    for (const socket of sockets) {
+      if(socket.handshake.auth._id == userId)
+      {
+        console.log("gameRequest test");
+        return socket
+      }
+    }
   }
 
 

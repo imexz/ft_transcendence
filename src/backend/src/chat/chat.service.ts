@@ -6,15 +6,27 @@ import { ChatroomService } from 'src/chatroom/chatroom.service';
 import { MessageService } from 'src/message/message.service';
 import User from 'src/users/entitys/user.entity';
 import { BanMuteService } from 'src/chatroom/banMute/banMute.service';
+import { Silance } from 'src/chatroom/banMute/banMute.entity';
 
 @Injectable()
 export class ChatService {
-  async ban(roomId: number, muteUserId: number, userId: number) {
-    const room = this.chatroomService.getRoom(roomId)
-    const user = await this.usersService.getUser(muteUserId)
-    const chatroom = await this.chatroomService.getRoom(roomId)
-    this.banMuteService.Ban(user, chatroom)
+  async adminAction(action: Silance, roomId: number, muteUserId: number, userId: number) {
+    const admins = await this.chatroomService.getRoomAdmins(roomId)
+    console.log("admins", admins, userId);
+    
+    const isAdmin = admins.some(element => element.id === userId );
+    console.log(isAdmin);
+    
+    if(isAdmin) {
+      console.log("isAdmin");
+      this.banMuteService.action(action ,await this.usersService.getUser(muteUserId), await this.chatroomService.getRoom(roomId))
+      if(action == Silance.baned)
+        return true
+    }
+    return false
   }
+
+
 
   async creatRoomDM(user: User, id: number, content: string) {
     if(user != undefined && id != undefined)
