@@ -9,6 +9,7 @@ import { QueueElem } from './game.interfaces/queueobj.interface'
 import { UsersService } from 'src/users/users.service';
 import User from 'src/users/entitys/user.entity';
 import { GameData } from './game.entities/gameData';
+import { UserStatus } from "../users/entitys/status.enum";
 
 @Injectable()
 export class GameService {
@@ -56,14 +57,14 @@ export class GameService {
 			}
 		}
 	}
-	async joinGameOrCreatGame(user: User, server: Server, opponent_user_id?: number): Promise<Game> {
+	async joinGameOrCreateGame(user: User, server: Server, opponent_user_id?: number): Promise<Game> {
 		let game = this.getGame(undefined) // checking for first game with missing (undefined) opponent
 		if (game == undefined) {
 			console.log("joinGameOrCreateGame game == undefined");
-			game = await this.#createGameInstance()
+			game = await this.#createGameInstance(user._id)
 			game.playerLeft = user
 			this.gamesArr.push(game)
-			console.log("game created", game);
+			// opponent_user_id is set when called via Frontend::askForMatch
 			if(opponent_user_id != undefined) {
 				const opponent = await this.userService.getUser(opponent_user_id)
 				game.playerRight = opponent
@@ -74,15 +75,21 @@ export class GameService {
 		}
 		return game
 	}
-	async #createGameInstance(): Promise<Game> {
+	async #createGameInstance(userId: number): Promise<Game> {
 		console.log('inside createGameInstance()');
 		const setup = new GameSetup;
-		var game = this.gameRepository.create();
-		console.log("after repo create");
-		game = await this.gameRepository.save(game);
-		// console.log('leaving createGameInstance()');
-		return new Game(game.id, setup);
+		console.log('leaving createGameInstance()');
+		return new Game(userId, setup);
 	}
+	// async #createGameInstance(): Promise<Game> {
+	// 	console.log('inside createGameInstance()');
+	// 	const setup = new GameSetup;
+	// 	var game = this.gameRepository.create();
+	// 	console.log("after repo create");
+	// 	game = await this.gameRepository.save(game);
+	// 	console.log('leaving createGameInstance()');
+	// 	return new Game(game.id, setup);
+	// }
 	async #emitGameData(game: Game, server: Server) {
 		// console.log("emitGameData");
 		const tmpGame: Game = await this.getData(game)
@@ -96,6 +103,8 @@ export class GameService {
 		server.to(game.id.toString()).emit('updateGame', updatedGameData);
 	}
 	async #startGame(server: Server, game: Game) {
+		this.userService.setStatus(game.playerLeft._id, UserStatus.PLAYING);
+		this.userService.setStatus(game.playerRight._id, UserStatus.PLAYING);
 		server.to(game.id.toString()).emit("Game", game)
 		console.log("startGame");
 		
@@ -114,7 +123,6 @@ export class GameService {
 			this.#reset(game);
 		}
 		await this.#isGameFinished(game);
-		// console.log("getData ende");
 		return game
 	}
 	#updateData(game: Game) {
@@ -241,17 +249,21 @@ export class GameService {
 	}
 	async #isGameFinished(game: Game) {
 		// var game: Game | undefined = this.games.get(id);
-		if (game != undefined && (game.score.scoreLeft == 10 || game.score.scoreRight == 10)) {
-			// const gameEntry = this.gameRepository.create({scoreLeft: game.scoreLeft, scoreRight: game.scoreRight});
-			// game.playerLeft = await this.userService.getUser(game.playerLeft._id)
-			// game.playerRight = await this.userService.getUser(game.playerRight._id)
-			await this.gameRepository.save(game);
+		if (game != undefined && (game.score.scoreLeft == 3 || game.score.scoreRight == 3)) {
 			clearInterval(game.interval);
 			game.interval = null
+			let gameInstance: Game = this.gameRepository.create();
+			gameInstance.playerRight = game.playerRight;
+			gameInstance.playerLeft = game.playerLeft;
+			// gameInstance.interval = game.interval;
+			gameInstance.scoreLeft = game.scoreLeft;
+			gameInstance.scoreRight = game.scoreRight;
+			await this.gameRepository.save(gameInstance);
+			this.userService.setStatus(game.playerLeft._id, UserStatus.ONLINE)
+			this.userService.setStatus(game.playerRight._id, UserStatus.ONLINE)
 			this.removeGame(game)
-			console.log("in isGameFinished");
-			// game.finished = false;
-			console.log("game finished, keys removed");
+			console.log("game is finished");
+			
 			// TODO: delete room (?)
 			// TODO: reset frontend variables
 		}

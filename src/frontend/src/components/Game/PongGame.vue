@@ -1,7 +1,7 @@
 <template>
   <div v-show="this.$store.state.game != null">
       <GamePlayers/>
-    <div v-if="this.winner == null" class="gameCanvas">
+    <div v-if="this.$store.state.winner == null" class="gameCanvas">
       <div>
         <Field @assignWinner="assignWinner"/>
       </div>
@@ -11,11 +11,12 @@
       </div>
     </div>
 	</div>
-	<div class="queue" v-show="this.$store.state.game == null && this.winner == null">
-		Waiting for a match...
+	<div class="queue" v-show="this.$store.state.game == null && this.$store.state.winner == null">
+    <text> Waiting for a match... </text>
+		<button @click="leaveGame"> Leave </button>
 	</div>
-  <div v-if="this.winner != null && this.$store.state.game == null">
-        <Result :winner = this.winner @newGame="newGame" />
+  <div v-if="this.$store.state.winner != null && this.$store.state.game == null">
+        <Result :winner = this.$store.state.winner @newGame="newGame" />
   </div>
 </template>
 
@@ -32,7 +33,7 @@
   export default defineComponent({
   	data () {
   		return {
-			  winner: null as User,
+			  // winner: null as User,
         fps: 0,
   		}
   	},
@@ -47,7 +48,7 @@
         console.log(game)
         this.assignGame(game)
 		  });
-      if (this.$store.state.game == null && this.winner == null) {
+      if (this.$store.state.game == null && this.$store.state.winner == null) {
         this.$store.state.socketGame.emit('checkGame', (game: Game) => {
           console.log(game)
         });
@@ -58,7 +59,7 @@
   	},
 		beforeUpdate() {
   		console.log("beforeUpdate");
-      if (this.$store.state.game == null && this.winner == null) {
+      if (this.$store.state.game == null && this.$store.state.winner == null) {
         this.$store.state.socketGame.emit('checkGame', (game: Game) => {
           console.log(game);
         });
@@ -73,11 +74,11 @@
   	methods: {
       newGame(){
         console.log("newGame");
-        this.winner = null
+        this.$store.state.winner = null
       },
       assignWinner(winner: User) {
         console.log("assignWinner");
-        this.winner = winner
+        this.$store.state.winner = winner
       },
       assignGame(game: Game) {
         this.$store.state.game = game

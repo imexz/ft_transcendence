@@ -44,8 +44,8 @@ export class FriendsService {
 				accepter: true
 			},
 			where: [
-				{requester:{ _id: user_id }, status: Not(Status.denide)},
-				{accepter:{	_id: user_id }, status: Not(Status.denide)},
+				{requester:{ _id: user_id }, status: Not(Status.denied)},
+				{accepter:{	_id: user_id }, status: Not(Status.denied)},
 			]
 		})
 

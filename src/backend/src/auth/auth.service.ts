@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
+import { GameService } from '../game/game.service';
 import { JwtService } from '@nestjs/jwt';
 import User from '../users/entitys/user.entity';
 import {TokenPayload} from './tokenPayload.interface';
@@ -9,7 +10,7 @@ import { JwtStrategy } from './jwt-two/jwt.strategy';
 
 @Injectable()
 export class AuthService {
-	constructor(private usersService: UsersService, private jwtService: JwtService, private jwtStrategy: JwtStrategy) {}
+	constructor(private usersService: UsersService, private jwtService: JwtService, private jwtStrategy: JwtStrategy, private gameService: GameService) {}
 	
 	async validateUser(id: number) {
 
@@ -59,7 +60,11 @@ export class AuthService {
 			  socket.disconnect()
 			  return false
 			} else {
-				this.usersService.setStatus(socket.handshake.auth._id, UserStatus.ONLINE)
+				if (this.gameService.getGame(socket.handshake.auth._id) == undefined)
+					await this.usersService.setStatus(socket.handshake.auth._id, UserStatus.ONLINE)
+				else
+					await this.usersService.setStatus(socket.handshake.auth._id, UserStatus.PLAYING)
+					
 				// console.log(socket.handshake.auth);
 				return true
 			}

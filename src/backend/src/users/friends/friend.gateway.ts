@@ -44,7 +44,7 @@ export class FriendGateway {
     }
 
     @SubscribeMessage('Request')
-    async gameRequest(
+    async friendRequest(
     @ConnectedSocket() client: Socket,
     @MessageBody('id') id?: number )
     {
@@ -53,7 +53,7 @@ export class FriendGateway {
       if(id != client.handshake.auth._id) {
         if(await this.friendsService.findFriendShip(client.handshake.auth._id, id) == undefined){
           client.handshake.auth.friendStatus = Status.requsted;
-          (await this.usersService.getUserSocket(this.server, id))?.emit("Request", client.handshake.auth)
+          (await this.usersService.getUserSocket(this.server, id))?.emit('Request', client.handshake.auth)
           this.friendsService.request_friendship(client.handshake.auth._id, id)
         } else {
         // console.log("friendship alredy exist");

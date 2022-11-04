@@ -1,7 +1,7 @@
 
 import { Vue } from 'vue-class-component'
 import { createStore, storeKey } from 'vuex'
-import User from '@/models/user';
+import User, { UserStatus } from '@/models/user';
 import router from '@/router';
 import VueAxios from 'axios';
 import { API_URL } from '@/defines';
@@ -25,13 +25,14 @@ export interface State {
   rooms: []
   game: Game | null
   pendingRequest: boolean
+  winner: User | null
 }
 
 const storage = localStorage.getItem('user')
 const user = storage?JSON.parse(storage):null;
 const initialState = user?
-  {validated: true, user: user, socket: null,  socketChat: null,  socketGame: null, friendsList: null, NrMessages: 0, NrFriendRequests: 0, gameRequest: null, game: null, pendingRequest: false}:
-  {validated: false, user: null,  socket: null,  socketChat: null,  socketGame: null, friendsList: null, NrMessages: 0, NrFriendRequests: 0, gameRequest: null, game: null, pendingRequest: false};
+  {validated: true, user: user, socket: null,  socketChat: null,  socketGame: null, friendsList: null, NrMessages: 0, NrFriendRequests: 0, gameRequest: null, game: null, pendingRequest: false, winner: null}:
+  {validated: false, user: null,  socket: null,  socketChat: null,  socketGame: null, friendsList: null, NrMessages: 0, NrFriendRequests: 0, gameRequest: null, game: null, pendingRequest: false, winner: null};
 
 export default createStore<State>({
 
@@ -53,6 +54,7 @@ export default createStore<State>({
   mutations: {
     logOut(state) {
       state.validated = false;
+      state.socket.disconnect();
     },
     logIn(state, user) {
       // console.log("logIn");
@@ -82,22 +84,22 @@ export default createStore<State>({
       state.socketChat.on('message',() => {
         state.NrMessages++
       })
-      state.socketGame.on('Request',(user: User) => {
+      state.socketGame.on('GameRequestFrontend',(user: User) => {
         state.gameRequest = user;
         // console.log("id", state.gameRequest)
         console.log("receive askformatch");
       })
-      state.socketGame.on('NowInGame', () => {
+      state.socketGame.on('NowInGame', (cb) => {
         // state.game = game;
         console.log("receive NowInGame");
-        router.push('/play')
+        if (cb)
+          router.push('/play')
+        else {
+          state.game = null;
+          state.pendingRequest = false;
+          router.push('/')
+        }
       })
-      state.socketGame.on('GameRequestDenied', () => {
-        state.game = null;
-        state.pendingRequest = false;
-        router.push('/');
-      }) 
-
       state.socket.on('Request',(data) => {
         state.friendsList.push(data)
           console.log("receive  request");
