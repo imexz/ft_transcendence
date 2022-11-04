@@ -1,6 +1,6 @@
-import { chatroom } from "../chatroom/chatroom.entity";
+import chatroom from "../chatroom/chatroom.entity";
 import User from "../users/entitys/user.entity";
-import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
+import {JoinColumn, Column, CreateDateColumn, Entity, ManyToOne, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
 export class message {
@@ -18,8 +18,12 @@ export class message {
     @Column()
     content: string;
 
-    @ManyToOne(() => User, (user) => user.messeges) //TB typo?
-    user: User;
+    @ManyToOne(() => User, (sender) => sender.messeges) //TB typo?
+    // @JoinColumn({name: "userId"})
+    sender: User;
+
+    @Column({ nullable: true })
+    senderId: number
 
     @ManyToOne(() => chatroom, (chatroom) => chatroom.messages, {onDelete: 'CASCADE'} )
     chatroom: chatroom;

@@ -1,4 +1,4 @@
-import { Controller, Delete, Get, UseGuards, Request, Body, Post, HttpException, HttpStatus } from "@nestjs/common";
+import { Controller, Delete, Get, UseGuards, Request, Body, Post, HttpException, HttpStatus, UseInterceptors, ClassSerializerInterceptor} from "@nestjs/common";
 import { JwtAuthGuard } from "src/auth/jwt-two/jwt-auth.guard";
 import User from "src/users/entitys/user.entity";
 import { Access } from "./chatroom.entity";
@@ -9,6 +9,7 @@ export class ChatroomController {
     constructor(private readonly chatroomService: ChatroomService){}
 
     @Get('all')
+    @UseInterceptors(ClassSerializerInterceptor)
 	@UseGuards(JwtAuthGuard)
     async getAll(@Request() req){
         console.log("all");
@@ -36,7 +37,7 @@ export class ChatroomController {
             throw new HttpException('Forbidden', HttpStatus.CONFLICT);
         console.log("creat");
         console.log(req.user);
-        
+
         return await this.chatroomService.getAll(req.user)
     }
 

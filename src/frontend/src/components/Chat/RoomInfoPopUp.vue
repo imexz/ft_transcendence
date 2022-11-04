@@ -14,7 +14,7 @@
     <div class="userGroup">Users</div>
     <div class="user" v-for="user in roomInfo?.room.users">
       <UserSummary
-        v-if="!room?.admins.some((us: User) => us._id == user._id)"
+        v-if="!room?.admins.some((us: User) => us.id == user.id)"
         :user=user :extraButtons="admin?extraButtons:[]"
         @action="reEmit"></UserSummary>
     </div>

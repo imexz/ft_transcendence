@@ -37,12 +37,13 @@ export default defineComponent({
         this.user =this.$store.getters.getUser;
       }
       else {
-      VueAxios({
-          url: '/users/find/' + this.id,
-          baseURL: API_URL,
-          method: 'GET',
-          withCredentials: true,
-        })
+      // VueAxios({
+      //     url: '/users/find/' + this.id,
+      //     baseURL: API_URL,
+      //     method: 'GET',
+      //     withCredentials: true,
+      //   })
+          this.$store.dispatch('getUser', this.id)
           .then(response => { this.user = response.data })
           .catch()
       }
@@ -52,7 +53,7 @@ export default defineComponent({
     this.fetchUser();
   },
   updated() {
-    if (this.user && ( parseInt(this.id) != this.user._id) )
+    if (this.user && ( parseInt(this.id) != this.user.id) )
       this.fetchUser();
   }
 })
@@ -77,7 +78,7 @@ export default defineComponent({
     border-left: none;
 
   }
-  
+
   .nameLine {
     margin-left: 136px;
     font-size: 25px;

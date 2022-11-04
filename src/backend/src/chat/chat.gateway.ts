@@ -4,7 +4,12 @@ import { ChatService } from './chat.service';
 import { hostURL } from 'src/hostURL';
 import { AuthService } from 'src/auth/auth.service';
 import User from 'src/users/entitys/user.entity';
+import chatroom from 'src/chatroom/chatroom.entity';
 
+
+interface ServerToClientEvents {
+  basicEmit: (rooms: chatroom[]) => void;
+}
 
 @WebSocketGateway({
   cors: {
@@ -20,7 +25,7 @@ export class ChatGateway {
   @WebSocketServer()
   server: Server;
 
-  // Socket.use(() => {}) 
+  // Socket.use(() => {})
 
   constructor(private readonly chatService: ChatService, private authService: AuthService) {}
 
@@ -37,38 +42,71 @@ export class ChatGateway {
 
 // console.log(socket.handshake);
 
-      this.joinRoom(socket)
+      this.joinRoomTEST(socket)
     }
+  }
+
+  async joinRoomTEST(@ConnectedSocket() client: Socket) {
+    console.log("joinRoomTEST");
+
+    const rooms = await this.chatService.getUserRooms(client.handshake.auth.id)
+
+      console.log(rooms);
+
+
+
+      var tmp = []
+      for (let index = 0; index < rooms.length; index++) {
+        tmp.push(rooms[index].roomId.toString())
+      }
+      console.log("tmp = ", tmp);
+
+      client.join(tmp)
+      console.log("joinRoomTEST ende");
+
   }
 
   @SubscribeMessage('join')
   async joinRoom(
     @ConnectedSocket() client: Socket,
-    @MessageBody('roomId') roomId?: number,
-    @MessageBody('password') password?: string,)
+    // @MessageBody('roomId') roomId: any,
+    @MessageBody('roomId') roomId: number,
+    @MessageBody('password') password?: string,
+    )
      {
+      console.log("Tobi asys", roomId, typeof(roomId));
+
       console.log("join");
+      console.log("roomIdGateway: ", roomId );
+
 
       // console.log(client.handshake);
-      console.log("join after");
+      console.log("roomId", roomId);
 
-      const rooms = await this.chatService.getUserRooms(client.handshake.auth._id)
+      const rooms = await this.chatService.getUserRooms(client.handshake.auth.id)
 
       console.log(rooms);
-    
 
 
-    var tmp = []
-    for (let index = 0; index < rooms.length; index++) {
-      tmp.push(rooms[index].roomId.toString())
-    }
 
-    if (roomId != undefined && this.chatService.manageJoin(client.handshake.auth._id, roomId, password)) {
-      tmp.push(roomId.toString())
-    }
-    console.log("tmp = ", tmp);
+      var tmp = []
+      for (let index = 0; index < rooms.length; index++) {
+        tmp.push(rooms[index].roomId.toString())
+      }
+      const roomIdNumber: number = Number(roomId)
+      const testbool: boolean = await this.chatService.manageJoin(client.handshake.auth.id, roomIdNumber, password)
+      console.log("bool: ", testbool);
 
-    client.join(tmp)
+      if (roomId != undefined && testbool) {
+        tmp.push(roomId.toString())
+      }
+      console.log("tmp = ", tmp);
+
+      client.join(tmp)
+      console.log("join after");
+      return await this.chatService.findAllMessages(roomId, client.handshake.auth.id)
+
+
   }
 
   @SubscribeMessage('leave')
@@ -77,11 +115,13 @@ export class ChatGateway {
     @ConnectedSocket() client:Socket,
   ) {
     console.log("leave");
+    console.log("hoho", roomId);
+
 
     const room_name = await this.chatService.getRoomName(roomId)
 
     client.leave(room_name);
-    this.chatService.manageLeave(client.handshake.auth._id, room_name)
+    this.chatService.manageLeave(client.handshake.auth.id, room_name)
   }
 
   @SubscribeMessage('typing')
@@ -93,10 +133,10 @@ export class ChatGateway {
     // console.log(roomId)
     console.log("typing")
 
-    // const name = await this.chatService.getClientName(client.handshake.auth._id);
+    // const name = await this.chatService.getClientName(client.handshake.auth.id);
     // const room_name = await this.chatService.getRoomName(roomId)
     // const name = client.Id
-    const userId = client.handshake.auth._id
+    const userId = client.handshake.auth.id
     client.to(roomId.toString()).emit('typing', { userId: userId , isTyping , roomId});
     // console.log("recive and emit typing");
 
@@ -107,10 +147,10 @@ export class ChatGateway {
     console.log('findAllMessages');
     console.log(roomId);
     // console.log(client.handshake);
-    console.log(client.handshake.auth._id);
+    console.log(client.handshake.auth.id);
 
 
-    return await this.chatService.findAllMessages(roomId, client.handshake.auth._id);
+    return await this.chatService.findAllMessages(roomId, client.handshake.auth.id);
     // return {test};
   }
 
@@ -123,24 +163,23 @@ export class ChatGateway {
     console.log("createMessage");
     console.log(roomId);
     console.log(content);
-    console.log(client.handshake.auth._id);
+    console.log(client.handshake.auth.id);
 
     // const room_name = await this.chatService.getRoomName(roomId)
 
-    const message = await this.chatService.createMessage(client.handshake.auth._id, roomId, content);
+    const message = await this.chatService.createMessage(client.handshake.auth.id, roomId, content);
 
     // client.to(room_name).emit('message', message);
     if(message) {
       const tmp = {
-      senderId: client.handshake.auth._id.toString(),
+      senderId: client.handshake.auth.id.toString(),
       _id: message._id,
       content: content,
-      avatar: message.user.avatar_url,
+      avatar: message.sender.avatar_url,
       timestamp: message.timestamp,
-      username: message.user.username }
-      // _id: 0,
+      username: message.sender.username }
+      // id: 0,
       // indexId: 12092,
-
 
       // console.log(test);
       console.log({tmp, roomId});
@@ -151,6 +190,7 @@ export class ChatGateway {
 
 
       client.to(roomId.toString()).emit('message', {message: tmp, roomId});
+      client.to(roomId.toString()).emit('newMessage', {message: tmp, roomId});
       console.log("createMessage ende");
       return tmp;
     } else {
@@ -173,7 +213,7 @@ export class ChatGateway {
   ) {
       console.log("delete found");
       console.log(messageId);
-      this.chatService.deleteMessage(messageId, client.handshake.auth._id);
+      this.chatService.deleteMessage(messageId, client.handshake.auth.id);
 
 
   }
@@ -198,7 +238,7 @@ export class ChatGateway {
   ) {
       console.log("createRoomInfo");
       console.log(roomId);
-      return await this.chatService.createRoomInfo(roomId, client.handshake.auth._id);
+      return await this.chatService.createRoomInfo(roomId, client.handshake.auth.id);
   }
 
   @SubscribeMessage('DM')

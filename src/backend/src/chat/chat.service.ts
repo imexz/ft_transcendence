@@ -13,15 +13,15 @@ export class ChatService {
     if(user != undefined && id != undefined)
     {
       console.log(content);
-      
+
       const user1 = await this.usersService.getUser(id)
       const chatroom = await this.chatroomService.findOrCreatDM(user, user1)
       this.messageService.userAddMessageToRoom(user, content, chatroom.chatroom)
     }
   }
 
-  async createRoomInfo(roomId: number, _id: any) {
-    return await this.chatroomService.createRoomInfo(roomId, _id);
+  async createRoomInfo(roomId: number, id: any) {
+    return await this.chatroomService.createRoomInfo(roomId, id);
   }
 
   async createMessageReaction(messageId: number, reaction: any, remove: boolean) {
@@ -65,10 +65,15 @@ export class ChatService {
 
 
         async manageJoin(user_id: number, roomId: number, password?: string) {
+            console.log("roomIdmanageJoin: ", roomId);
+
             const user = await this.usersService.getUser(user_id)
-            return this.chatroomService.userToRoom(user, roomId, password);
+            const testbool2: boolean = await this.chatroomService.userToRoom(user, roomId, password);
+            console.log("testbool2: ", testbool2);
+
+            return testbool2
         }
-        
+
 
 
 
