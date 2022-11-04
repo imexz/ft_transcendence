@@ -1,7 +1,7 @@
 
 import { Vue } from 'vue-class-component'
 import { createStore, storeKey } from 'vuex'
-import User from '@/models/user';
+import User, { UserStatus } from '@/models/user';
 import router from '@/router';
 import VueAxios from 'axios';
 import { API_URL } from '@/defines';
@@ -25,13 +25,15 @@ export interface State {
   gameRequest: User | null
   rooms: Room[]
   game: Game | null
+  pendingRequest: boolean
+  winner: User | null
 }
 
 const storage = localStorage.getItem('user')
 const user = storage?JSON.parse(storage):null;
 const initialState = user?
-  {validated: true, user: user, socket: null,  socketChat: null,  socketGame: null, friendsList: null, NrMessages: 0, NrFriendRequests: 0, gameRequest: null, game: null}:
-  {validated: false, user: null,  socket: null,  socketChat: null,  socketGame: null, friendsList: null, NrMessages: 0, NrFriendRequests: 0, gameRequest: null, game: null};
+  {validated: true, user: user, socket: null,  socketChat: null,  socketGame: null, friendsList: null, NrMessages: 0, NrFriendRequests: 0, gameRequest: null, game: null, pendingRequest: false, winner: null}:
+  {validated: false, user: null,  socket: null,  socketChat: null,  socketGame: null, friendsList: null, NrMessages: 0, NrFriendRequests: 0, gameRequest: null, game: null, pendingRequest: false, winner: null};
 
 export default createStore<State>({
 
@@ -56,10 +58,11 @@ export default createStore<State>({
   mutations: {
     logOut(state) {
       state.validated = false;
+      state.socket.disconnect();
     },
     logIn(state, user) {
-      console.log("logIn");
-
+      // console.log("logIn");
+      
       state.validated = true;
       state.user = user;
       state.socket = io(API_URL, {
@@ -67,14 +70,14 @@ export default createStore<State>({
               id: document.cookie
           }
       })
-      console.log("default socket init");
-
+      // console.log("default socket init");
+      
       state.socketChat = io(API_URL + "/chat", {
         auth: {
           id: document.cookie
         }
       })
-      console.log("chat socket init");
+      // console.log("chat socket init");
       state.socketGame = io(API_URL + "/game", {
         auth: {
           id: document.cookie
@@ -94,20 +97,25 @@ export default createStore<State>({
       })
 
 
-      state.socketGame.on('Request',(user: User) => {
+      state.socketGame.on('GameRequestFrontend',(user: User) => {
         state.gameRequest = user;
-        console.log("id", state.gameRequest)
-        console.log("askformatch");
+        // console.log("id", state.gameRequest)
+        console.log("receive askformatch");
       })
-      state.socketGame.on('NowInGame', (game: Game) => {
-        state.game = game;
-        console.log("NowInGame");
-        router.push('/play')
+      state.socketGame.on('NowInGame', (cb) => {
+        // state.game = game;
+        console.log("receive NowInGame");
+        if (cb)
+          router.push('/play')
+        else {
+          state.game = null;
+          state.pendingRequest = false;
+          router.push('/')
+        }
       })
-
       state.socket.on('Request',(data) => {
         state.friendsList.push(data)
-          console.log("recive  request");
+          console.log("receive  request");
       })
     },
     changeUserName(state, username) {
@@ -117,8 +125,8 @@ export default createStore<State>({
       state.user.isTwoFactorAuthenticationEnabled = enable;
     },
     setFriendsList(state, friendsList) {
-      console.log(friendsList);
-
+      // console.log(friendsList);
+      
       state.friendsList = friendsList;
     },
     addFriend(state, user) {
@@ -147,7 +155,7 @@ export default createStore<State>({
       commit('logOut');
       document.cookie = "Authentication=; expires=Thu, 01 Jan 1970 00:00:00 GMT;SameSite=Lax"
       localStorage.removeItem('user');
-      console.log(router.currentRoute.value.path)
+      // console.log(router.currentRoute.value.path)
       if (router.currentRoute.value.path != '/login/tfa')
         router.push("/login");
     },

@@ -44,8 +44,8 @@ export class FriendsService {
 				accepter: true
 			},
 			where: [
-				{requester:{ id: user_id }, status: Not(Status.denide)},
-				{accepter:{	id: user_id }, status: Not(Status.denide)},
+				{requester:{ id: user_id }, status: Not(Status.denied)},
+				{accepter:{	id: user_id }, status: Not(Status.denied)},
 			]
 		})
 
@@ -61,9 +61,9 @@ export class FriendsService {
 				tmp.push(element.requester)
 			}
 		});
-		console.log("getFriendst");
-		console.log(tmp);
-
+		// console.log("getFriendst");
+		// console.log(tmp);
+		
 		return tmp
 	}
 
@@ -106,8 +106,8 @@ export class FriendsService {
 
     async request_friendship(user_id: number, friend_id: number) {
 		if(user_id && friend_id) {
-			console.log("request_friendship");
-
+			// console.log("request_friendship");
+			
 			const user1 = this.usersService.getUser(user_id)
 			const user2 = this.usersService.getUser(friend_id)
 
@@ -120,10 +120,10 @@ export class FriendsService {
     async response_friendship(user_id: number, friend_id: number, status: Status ) {
 		if(user_id && friend_id) {
 			var friendship = await this.findFriendShip(user_id, friend_id)
-			console.log("response_friendship", friendship, status);
-			console.log(user_id, friend_id);
-
-
+			// console.log("response_friendship", friendship, status);
+			// console.log(user_id, friend_id);
+			
+			
 			if (friendship != undefined) {
 				this.friendRepository.update(friendship.id, {status: status})
 			}

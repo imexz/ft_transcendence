@@ -12,8 +12,8 @@ export class ChatService {
   async creatRoomDM(user: User, id: number, content: string) {
     if(user != undefined && id != undefined)
     {
-      console.log(content);
-
+      // console.log(content);
+      
       const user1 = await this.usersService.getUser(id)
       const chatroom = await this.chatroomService.findOrCreatDM(user, user1)
       this.messageService.userAddMessageToRoom(user, content, chatroom.chatroom)
@@ -88,9 +88,9 @@ export class ChatService {
 
         async getClientName(id: number) {
             const user = await this.usersService.getUser(id)
-            console.log("getClientName");
-            console.log(id);
-            console.log(user);
+            // console.log("getClientName");
+            // console.log(id);
+            // console.log(user);
             return user.username
         }
 

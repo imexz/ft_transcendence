@@ -1,20 +1,21 @@
 <template>
   <div v-show="this.$store.state.game != null">
       <GamePlayers/>
-    <div v-if="this.winner == null" class="gameCanvas">
+    <div v-if="this.$store.state.winner == null" class="gameCanvas">
       <div>
-        <Field @asigneWinner="asigneWinner"/>
+        <Field @assignWinner="assignWinner"/>
       </div>
       <div v-show="this.$store.state.user.id!=this.$store.state.game?.playerRight?.id && this.$store.state.user.id!=this.$store.state.game?.playerLeft?.id"  class="leaveGame">
         <button @click="leaveGame"> Leave </button>
       </div>
     </div>
 	</div>
-	<div class="queue" v-show="this.$store.state.game == null && this.winner == null">
-		Waiting for a match...
+	<div class="queue" v-show="this.$store.state.game == null && this.$store.state.winner == null">
+    <text> Waiting for a match... </text>
+		<button @click="leaveGame"> Leave </button>
 	</div>
-  <div v-if="this.winner != null && this.$store.state.game == null">
-        <Result :winner = this.winner @newGame="newGame" />
+  <div v-if="this.$store.state.winner != null && this.$store.state.game == null">
+        <Result :winner = this.$store.state.winner @newGame="newGame" />
   </div>
 </template>
 
@@ -31,7 +32,7 @@
   export default defineComponent({
   	data () {
   		return {
-			  winner: null as User,
+			  // winner: null as User,
         fps: 0,
   		}
   	},
@@ -40,16 +41,15 @@
       Result,
       Field
     },
-  	created() { // always called when Component is initialized (e.g. on refresh)
-  		console.log("in created");
-
+  	created() {
+  		console.log("in created"); 
   		this.$store.state.socketGame.on('Game', (game: Game) => {
-        console.log(game);
-        this.asigneGame(game)
+        console.log(game)
+        this.assignGame(game)
 		  });
-      if (this.$store.state.game == null && this.winner == null) {
+      if (this.$store.state.game == null && this.$store.state.winner == null) {
         this.$store.state.socketGame.emit('checkGame', (game: Game) => {
-          console.log(game);
+          console.log(game)
         });
       }
   	},
@@ -58,14 +58,13 @@
   	},
 		beforeUpdate() {
   		console.log("beforeUpdate");
-    if (this.$store.state.game == null && this.winner == null) {
-      this.$store.state.socketGame.emit('checkGame', (game: Game) => {
-        console.log(game);
-      });
-    }
-		console.log("leaving beforeUpdate");
-
-	},
+      if (this.$store.state.game == null && this.$store.state.winner == null) {
+        this.$store.state.socketGame.emit('checkGame', (game: Game) => {
+          console.log(game);
+        });
+      }
+		  console.log("leaving beforeUpdate");
+	  },
   	unmounted() {
   		console.log("in unmount");
       this.$store.state.socketGame.emit('Quit')
@@ -74,14 +73,13 @@
   	methods: {
       newGame(){
         console.log("newGame");
-        this.winner = null
+        this.$store.state.winner = null
       },
-      asigneWinner(winner: User) {
-        console.log("asigneWinner");
-
-        this.winner = winner
+      assignWinner(winner: User) {
+        console.log("assignWinner");
+        this.$store.state.winner = winner
       },
-      asigneGame(game: Game) {
+      assignGame(game: Game) {
         this.$store.state.game = game
         if (this.$store.state.game.playerRight != undefined) {
   			  document.addEventListener('keydown', this.keyEvents, false);

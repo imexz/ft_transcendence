@@ -2,6 +2,7 @@
   <div class="footer">
       <AskForGame v-if="this.$store.state.gameRequest != null"/>
       <FriendList v-if="$store.state.validated"></FriendList>
+      <PendingGameRequest v-if="$store.state.pendingRequest"></PendingGameRequest>
   </div>
 </template>
 
@@ -10,11 +11,13 @@
 import { defineComponent } from 'vue';
 import FriendList from '@/components/Footer/FriendList.vue';
 import AskForGame from '@/components/Game/AskForGame.vue'
+import PendingGameRequest from '../Game/PendingGameRequest.vue';
 
 export default defineComponent({
   components: {
     FriendList,
-    AskForGame
+    AskForGame,
+    PendingGameRequest
   }
 })
 </script>
