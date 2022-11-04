@@ -174,14 +174,6 @@ export default createStore<State>({
       .catch()
     }
   },
-  async getUser(id : number) {
-    return await VueAxios({
-      url: '/users/find/' + id,
-      baseURL: API_URL,
-      method: 'GET',
-      withCredentials: true,
-    })
-  },
   modules: {
   }
 })

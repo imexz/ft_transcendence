@@ -3,7 +3,7 @@ import User from "./user";
 export default class Message {
     constructor(message: any, user: User) {
 
-        console.warn("constructor for message called", message);
+        // console.warn("constructor for message called", message);
         this._id = message._id
         this.content = message.content
         this.avatar = user.avatar_url

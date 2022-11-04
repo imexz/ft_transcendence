@@ -2,7 +2,8 @@ import  User  from "./user";
 import  Message  from "./message";
 import UserService from "./user"
 import Toast from '@/components/Toast.vue'
-import store from '../store/index'
+import VueAxios from 'axios';
+import { API_URL } from '@/defines';
 
 export enum Access {
     public,
@@ -23,11 +24,10 @@ export default class Room {
         {
             this.findUser(room.messages[i].senderId)
             .then(user => (this.messages.push(new Message(room.messages[i], user))))
-            .catch(error => (console.error("User not found"),
-                Toast.triggerToast('User not found', 'error')))
+            .catch(error => (console.error("User not found"))
         }
         this.admins = room.admins
-        console.warn("Room constructor called", room);
+        // console.warn("Room constructor called", room);
 
     }
 
@@ -54,7 +54,12 @@ export default class Room {
         }
         if (user == undefined)
         {
-            user = await store.dispatch('getUser', userId)
+            user = await VueAxios({
+                url: '/users/find/' + userId,
+                baseURL: API_URL,
+                method: 'GET',
+                withCredentials: true,
+              })
         }
 
         return user

@@ -37,13 +37,12 @@ export default defineComponent({
         this.user =this.$store.getters.getUser;
       }
       else {
-      // VueAxios({
-      //     url: '/users/find/' + this.id,
-      //     baseURL: API_URL,
-      //     method: 'GET',
-      //     withCredentials: true,
-      //   })
-          this.$store.dispatch('getUser', this.id)
+      VueAxios({
+          url: '/users/find/' + this.id,
+          baseURL: API_URL,
+          method: 'GET',
+          withCredentials: true,
+        })
           .then(response => { this.user = response.data })
           .catch()
       }
