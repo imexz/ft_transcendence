@@ -160,7 +160,7 @@ export default defineComponent({
     // for match and spectate
     askForMatch(){
       this.closeDmPopUp()
-      if (this.user._id === this.$store.state.user._id) return;
+      if (this.user.id === this.$store.state.user.id) return;
       this.$store.state.winner = null;
       this.$store.state.socketGame.emit('GameRequestBackend', {id: this.user.id}, (r) => { 
         

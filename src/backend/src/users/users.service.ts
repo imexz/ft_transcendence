@@ -72,7 +72,7 @@ export class UsersService {
 				
               return socket
             }
-			// console.log(socket.handshake.auth._id);
+			// console.log(socket.handshake.auth.id);
 			
           }		
 	}

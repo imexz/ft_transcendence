@@ -71,8 +71,8 @@ handleLeaveGame(@ConnectedSocket() client: Socket): void {
       client.leave(element)
 
   });
-  let game = this.gameService.getGame(client.handshake.auth._id);
-  if (game != undefined && client.handshake.auth._id === game.paddleLeft.id) {
+  let game = this.gameService.getGame(client.handshake.auth.id);
+  if (game != undefined && client.handshake.auth.id === game.paddleLeft.id) {
     this.gameService.removeGame(game);
   }
   // console.log(client.rooms);
@@ -90,7 +90,7 @@ handleLeaveGame(@ConnectedSocket() client: Socket): void {
   async gameRequest(
     @ConnectedSocket() client: Socket,
     @MessageBody('id') id?: number) {
-      if (client.handshake.auth._id === id) {
+      if (client.handshake.auth.id === id) {
         client.emit('NowInGame', false)
         return null;
       }
@@ -98,7 +98,7 @@ handleLeaveGame(@ConnectedSocket() client: Socket): void {
       if(game == undefined) {
         const socket = await this.findSocketOfUser(id)
         socket.emit('GameRequestFrontend', client.handshake.auth as User)
-        // console.log("gameRequest: client_id: %d | id: %d", client.handshake.auth._id, id);
+        // console.log("gameRequest: client_id: %d | id: %d", client.handshake.auth.id, id);
         game = await this.gameService.joinGameOrCreateGame(client.handshake.auth as User, this.server, id)
         // client.emit('NowInGame', true)
       } else if (game.interval == null) {

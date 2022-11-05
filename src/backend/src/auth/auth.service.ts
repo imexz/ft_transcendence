@@ -60,10 +60,10 @@ export class AuthService {
 			  socket.disconnect()
 			  return false
 			} else {
-				if (this.gameService.getGame(socket.handshake.auth._id) == undefined)
-					await this.usersService.setStatus(socket.handshake.auth._id, UserStatus.ONLINE)
+				if (this.gameService.getGame(socket.handshake.auth.id) == undefined)
+					await this.usersService.setStatus(socket.handshake.auth.id, UserStatus.ONLINE)
 				else
-					await this.usersService.setStatus(socket.handshake.auth._id, UserStatus.PLAYING)
+					await this.usersService.setStatus(socket.handshake.auth.id, UserStatus.PLAYING)
 					
 				// console.log(socket.handshake.auth);
 				return true

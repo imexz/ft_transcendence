@@ -36,7 +36,7 @@ import { UsersService } from "src/users/users.service";
 
     isTwoFactorAuthenticationCodeValid(twoFactorAuthenticationCode: string, user: User) {
         // console.log('isTwoFactorAuthenticationCodeValid');
-        // const tmp_user  = await this.usersService.getUser(user._id)
+        // const tmp_user  = await this.usersService.getUser(user.id)
         
         // console.log(twoFactorAuthenticationCode, user.twoFactorAuthenticationSecret);
         
