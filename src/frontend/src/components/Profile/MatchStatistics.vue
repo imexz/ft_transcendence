@@ -22,7 +22,7 @@
         stroke-dashoffset="25"></circle>
         <g class="donut-text donut-text-1">
           <text y="50%" transform="translate(0, 2)">
-            <tspan x="50%" text-anchor="middle" class="donut-percent">{{ (winCount / totalGames * 100).toFixed(2)}}%</tspan>   
+            <tspan x="50%" text-anchor="middle" class="donut-percent">{{ ((winCount / totalGames * 100) || 0).toFixed(1) }}%</tspan>   
           </text>
           <text y="60%" transform="translate(0, 2)">
             <tspan x="50%" text-anchor="middle" class="donut-data">Games Played: {{ totalGames }}</tspan>   
@@ -45,8 +45,8 @@ export default defineComponent({
   },
   computed: {
     percentage() {
-      let p: string = (this.winCount / this.totalGames * 100).toFixed(0)
-      let n: string = (100 - (this.winCount / this.totalGames * 100)).toFixed(0)
+      let p: string = ((this.winCount / this.totalGames * 100)|0).toFixed(0)
+      let n: string = (100 - ((this.winCount / this.totalGames * 100))|0).toFixed(0)
       return p + " " + n;
     }
   },

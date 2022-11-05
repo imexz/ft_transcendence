@@ -3,7 +3,7 @@ import { banMute, Silance } from './banMute.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import User from 'src/users/entitys/user.entity';
-import { chatroom } from '../chatroom.entity';
+import chatroom from '../chatroom.entity';
 
 
 

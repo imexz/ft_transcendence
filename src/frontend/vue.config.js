@@ -13,6 +13,6 @@ module.exports = defineConfig({
           isCustomElement: tagName => tagName === 'vue-advanced-chat'        }
       }))
   },
-  devServer: {    port: 8080,  }
+  devServer: { port: 8080}
 })
 

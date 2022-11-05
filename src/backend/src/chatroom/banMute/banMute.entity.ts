@@ -1,6 +1,6 @@
 import User from "../../users/entitys/user.entity";
 import { Column, Entity, CreateDateColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, OneToOne, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
-import { chatroom } from "../chatroom.entity";
+import chatroom from "../chatroom.entity";
 
 export enum Silance {
     muted,

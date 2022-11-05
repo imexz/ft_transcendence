@@ -14,7 +14,7 @@ export class AvatarService {
         private fileRepository: Repository<fileEntity>,
         private usersService: UsersService
     ){}
-        
+
     async getFile(id: number) {
         return await this.fileRepository.findOneBy({id: id})
     }
@@ -36,7 +36,7 @@ export class AvatarService {
         const avatar = await this.fileRepository.findOne({
             where: {
                 user: {
-                    _id: id
+                    id: id
                 }
             }
         }

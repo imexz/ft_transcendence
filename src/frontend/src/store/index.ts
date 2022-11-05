@@ -8,6 +8,7 @@ import { API_URL } from '@/defines';
 import { io, Socket } from 'socket.io-client'
 import { RequestEnum } from '@/enums/models/RequestEnum';
 import Game from '@/models/game';
+import Room from '@/models/room';
 
 
 
@@ -22,7 +23,7 @@ export interface State {
   NrMessages: number
   NrFriendRequests: number
   gameRequest: User | null
-  rooms: []
+  rooms: Room[]
   game: Game | null
 }
 
@@ -45,9 +46,12 @@ export default createStore<State>({
     getSocket(state) {
       return state.socket
     },
-    getFriends(state) {      
+    getFriends(state) {
       return state.friendsList
-    } 
+    },
+    getRooms(state) {
+      return state.rooms
+    }
   },
   mutations: {
     logOut(state) {
@@ -55,7 +59,7 @@ export default createStore<State>({
     },
     logIn(state, user) {
       console.log("logIn");
-      
+
       state.validated = true;
       state.user = user;
       state.socket = io(API_URL, {
@@ -64,7 +68,7 @@ export default createStore<State>({
           }
       })
       console.log("default socket init");
-      
+
       state.socketChat = io(API_URL + "/chat", {
         auth: {
           id: document.cookie
@@ -76,11 +80,20 @@ export default createStore<State>({
           id: document.cookie
         }
       })
+
       console.log("game socket init");
       console.log(document.cookie);
       state.socketChat.on('message',() => {
         state.NrMessages++
       })
+
+      state.socketChat.on('newMessage',(data) => {
+        console.log("newMessage received:");
+
+        console.log(state.rooms[data.roomId]/* .messages.push(data.message) */)
+      })
+
+
       state.socketGame.on('Request',(user: User) => {
         state.gameRequest = user;
         console.log("id", state.gameRequest)
@@ -105,17 +118,29 @@ export default createStore<State>({
     },
     setFriendsList(state, friendsList) {
       console.log(friendsList);
-      
+
       state.friendsList = friendsList;
     },
     addFriend(state, user) {
       state.friendsList?.push(user)
     },
     removeFriend(state, id) { //todo make better
-      const index = state.friendsList?.findIndex(element => element._id == id)
+      const index = state.friendsList?.findIndex(element => element.id == id)
       if (index != -1)
-        state.friendsList?.splice(state.friendsList?.findIndex(element => element._id == id) , 1)
-    }
+        state.friendsList?.splice(state.friendsList?.findIndex(element => element.id == id) , 1)
+    },
+    setRooms(state, rooms: any) {
+      state.rooms = [] as Room[]
+      // console.log(state.rooms instanceof Room);
+
+      for (let i = 0; i < rooms.length; ++i)
+      {
+        state.rooms.push(new Room(rooms[i]))
+      }
+      // state.rooms = rooms
+      console.log("ROOMS: ", rooms, rooms[0] instanceof Room)
+      console.log("state.ROOMS: ", state.rooms, state.rooms[0] instanceof Room)
+    },
   },
   actions: {
     logOut({ commit }) {
@@ -129,6 +154,14 @@ export default createStore<State>({
     logIn({ commit }, user) {
       commit('logIn', user);
       localStorage.setItem('user', JSON.stringify(user));
+      VueAxios({
+        url: 'chatroom/all',
+        baseURL: API_URL,
+        method: 'GET',
+        withCredentials: true
+      })
+      .then(response => { commit('setRooms', response.data); console.log("rooms after api call: ", response.data);
+      })
     },
     getFriendsList({ commit }) {
       VueAxios({

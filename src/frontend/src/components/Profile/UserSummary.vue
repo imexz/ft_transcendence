@@ -1,7 +1,12 @@
 <template>
   <div class="userSummary">
     <div v-if="showDm" class="dmPopUp">
-      <div class="txt">Write DM</div>
+      <div class="headLineWrapper">
+        <div class="headLine">Direct Message</div>
+        <button class="exitButton" @click="closeDmPopUp">
+          <font-awesome-icon icon="fa-solid fa-x" />
+        </button>
+      </div>
       <form @submit.prevent="sendDm">
         <textarea class="dmText" v-model="msgText" placeholder="your message" rows="4">
         </textarea>
@@ -9,7 +14,7 @@
       </form>
     </div>
     <div v-if="showGame" class="dmPopUp">
-      <ViewGamePopup @actions="viewGame" :game="game" :userId="user._id" />
+      <ViewGamePopup @actions="viewGame" :game="game" :userId="user.id" />
     </div>
     <div class="normalView">
       <img :src="user?.avatar_url" alt="Avatar">
@@ -34,21 +39,21 @@
       </div>
     </div>
     <div class="dropdownMenu" v-if="show">
-      <button 
-        v-if="$store.getters.getFriends != '' && $store.getters.getFriends.some((us: User) => us._id == user._id)"
+      <button
+        v-if="$store.getters.getFriends != '' && $store.getters.getFriends.some((us: User) => us.id == user.id)"
         class="dropdownElement"
         @click="removeFriend">
         <font-awesome-icon icon="fa-solid fa-user-minus" />
       </button>
-      <button 
+      <button
         v-else
         class="dropdownElement"
         @click="addFriend">
         <font-awesome-icon icon="fa-solid fa-user-plus" />
       </button>
-      <button 
+      <button
         class="dropdownElement"
-        @click="viewProfile(user?._id)" >
+        @click="viewProfile(user?.id)" >
         <font-awesome-icon icon="fa-solid fa-eye" />
       </button>
       <button
@@ -65,7 +70,7 @@
         @click="askForMatch">
         <font-awesome-icon icon="fa-solid fa-table-tennis-paddle-ball" />
       </button>
-      <button 
+      <button
         v-for="button in extraButtons"
         class="dropdownElement"
         @click="customEmit(button.emit)">
@@ -113,10 +118,10 @@ export default defineComponent({
   },
   methods: {
     customEmit(emitMsg){
-      this.$emit('action', emitMsg, this.user._id)
+      this.$emit('action', emitMsg, this.user.id)
     },
     addFriend(): void {
-      this.$store.state.socket.emit('Request', {id: this.user._id})
+      this.$store.state.socket.emit('Request', {id: this.user.id})
       this.user.friendStatus = Status.pending
       this.$store.commit("addFriend", this.user)
     },
@@ -124,14 +129,14 @@ export default defineComponent({
       if(status == Status.accepted){
         this.user.friendStatus = null
       } else {
-        this.$store.commit("removeFriend", this.user._id)
+        this.$store.commit("removeFriend", this.user.id)
       }
-      this.$store.state.socket.emit('Response', {id: this.user._id, status: status})
+      this.$store.state.socket.emit('Response', {id: this.user.id, status: status})
       console.log("response", status)
     },
     removeFriend(){
-      this.$store.state.socket.emit('Remove', {id: this.user._id})
-      this.$store.commit("removeFriend", this.user._id)
+      this.$store.state.socket.emit('Remove', {id: this.user.id})
+      this.$store.commit("removeFriend", this.user.id)
     },
     viewProfile(id: number){
       this.show = false;
@@ -154,7 +159,7 @@ export default defineComponent({
     },
     askForMatch(){
       this.closeDmPopUp()
-      this.$store.state.socketGame.emit('Request', {id: this.user._id}, (r) => { 
+      this.$store.state.socketGame.emit('Request', {id: this.user.id}, (r) => {
         this.showGame = !this.showGame
         console.log("AskForMatch");
       }
@@ -165,7 +170,7 @@ export default defineComponent({
           this.showGame = false;
           break;
         case 'view':
-          this.$store.state.socketGame.emit('ViewGame', {id: this.user._id}, () => {
+          this.$store.state.socketGame.emit('ViewGame', {id: this.user.id}, () => {
             this.showGame = !this.showGame
             this.$router.push('/play')
           });
@@ -196,7 +201,7 @@ export default defineComponent({
       console.log(this.msgText)
       this.closeDmPopUp()
       this.toggleDropdown()
-      this.$store.state.socketChat.emit('DM', {content: this.msgText, id: this.user._id})
+      this.$store.state.socketChat.emit('DM', {content: this.msgText, id: this.user.id})
       this.msgText = ""
     }
 
@@ -272,7 +277,7 @@ export default defineComponent({
   }
   .dropdownElement:hover {
     background-color: var(--ft_dark_purple);
-    
+
   }
   .dmPopUp {
     position: absolute;
@@ -344,5 +349,36 @@ export default defineComponent({
   .friendButton:hover {
     background-color: var(--ft_cyan);
     color: var(--ft_dark);
+  }
+
+  .headLineWrapper {
+    margin-top: 15px;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    padding-left: 15px;
+    padding-right: 15px;
+    border-bottom: 1px solid var(--ft_cyan);
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .headLine {
+    font-size: 25px;
+    font-weight: bold;
+  }
+
+  .exitButton {
+    height: 30px;
+    width: 30px;
+    font-weight: bold;
+    padding: 3px;
+    border-radius: 50%;
+    border: 2px solid var(--ft_pink);
+    color: var(--ft_pink);
+    background-color: var(--ft_dark);
+  }
+  .exitButton:hover {
+    color: var(--ft_dark);
+    background-color: var(--ft_pink);
   }
 </style>

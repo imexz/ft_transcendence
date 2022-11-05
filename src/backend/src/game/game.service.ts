@@ -14,7 +14,7 @@ import { GameData } from './game.entities/gameData';
 export class GameService {
   startGame(server: Server, game: Game) {
     if (game.playerLeft != undefined && game.playerRight != undefined) {
-		this.#startGame(server, game)	
+		this.#startGame(server, game)
 	}
   }
 
@@ -32,17 +32,17 @@ export class GameService {
 		const game = this.getGame(user_id)
 		if(game != undefined && game.playerRight == undefined)
 		{
-			this.removeGame(game)			
+			this.removeGame(game)
 		}
 	}
 
 	getGame(user_id: number | undefined): Game {
-		return this.Samuel.find((value: Game) =>  value.playerLeft?._id == user_id || value.playerRight?._id == user_id)
+		return this.Samuel.find((value: Game) =>  value.playerLeft?.id == user_id || value.playerRight?.id == user_id)
 	}
-	
+
 	getPlayerSide(game: Game, user_id: number) {
 		if (game != undefined) {
-			if (game.playerLeft._id == user_id) {
+			if (game.playerLeft.id == user_id) {
 				return Side.left
 			} else {
 				return Side.right
@@ -54,9 +54,9 @@ export class GameService {
 		const game = this.getGame(user_id)
 		if(game != undefined) {
 			if (key == "ArrowUp" || key == "w") {
-				this.movePaddleUp(game, this.getPlayerSide(game, user_id))			
+				this.movePaddleUp(game, this.getPlayerSide(game, user_id))
 			} else if (key == "ArrowDown" || key == "s") {
-				this.movePaddleDown(game, this.getPlayerSide(game, user_id))			
+				this.movePaddleDown(game, this.getPlayerSide(game, user_id))
 			}
 		}
 	}
@@ -77,7 +77,7 @@ export class GameService {
 		}
 		return game
 	}
-	
+
 	async #createGameInstance(): Promise<Game> {
 		console.log('inside createGameInstance()');
 		const setup = new GameSetup;
@@ -98,21 +98,21 @@ export class GameService {
 			paddleRight: hi.paddleRight,
 			score: hi.score,
 			// finished: hi.finished,
-		}		
+		}
 		server.to(game.id.toString()).emit('updateGame', test);
 	}
 
 	async #startGame(server: Server, game: Game) {
 		server.to(game.id.toString()).emit("Game", game)
 		console.log("startGame");
-		
+
 		game.interval = setInterval(() => this.#emitGameData(game, server), 16) as unknown as number;
 		console.log("startGame end");
 	}
 
 	async getData(game: Game): Promise<Game | undefined> {
 		// console.log("getData");
-		
+
 		if (game == undefined) {
 			return undefined;
 		}
@@ -241,7 +241,7 @@ export class GameService {
 		 - 0.2 > game.ball.direction.y && game.ball.direction.y > 0.2 &&
 		 game.ball.direction.y > game.ball.direction.x * 10);
 		console.log(game.ball.direction.x, game.ball.direction.y);
-		
+
 		// console.log("dir x: %d | dir y: %d | angle: %d", game.ball.direction.x, game.ball.direction.y, game.ball.direction.angle);
 		game.ball.radius = this.setup.ballRadius;
 
@@ -260,8 +260,8 @@ export class GameService {
 		// var game: Game | undefined = this.games.get(id);
 		if (game != undefined && (game.score.scoreLeft == 10 || game.score.scoreRight == 10)) {
 			// const gameEntry = this.gameRepository.create({scoreLeft: game.scoreLeft, scoreRight: game.scoreRight});
-			// game.playerLeft = await this.userService.getUser(game.playerLeft._id)
-			// game.playerRight = await this.userService.getUser(game.playerRight._id)
+			// game.playerLeft = await this.userService.getUser(game.playerLeft.id)
+			// game.playerRight = await this.userService.getUser(game.playerRight.id)
 			await this.gameRepository.save(game);
 			clearInterval(game.interval);
 			game.interval = null
@@ -281,9 +281,9 @@ export class GameService {
 		}
 	}
 
-	movePaddleUp(game: Game, side: Side) {		
+	movePaddleUp(game: Game, side: Side) {
 		// console.log("movePaddleUp", side);
-		
+
 		if (side == Side.left) {
 			if (game.paddleLeft.position.y > 0)
 				game.paddleLeft.position.y -= game.paddleLeft.speed;
@@ -308,7 +308,7 @@ export class GameService {
 	}
 	// leaveGame(user_id: number, game: Game) {
 
-	// 	if (user_id === game.playerLeft._id || user_id === game.playerRight._id) {
+	// 	if (user_id === game.playerLeft.id || user_id === game.playerRight.id) {
 	// 		// this.intervals.delete(gameId);
 	// 	} else {
 	// 		console.log("leaveGame gid", game.id, typeof game.id);
@@ -317,10 +317,10 @@ export class GameService {
 	// }
 
 	async getMatchHistory(user: User){
-	// 	return await this.gameRepository.find({ 
+	// 	return await this.gameRepository.find({
 	// 		where: {
 	// 			player: {
-	// 				_id: user._id
+	// 				id: user.id
 	// 			}
 	// 		},
 	// 		relations: {
@@ -330,21 +330,21 @@ export class GameService {
 	// }
 	if (user == undefined) {
 		console.log("user == undefind");
-		
+
 	}
-	console.log("user._id", user._id, typeof(user._id));
-	
+	console.log("user.id", user.id, typeof(user.id));
+
 
 		return await this.gameRepository.createQueryBuilder("game")
-		// .innerJoinAndSelect("game.player", "player", "player._id = :id", { id: user._id})
-		.leftJoin('game.playerRight', 'tmp', 'tmp._id = :id', { id: user._id as number} )
-		.leftJoin('game.playerLeft', 'tmp1', 'tmp1._id = :idd', { idd: user._id  as number})
-		.leftJoinAndSelect('game.playerRight', 'playerRight', 'playerRight._id != :iid', { iid: user._id} )
-		.leftJoinAndSelect('game.playerLeft', 'playerLeft', 'playerLeft._id != :iidd', { iidd: user._id})
-		.where("game.playerRight._id = :te", {te: user._id})
-		.orWhere("game.playerLeft._id = :te1", {te1: user._id})
-		// .innerJoinAndSelect("game.playerRight", "playerRight", "playerRight._id != :id", { id: user._id} )
-		// .innerJoinAndSelect("game.player", "player", "player._id != :id", { id: user._id})
+		// .innerJoinAndSelect("game.player", "player", "player.id = :id", { id: user.id})
+		.leftJoin('game.playerRight', 'tmp', 'tmp.id = :id', { id: user.id as number} )
+		.leftJoin('game.playerLeft', 'tmp1', 'tmp1.id = :idd', { idd: user.id  as number})
+		.leftJoinAndSelect('game.playerRight', 'playerRight', 'playerRight.id != :iid', { iid: user.id} )
+		.leftJoinAndSelect('game.playerLeft', 'playerLeft', 'playerLeft.id != :iidd', { iidd: user.id})
+		.where("game.playerRight.id = :te", {te: user.id})
+		.orWhere("game.playerLeft.id = :te1", {te1: user.id})
+		// .innerJoinAndSelect("game.playerRight", "playerRight", "playerRight.id != :id", { id: user.id} )
+		// .innerJoinAndSelect("game.player", "player", "player.id != :id", { id: user.id})
 		// .select("'scoreLeft'")
 		.getMany()
 	}

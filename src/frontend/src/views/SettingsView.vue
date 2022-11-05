@@ -40,7 +40,7 @@
         <twoFaSettings/>
       </div>
     </div>
-    <div class="section">
+    <!-- <div class="section">
       <div class="sectionHeadline"> 
         <h2>API-Test (DEBUG ONLY!!)</h2>
       </div>
@@ -59,7 +59,7 @@
         <p>prints the store content to console</p>
         <button @click="show">show Store</button>       
       </div>
-    </div>
+    </div> -->
   </div>
 </template>
 
@@ -115,14 +115,14 @@ export default defineComponent({
   .wrapper {
     width: 800px;
     margin: auto;
-    margin-top: 10px;
+    /* margin-top: 10px; */
     margin-bottom: 80px;
     display: flex;
     flex-direction: column;
     background-color: var(--ft_dark);
   }
   .wrapper h1 {
-    text-align: left;
+    /* text-align: left; */
     margin-bottom: 40px;
   
   }

@@ -2,7 +2,8 @@ import { Get, Injectable } from '@nestjs/common';
 import User from '../users/entitys/user.entity';
 import { Column, FindOptionsWhere, ManyToMany, Not, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Access, chatroom } from './chatroom.entity';
+import { Access } from './chatroom.entity';
+import chatroom from './chatroom.entity';
 import { message } from 'src/message/message.entity';
 import * as bcrypt from 'bcrypt';
 import { Status } from 'src/users/status_enum';
@@ -13,7 +14,7 @@ import { BanMuteService } from './banMute/banMute.service';
 export class ChatroomService {
 
 
-  async createRoomInfo(roomId: number, _id: any){
+  async createRoomInfo(roomId: number, id: any){
 
     console.log("createRoomInfoService");
 
@@ -34,7 +35,7 @@ export class ChatroomService {
         let room = null
         for(let k = 0; k < Room.users.length; ++k)
         {
-            if (Room.users[k]._id == _id)
+            if (Room.users[k].id == id)
             room = Room;
         }
         let isAdmin : Boolean
@@ -47,7 +48,7 @@ export class ChatroomService {
 
         for(let j = 0; j < room.admins.length; ++j)
         {
-            if (room.admins[j]._id == _id)
+            if (room.admins[j].id == id)
                 isAdmin = true
         }
 
@@ -72,13 +73,10 @@ export class ChatroomService {
   }
 
      async getAllwithUser(id: number) {
-        // console.log("getAllwithUser");
-        // console.log("id = ", id);
-
-       return await this.chatroomRepository.createQueryBuilder("chatroom")
-        .innerJoinAndSelect('chatroom.users', 'user', 'user._id = :id', { id: id })
+        return await this.chatroomRepository.createQueryBuilder("chatroom")
+        .innerJoinAndSelect('chatroom.users', 'user', 'user.id = :id', { id: id })
         .getMany()
-    }
+     }
 
     async getAllwithUserWriteAccess(id: number) {
         console.log("getAllwithUserWriteAccess");
@@ -101,8 +99,8 @@ export class ChatroomService {
        return room.roomName
     }
 
-    async findOrCreat(room: string | number): Promise<{ chatroom: chatroom; bool: boolean; }> {
-        if (room != undefined && room != '')
+    async findOrCreat(room: number): Promise<{ chatroom: chatroom; bool: boolean; }> {
+        if (room != undefined)
         {
             let test: FindOptionsWhere<chatroom>
             test = (typeof room === 'string') ? {roomName: room} : {roomId: room}
@@ -124,6 +122,8 @@ export class ChatroomService {
             }
             return {chatroom, bool: false};
         }
+        console.log("roomId inside", room);
+
         return undefined
     }
 
@@ -139,7 +139,7 @@ export class ChatroomService {
                     messages: true
                 },
                 where: {
-                    users: [{_id: user._id}, {_id: user1._id}],
+                    users: [{id: user.id}, {id: user1.id}],
                     access: Access.dm
                 }
             })
@@ -162,8 +162,12 @@ export class ChatroomService {
     {
         if(user != null) {
             var ret: { chatroom: chatroom, bool: boolean }
+            console.log("roomId outside: ", roomId);
+
             ret = await this.findOrCreat(roomId)
             console.log();
+            console.log("ret: ", ret);
+
             if(ret != undefined) {
                 if(ret.bool) {
                     ret.chatroom.admins = [user]
@@ -194,7 +198,7 @@ export class ChatroomService {
                             break;
                     }
                 }
-                this.chatroomRepository.save(ret.chatroom)
+                await this.chatroomRepository.save(ret.chatroom)
                 return true
             }
         }
@@ -213,20 +217,20 @@ export class ChatroomService {
                 admins: true,
                 users: true
             }})
-            if(room.owner._id == user._id) {
+            if(room.owner.id == user.id) {
                 console.log("user is owner");
             }
             console.log(user);
             console.log(room.owner);
 
             var index = room.admins.findIndex(object => {
-                return object._id === user._id
+                return object.id === user.id
             })
             if(index != -1) {
                 room.admins.splice(index, 1)
             }
             index = room.users.findIndex(object => {
-                return object._id === user._id
+                return object.id === user.id
             })
             if(index != -1) {
                 room.users.splice(index, 1)
@@ -245,22 +249,36 @@ export class ChatroomService {
         private banMuteService: BanMuteService
     ){}
 
+
     async getAll(user: User) {
+
         const rooms = await this.chatroomRepository.createQueryBuilder("chatroom")
         .leftJoinAndSelect('chatroom.users', 'us')
-        .leftJoinAndSelect('chatroom.admins', 'admins')
+        .leftJoinAndSelect('chatroom.admins', 'admins', "us.id = :userid1", {userid1: user.id})
         .where("access IN (:...values)", { values: [ Access.protected, Access.public ] })
-        .orWhere("us._id = :test", {test: user._id})
-        .leftJoinAndSelect('chatroom.users', 'users')
+        .orWhere("us.id = :test", {test: user.id})
+        .leftJoinAndSelect('chatroom.users', 'users', "us.id = :userid3", {userid3: user.id})
+        .leftJoinAndSelect('chatroom.messages', 'messages', "us.id = :userid2", {userid2: user.id})
+        // .leftJoinAndMapOne('chatroom.messages."senderId"', 'chatroom.messages.user.id', 'message', "1 > 0")
+        // .addSelect((sub) => {
+        //     return sub.select("message.user_id").from(message, 'message').limit(1)
+        // }, "chatroom.messages.user_id")
+        // .addSelect("chatroom.message.user_id")
+        // .leftJoinAndSelect(
+        //     qb => qb
+        //         .from(message, "test")
+        //         .select('test.user_id, test.id, test.timestamp, test.content')
+        //     , 'messages', '1 > 0' )
+        // .leftJoinAndSelectAndMapOne('chatroom.messages', 'messages', "users.id = :userid2", {userid2: user.id})
         .getMany()
 
-        console.log(rooms);
+        console.log("here", rooms);
         rooms.forEach(element => {
             if(element.access == Access.dm) {
                 var room_name: string = '';
                 console.log(element.users);
                 element.users.forEach(element1 => {
-                    room_name += element1._id == user._id ? '' :  element1.username + " "
+                    room_name += element1.id == user.id ? '' :  element1.username + " "
                 });
                 element.roomName = room_name;
             }

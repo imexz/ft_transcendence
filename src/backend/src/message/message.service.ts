@@ -4,7 +4,7 @@ import { UsersService } from '../users/users.service';
 import { Repository } from 'typeorm';
 import { message } from './message.entity';
 import User from '../users/entitys/user.entity';
-import { chatroom } from 'src/chatroom/chatroom.entity';
+import chatroom from 'src/chatroom/chatroom.entity';
 import { timestamp } from 'rxjs';
 
 @Injectable()
@@ -25,14 +25,14 @@ export class MessageService {
     async userDeleteMessage(messageId: number, id: number) {
         this.messageRepository.delete({
             _id: messageId,
-            user: {_id: id}
+            sender: {id: id}
         })
     }
 
     async userAddMessageToRoom(user: User, conntent: string, chatroom: chatroom) {
         if (user != undefined && chatroom != undefined && conntent != undefined) {
-            
-            var new_message = this.messageRepository.create({user: user, chatroom: chatroom, content: conntent});
+
+            var new_message = this.messageRepository.create({sender: user, chatroom: chatroom, content: conntent});
             console.log(conntent);
             return await this.messageRepository.save(new_message);
         } else {
@@ -44,8 +44,8 @@ export class MessageService {
     async getAllMessagesOfRoom(roomId: number) {
         const messages = await this.messageRepository.createQueryBuilder("messages")
             .leftJoinAndSelect("messages.user", "user")
-            .select('CAST( messages.user_id AS varchar ) AS "senderId", messages._id, content, user.avatar_url AS avatar, messages.timestamp AS timestamp, user.username AS username')
-            // .select('messages.user_id AS "senderId", _id, content, messages.user')
+            .select('CAST( messages.user_id AS varchar ) AS "senderId", messages.id, content, user.avatar_url AS avatar, messages.timestamp AS timestamp, user.username AS username')
+            // .select('messages.user_id AS "senderId", id, content, messages.user')
             .where('messages.chatroom.roomId = :roomId', { roomId: roomId})
             .orderBy('timestamp')
             .getRawMany()

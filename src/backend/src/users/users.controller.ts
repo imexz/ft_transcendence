@@ -18,7 +18,7 @@ export class UsersController {
 		// console.log("findOne");
 		const user = this.usersService.getUser(params);
 		// console.log("findOne", user);
-		
+
 		return user;
 	}
 
@@ -26,8 +26,8 @@ export class UsersController {
 	@UseGuards(JwtAuthGuard)
 	findAll(@Request() req){
 		console.log(req);
-		
-		return this.usersService.findAll(req.user._id)
+
+		return this.usersService.findAll(req.user.id)
 	}
 
 	@Post('addUser')
@@ -40,17 +40,17 @@ export class UsersController {
 	// @Post('addFriend')
 	// @UseGuards(JwtAuthGuard)
 	// requestFriend(@Request() req, @Body("id") id: number){
-	// 	return this.friendsService.request_friendship(req.user._id, id)
+	// 	return this.friendsService.request_friendship(req.user.id, id)
 	// 	// console.log(id);
-	// 	// return  this.usersService.addfriend(req.user._id, id);
+	// 	// return  this.usersService.addfriend(req.user.id, id);
 	// }
 
 	// @Post('removeFriend')
 	// @UseGuards(JwtAuthGuard)
 	// removeFriend(@Request() req, @Body("id") id: number){
-	// 	this.friendsService.remove_friendship(req.user._id, id)
+	// 	this.friendsService.remove_friendship(req.user.id, id)
 	// 	// console.log(id);
-	// 	// return  this.usersService.addfriend(req.user._id, id);
+	// 	// return  this.usersService.addfriend(req.user.id, id);
 	// }
 
 	@Get('validate')
@@ -61,25 +61,25 @@ export class UsersController {
 		console.log("inside validate");
 		console.log(req.user);
 		console.log("inside validate1");
-		
-		
+
+
 		// console.log(user);
-		return await this.usersService.getUser(req.user._id)
+		return await this.usersService.getUser(req.user.id)
 	}
-	
+
 	@Post('update_name')
 	@UseGuards(JwtAuthGuard)
 	update_name(@Body("name") name, @Request() req) {
 		console.log("inside update_name");
 		console.log(req.user);
 		console.log("inside update_name1");
-		
-		this.usersService.updateName(req._id, name);
+
+		this.usersService.updateName(req.id, name);
 	}
 
 	@Delete()
 	delete(@Request() req) {
-		this.usersService.remove(req.user._id)
+		this.usersService.remove(req.user.id)
 	}
 
 
@@ -98,7 +98,7 @@ export class UsersController {
 	//   if (!isCodeValid) {
 	// 	throw new UnauthorizedException('Wrong authentication code');
 	//   }
-	//   this.usersService.turnOnTwoFactorAuthentication(request.user._id);
+	//   this.usersService.turnOnTwoFactorAuthentication(request.user.id);
 	// }
 
 	// @Get('turn-off')
@@ -107,7 +107,7 @@ export class UsersController {
 	// async turnOffTwoFactorAuthentication(
 	//   @Req() request,
 	// ) {
-	//   await this.usersService.turnOffTwoFactorAuthentication(request.user._id);
+	//   await this.usersService.turnOffTwoFactorAuthentication(request.user.id);
 	// }
 
 }

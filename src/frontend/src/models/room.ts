@@ -1,5 +1,9 @@
 import  User  from "./user";
 import  Message  from "./message";
+import UserService from "./user"
+import Toast from '@/components/Toast.vue'
+import VueAxios from 'axios';
+import { API_URL } from '@/defines';
 
 export enum Access {
     public,
@@ -9,17 +13,57 @@ export enum Access {
 }
 
 export default class Room {
-    constructor(name: string) {
-        this.roomName = name
+    constructor(room: any) {
+        this.access = room.access
+        this.roomName = room.roomName
+        this.roomId = room.roomId
+        // this.messages = room.messages // run through for loop and convert to real Message object again
+        this.messages = [] as Message[]
+        this.users = room.users
+        for (let i = 0; i < room.messages.length; ++i)
+        {
+            this.findUser(room.messages[i].senderId)
+            .then(user => (this.messages.push(new Message(room.messages[i], user))))
+            .catch(error => (console.error("User not found"))
+        }
+        this.admins = room.admins
+        // console.warn("Room constructor called", room);
+
     }
 
-    roomId: number
-    roomName: string
+    access: Access = 0
+    roomId: number = null
+    roomName: string = null
 
-    users: User[]
+    users: User[] = []
+    admins: User[] = []
 
-    messages: Message[]
+    messages: Message[] = []
 
+    async findUser(userId : number): Promise<User>{
+
+        let user: User = undefined
+
+        for (let i = 0; i < this.users.length; ++i)
+        {
+            if (this.users[i].id == userId)
+            {
+                user = this.users[i]
+                break
+            }
+        }
+        if (user == undefined)
+        {
+            user = await VueAxios({
+                url: '/users/find/' + userId,
+                baseURL: API_URL,
+                method: 'GET',
+                withCredentials: true,
+              })
+        }
+
+        return user
+    }
 
 }
 

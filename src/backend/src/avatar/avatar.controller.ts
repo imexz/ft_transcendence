@@ -25,20 +25,20 @@ export class AvatarController {
     file: Express.Multer.File,
   ) {
       console.log(req.user);
-      return await this.avatarService.add(req.user._id, file)
+      return await this.avatarService.add(req.user.id, file)
   }
 
   @Get()
   @Header('Content-Type', 'image/jpeg')
 	@UseGuards(JwtAuthGuard)
   async getAvatar(@Request() req) {
-      return new StreamableFile((await this.avatarService.getFile(req.user._id)).data)
+      return new StreamableFile((await this.avatarService.getFile(req.user.id)).data)
   }
 
   @Delete()
 	@UseGuards(JwtAuthGuard)
   async deleteAvatar(@Request() req) {
-    return await this.avatarService.delete(req.user._id)
+    return await this.avatarService.delete(req.user.id)
   }
 
 

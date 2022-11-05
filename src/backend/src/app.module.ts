@@ -8,7 +8,7 @@ import { fileEntity } from './avatar/file.entitys'
 import { AvatarModule } from './avatar/avatar.module';
 import { UsersModule } from './users/users.module';
 import { message } from './message/message.entity';
-import { chatroom } from './chatroom/chatroom.entity';
+import  chatroom  from './chatroom/chatroom.entity';
 import { ChatModule } from './chat/chat.module';
 import { GameModule } from './game/game.module';
 import { Game } from './game/game.entities/game.entity';

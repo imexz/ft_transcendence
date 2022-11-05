@@ -18,7 +18,7 @@ export class UsersService {
 	async getFriends(id: any) {
 
 		const friends = await this.usersRepository.findOne({where:{
-			_id: id
+			id: id
 		},
 		relations:{
 			myFriends: true
@@ -29,7 +29,7 @@ export class UsersService {
 
 
     async addClientId(id: number, clientId: string) {
-		const user = await this.usersRepository.findOneBy({_id: id})
+		const user = await this.usersRepository.findOneBy({id: id})
 		this.usersRepository.update(id, user)
 		return user.username;
     }
@@ -41,22 +41,22 @@ export class UsersService {
 
 	async findAll(id: number): Promise<User[]> {
 		// console.log("findAll");
-		const users = await this.usersRepository.find({ where: {_id: Not(id)}});
+		const users = await this.usersRepository.find({ where: {id: Not(id)}});
 		// console.log(user);
 		return users
 	}
 
 	async getUser(id: number): Promise<User> {
 		// console.log("getUser -> ", id);
-		
+
 		if(id != undefined) {
-			const user = await this.usersRepository.findOne({where: {_id: id}})
+			const user = await this.usersRepository.findOne({where: {id: id}})
 			// console.log("getUsers: ", user);
-			
+
 			return user
 		}
 		// console.log("getUser returns undefined");
-		
+
 		return undefined
 	}
 
@@ -64,17 +64,17 @@ export class UsersService {
 	async getUserSocket(server, id: number){
 		const sockets = await server.fetchSockets();
 		console.log("getUserSocket");
-		
+
 		for (const socket of sockets) {
-            if(socket.handshake.auth._id == id)
+            if(socket.handshake.auth.id == id)
             {
 				console.log("found socket");
-				
+
               return socket
             }
-			console.log(socket.handshake.auth._id);
-			
-          }		
+			console.log(socket.handshake.auth.id);
+
+          }
 	}
 
 
@@ -98,7 +98,7 @@ export class UsersService {
 	}
 
 	async updateAvatar(id: number, file: fileEntity) {
-		const user = await this.usersRepository.findOneBy({_id: id})
+		const user = await this.usersRepository.findOneBy({id: id})
 		if (user == null) {
 			return
 		}
@@ -115,7 +115,7 @@ export class UsersService {
 
 	async updateName(id: number, username: string)
 	{
-		const user = await this.usersRepository.findOneBy({_id: id})
+		const user = await this.usersRepository.findOneBy({id: id})
 		if (user == null)
 		{
 			return
@@ -124,7 +124,7 @@ export class UsersService {
 		return this.usersRepository.save(user)
 	}
 
-	
+
 
 	// async addfriend(user_id: number, friend_id: number) {
 	// 	// console.log(user_id);
@@ -134,17 +134,17 @@ export class UsersService {
 	// 		try{
 	// 			const user = await this.usersRepository.findOne({
 	// 				where: {
-	// 					_id: user_id
+	// 					id: user_id
 	// 				},
 	// 				relations: {
 	// 					friends: true,
 	// 				}
 	// 			});
-	// 			const user_friend: User = await this.usersRepository.findOneBy({_id: friend_id});
-	
+	// 			const user_friend: User = await this.usersRepository.findOneBy({id: friend_id});
+
 	// 			user.friends.push(user_friend);
 	// 			this.usersRepository.save(user);
-	
+
 	// 		} catch(exception: unknown) {
 	// 			console.log(exception)
 	// 			console.log("freind or user null");

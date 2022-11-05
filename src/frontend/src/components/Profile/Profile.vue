@@ -52,7 +52,7 @@ export default defineComponent({
     this.fetchUser();
   },
   updated() {
-    if (this.user && ( parseInt(this.id) != this.user._id) )
+    if (this.user && ( parseInt(this.id) != this.user.id) )
       this.fetchUser();
   }
 })
@@ -77,7 +77,7 @@ export default defineComponent({
     border-left: none;
 
   }
-  
+
   .nameLine {
     margin-left: 136px;
     font-size: 25px;

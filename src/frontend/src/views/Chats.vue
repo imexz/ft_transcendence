@@ -1,6 +1,10 @@
 <template>
   <div v-if="socket" class="chatWrapper">
-    <h1>Chat</h1>
+    <div class="chatBanner"></div>
+    <div class="headLine">
+      <span>Chat</span>
+    </div>
+    <div>
     <vue-advanced-chat
       :height="height"
       :current-user-id="currentUserId"
@@ -26,28 +30,18 @@
       @delete-message="deleteMessage($event.detail[0])"
       @message-action-handler="messageActionHandler($event.detail[0])"
     >
-    <!-- <div slot="room-list-item_1">
-      This is a new room header
-    </div> -->
     </vue-advanced-chat>
+  </div>
+    <div class="chatFooter"></div>
     <Toast v-if="showToast" :msg=toastMsg :mode=toastMode />
     <div v-if="createRoomPopUp" class="createRoomPopUp">
       <createRoomPopup @actions="createRoomActions"/>
     </div>
-
     <div v-if="roomInfoPopUp" class="roomInfoPopUp">
       <roomInfoPopUp :roomInfo="roomInfoData" @action="roomInfoActions"/>
     </div>
-
-    <!-- <joinRoomPopup
-      v-if="PoppupJoin"
-      :TogglePopup="() => makePopupJoin()"
-      :password="password"
-      :roomId="">
-      <h2>Join Room</h2>
-    </joinRoomPopup> -->
-    </div>
-  </template>
+  </div>
+</template>
 
   <script lang="ts">
   import { register } from 'vue-advanced-chat'
@@ -60,6 +54,8 @@
   import roomInfoPopUp from '@/components/Chat/RoomInfoPopUp.vue';
   import { customChatStyle } from "@/styles/chatStyle";
   import Toast from "@/components/Toast.vue";
+  import Message from '@/models/message';
+  import Room from '@/models/room';
 
   register()
 
@@ -70,26 +66,17 @@
           height: "800px",
           currentUserId: '',
           currentRoomId: '',
-          rooms: [],
+          rooms: [] as Room[],
           messages: [],
           messagesLoaded: false, //TB change this value to show a loading icon on the top of the chat
           messageActions: [
             { name: 'deleteMessage' , title: 'delete message', onlyMe: true },
-            { name: 'profile', title: 'show profile'},
-            // { name: 'block', title: 'block user'},
-            // { name: 'play', title: 'play with user' },
           ],
           usernameOptions: { minUsers: 3, currentUser: false },
           roomActions: [
             { name: 'join', title: 'Join Room' },
-            { name: 'leave', title: 'Leave Room' },
-            { name: 'deleteRoom', title: 'Delete Room' }
+            { name: 'leave', title: 'Leave Room' }
           ],
-          // templatesText: [ //TB did not work as expected at first
-          //   { tag: 'help', text: 'shows all commands' },
-          //   { tag: 'ban', text: 'ban a user for x seconds' },
-          //   { tag: 'mute', text: 'mute a user for x seconds' }
-          // ],
           createRoomPopUp: ref(false),
           PoppupJoin: ref(false),
           roomInfoPopUp: ref(false),
@@ -103,7 +90,20 @@
           showToast : ref<boolean | null>(false),
           toastMsg : ref<string>(''),
           toastMode : ref<string>(''),
-        }
+          // textMessages : {
+          //   ROOMS_EMPTY: 'Aucune conversation',
+          //   ROOM_EMPTY: 'Aucune conversation sélectionnée',
+          //   NEW_MESSAGES: 'Nouveaux messages',
+          //   MESSAGE_DELETED: 'Ce message a été supprimé',
+          //   MESSAGES_EMPTY: 'No Messages',
+          //   CONVERSATION_STARTED: 'La conversation a commencée le :',
+          //   TYPE_MESSAGE: 'Tapez votre message',
+          //   SEARCH: 'Rechercher',
+          //   IS_ONLINE: 'est en ligne',
+          //   LAST_SEEN: 'dernière connexion ',
+          //   IS_TYPING: 'est en train de taper...',
+          //   CANCEL_SELECT_MESSAGE: 'Annuler Sélection'}
+          }
       },
       components:{
         createRoomPopup,
@@ -128,16 +128,30 @@
           console.log("putMessages");
           this.currentRoomId = room.roomId
           this.updateMessages(room.roomId)
+          // this.messagesLoaded = true;
         },
 
         async updateMessages(roomId) {
           console.log("updateMessages");
           console.log(roomId);
-          this.socket.emit('findAllMessages', {roomId: roomId}, (response) => {
-            console.log(response);
-            this.messages = response;
-            this.messagesLoaded = true;
-          })
+          // this.socket.emit('findAllMessages', {roomId: roomId}, (response) => {
+          //   console.log("mesages_old: ", response);
+
+          //   console.log(response, "ende");
+          //   this.messages = response;
+          //   this.messagesLoaded = true;
+          // })
+          console.log("rooms:", this.rooms);
+          for (let i = 0; i < this.rooms.length; ++i)
+          {
+            if (this.rooms[i].roomId == roomId)
+              this.messages = this.rooms[i].messages
+          }
+          console.log("messages_new:", this.messages);
+
+          this.messagesLoaded = true;
+          console.log("endeende");
+
         },
         sendMessage({ roomId, content, files, replyMessage }) {
           console.log("createMessage");
@@ -187,33 +201,12 @@
           console.log(roomId)
           this.PoppupJoin = !this.PoppupJoin
           if (this.PoppupJoin == false) {
-            this.$store.state.socket.emit('join', {roomId: roomId, password: this.password})
+            console.log("clicked on join");
+
+            this.$store.state.socket.emit('join', {roomId: roomId, password: this.password}) //TB is this used???
           }
           console.log(this.PoppupJoin);
         },
-        // creatRoom(){
-        //     VueAxios({
-        //         url: '/chatroom/creat',
-        //         baseURL: API_URL,
-        //         method: 'POST',
-        //         withCredentials: true,
-        //         data: { room_name: "test", access: "public"}
-        //     })
-        //         .then(response => {
-        //           console.log(response);
-        //           if(response != null) {
-        //             const rooms = []
-        //             for (let i = 0; i < response.length; i++) {
-        //               rooms.push(response)
-        //             }
-        //             this.rooms = rooms
-        //             this.$emit('success', 'creat Room')
-        //             console.log("succes");
-        //           }
-        //         })
-        //         .catch(error => { this.$emit('error') })
-        // },
-
         emitTyping({ roomId, message }) {
           console.log("emitTyping");
           console.log(roomId);
@@ -231,23 +224,31 @@
             }, 2000);
           }
           console.log("emit typing ende");
-          // console.log("roomId");
-          // console.log(roomId.roomId);
-
+        },
+        fillMessagesData(){
+          // this.rooms.forEach(
+          //   messages => messages.forEach(
+          //     username => username = "test"
+          //   )
+          // )
         },
         getRooms(){
-            VueAxios({
-                url: '/chatroom/all',
-                baseURL: API_URL,
-                method: 'GET',
-                withCredentials: true,
-            })
-                .then(response => {
-                console.log(response.data);
+            // VueAxios({
+            //     url: '/chatroom/all',
+            //     baseURL: API_URL,
+            //     method: 'GET',
+            //     withCredentials: true,
+            // })
+            //     .then(response => {
+            //     console.log(response.data);
 
-                this.rooms = response.data
-                })
-                .catch()
+                // this.rooms = response.data
+                // })
+                // .catch()
+            this.rooms = this.$store.getters.getRooms;
+            this.fillMessagesData();
+            console.log("rooms: ", this.rooms);
+
         },
         initSocket(){
           this.socket = this.$store.state.socketChat
@@ -256,7 +257,7 @@
           }
           console.log("initSocket")
         },
-        roomActionHandler({ roomId, action }) {
+        async roomActionHandler({ roomId, action }) {
           console.log("roomActionHandler");
           console.log(action);
           console.log(roomId);
@@ -266,18 +267,25 @@
               for (let index = 0; index < this.rooms.length; index++) {
                 if(this.rooms[index].roomId == roomId)
                 {
+                  console.log("next")
+                  var result: string = undefined
                   if (this.rooms[index].access == 'protected')
-                  {
-                    const result = prompt("This room is protected\n password", "password")
+                    result = prompt("This room is protected\n password", "password")
+
                     console.log(result);
-                      this.socket.emit('join', {roomId: roomId, password: result})
-                      // this.makePopupJoin(roomId)
-                    } else {
-                      this.socket.emit('join', {roomId: roomId})
-                  }
+                    console.log("roomIdFrontend", roomId);
+
+                    this.socket.emit('join', {roomId: roomId, password: result}, (response)=> {this.messages = response})
+
+                    console.log(this.messages);
+
+                    console.log("after join");
+
+                    //  this.updateMessages(roomId))
                 }
               }
-              this.updateMessages(roomId)
+
+              // this.updateMessages(roomId)
               break;
               case 'leave':
                 this.updateMessages(roomId)
@@ -301,6 +309,9 @@
               break ;
             case "ban":
               this.banUser(userId, room);
+              break;
+            case "exit":
+              this.toggleRoomInfo();
               break;
           }
         },
@@ -452,7 +463,7 @@
         });
 
         this.getRooms();
-        this.currentUserId = this.$store.getters.getUser._id;
+        this.currentUserId = this.$store.getters.getUser.id;
 
         console.log("mounted CHAT");
         // console.log(this.currentUserId)
@@ -470,48 +481,47 @@
     })
 </script>
 
-<!-- <script lang="ts">
-    import { register } from 'vue-advanced-chat'
-
-      export default {
-        data() {
-          return {
-            register: register,
-            currentUserId: '1234',
-            rooms: [],
-            messages: [],
-            roomActions: [
-              { name: 'inviteUser', title: 'Invite User' },
-              { name: 'removeUser', title: 'Remove User' },
-              { name: 'deleteRoom', title: 'Delete Room' }
-            ]
-          }
-        }
-      }
-</script> -->
-
 <style scoped>
 
   .chatWrapper {
+    position: relative;
     width: 800px;
     margin: auto;
+    margin-top: 80px;
     margin-bottom: 80px;
     z-index: 1;
   }
-  
-  .roomInfoPopUp {
+
+  .headLine {
     position: absolute;
-    margin: auto;
-    left: 0;
-    right: 0;
-    top: 100px;
-    width: 400px;
-    height: 400px;
+    top: 129px;
+    left: 325px;
+    width: 150px;
+    height: 41px;
+    font-size: 30px;
+    font-weight: bold;
     background-color: var(--ft_dark);
-    border: 1px solid var(--ft_cyan);
-    border-radius: 10px;
-    z-index: 10;
-    overflow-y: auto;
+    border: 2px solid var(--ft_cyan);
+    border-radius: 10px 10px 0px 0px;
+    border-bottom: none;
+  }
+
+  .chatBanner {
+    width: 100%;
+    height: 170px;
+    background: url(@/assets/chatBanner.png);
+    background-size: cover;
+    background-position: 0px 420px;
+    border: 2px solid var(--ft_cyan);
+    border-bottom: none;
+    border-radius: 10px 10px 0px 0px ;
+  }
+  .chatFooter {
+    width: 100%;
+    height: 20px;
+    border: 2px solid var(--ft_cyan);
+    border-radius: 0px 0px 10px 10px;
+    border-top: none;
   }
 
 </style>

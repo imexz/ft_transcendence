@@ -5,7 +5,7 @@
       <div>
         <Field @asigneWinner="asigneWinner"/>
       </div>
-      <div v-show="this.$store.state.user._id!=this.$store.state.game?.playerRight?._id && this.$store.state.user._id!=this.$store.state.game?.playerLeft?._id"  class="leaveGame">
+      <div v-show="this.$store.state.user.id!=this.$store.state.game?.playerRight?.id && this.$store.state.user.id!=this.$store.state.game?.playerLeft?.id"  class="leaveGame">
         <button @click="leaveGame"> Leave </button>
       </div>
     </div>
@@ -42,7 +42,7 @@
     },
   	created() { // always called when Component is initialized (e.g. on refresh)
   		console.log("in created");
-      
+
   		this.$store.state.socketGame.on('Game', (game: Game) => {
         console.log(game);
         this.asigneGame(game)
@@ -78,7 +78,7 @@
       },
       asigneWinner(winner: User) {
         console.log("asigneWinner");
-        
+
         this.winner = winner
       },
       asigneGame(game: Game) {
@@ -124,12 +124,12 @@
 
 }
 
-.gameCanvas {
+/* .gameCanvas {
   display: inline-block;
   padding: 20px;
   border: 2px solid var(--ft_cyan);
   border-radius: 10px;
 
-}
+} */
 
 </style>

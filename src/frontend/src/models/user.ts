@@ -2,13 +2,13 @@ export enum UserStatus {
 	ONLINE,
 	OFFLINE,
   PLAYING,
-  SPECTATING,    
+  SPECTATING,
 }
 
 export default class User {
-  constructor(_id: number, username: string, avatar_url: string,
+  constructor(id: number, username: string, avatar_url: string,
     avatar_url_42intra: string, userStatus: UserStatus, clientId: any, isTwoFactorAuthenticationEnabled: boolean) {
-    this._id = _id
+    this.id = id
     this.username = username
     this.avatar_url = avatar_url
     this.avatar_url_42intra = avatar_url_42intra
@@ -16,21 +16,21 @@ export default class User {
     this.clientId = clientId
     this.isTwoFactorAuthenticationEnabled = isTwoFactorAuthenticationEnabled
   }
-  _id: number
+  id: number
   username: string
   avatar_url: string
-  
+
   userStatus: any
   avatar_url_42intra: string
   clientId: any
   isTwoFactorAuthenticationEnabled: boolean
 }
-//   constructor(_id: number, username: string, avatar_url: string, 
+//   constructor(id: number, username: string, avatar_url: string,
 //     status: string, me: number
 //     // , isTwoFactorAuthenticationEnabled: boolean,
 //     // twoFactorAuthenticationSecret: null
 //     ){
-//     this._id = _id
+//     this.id = id
 //     this.username = username
 //     this.avatar_url = avatar_url
 //     this.status = status
@@ -38,10 +38,10 @@ export default class User {
 //     // this.isTwoFactorAuthenticationEnabled = isTwoFactorAuthenticationEnabled
 //     // this.twoFactorAuthenticationSecret = twoFactorAuthenticationSecret
 //   }
-//   _id: number
+//   id: number
 //   username: string
 //   avatar_url: string
-  
+
 //   status: string
 //   me: number
 //   // isTwoFactorAuthenticationEnabled: boolean

@@ -5,7 +5,7 @@ import { UsersModule } from "src/users/users.module";
 import { banMute } from "./banMute/banMute.entity";
 import { BanMuteService } from "./banMute/banMute.service";
 import { ChatroomController } from "./chatroom.controller";
-import { chatroom } from "./chatroom.entity";
+import chatroom from "./chatroom.entity";
 import { ChatroomService } from "./chatroom.service";
 
 @Module({

@@ -19,8 +19,8 @@ export class TwoFactorAuthenticationController {
     @UseGuards(JwtAuthGuard)
     async register(@Res() response: Response, @Req() request) {
         const { otpauthUrl } = await this.twoFactorAuthenticationService.genaretwofaSecret(request.user);
-        // this.twoFactorAuthenticationService.turnOnTwoFactorAuthentication(request.user._id)
-        this.twoFactorAuthenticationService.turnOffTwoFactorAuthentication(request.user._id)
+        // this.twoFactorAuthenticationService.turnOnTwoFactorAuthentication(request.user.id)
+        this.twoFactorAuthenticationService.turnOffTwoFactorAuthentication(request.user.id)
         return this.twoFactorAuthenticationService.pipeQrCodeStream(response, otpauthUrl);
     }
 
@@ -36,17 +36,17 @@ export class TwoFactorAuthenticationController {
             request.user
         );
         console.log(isCodeValid);
-        
+
             if (isCodeValid == false) {
                 throw new UnauthorizedException('Wrong authentication code');
             }
 
-        // const accessTokenCookie = this.authService.getCookieWithJwtAccessToken(request.user._id, true);
+        // const accessTokenCookie = this.authService.getCookieWithJwtAccessToken(request.user.id, true);
 
         // request.res.cookie('token', [accessTokenCookie]);
 
         request.res.setHeader('Set-Cookie', this.authService.getCookieWithJwtAccessToken(
-			request.user._id,
+			request.user.id,
 			true,
 		))
         return request.user;
@@ -66,7 +66,7 @@ export class TwoFactorAuthenticationController {
 	  if (!isCodeValid) {
 		throw new UnauthorizedException('Wrong authentication code');
 	  }
-	  this.twofaService.turnOnTwoFactorAuthentication(request.user._id);
+	  this.twofaService.turnOnTwoFactorAuthentication(request.user.id);
 	}
 
 	@Get('turn-off')
@@ -75,7 +75,7 @@ export class TwoFactorAuthenticationController {
 	async turnOffTwoFactorAuthentication(
 	  @Req() request,
 	) {
-	  await this.twofaService.turnOffTwoFactorAuthentication(request.user._id);
+	  await this.twofaService.turnOffTwoFactorAuthentication(request.user.id);
 	}
 
 
