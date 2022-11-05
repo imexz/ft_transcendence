@@ -159,18 +159,20 @@ export default defineComponent({
     },
     // for match and spectate
     askForMatch(){
+      const isSelfInvite: boolean = this.user.id === this.$store.state.user.id
+
       this.closeDmPopUp()
-      if (this.user.id === this.$store.state.user.id) return;
+      if (isSelfInvite) return;
       this.$store.state.winner = null;
       this.$store.state.socketGame.emit('GameRequestBackend', {id: this.user.id}, (r) => { 
-        
         if (r != undefined) {
           this.showGame = !this.showGame
-          if(r.playerLeft == this.$store.state.user.id || r.playerRight == this.$store.state.user.id)
+          const isUserActivePlayer: boolean = r.playerLeft == this.$store.state.user.id || r.playerRight == this.$store.state.user.id
+          if(!isSelfInvite && isUserActivePlayer)
             this.$store.state.pendingRequest = true;
+          this.$store.state.game = r
           this.$router.push("/play")
         }
-        this.$store.state.game = r
       })
       console.log("AskForMatch");
     },

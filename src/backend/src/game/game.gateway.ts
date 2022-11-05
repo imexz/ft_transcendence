@@ -90,20 +90,27 @@ handleLeaveGame(@ConnectedSocket() client: Socket): void {
   async gameRequest(
     @ConnectedSocket() client: Socket,
     @MessageBody('id') id?: number) {
+
       if (client.handshake.auth.id === id) {
         client.emit('NowInGame', false)
-        return null;
+        return undefined;
       }
-      var game: Game = this.gameService.getGame(id)
-      if(game == undefined) {
-        const socket = await this.findSocketOfUser(id)
-        socket.emit('GameRequestFrontend', client.handshake.auth as User)
-        // console.log("gameRequest: client_id: %d | id: %d", client.handshake.auth.id, id);
-        game = await this.gameService.joinGameOrCreateGame(client.handshake.auth as User, this.server, id)
-        // client.emit('NowInGame', true)
-      } else if (game.interval == null) {
-        this.gameService.startGame(this.server, game);
-      } else {
+      let game: Game | undefined = this.gameService.getGame(client.handshake.auth.id)
+      // check if client is in a game
+      if (game == undefined) {
+        console.log("gameRequest: client has no game");
+        game = this.gameService.getGame(id)
+        // check if opponent is in a game
+        if(game == undefined) {
+          console.log("gameRequest: opponent has no game");
+          const socket = await this.findSocketOfUser(id)
+          socket.emit('GameRequestFrontend', client.handshake.auth as User)
+          game = await this.gameService.joinGameOrCreateGame(client.handshake.auth as User, this.server, id)
+          // client.emit('NowInGame', true)
+        } else if (game.interval == null) {
+          console.log("gameRequest: call startGame");
+          this.gameService.startGame(this.server, game);
+        }
       }
       client.join(game.id.toString());
       // client.emit('NowInGame', true)

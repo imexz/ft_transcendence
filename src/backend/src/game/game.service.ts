@@ -59,7 +59,7 @@ export class GameService {
 	}
 	async joinGameOrCreateGame(user: User, server: Server, opponent_user_id?: number): Promise<Game> {
 		let game = this.getGame(undefined) // checking for first game with missing (undefined) opponent
-		if (game == undefined) {
+		if (game == undefined || opponent_user_id) {
 			console.log("joinGameOrCreateGame game == undefined");
 			game = await this.#createGameInstance(user.id)
 			game.playerLeft = user

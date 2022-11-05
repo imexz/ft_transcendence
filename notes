@@ -1,0 +1,48 @@
+Starting a Game:
+
+1. Queue
+1.1. successful 
+1.2. abort before success
+1.3. waiting for match
+
+
+2. Invite
+
+2.1. Invitor is available
+    2.1.1. invited player is available
+        2.1.1.1. accept
+        2.1.1.2. deny
+        2.1.1.3. does not reply --> deny after certain time passed
+    2.1.2. invited player is unavailable
+        2.1.2.1. invited player is offline                    // no effect
+        2.1.2.2. invited player is playing a game             // start spectate
+        2.1.2.3. invited player is spectating a game          // also spectate
+2.2. Invitor is in a game --> no effect
+
+
+Topics:
+
+viewRequest: when user in game and tries to invite/view game of third user -->cannot read undefined
+
+When invited, inviting the other player back should not be possible
+
+joinAndCreateGame function: x goes to queue, y invites x --> frontend bug
+x invites y, z invites x --> game starts for x and y, z spectates
+
+Spectator: Winning Screen shows "askForRematch" Button
+
+Search for player y, log out player y, invite player y to a match --> starts game...
+
+Change hitbox of paddles / collision control
+Limit serving angle
+
+Ideas:
+    do not change view when adding user as friend
+
+Done:
+<!-- After Game: invite winner to game (even if its the same person) -->
+<!-- spectating a game via paddleIcon leads to range error -->
+<!-- autoselect form field when clicking on search icon -->
+<!-- When in Game: paddleButton in UserSummery is clickable -->
+<!-- No invites from User currently playing -->
+<!-- Reload when invited and accepted a game -->
