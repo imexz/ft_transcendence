@@ -8,6 +8,7 @@ import { message } from 'src/message/message.entity';
 import * as bcrypt from 'bcrypt';
 import { UsersService } from 'src/users/users.service';
 import { BanMuteService } from './banMute/banMute.service';
+import { IsNull, Not } from "typeorm"
 
 @Injectable()
 export class ChatroomService {
@@ -101,13 +102,28 @@ export class ChatroomService {
         // console.log("id = ", id);
         // const mute = this.banMuteService.test()
 
-       return await this.chatroomRepository.createQueryBuilder("chatroom")
-       .where('chatroom.roomId = :id', {id: roomId})
-       .innerJoinAndSelect('chatroom.users', 'user', 'user.id = :id1', { id1: id })
-       .leftJoinAndSelect('chatroom.muted', 'muted','user.id != :id2', { id2: id })
-        // .where('muted.user._id != :iid', {iid: id})
+        return await this.chatroomRepository.findOne({
+            relations: {
+                users: true,
+                muted: {
+                    user: true
+                }
+                
+            },
+            where: {
+                roomId: roomId,
+                users: {id: id}
+            }
+        })
+
+    //    return await this.chatroomRepository.createQueryBuilder("chatroom")
+    //    .where('chatroom.roomId = :id', {id: roomId})
+    //    .innerJoinAndSelect('chatroom.users', 'user', 'user.id = :id1', { id1: id })
+    //    .leftJoinAndSelect('chatroom.muted', 'muted')
+       
+    //    .getMany()
+        // .where('muted.user.id != :iid', {iid: id})
         // .innerJoinAndSelect('chatroom.users', 'user', 'user._id = :id && muted._id != :id', { id: id })
-        .getMany()
     }
 
     async getRoomName(roomId: number): Promise<string> {

@@ -144,8 +144,10 @@
           console.log("rooms:", this.rooms);
           for (let i = 0; i < this.rooms.length; ++i)
           {
-            if (this.rooms[i].roomId == roomId)
-              this.messages = this.rooms[i].messages
+            if (this.rooms[i].roomId == roomId) {
+              if(this.rooms[i].messages != undefined)
+                this.messages = this.rooms[i].messages
+            }
           }
           console.log("messages_new:", this.messages);
 
