@@ -157,12 +157,22 @@ export default defineComponent({
         window.addEventListener('click', this.hideDropDown)
       this.show = !this.show
     },
+    // for match and spectate
     askForMatch(){
       this.closeDmPopUp()
-      this.$store.state.socketGame.emit('Request', {id: this.user.id}, (r) => {
-        this.showGame = !this.showGame
-        console.log("AskForMatch");
-      }
+      if (this.user.id === this.$store.state.user.id) return;
+      this.$store.state.winner = null;
+      this.$store.state.socketGame.emit('GameRequestBackend', {id: this.user.id}, (r) => { 
+        
+        if (r != undefined) {
+          this.showGame = !this.showGame
+          if(r.playerLeft == this.$store.state.user.id || r.playerRight == this.$store.state.user.id)
+            this.$store.state.pendingRequest = true;
+          this.$router.push("/play")
+        }
+        this.$store.state.game = r
+      })
+      console.log("AskForMatch");
     },
     viewGame(status){
       switch (status) {

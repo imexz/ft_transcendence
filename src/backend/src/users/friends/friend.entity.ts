@@ -6,7 +6,7 @@ import User from "../entitys/user.entity";
 export enum Status {
 	requsted = 1,
 	accepted,
-	denide
+	denied
 }
 
 @Entity()

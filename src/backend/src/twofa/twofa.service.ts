@@ -35,19 +35,19 @@ import { UsersService } from "src/users/users.service";
     }
 
     isTwoFactorAuthenticationCodeValid(twoFactorAuthenticationCode: string, user: User) {
-        console.log('isTwoFactorAuthenticationCodeValid');
+        // console.log('isTwoFactorAuthenticationCodeValid');
         // const tmp_user  = await this.usersService.getUser(user.id)
-
-        console.log(twoFactorAuthenticationCode, user.twoFactorAuthenticationSecret);
-
+        
+        // console.log(twoFactorAuthenticationCode, user.twoFactorAuthenticationSecret);
+        
         try {
 
             const ret = authenticator.check(
                 twoFactorAuthenticationCode,
                 user.twoFactorAuthenticationSecret
             )
-            console.log("check=", ret);
-
+            // console.log("check=", ret);
+            
             return ret
         } catch (err) {
             // Possible errors

@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
+import { GameService } from '../game/game.service';
 import { JwtService } from '@nestjs/jwt';
 import User from '../users/entitys/user.entity';
 import {TokenPayload} from './tokenPayload.interface';
@@ -9,12 +10,12 @@ import { JwtStrategy } from './jwt-two/jwt.strategy';
 
 @Injectable()
 export class AuthService {
-	constructor(private usersService: UsersService, private jwtService: JwtService, private jwtStrategy: JwtStrategy) {}
-
+	constructor(private usersService: UsersService, private jwtService: JwtService, private jwtStrategy: JwtStrategy, private gameService: GameService) {}
+	
 	async validateUser(id: number) {
 
 			const user = await this.usersService.getUser(id);
-			console.log("all good");
+			// console.log("all good");
 			return user;
 	}
 
@@ -48,23 +49,27 @@ export class AuthService {
 	public async validateSocket(socket: Socket){
 		try {
 			socket.handshake.auth =  await this.jwtService.verify(socket.handshake.auth.id.replace('Authentication=',''));
-			console.log("socket handshake");
-			console.log(socket.handshake.auth);
-
+			// console.log("socket handshake");
+			// console.log(socket.handshake.auth);
+			
 			socket.handshake.auth = await this.jwtStrategy.validate(socket.handshake.auth as TokenPayload)
-			console.log("socket handshake1");
-			console.log(socket.handshake.auth);
+			// console.log("socket handshake1");
+			// console.log(socket.handshake.auth);
 			if(await socket.handshake.auth === undefined){
-			  console.log("validation goes wrong");
+			//   console.log("validation goes wrong");
 			  socket.disconnect()
 			  return false
 			} else {
-				this.usersService.setStatus(socket.handshake.auth.id, UserStatus.ONLINE)
+				if (this.gameService.getGame(socket.handshake.auth.id) == undefined)
+					await this.usersService.setStatus(socket.handshake.auth.id, UserStatus.ONLINE)
+				else
+					await this.usersService.setStatus(socket.handshake.auth.id, UserStatus.PLAYING)
+					
 				// console.log(socket.handshake.auth);
 				return true
 			}
 			} catch (error) {
-			  console.log("wrong token", error);
+			//   console.log("wrong token", error);
 			  socket.disconnect()
 			  return false
 			}

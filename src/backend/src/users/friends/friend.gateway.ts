@@ -44,7 +44,7 @@ export class FriendGateway {
     }
 
     @SubscribeMessage('Request')
-    async gameRequest(
+    async friendRequest(
     @ConnectedSocket() client: Socket,
     @MessageBody('id') id?: number )
     {

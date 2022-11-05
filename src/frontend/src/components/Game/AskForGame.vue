@@ -20,13 +20,16 @@ export default defineComponent({
         UserSummary,
     },
     methods:{
-        accept(){ 
+        accept(){
+          console.log('winner null');
+          
+            this.$store.state.winner = null
             this.$store.state.socketGame.emit("accept")
             this.$store.state.gameRequest = null
             this.$router.push('/play')
         },
         refuse(){ 
-            this.$store.state.socketGame.emit("denide")
+            this.$store.state.socketGame.emit("denied")
             this.$store.state.gameRequest = null
         }
     }

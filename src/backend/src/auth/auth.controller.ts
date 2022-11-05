@@ -18,8 +18,8 @@ export class AuthController{
 	@UseGuards(LocalAuthGuard)
 	@Get('login/callback')
 	@Redirect("", 302)
-	callback(@Request() req, @Res({ passthrough: true }) res ) {
-		console.log('login/callback');
+	callback(@Request() req, @Res({ passthrough: true }) res ) { 
+		// console.log('login/callback');
 
 		// res.cookie("token", this.authService.login(req.user));
 
@@ -37,7 +37,7 @@ export class AuthController{
 			false,
 		))
 
-    console.log(req.user.isTwoFactorAuthenticationEnabled)
+    // console.log(req.user.isTwoFactorAuthenticationEnabled)
     if (req.user.isTwoFactorAuthenticationEnabled){
       return {
         url: hostURL + ":8080/login/tfa"
@@ -52,8 +52,8 @@ export class AuthController{
 	@Get('logout')
 	@UseGuards(JwtAuthGuard)
 	logout(@Request() req, @Res({ passthrough: true }) res) {
-		console.log("logout");
-
+		// console.log("logout");
+		
 		res.setHeader('Set-Cookie', this.authService.getCookieWithJwtAccessToken(
 			req.user.id,
 			false,

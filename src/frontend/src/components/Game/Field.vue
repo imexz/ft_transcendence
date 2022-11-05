@@ -182,9 +182,9 @@ console.log("initPixi");
             this.styleData.fgColor = 0xe70038
             break;
         }
-        if (this.gameData.score.scoreLeft == 10 ||  this.gameData.score.scoreRight == 10) {
+        if (this.gameData.score.scoreLeft == 3 ||  this.gameData.score.scoreRight == 3) {
           
-          this.$emit('asigneWinner',this.gameData.score.scoreLeft == 10 ? this.$store.state.game.playerLeft : this.$store.state.game.playerRight)
+          this.$emit('assignWinner',this.gameData.score.scoreLeft == 3 ? this.$store.state.game.playerLeft : this.$store.state.game.playerRight)
           console.log("winner");
           this.$store.state.game = null
         }

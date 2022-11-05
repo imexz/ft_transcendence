@@ -35,8 +35,8 @@ export class TwoFactorAuthenticationController {
             twoFactorAuthenticationCode,
             request.user
         );
-        console.log(isCodeValid);
-
+        // console.log(isCodeValid);
+        
             if (isCodeValid == false) {
                 throw new UnauthorizedException('Wrong authentication code');
             }

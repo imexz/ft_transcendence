@@ -36,9 +36,9 @@ export class ChatGateway {
 
 
   async handleConnection(socket) {
-    console.log('====connected chat====')
+    // console.log('====connected chat====')
     if (await this.authService.validateSocket(socket)) {
-      console.log("validate chat succes full");
+      // console.log("validate chat succes full");
 
 // console.log(socket.handshake);
 
@@ -85,7 +85,8 @@ export class ChatGateway {
 
       const rooms = await this.chatService.getUserRooms(client.handshake.auth.id)
 
-      console.log(rooms);
+      // console.log(rooms);
+    
 
 
 
@@ -131,7 +132,7 @@ export class ChatGateway {
     @ConnectedSocket() client:Socket,
   ) {
     // console.log(roomId)
-    console.log("typing")
+    // console.log("typing")
 
     // const name = await this.chatService.getClientName(client.handshake.auth.id);
     // const room_name = await this.chatService.getRoomName(roomId)
@@ -144,8 +145,8 @@ export class ChatGateway {
 
   @SubscribeMessage('findAllMessages')
   async findAllMessages(@MessageBody('roomId') roomId: number, @ConnectedSocket() client:Socket,) {
-    console.log('findAllMessages');
-    console.log(roomId);
+    // console.log('findAllMessages');
+    // console.log(roomId);
     // console.log(client.handshake);
     console.log(client.handshake.auth.id);
 
@@ -160,10 +161,10 @@ export class ChatGateway {
   @MessageBody('content') content: string,
   @ConnectedSocket() client: Socket,
   ) {
-    console.log("createMessage");
-    console.log(roomId);
-    console.log(content);
-    console.log(client.handshake.auth.id);
+    // console.log("createMessage");
+    // console.log(roomId);
+    // console.log(content);
+    // console.log(client.handshake.auth.id);
 
     // const room_name = await this.chatService.getRoomName(roomId)
 
@@ -182,10 +183,10 @@ export class ChatGateway {
       // indexId: 12092,
 
       // console.log(test);
-      console.log({tmp, roomId});
-      console.log("timestamp before");
-      console.log(tmp.timestamp);
-      console.log("timestamp after");
+      // console.log({tmp, roomId});
+      // console.log("timestamp before");
+      // console.log(tmp.timestamp);
+      // console.log("timestamp after");
       // tmp.timestamp = tmp.timestamp. //TB resume work
 
 
@@ -194,7 +195,7 @@ export class ChatGateway {
       console.log("createMessage ende");
       return tmp;
     } else {
-      console.log("message == empty");
+      // console.log("message == empty");
 
     }
 
@@ -224,8 +225,8 @@ export class ChatGateway {
     @MessageBody('reaction') reaction : any,
     @MessageBody('remove') remove : boolean,
   ) {
-      console.log("createMessageReaction");
-      console.log(messageId);
+      // console.log("createMessageReaction");
+      // console.log(messageId);
       this.chatService.createMessageReaction(messageId, reaction, remove);
 
 
