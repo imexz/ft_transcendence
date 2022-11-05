@@ -1,10 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { banMute, Silance } from './banMute.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import User from 'src/users/entitys/user.entity';
 import { chatroom } from '../chatroom.entity';
 import { ChatroomService } from '../chatroom.service';
+import { banMute } from './banMute.entity';
+import { AdminAction } from 'src/users/entitys/admin.enum';
 
 
 
@@ -16,7 +17,7 @@ export class BanMuteService {
         private chatroomService: ChatroomService
         ) {}
 
-    action(action: Silance, user: User, chatroom: chatroom) {
+    action(action: AdminAction, user: User, chatroom: chatroom) {
         console.log("action", action);
         
         var mute = this.banMuteRepository.create()
@@ -24,7 +25,9 @@ export class BanMuteService {
         mute.chatroom = chatroom
         mute.type = action
         this.banMuteRepository.save(mute)
-        this.chatroomService.removeUserFromChatroom(user, chatroom.roomName)
+        if (action == AdminAction.baned) {
+            this.chatroomService.removeUserFromChatroom(user, chatroom.roomName)
+        }
     }
 
     // async test(chatroom_id: number) {

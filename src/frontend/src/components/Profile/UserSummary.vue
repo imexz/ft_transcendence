@@ -61,10 +61,10 @@
         @click="toggleDmPopUp">
         <font-awesome-icon icon="fa-solid fa-message" />
       </button>
-      <button
+      <!-- <button
         class="dropdownElement">
         <font-awesome-icon icon="fa-solid fa-ban" />
-      </button>
+      </button> -->
       <button
         class="dropdownElement"
         @click="askForMatch">

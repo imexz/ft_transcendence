@@ -4,7 +4,7 @@ import { ChatService } from './chat.service';
 import { hostURL } from 'src/hostURL';
 import { AuthService } from 'src/auth/auth.service';
 import User from 'src/users/entitys/user.entity';
-import { Silance } from 'src/chatroom/banMute/banMute.entity';
+import { AdminAction } from 'src/users/entitys/admin.enum';
 
 
 @WebSocketGateway({
@@ -100,7 +100,7 @@ export class ChatGateway {
 
   @SubscribeMessage('action')
   async ban(
-    @MessageBody('emiType') emiType: Silance,
+    @MessageBody('emiType') emiType: AdminAction,
     @MessageBody('userId') muteUserId: number,
     @MessageBody('roomId') roomId: number,
     @ConnectedSocket() client:Socket,

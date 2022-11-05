@@ -6,22 +6,26 @@ import { ChatroomService } from 'src/chatroom/chatroom.service';
 import { MessageService } from 'src/message/message.service';
 import User from 'src/users/entitys/user.entity';
 import { BanMuteService } from 'src/chatroom/banMute/banMute.service';
-import { Silance } from 'src/chatroom/banMute/banMute.entity';
+import { AdminAction } from 'src/users/entitys/admin.enum';
 
 @Injectable()
 export class ChatService {
-  async adminAction(action: Silance, roomId: number, muteUserId: number, userId: number) {
+  async adminAction(action: AdminAction, roomId: number, UserId: number, adminId: number) {
     const admins = await this.chatroomService.getRoomAdmins(roomId)
-    console.log("admins", admins, userId);
+    console.log("admins", admins, adminId);
     
-    const isAdmin = admins.some(element => element.id === userId );
+    const isAdmin = admins.some(element => element.id === adminId );
     console.log(isAdmin);
     
     if(isAdmin) {
       console.log("isAdmin");
-      this.banMuteService.action(action ,await this.usersService.getUser(muteUserId), await this.chatroomService.getRoom(roomId))
-      if(action == Silance.baned)
-        return true
+      if (action == AdminAction.baned || action == AdminAction.muted) {
+        this.banMuteService.action(action ,await this.usersService.getUser(UserId), await this.chatroomService.getRoom(roomId))
+        if(action == AdminAction.baned)
+          return true
+      } else if (action == AdminAction.toAdmin) {
+        this.chatroomService.addRoomAdmin(roomId, UserId)
+      }
     }
     return false
   }
@@ -73,7 +77,7 @@ export class ChatService {
 
 
         async createMessage(user: User, roomId:number, content: string) {
-            const rooms = await this.chatroomService.getAllwithUserWriteAccess(user._id)
+            const rooms = await this.chatroomService.getAllwithUserWriteAccess(user._id, roomId)
             console.log("rooms=", rooms);
             
             for (let index = 0; index < rooms.length; index++) {
