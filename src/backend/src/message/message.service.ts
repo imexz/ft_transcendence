@@ -32,7 +32,7 @@ export class MessageService {
     async userAddMessageToRoom(user: User, conntent: string, chatroom: chatroom) {
         if (user != undefined && chatroom != undefined && conntent != undefined) {
             
-            var new_message = this.messageRepository.create({user: user, chatroom: chatroom, content: conntent});
+            var new_message = this.messageRepository.create({sender: user, chatroom: chatroom, content: conntent});
             // console.log(conntent);
             return await this.messageRepository.save(new_message);
         } else {

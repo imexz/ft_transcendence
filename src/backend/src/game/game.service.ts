@@ -61,7 +61,7 @@ export class GameService {
 		let game = this.getGame(undefined) // checking for first game with missing (undefined) opponent
 		if (game == undefined) {
 			console.log("joinGameOrCreateGame game == undefined");
-			game = await this.#createGameInstance(user._id)
+			game = await this.#createGameInstance(user.id)
 			game.playerLeft = user
 			this.gamesArr.push(game)
 			// opponent_user_id is set when called via Frontend::askForMatch
