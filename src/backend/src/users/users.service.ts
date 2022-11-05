@@ -74,7 +74,7 @@ export class UsersService {
             }
 			// console.log(socket.handshake.auth.id);
 			
-          }		
+        }		
 	}
 
 

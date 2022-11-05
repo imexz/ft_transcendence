@@ -1,9 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { banMute, Silance } from './banMute.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import User from 'src/users/entitys/user.entity';
 import chatroom from '../chatroom.entity';
+import { ChatroomService } from '../chatroom.service';
+import { banMute } from './banMute.entity';
+import { AdminAction } from 'src/users/entitys/admin.enum';
 
 
 
@@ -11,29 +13,27 @@ import chatroom from '../chatroom.entity';
 export class BanMuteService {
     constructor(
         @InjectRepository(banMute)
-        private banMuteRepository: Repository<banMute>
-    ) {}
+        private banMuteRepository: Repository<banMute>,
+        private chatroomService: ChatroomService
+        ) {}
 
-    Mute(user: User, chatroom: chatroom) {
+    action(action: AdminAction, user: User, chatroom: chatroom) {
+        console.log("action", action);
+        
         var mute = this.banMuteRepository.create()
         mute.user = user
         mute.chatroom = chatroom
-        mute.type = Silance.muted
+        mute.type = action
         this.banMuteRepository.save(mute)
+        if (action == AdminAction.baned) {
+            this.chatroomService.removeUserFromChatroom(user, chatroom.roomName)
+        }
     }
 
-    Ban(user: User, chatroom: chatroom) {
-        var mute = this.banMuteRepository.create()
-        mute.user = user
-        mute.chatroom = chatroom
-        mute.type = Silance.baned
-        this.banMuteRepository.save(mute)
-    }
-
-    async test(chatroom_id: number) {
-        return await this.banMuteRepository.createQueryBuilder("mute")
-        .innerJoinAndSelect('mute.chatroom', 'chatroom', 'chatroom._id = :id', {id: chatroom_id} )
-    }
+    // async test(chatroom_id: number) {
+    //     return await this.banMuteRepository.createQueryBuilder("mute")
+    //     .innerJoinAndSelect('mute.chatroom', 'chatroom', 'chatroom._id = :id', {id: chatroom_id} )
+    // }
     
 
 

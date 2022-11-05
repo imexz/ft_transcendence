@@ -5,9 +5,32 @@ import { UsersService } from 'src/users/users.service';
 import { ChatroomService } from 'src/chatroom/chatroom.service';
 import { MessageService } from 'src/message/message.service';
 import User from 'src/users/entitys/user.entity';
+import { BanMuteService } from 'src/chatroom/banMute/banMute.service';
+import { AdminAction } from 'src/users/entitys/admin.enum';
 
 @Injectable()
 export class ChatService {
+  async adminAction(action: AdminAction, roomId: number, UserId: number, adminId: number) {
+    const admins = await this.chatroomService.getRoomAdmins(roomId)
+    console.log("admins", admins, adminId);
+    
+    const isAdmin = admins.some(element => element.id === adminId );
+    console.log(isAdmin);
+    
+    if(isAdmin) {
+      console.log("isAdmin");
+      if (action == AdminAction.baned || action == AdminAction.muted) {
+        this.banMuteService.action(action ,await this.usersService.getUser(UserId), await this.chatroomService.getRoom(roomId))
+        if(action == AdminAction.baned)
+          return true
+      } else if (action == AdminAction.toAdmin) {
+        this.chatroomService.addRoomAdmin(roomId, UserId)
+      }
+    }
+    return false
+  }
+
+
 
   async creatRoomDM(user: User, id: number, content: string) {
     if(user != undefined && id != undefined)
@@ -43,6 +66,7 @@ export class ChatService {
     constructor(
         private chatroomService: ChatroomService,
         private usersService: UsersService,
+        private banMuteService: BanMuteService,
         private messageService: MessageService,
         ){}
 
@@ -53,7 +77,7 @@ export class ChatService {
 
 
         async createMessage(user: User, roomId:number, content: string) {
-            const rooms = await this.chatroomService.getAllwithUserWriteAccess(user.id)
+            const rooms = await this.chatroomService.getAllwithUserWriteAccess(user.id, roomId)
             console.log("rooms=", rooms);
             
             for (let index = 0; index < rooms.length; index++) {

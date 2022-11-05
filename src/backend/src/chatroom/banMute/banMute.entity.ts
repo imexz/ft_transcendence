@@ -1,11 +1,8 @@
 import User from "../../users/entitys/user.entity";
 import { Column, Entity, CreateDateColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, OneToOne, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
 import chatroom from "../chatroom.entity";
+import { AdminAction } from "src/users/entitys/admin.enum";
 
-export enum Silance {
-    muted,
-    baned
-}
 
 @Entity()
 export class banMute{
@@ -23,7 +20,8 @@ export class banMute{
 
     @Column({
         type: "enum",
-        enum: Silance,
+        enum: AdminAction,
+        default: AdminAction.muted
     })
-    type: Silance
+    type: AdminAction
 }

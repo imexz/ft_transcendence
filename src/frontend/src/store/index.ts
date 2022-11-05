@@ -181,14 +181,14 @@ export default createStore<State>({
       .then(response => { commit('setFriendsList', response.data)})
       .catch()
     },
-    askForMatch(){
-      this.$store.state.socketGame.emit('Request', {id: this.user._id}, (r) => {
+    // askForMatch(){
+    //   this.$store.state.socketGame.emit('Request', {id: this.user._id}, (r) => {
         // this.$router.push('/play/')    
-        this.showGame = !this.showGame
-        this.$store.state.game = r
-      })
-      console.log("AskForMatch");
-    }
+        // this.showGame = !this.showGame
+        // this.$store.state.game = r
+    //   })
+    //   console.log("AskForMatch");
+    // }
   },
   
   modules: {

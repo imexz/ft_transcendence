@@ -5,6 +5,7 @@ import { hostURL } from 'src/hostURL';
 import { AuthService } from 'src/auth/auth.service';
 import User from 'src/users/entitys/user.entity';
 import chatroom from 'src/chatroom/chatroom.entity';
+import { AdminAction } from 'src/users/entitys/admin.enum';
 
 
 interface ServerToClientEvents {
@@ -19,6 +20,7 @@ interface ServerToClientEvents {
   },
   namespace: 'chat'
 })
+
 
 export class ChatGateway {
 
@@ -143,6 +145,23 @@ export class ChatGateway {
 
   }
 
+  @SubscribeMessage('action')
+  async ban(
+    @MessageBody('emiType') emiType: AdminAction,
+    @MessageBody('userId') muteUserId: number,
+    @MessageBody('roomId') roomId: number,
+    @ConnectedSocket() client:Socket,
+  ) {
+    // console.log(roomId)
+    console.log("ban")
+    if(await this.chatService.adminAction(emiType, roomId, muteUserId, client.handshake.auth.id) == true) {
+      const socket = await this.findSocketOfUser(muteUserId)
+      socket.leave(roomId.toString())
+    }
+    // console.log("recive and emit typing");
+
+  }
+
   @SubscribeMessage('findAllMessages')
   async findAllMessages(@MessageBody('roomId') roomId: number, @ConnectedSocket() client:Socket,) {
     // console.log('findAllMessages');
@@ -169,8 +188,6 @@ export class ChatGateway {
     // const room_name = await this.chatService.getRoomName(roomId)
 
     const message = await this.chatService.createMessage(client.handshake.auth as User, roomId, content);
-
-    // client.to(room_name).emit('message', message);
     if(message) {
       const tmp = {
       senderId: client.handshake.auth.id.toString(),
@@ -189,7 +206,6 @@ export class ChatGateway {
       // console.log("timestamp after");
       // tmp.timestamp = tmp.timestamp. //TB resume work
 
-
       client.to(roomId.toString()).emit('message', {message: tmp, roomId});
       client.to(roomId.toString()).emit('newMessage', {message: tmp, roomId});
       console.log("createMessage ende");
@@ -198,13 +214,6 @@ export class ChatGateway {
       // console.log("message == empty");
 
     }
-
-      // console.log(client.);
-
-      // console.log("emit mesage");
-      // console.log(message);
-      // console.log(tmp);
-
   }
 
   @SubscribeMessage('deleteMessage')
@@ -249,6 +258,17 @@ export class ChatGateway {
     @MessageBody('id') id: number,
   ) {
     this.chatService.creatRoomDM(client.handshake.auth as User, id, content)
+  }
+
+  async findSocketOfUser(userId: number) {
+    const sockets = await this.server.fetchSockets();
+    for (const socket of sockets) {
+      if(socket.handshake.auth.id == userId)
+      {
+        console.log("gameRequest test");
+        return socket
+      }
+    }
   }
 
 

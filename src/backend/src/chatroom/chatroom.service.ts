@@ -1,17 +1,35 @@
-import { Get, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import User from '../users/entitys/user.entity';
-import { Column, FindOptionsWhere, ManyToMany, Not, Repository } from 'typeorm';
+import { FindOptionsWhere, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Access } from './chatroom.entity';
 import chatroom from './chatroom.entity';
 import { message } from 'src/message/message.entity';
 import * as bcrypt from 'bcrypt';
-import { Status } from 'src/users/status_enum';
 import { UsersService } from 'src/users/users.service';
 import { BanMuteService } from './banMute/banMute.service';
 
 @Injectable()
 export class ChatroomService {
+  async addRoomAdmin(roomId: number, userId: number) {
+    console.log("addRoomAdmin");
+    
+    const room  = await this.chatroomRepository.findOne({
+        where: {
+            roomId: roomId
+        },
+        relations: {
+            admins: true
+        }
+    })
+    if (room != undefined) {
+        const user = room.admins.find(element => element.id == userId)
+        if (user == undefined) {
+            room.admins.push(await this.usersService.getUser(userId))
+            this.chatroomRepository.save(room)
+        }
+    }
+  }
 
 
   async createRoomInfo(roomId: number, id: any){
@@ -78,19 +96,19 @@ export class ChatroomService {
         .getMany()
      }
 
-    async getAllwithUserWriteAccess(id: number) {
+    async getAllwithUserWriteAccess(id: number, roomId: number) {
         console.log("getAllwithUserWriteAccess");
         // console.log("id = ", id);
         // const mute = this.banMuteService.test()
 
        return await this.chatroomRepository.createQueryBuilder("chatroom")
-        .leftJoin('chatroom.muted', 'muted')
-        .innerJoinAndSelect('chatroom.users', 'user', 'user._id = :id', { id: id })
-        .where('muted.user._id != :iid', {iid: id})
+       .where('chatroom.roomId = :id', {id: roomId})
+       .innerJoinAndSelect('chatroom.users', 'user', 'user.id = :id1', { id1: id })
+       .leftJoinAndSelect('chatroom.muted', 'muted','user.id != :id2', { id2: id })
+        // .where('muted.user._id != :iid', {iid: id})
         // .innerJoinAndSelect('chatroom.users', 'user', 'user._id = :id && muted._id != :id', { id: id })
         .getMany()
     }
-
 
     async getRoomName(roomId: number): Promise<string> {
         // console.log("getRoomName");
@@ -111,7 +129,10 @@ export class ChatroomService {
                     admins: true,
                     users: true,
                     owner: true,
-                    messages: true
+                    messages: true,
+                    muted: {
+                        user: true
+                    }
                 }
             })
             if(chatroom == null && typeof room === 'string') {
@@ -136,7 +157,9 @@ export class ChatroomService {
                     admins: true,
                     users: true,
                     owner: true,
-                    messages: true
+                    messages: {
+                        sender: true
+                    }
                 },
                 where: {
                     users: [{id: user.id}, {id: user1.id}],
@@ -176,7 +199,6 @@ export class ChatroomService {
                 } else {
                     switch (ret.chatroom.access) {
                         case Access.protected:
-                            // bcrypt.compare()
                             if(await bcrypt.compare(password, ret.chatroom.hash) == false) {
                                 // console.log("result === false");
                                 return false
@@ -193,8 +215,19 @@ export class ChatroomService {
                             case Access.public:
 
                             default:
-                                if(ret.chatroom.users.indexOf(user) == -1)
+                                console.log(ret.chatroom.muted);
+                                
+                                if( ret.chatroom.users.indexOf(user) == -1 &&
+                                    (ret.chatroom.muted == undefined ||
+                                    ret.chatroom.muted.find((element) => element.user.id == user.id) == undefined))
+                                {
+                                    console.log("sucesfull joind");
+                                    
                                     ret.chatroom.users.push(user)
+                                } else {
+                                    console.log("join goes wrong");
+                                    
+                                }
                             break;
                     }
                 }
@@ -246,7 +279,7 @@ export class ChatroomService {
         @InjectRepository(chatroom)
         private chatroomRepository: Repository<chatroom>,
         private usersService: UsersService,
-        private banMuteService: BanMuteService
+        // private banMuteService: BanMuteService
     ){}
 
 
@@ -289,9 +322,18 @@ export class ChatroomService {
     async getRoom(room: string | number) {
         // console.log("before");
         const test = typeof room === 'string' ? {roomName: room} : {roomId: room}
-
         return await this.chatroomRepository.findOne({where: test})
-        // console.log("after");
+    }
+
+    async getRoomAdmins(room: number)  {
+        console.log("roomId", room);
+        
+        return await this.chatroomRepository.createQueryBuilder('room')
+        .where("room.roomId = :roo", {roo: room})
+        .leftJoinAndSelect('room.admins', 'admins')
+        .select('admins.id AS id')
+        .getRawMany()
+        // .where()
     }
 
     async addRoom(room_name: string, access: Access,  user: User, password?: string) {

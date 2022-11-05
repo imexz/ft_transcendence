@@ -11,6 +11,7 @@ export enum Access {
     dm,
 }
 
+
 @Entity()
 export default class chatroom{
     @PrimaryGeneratedColumn()
@@ -42,5 +43,4 @@ export default class chatroom{
     @Exclude()
     @Column({nullable: true})
     hash: string
-
 }

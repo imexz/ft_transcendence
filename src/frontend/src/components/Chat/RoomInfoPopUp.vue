@@ -28,6 +28,11 @@ import Room from '@/models/room';
 import User from '@/models/user';
 
 
+  enum AdminAction {
+      muted,
+      baned,
+      toAdmin
+  }
 export default defineComponent({
   data() {
     return {
@@ -36,13 +41,18 @@ export default defineComponent({
       extraButtons: [
         {
           icon: "fa-solid fa-comment-slash",
-          emit: "mute"
+          emit: AdminAction.muted
         },
         {
           icon: "fa-solid fa-gavel",
-          emit: "ban"
+          emit: AdminAction.toAdmin
+        },
+        {
+          icon: "fa-solid fa-ban",
+          emit: AdminAction.baned
         }
-      ]
+      ],
+      AdminAction
     }
   },
   updated() {
@@ -64,8 +74,10 @@ export default defineComponent({
     }
   },
   methods: {
-    reEmit(emitMsg, userId){
-      this.$emit("action", emitMsg, userId, this.room.roomId)
+    reEmit(emiType: AdminAction, userId){
+      console.log(emiType, userId);
+      
+      this.$store.state.socketChat.emit('action', {emiType, userId, roomId: this.room.roomId})
     },
     closePopUp(){
       this.$emit("action", "exit")
