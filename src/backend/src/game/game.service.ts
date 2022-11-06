@@ -114,7 +114,6 @@ export class GameService {
 		this.userService.setStatus(game.playerRight.id, UserStatus.PLAYING);
 		server.to(game.id.toString()).emit('GameInfo', game)
 		console.log("startGame");
-
 		game.interval = setInterval(() => this.emitGameData(game, server), 16) as unknown as number;
 		console.log("startGame end");
 	}

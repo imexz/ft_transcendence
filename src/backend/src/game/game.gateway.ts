@@ -13,7 +13,6 @@ import { hostURL } from 'src/hostURL';
 import { AuthService } from 'src/auth/auth.service';
 import { Game, Side } from './game.entities/game.entity';
 import User from 'src/users/entitys/user.entity';
-import { GameData } from './game.entities/gameData';
 import { forwardRef, Injectable, Inject } from '@nestjs/common';
 
 @WebSocketGateway({
@@ -103,28 +102,25 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   }
 
   @SubscribeMessage('accept')
-  createGame(
+  handleAcceptGameRequest(
     @ConnectedSocket() client: Socket,
   ) {
     var game: Game = this.gameService.getGame(client.handshake.auth.id)
     if(game != undefined && game.interval == null) {
       this.gameService.startGame(this.server, game)
-      console.log("game strated");
-
     }
   }
 
   @SubscribeMessage('denied')
-  async removeGame(
-    @ConnectedSocket() client: Socket,
-  ) {
+  async handleDenyGameRequest(@ConnectedSocket() client: Socket) {
     // player was added to the game without doing anything
     var game: Game = this.gameService.getGame(client.handshake.auth.id)
     if(game != undefined && game.interval == null) {
-      const socket = await this.findSocketOfUser(game.playerLeft.id)
-      if (this.gameService.removeGame(game)) {
-        socket.emit('NowInGame', false)
-      }
+    	const socket = await this.findSocketOfUser(game.playerLeft.id)
+		this.leaveRoom(game.id.toString())
+		if (this.gameService.removeGame(game)) {
+    		socket.emit('NowInGame', false)
+    	}
     }
   }
 
@@ -142,12 +138,11 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   handleLeaveGame(@ConnectedSocket() client: Socket): void {
 	console.log("leaveGame");
 	client.rooms.forEach(element => {
-	  if(element != client.id)
+	//   if(element != client.id)
 		client.leave(element)
-
 	});
 	let game = this.gameService.getGame(client.handshake.auth.id);
-	if (game != undefined && client.handshake.auth.id === game.paddleLeft.id) {
+	if (game != undefined && client.handshake.auth.id === game.playerLeft.id) {
 	  this.gameService.removeGame(game);
 	}
 	console.log("leaveGame ende");
@@ -175,9 +170,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   async findSocketOfUser(userId: number) {
     const sockets = await this.server.fetchSockets();
     for (const socket of sockets) {
-      if(socket.handshake.auth.id == userId)
-      {
-        // console.log("gameRequest test");
+      if(socket.handshake.auth.id == userId) {
         return socket
       }
     }
