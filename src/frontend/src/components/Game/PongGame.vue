@@ -20,7 +20,6 @@
 </template>
 
 <script lang="ts">
-  import { Socket } from "socket.io-client";
   import { defineComponent } from 'vue';
   import Game from '@/models/game';
   import GamePlayers from './GamePlayers.vue'
@@ -42,15 +41,13 @@
       Field
     },
   	created() {
-  		console.log("in created"); 
-  		this.$store.state.socketGame.on('Game', (game: Game) => {
+  		console.log("in created");
+  		this.$store.state.socketGame.on('GameInfo', (game: Game) => {
         console.log(game)
         this.assignGame(game)
 		  });
       if (this.$store.state.game == null && this.$store.state.winner == null) {
-        this.$store.state.socketGame.emit('checkGame', (game: Game) => {
-          console.log(game)
-        });
+        this.$store.state.socketGame.emit('isInGame');
       }
   	},
   	mounted() {
@@ -59,16 +56,16 @@
 		beforeUpdate() {
   		console.log("beforeUpdate");
       if (this.$store.state.game == null && this.$store.state.winner == null) {
-        this.$store.state.socketGame.emit('checkGame', (game: Game) => {
+        this.$store.state.socketGame.emit('isInGame', (game: Game) => {
           console.log(game);
         });
       }
-		  console.log("leaving beforeUpdate");
+		console.log("leaving beforeUpdate");
 	  },
   	unmounted() {
   		console.log("in unmount");
-      this.$store.state.socketGame.emit('Quit')
-      this.$store.state.socketGame.off('Game')
+      this.$store.state.socketGame.emit('quitPendingGame')
+      this.$store.state.socketGame.off('GameInfo')
   	},
   	methods: {
       newGame(){
@@ -86,10 +83,10 @@
         }
       },
       keyEvents(event) {
-        if (!this.finished) {
+        // if (!this.finished) {
           console.log(event.key);
           this.$store.state.socketGame.emit('key', event.key)
-        }
+        // }
       },
       leaveGame() {
         this.$store.state.socketGame.emit('leaveGame');

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { Game, Side } from './game.entities/game.entity';
 import { Paddle } from './game.entities/paddle.entity';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -10,29 +10,32 @@ import { UsersService } from 'src/users/users.service';
 import User from 'src/users/entitys/user.entity';
 import { GameData } from './game.entities/gameData';
 import { UserStatus } from "../users/entitys/status.enum";
+import { GameGateway } from './game.gateway';
 
 @Injectable()
 export class GameService {
 	constructor(
 		private userService: UsersService,
+		@Inject(forwardRef(() => GameGateway))
+		private gameGateway: GameGateway,
 		){}
 
 	setup = new GameSetup;
-	
+	gamesArr: Array<Game> = []
+
 	@InjectRepository(Game)
 	private gameRepository: Repository<Game>
-	
-	gamesArr: Array<Game> = []
-	
-	removePlayerFromWaiting(user_id: number) {
+
+	removePendingGame(user_id: number) {
 		const game = this.getGame(user_id)
 		if(game != undefined && game.playerRight == undefined) {
-			this.removeGame(game)			
+			this.gameGateway.leaveRoom(game.id.toString());
+			this.removeGame(game);
 		}
 	}
 	startGame(server: Server, game: Game) {
 	  if (game.playerLeft != undefined && game.playerRight != undefined) {
-		  this.#startGame(server, game)	
+		  this.startGamePrivate(server, game)
 	  }
 	}
 	getGame(user_id: number | undefined): Game {
@@ -61,7 +64,7 @@ export class GameService {
 		let game = this.getGame(undefined) // checking for first game with missing (undefined) opponent
 		if (game == undefined || opponent_user_id) {
 			console.log("joinGameOrCreateGame game == undefined");
-			game = await this.#createGameInstance(user.id)
+			game = await this.createGameInstance(user.id)
 			game.playerLeft = user
 			this.gamesArr.push(game)
 			// opponent_user_id is set when called via Frontend::askForMatch
@@ -75,13 +78,13 @@ export class GameService {
 		}
 		return game
 	}
-	async #createGameInstance(userId: number): Promise<Game> {
+	async createGameInstance(userId: number): Promise<Game> {
 		console.log('inside createGameInstance()');
 		const setup = new GameSetup;
 		console.log('leaving createGameInstance()');
 		return new Game(userId, setup);
 	}
-	// async #createGameInstance(): Promise<Game> {
+	// async createGameInstance(): Promise<Game> {
 	// 	console.log('inside createGameInstance()');
 	// 	const setup = new GameSetup;
 	// 	var game = this.gameRepository.create();
@@ -90,7 +93,7 @@ export class GameService {
 	// 	console.log('leaving createGameInstance()');
 	// 	return new Game(game.id, setup);
 	// }
-	async #emitGameData(game: Game, server: Server) {
+	async emitGameData(game: Game, server: Server) {
 		// console.log("emitGameData");
 		const tmpGame: Game = await this.getData(game)
 		const updatedGameData: GameData = {
@@ -99,16 +102,20 @@ export class GameService {
 			paddleRight: tmpGame.paddleRight,
 			score: tmpGame.score,
 			// finished: tmpGame.finished,
-		}		
+		}
 		server.to(game.id.toString()).emit('updateGame', updatedGameData);
+		if (updatedGameData.score.scoreLeft === 3 || updatedGameData.score.scoreRight === 3) {
+			console.log("emitGameData: leaveRoom");
+			this.gameGateway.leaveRoom(game.id.toString());
+		}
 	}
-	async #startGame(server: Server, game: Game) {
+	async startGamePrivate(server: Server, game: Game) {
 		this.userService.setStatus(game.playerLeft.id, UserStatus.PLAYING);
 		this.userService.setStatus(game.playerRight.id, UserStatus.PLAYING);
-		server.to(game.id.toString()).emit("Game", game)
+		server.to(game.id.toString()).emit('GameInfo', game)
 		console.log("startGame");
 
-		game.interval = setInterval(() => this.#emitGameData(game, server), 16) as unknown as number;
+		game.interval = setInterval(() => this.emitGameData(game, server), 16) as unknown as number;
 		console.log("startGame end");
 	}
 	async getData(game: Game): Promise<Game | undefined> {
@@ -117,15 +124,15 @@ export class GameService {
 		if (game == undefined) {
 			return undefined;
 		}
-		this.#updateData(game)
-		this.#collisionControl(game);
-		if (this.#scored(game)){
-			this.#reset(game);
+		this.updateData(game)
+		this.collisionControl(game);
+		if (this.scored(game)){
+			this.reset(game);
 		}
-		await this.#isGameFinished(game);
+		await this.isGameFinished(game);
 		return game
 	}
-	#updateData(game: Game) {
+	updateData(game: Game) {
 		// let game: Game = this.games.get(id);
 		game.ball.position.x += game.ball.direction.x;
 		game.ball.position.y += game.ball.direction.y;
@@ -156,11 +163,11 @@ export class GameService {
 		}
 		// console.log("gameid: %d | ball: x %d, y %d", id, game.ball.position.x, game.ball.position.y);
 	}
-	#isBallWithinPaddleRange(game: Game, paddle: Paddle): boolean {
+	isBallWithinPaddleRange(game: Game, paddle: Paddle): boolean {
 		return (game.ball.position.y >= paddle.position.y &&
 			game.ball.position.y <= paddle.position.y + paddle.height)
 	}
-	#isBallAtPaddle(game: Game, paddle: Paddle): boolean {
+	isBallAtPaddle(game: Game, paddle: Paddle): boolean {
 		let ret: boolean = false;
 		// let game: Game = this.games.get(id);
 		if (paddle.id == "left") {
@@ -170,12 +177,12 @@ export class GameService {
 		}
 		return ret;
 	}
-	#calcAngle(game: Game, paddle: Paddle) {
+	calcAngle(game: Game, paddle: Paddle) {
 		var section: number;
 		// let game: Game = this.games.get(id);
 
 		section = paddle.height / 8;
-		if (this.#isBallWithinPaddleRange(game, paddle)) {
+		if (this.isBallWithinPaddleRange(game, paddle)) {
 			var i: number = 1;
 			while (game.ball.position.y > (paddle.position.y + i * section)) {
 				i++;
@@ -183,28 +190,28 @@ export class GameService {
 			game.ball.direction.angle = paddle.reboundAngles[i - 1];
 		}
 	}
-	#updateBallDirection(game: Game, paddle: Paddle) {
-		this.#calcAngle(game, paddle);
+	updateBallDirection(game: Game, paddle: Paddle) {
+		this.calcAngle(game, paddle);
 		// let game: Game = this.games.get(id);
 		game.ball.direction.x = game.ball.direction.speed * Math.cos(game.ball.direction.angle * (Math.PI / 180));
 		game.ball.direction.y = game.ball.direction.speed * Math.sin(game.ball.direction.angle * (Math.PI / 180));
 	}
-	#collisionControl(game: Game) {
+	collisionControl(game: Game) {
 		// var game: Game = this.games.get(id);
 		if (game.ball.direction.x > 0) {
-			if (this.#isBallAtPaddle(game, game.paddleRight) &&
-				this.#isBallWithinPaddleRange(game, game.paddleRight)) {
-					this.#updateBallDirection(game, game.paddleRight);
+			if (this.isBallAtPaddle(game, game.paddleRight) &&
+				this.isBallWithinPaddleRange(game, game.paddleRight)) {
+					this.updateBallDirection(game, game.paddleRight);
 			}
 		}
 		else {
-			if (this.#isBallAtPaddle(game, game.paddleLeft) &&
-				this.#isBallWithinPaddleRange(game, game.paddleLeft)) {
-					this.#updateBallDirection(game, game.paddleLeft);
+			if (this.isBallAtPaddle(game, game.paddleLeft) &&
+				this.isBallWithinPaddleRange(game, game.paddleLeft)) {
+					this.updateBallDirection(game, game.paddleLeft);
 			}
 		}
 	}
-	#scored(game: Game): boolean {
+	scored(game: Game): boolean {
 		var ret: boolean = false;
 		// let game: Game = this.games.get(id);
 		if (game.ball.position.x - game.ball.radius <= 0) {
@@ -219,7 +226,7 @@ export class GameService {
 		}
 		return ret;
 	}
-	#reset(game: Game) {
+	reset(game: Game) {
 		// let game: Game = this.games.get(id);
 		game.ball.position.x = this.setup.ballPos.x;
 		game.ball.position.y = this.setup.ballPos.y;
@@ -247,15 +254,13 @@ export class GameService {
 		game.score.increaseLeft = this.setup.scoreIncrease;
 		game.score.increaseRight = this.setup.scoreIncrease;
 	}
-	async #isGameFinished(game: Game) {
-		// var game: Game | undefined = this.games.get(id);
+	async isGameFinished(game: Game) {
 		if (game != undefined && (game.score.scoreLeft == 3 || game.score.scoreRight == 3)) {
 			clearInterval(game.interval);
 			game.interval = null
 			let gameInstance: Game = this.gameRepository.create();
 			gameInstance.playerRight = game.playerRight;
 			gameInstance.playerLeft = game.playerLeft;
-			// gameInstance.interval = game.interval;
 			gameInstance.scoreLeft = game.scoreLeft;
 			gameInstance.scoreRight = game.scoreRight;
 			await this.gameRepository.save(gameInstance);
@@ -263,21 +268,17 @@ export class GameService {
 			this.userService.setStatus(game.playerRight.id, UserStatus.ONLINE)
 			this.removeGame(game)
 			console.log("game is finished");
-			
-			// TODO: delete room (?)
-			// TODO: reset frontend variables
 		}
 	}
 	removeGame(game: Game): boolean {
 		const index = this.gamesArr.indexOf(game, 0);
 		if (index > -1) {
 			this.gamesArr.splice(index, 1);
-			// inform opponent about denied game request
 			return true;
 		}
 		return false;
 	}
-	movePaddleUp(game: Game, side: Side) {		
+	movePaddleUp(game: Game, side: Side) {
 		// console.log("movePaddleUp", side);
 
 		if (side == Side.left) {
@@ -301,34 +302,12 @@ export class GameService {
 				game.paddleRight.position.y += game.paddleRight.speed;
 		}
 	}
-	// leaveGame(user_id: number, game: Game) {
 
-	// 	if (user_id === game.playerLeft.id || user_id === game.playerRight.id) {
-	// 		// this.intervals.delete(gameId);
-	// 	} else {
-	// 		console.log("leaveGame gid", game.id, typeof game.id);
-	// 		console.log("leaveGame uid", user_id, typeof user_id);
-	// 	}
-	// }
 	async getMatchHistory(user: User){
-	// 	return await this.gameRepository.find({
-	// 		where: {
-	// 			player: {
-	// 				id: user.id
-	// 			}
-	// 		},
-	// 		relations: {
-	// 			player: true
-	// 		}
-	// 	})
-	// }
-	if (user == undefined) {
-		console.log("user == undefind");
-
-	}
-	console.log("user.id", user.id, typeof(user.id));
-
-
+		if (user == undefined) {
+			console.log("user == undefind");
+		}
+		console.log("user.id", user.id, typeof(user.id));
 		return await this.gameRepository.createQueryBuilder("game")
 		// .innerJoinAndSelect("game.player", "player", "player.id = :id", { id: user.id})
 		.leftJoin('game.playerRight', 'tmp', 'tmp.id = :id', { id: user.id as number} )

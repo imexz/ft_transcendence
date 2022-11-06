@@ -62,7 +62,7 @@ export default createStore<State>({
     },
     logIn(state, user) {
       // console.log("logIn");
-      
+
       state.validated = true;
       state.user = user;
       state.socket = io(API_URL, {
@@ -71,7 +71,7 @@ export default createStore<State>({
           }
       })
       // console.log("default socket init");
-      
+
       state.socketChat = io(API_URL + "/chat", {
         auth: {
           id: document.cookie
@@ -86,6 +86,12 @@ export default createStore<State>({
 
       console.log("game socket init");
       console.log(document.cookie);
+
+	  state.socketGame.on('disconnecting', () => {
+		console.log("game socket disconnecting");
+		console.log(state.socketGame.rooms);
+	  })
+
       state.socketChat.on('message',() => {
         state.NrMessages++
       })
@@ -126,7 +132,7 @@ export default createStore<State>({
     },
     setFriendsList(state, friendsList) {
       // console.log(friendsList);
-      
+
       state.friendsList = friendsList;
     },
     addFriend(state, user) {

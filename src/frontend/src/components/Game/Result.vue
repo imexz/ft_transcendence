@@ -3,7 +3,7 @@
     <user-summary :user=winner />
     <div>
         <!-- TODO: add function to @click -->
-        <button @click=""> ask for rematch </button>
+        <button @click="askForRematch"> ask for rematch </button>
         <button @click="newGame"> new game</button>
     </div>
 </template>
@@ -21,9 +21,21 @@ export default defineComponent({
     components: {
         UserSummary
     },
+	unmounted() {
+		console.log("result.vue unmounted");
+		// this.leaveRoom();
+	},
     methods: {
+		leaveRoom() {
+			this.$store.state.socketGame.emit('leaveRoom')
+		},
+		askForRematch() {
+			console.log("askForRematch");
+			this.$emit('newGame');
+		},
         newGame() {
-            console.log("newGame");  
+            console.log("newGame");
+			// this.leaveRoom()
             this.$emit('newGame')
         }
     }
