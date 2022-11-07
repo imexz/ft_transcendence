@@ -14,7 +14,7 @@ import { IsNull, Not } from "typeorm"
 export class ChatroomService {
   async addRoomAdmin(roomId: number, userId: number) {
     console.log("addRoomAdmin");
-    
+
     const room  = await this.chatroomRepository.findOne({
         where: {
             roomId: roomId
@@ -93,7 +93,7 @@ export class ChatroomService {
 
      async getAllwithUser(id: number) {
         return await this.chatroomRepository.createQueryBuilder("chatroom")
-        .innerJoinAndSelect('chatroom.users', 'user', 'user.id = :id', { id: id })
+        .innerJoinAndSelect('chatroom.users', 'user', 'user.id = :user_id', { user_id: id })
         .getMany()
      }
 
@@ -108,7 +108,7 @@ export class ChatroomService {
                 muted: {
                     user: true
                 }
-                
+
             },
             where: {
                 roomId: roomId,
@@ -120,7 +120,7 @@ export class ChatroomService {
     //    .where('chatroom.roomId = :id', {id: roomId})
     //    .innerJoinAndSelect('chatroom.users', 'user', 'user.id = :id1', { id1: id })
     //    .leftJoinAndSelect('chatroom.muted', 'muted')
-       
+
     //    .getMany()
         // .where('muted.user.id != :iid', {iid: id})
         // .innerJoinAndSelect('chatroom.users', 'user', 'user._id = :id && muted._id != :id', { id: id })
@@ -232,17 +232,17 @@ export class ChatroomService {
 
                             default:
                                 console.log(ret.chatroom.muted);
-                                
+
                                 if( ret.chatroom.users.indexOf(user) == -1 &&
                                     (ret.chatroom.muted == undefined ||
                                     ret.chatroom.muted.find((element) => element.user.id == user.id) == undefined))
                                 {
                                     console.log("sucesfull joind");
-                                    
+
                                     ret.chatroom.users.push(user)
                                 } else {
                                     console.log("join goes wrong");
-                                    
+
                                 }
                             break;
                     }
@@ -303,7 +303,7 @@ export class ChatroomService {
 
         const rooms = await this.chatroomRepository.createQueryBuilder("chatroom")
         .leftJoinAndSelect('chatroom.users', 'us')
-        .leftJoinAndSelect('chatroom.admins', 'admins', "us.id = :userid1", {userid1: user.id})
+        .leftJoinAndSelect('chatroom.admins', 'admins', "admins.id = :userid1", {userid1: user.id})
         .where("access IN (:...values)", { values: [ Access.protected, Access.public ] })
         .orWhere("us.id = :test", {test: user.id})
         .leftJoinAndSelect('chatroom.users', 'users', "us.id = :userid3", {userid3: user.id})
@@ -343,7 +343,7 @@ export class ChatroomService {
 
     async getRoomAdmins(room: number)  {
         console.log("roomId", room);
-        
+
         return await this.chatroomRepository.createQueryBuilder('room')
         .where("room.roomId = :roo", {roo: room})
         .leftJoinAndSelect('room.admins', 'admins')

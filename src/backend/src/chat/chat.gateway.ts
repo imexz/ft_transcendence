@@ -4,7 +4,7 @@ import { ChatService } from './chat.service';
 import { hostURL } from 'src/hostURL';
 import { AuthService } from 'src/auth/auth.service';
 import User from 'src/users/entitys/user.entity';
-import chatroom from 'src/chatroom/chatroom.entity';
+import chatroom, { Access } from 'src/chatroom/chatroom.entity';
 import { AdminAction } from 'src/users/entitys/admin.enum';
 
 
@@ -88,7 +88,7 @@ export class ChatGateway {
       const rooms = await this.chatService.getUserRooms(client.handshake.auth.id)
 
       // console.log(rooms);
-    
+
 
 
 
@@ -212,6 +212,34 @@ export class ChatGateway {
       return tmp;
     } else {
       // console.log("message == empty");
+
+    }
+  }
+
+  @SubscribeMessage('createRoom')
+  async createRoom(
+  @MessageBody('roomName') roomName: string,
+  @MessageBody('access') access: Access,
+  @ConnectedSocket() client: Socket,
+  @MessageBody('password') password?: string,
+  ) {
+    console.log("createRoom");
+    console.log("roomName:", roomName);
+    console.log("access:", access);
+    console.log("user id:", client.handshake.auth.id);
+
+    // const room_name = await this.chatService.getRoomName(roomId)
+
+    const room = await this.chatService.createRoom(client.handshake.auth as User, roomName, access, password);
+    if(room) {
+      // console.log("emitting newRoom now"); //!!!!!!!!!!!!!!!!
+      // client.emit('newRoom', room);
+
+      console.log("createRoom ende");
+      return room
+    }
+    else {
+      console.log("room == empty");
 
     }
   }

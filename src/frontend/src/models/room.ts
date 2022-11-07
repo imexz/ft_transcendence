@@ -18,12 +18,12 @@ export default class Room {
         this.roomName = room.roomName
         this.roomId = room.roomId
         // this.messages = room.messages // run through for loop and convert to real Message object again
-        this.messages = [] as Message[]
         this.users = [] as User[]
         for (let i = 0; i < room.users.length; ++i)
         {
             this.users[i] = new User(room.users[i])
         }
+        this.messages = [] as Message[]
         for (let i = 0; i < room.messages.length; ++i)
         {
             this.findUser(room.messages[i].senderId)

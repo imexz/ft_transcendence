@@ -44,7 +44,6 @@
 </template>
 
   <script lang="ts">
-  import { register } from 'vue-advanced-chat'
   import { io, Socket } from 'socket.io-client';
   import { defineComponent, ref } from 'vue';
   import VueAxios from 'axios';
@@ -56,12 +55,14 @@
   import Toast from "@/components/Toast.vue";
   import Message from '@/models/message';
   import Room from '@/models/room';
+  import { Access } from '@/models/room';
 
+  import { register } from 'vue-advanced-chat'
   register()
 
-    export default defineComponent({
-      data() {
-        return {
+  export default defineComponent({
+    data() {
+      return {
           style: customChatStyle,
           height: "800px",
           currentUserId: '',
@@ -155,7 +156,7 @@
           console.log("endeende");
 
         },
-        sendMessage({ roomId, content, files, replyMessage }) {
+        sendMessage({ roomId, content}) {
           console.log("createMessage");
           console.log(roomId);
           this.socket.emit('createMessage', { roomId: roomId, content: content}, (response) =>
@@ -271,8 +272,8 @@
                 {
                   console.log("next")
                   var result: string = undefined
-                  if (this.rooms[index].access == 'protected')
-                    result = prompt("This room is protected\n password", "password")
+                  if (this.rooms[index].access == Access.protected)
+                    result = prompt("This room is protected\n password", "password") // @Tobi please rework this popup so it matches the style of our website, can be triggered by trying to join a protected room
 
                     console.log(result);
                     console.log("roomIdFrontend", roomId);
@@ -291,6 +292,8 @@
               break;
               case 'leave':
                 this.updateMessages(roomId)
+                this.socket.emit('leave', roomId)
+                break;
               default:
                 this.socket.emit(action.name, roomId)
               break;
@@ -385,14 +388,16 @@
           }
         },
         addMessage(message) {
-          console.log("addMessage");
+          console.log("addMessage", message);
           console.log(this.messages.length);
-          const messages = []
-          for (let i = 0; i < this.messages.length; i++) {
-            messages.push(this.messages[i])
-          }
-          messages.push(message)
-          this.messages = messages
+          // let messages = [] as Message[]
+          // let i = 0
+          // for (; i < this.messages.length; i++) {
+          //   messages[i] = new Message(this.messages[i], this.Room.findUser(this.messages[i].senderId))
+          // }
+          // messages = this.messages;
+          this.messages[this.messages.length] = new Message(message)
+          // this.messages = messages
           console.log(this.messages.length);
           console.log(this.messages[this.messages.length - 1]);
           console.log(this.messages[this.messages.length - 2]);

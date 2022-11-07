@@ -15,11 +15,13 @@ export class MessageService {
         ) {}
 
     async addMessageReaction(messageId: number, reaction: any) {
-        throw new Error('Method not implemented.');
+        // throw new Error('Method not implemented.');
+        console.log('Method not implemented.');
     }
 
     async removeMessageReaction(messageId: number, reaction: any) {
-      throw new Error('Method not implemented.');
+        // throw new Error('Method not implemented.');
+        console.log('Method not implemented.');
     }
 
     async userDeleteMessage(messageId: number, id: number) {
@@ -31,7 +33,7 @@ export class MessageService {
 
     async userAddMessageToRoom(user: User, conntent: string, chatroom: chatroom) {
         if (user != undefined && chatroom != undefined && conntent != undefined) {
-            
+
             var new_message = this.messageRepository.create({sender: user, chatroom: chatroom, content: conntent});
             // console.log(conntent);
             return await this.messageRepository.save(new_message);

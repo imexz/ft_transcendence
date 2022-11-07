@@ -7,8 +7,8 @@
         <div class="elem">
           <select class="elem2" v-model="access" >
             <option :value="Access.private"  >privat</option>
-            <option :value="Access.public" selected>public</option> 
-            <option :value="Access.protected" >protected</option> 
+            <option :value="Access.public" selected>public</option>
+            <option :value="Access.protected" >protected</option>
           </select>
         </div>
         <div class="elem">
@@ -39,21 +39,34 @@ export default defineComponent({
   },
   methods: {
     createRoom(): void{
-      console.log("creatRoom");            
-      VueAxios({
-        url: '/chatroom/creat',
-        baseURL: API_URL,
-        method: 'POST',
-        withCredentials: true,
-        data: { room_name: this.name, access: this.access, password: this.password}
-      })
-        .then(response => {
-        console.log(response);
-        if(response != null)
+      console.log("createRoom");
+      this.$store.state.socketChat.emit('createRoom', {roomName: this.name, access: this.access, password: this.password},  // !!!!!!!!!!!!!!!
+    // old //
+      // VueAxios({
+      //   url: '/chatroom/creat',
+      //   baseURL: API_URL,
+      //   method: 'POST',
+      //   withCredentials: true,
+      //   data: { room_name: this.name, access: this.access, password: this.password}
+      // })
+    // old //
+        response => {
+          if(response != null)
+            {console.log(response);
             console.log("success");
             this.$emit('actions', 'success');
+            console.log("rooms before dispatch", response);
+            this.$store.dispatch('updateRooms', response);}
+          else
+          {
+            console.error("response was null");
+            this$emit('actions', 'error');
+          }
+
         })
-        .catch(error => { this.$emit('actions', 'error') })
+      // old //
+        // .catch(error => { this.$emit('actions', 'error') })
+      // old //
       }
     },
 })
