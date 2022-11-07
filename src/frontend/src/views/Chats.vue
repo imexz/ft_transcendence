@@ -301,7 +301,7 @@
           this.socket.emit(
             'roomInfo',
             {roomId: roomId},
-            data => { console.log(data), this.roomInfoData = data}
+            data => { console.log("roomInfoData", data), this.roomInfoData = data}
           );
         },
         roomInfoActions(emitMsg, userId, room){

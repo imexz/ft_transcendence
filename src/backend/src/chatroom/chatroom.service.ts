@@ -31,62 +31,15 @@ export class ChatroomService {
   }
 
 
-  async createRoomInfo(roomId: number, id: any){
-
-    // console.log("createRoomInfoService");
-
-
-    const Room = await this.chatroomRepository.findOne({
-        where: {
-            roomId: roomId
-        },
-        relations: {
-            users: true,
-            admins: true
-        }
-    })
-    // console.log(Room)
-
+  async createRoomInfo(roomId: number, id: any): Promise<{room: chatroom, isAdmin: boolean}> {
+    const Room = await this.getRoomWithAdmins(roomId)
     if (Room != null)
     {
         let room = null
-        for(let k = 0; k < Room.users.length; ++k)
-        {
-            if (Room.users[k].id == id)
-            room = Room;
-        }
-        let isAdmin : Boolean
-
-        if (room == null)
-        {
-            room = []
-            return {room, isAdmin}
-        }
-
-        for(let j = 0; j < room.admins.length; ++j)
-        {
-            if (room.admins[j].id == id)
-                isAdmin = true
-        }
-
-        if (isAdmin == undefined)
-            isAdmin = false
-        // console.log("isAdmin:");
-        // console.log(isAdmin);
-
-        // console.log("end createRoomInfoService");
-        // console.log(room);
-
-        return { room, isAdmin };
+        room = Room.users.find(elem => elem.id == id) != undefined? Room : []
+        return { room:room,  isAdmin: room.admins.find(elem => elem.id == id) != undefined };
     }
-    // console.log("end createRoomInfoService with error");
     throw new Error("room not found");
-
-    // const room = rooms.find(roomId)
-
-    // console.log(room);
-
-    // return room
   }
 
      async getAllwithUser(id: number) {
@@ -367,7 +320,9 @@ export class ChatroomService {
             roomId: roomId
         },
         relations: {
-            admins: true
+            admins: true,
+            users: true,
+            owner: true
         }})
         // .where()
     }
