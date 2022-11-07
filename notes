@@ -22,9 +22,7 @@ Starting a Game:
 
 Topics:
 
-x invites y, z invites x, y denies -> x plays vs z
 
-viewRequest: when user in game and tries to invite/view game of third user -->cannot read undefined
 
 When invited, inviting the other player back should not be possible
 
@@ -48,4 +46,6 @@ Done:
 <!-- No invites from User currently playing -->
 <!-- Reload when invited and accepted a game -->
 <!-- x invites y, z invites x -> game starts for x and y, z spectates -->
+<!-- x invites y, z invites x, y denies -> x plays vs z -->
+<!-- viewRequest: when user in game and tries to invite/view game of third user ->cannot read undefined -->
 

@@ -17,11 +17,11 @@
 	  methods: {
 		cancelInvite() {
 			this.$store.state.socketGame.emit('leaveGame')
-			this.$router.push('/')
 			this.$store.state.pendingRequest = false
 			this.$store.state.game = null
 			this.$store.state.winner = null
 			this.$store.state.showGame = false
+			this.$router.push('/')
 		}
 	  },
   })

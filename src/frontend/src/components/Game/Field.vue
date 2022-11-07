@@ -1,6 +1,5 @@
 <template>
       <canvas id="pixi" class="gameCanvas"></canvas>
-
 </template>
 
 <script lang="ts">
@@ -183,19 +182,19 @@ console.log("initPixi");
             break;
         }
         if (this.gameData.score.scoreLeft == 3 ||  this.gameData.score.scoreRight == 3) {
-          
+
           this.$emit('assignWinner',this.gameData.score.scoreLeft == 3 ? this.$store.state.game.playerLeft : this.$store.state.game.playerRight)
           console.log("winner");
           this.$store.state.game = null
         }
-        
+
 
         // if (this.leftScore > 4 || this.rightScore > 4)
         //   this.styleData.fgColor = 0xFF0000
 
         // if ()
 
-      }        
+      }
     }
 })
 </script>

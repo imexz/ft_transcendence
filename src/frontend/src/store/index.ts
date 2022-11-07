@@ -110,14 +110,21 @@ export default createStore<State>({
       state.socketGame.on('NowInGame', (cb) => {
         // state.game = game;
         console.log("receive NowInGame");
-        if (cb)
-          router.push('/play')
+        if (cb) {
+			state.pendingRequest = false;
+			router.push('/play')
+		}
         else {
           state.game = null;
           state.pendingRequest = false;
           router.push('/')
         }
       })
+	  state.socketGame.on('canceled', () => {
+		console.log("receive invite canceled");
+		state.gameRequest = null;
+		state.pendingRequest = false;
+	  })
       state.socket.on('Request',(data) => {
         state.friendsList.push(data)
           console.log("receive  request");

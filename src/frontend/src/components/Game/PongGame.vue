@@ -9,11 +9,12 @@
         <button @click="leaveGame"> Leave </button>
       </div>
     </div>
-	</div>
-	<div class="queue" v-show="this.$store.state.game == null && this.$store.state.winner == null">
-    <text> Waiting for a match... </text>
-		<button @click="leaveGame"> Leave </button>
-	</div>
+  </div>
+  <div class="queue" v-show="this.$store.state.game == null && this.$store.state.winner == null">
+    <text> Waiting for opponent... </text>
+	<br>
+	<button @click="leaveGame"> Leave </button>
+  </div>
   <div v-if="this.$store.state.winner != null && this.$store.state.game == null">
         <Result :winner = this.$store.state.winner @newGame="newGame" />
   </div>
@@ -62,7 +63,7 @@
 		console.log("leaving beforeUpdate");
 	  },
   	unmounted() {
-  		console.log("in unmount");
+  	  console.log("in unmount");
       this.$store.state.socketGame.emit('quitPendingGame')
       this.$store.state.socketGame.off('GameInfo')
   	},
@@ -90,6 +91,8 @@
       leaveGame() {
         this.$store.state.socketGame.emit('leaveGame');
         this.$store.state.game = null
+		this.$store.state.pendingRequest = false
+		this.$store.winner = null
         this.$router.push("/");
       }
   	}
