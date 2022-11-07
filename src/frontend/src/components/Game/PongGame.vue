@@ -31,7 +31,6 @@
   export default defineComponent({
   	data () {
   		return {
-			  // winner: null as User,
         fps: 0,
   		}
   	},

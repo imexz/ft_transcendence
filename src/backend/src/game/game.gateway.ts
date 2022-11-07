@@ -79,13 +79,14 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	if (game == undefined) {
 		console.log("gameRequest: client has no game");
 		game = this.gameService.getGame(id);
-		// check if opponent is in a game
+		// check if opponent (id) is in a game
 		if(game == undefined) {
 			console.log("gameRequest: opponent has no game");
 			const socket = await this.findSocketOfUser(id)
+			// set frontend var gameRequest as User who wants to play
 			socket.emit('GameRequestFrontend', client.handshake.auth as User)
 			game = await this.gameService.joinGameOrCreateGame(client.handshake.auth as User, this.server, id)
-			// client.emit('NowInGame', true)
+			// client.emit('NowInGame', true) --> pushes to /play
 		} else { // opponent is playing
 			const isPlayer: boolean = clientId === game.playerLeft.id || clientId === game.playerRight.id;
 			if (isPlayer && game.interval == null) {
@@ -94,9 +95,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			}
 		}
 	}
-	// console.log(client.rooms);
 	client.join(game.id.toString());
-	// console.log(client.rooms);
 	// client.emit('NowInGame', true)
 	return {playerLeft: game.playerLeft, playerRight: game.playerRight}
   }
@@ -137,10 +136,12 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   @SubscribeMessage('leaveGame')
   handleLeaveGame(@ConnectedSocket() client: Socket): void {
 	console.log("leaveGame");
+	console.log(client.rooms);
 	client.rooms.forEach(element => {
 	//   if(element != client.id)
 		client.leave(element)
 	});
+	console.log(client.rooms);
 	let game = this.gameService.getGame(client.handshake.auth.id);
 	if (game != undefined && client.handshake.auth.id === game.playerLeft.id) {
 	  this.gameService.removeGame(game);

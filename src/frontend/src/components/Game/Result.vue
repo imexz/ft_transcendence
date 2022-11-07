@@ -2,7 +2,6 @@
     <h1> The winner is </h1>
     <user-summary :user=winner />
     <div>
-        <!-- TODO: add function to @click -->
         <button @click="askForRematch"> ask for rematch </button>
         <button @click="newGame"> new game</button>
     </div>
@@ -31,7 +30,7 @@ export default defineComponent({
 		},
 		askForRematch() {
 			console.log("askForRematch");
-			this.$emit('newGame');
+			// this.$emit('newGame');
 		},
         newGame() {
             console.log("newGame");

@@ -1,7 +1,7 @@
 <template>
     <div class="gameInvitePopUp">
         <h4>You have a pending game request</h4>
-		<button @click="">Cancel</button>
+		<button @click="cancelInvite">Cancel</button>
         <!-- <UserSummary :user = this.$store.state.gameRequest /> -->
     </div>
   </template>
@@ -17,6 +17,11 @@
 	  methods: {
 		cancelInvite() {
 			this.$store.state.socketGame.emit('leaveGame')
+			this.$router.push('/')
+			this.$store.state.pendingRequest = false
+			this.$store.state.game = null
+			this.$store.state.winner = null
+			this.$store.state.showGame = false
 		}
 	  },
   })

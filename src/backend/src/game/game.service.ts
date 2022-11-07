@@ -26,40 +26,10 @@ export class GameService {
 	@InjectRepository(Game)
 	private gameRepository: Repository<Game>
 
-	removePendingGame(user_id: number) {
-		const game = this.getGame(user_id)
-		if(game != undefined && game.playerRight == undefined) {
-			this.gameGateway.leaveRoom(game.id.toString());
-			this.removeGame(game);
-		}
-	}
-	startGame(server: Server, game: Game) {
-	  if (game.playerLeft != undefined && game.playerRight != undefined) {
-		  this.startGamePrivate(server, game)
-	  }
-	}
 	getGame(user_id: number | undefined): Game {
 		return this.gamesArr.find((value: Game) =>  value.playerLeft?.id == user_id || value.playerRight?.id == user_id)
 	}
-	getPlayerSide(game: Game, user_id: number) {
-		if (game != undefined) {
-			if (game.playerLeft.id == user_id) {
-				return Side.left
-			} else {
-				return Side.right
-			}
-		}
-	}
-	handleKeypress(user_id: number, key: string){
-		const game = this.getGame(user_id)
-		if(game != undefined) {
-			if (key == "ArrowUp" || key == "w") {
-				this.movePaddleUp(game, this.getPlayerSide(game, user_id))
-			} else if (key == "ArrowDown" || key == "s") {
-				this.movePaddleDown(game, this.getPlayerSide(game, user_id))
-			}
-		}
-	}
+
 	async joinGameOrCreateGame(user: User, server: Server, opponent_user_id?: number): Promise<Game> {
 		let game = this.getGame(undefined) // checking for first game with missing (undefined) opponent
 		if (game == undefined || opponent_user_id) {
@@ -84,15 +54,22 @@ export class GameService {
 		console.log('leaving createGameInstance()');
 		return new Game(userId, setup);
 	}
-	// async createGameInstance(): Promise<Game> {
-	// 	console.log('inside createGameInstance()');
-	// 	const setup = new GameSetup;
-	// 	var game = this.gameRepository.create();
-	// 	console.log("after repo create");
-	// 	game = await this.gameRepository.save(game);
-	// 	console.log('leaving createGameInstance()');
-	// 	return new Game(game.id, setup);
-	// }
+
+	startGame(server: Server, game: Game) {
+		if (game.playerLeft != undefined && game.playerRight != undefined) {
+			this.startEmittingGameData(server, game)
+		}
+	  }
+
+	async startEmittingGameData(server: Server, game: Game) {
+		this.userService.setStatus(game.playerLeft.id, UserStatus.PLAYING);
+		this.userService.setStatus(game.playerRight.id, UserStatus.PLAYING);
+		server.to(game.id.toString()).emit('GameInfo', game)
+		console.log("startGame");
+		game.interval = setInterval(() => this.emitGameData(game, server), 16) as unknown as number;
+		console.log("startGame end");
+	}
+
 	async emitGameData(game: Game, server: Server) {
 		// console.log("emitGameData");
 		const tmpGame: Game = await this.getData(game)
@@ -109,14 +86,7 @@ export class GameService {
 			this.gameGateway.leaveRoom(game.id.toString());
 		}
 	}
-	async startGamePrivate(server: Server, game: Game) {
-		this.userService.setStatus(game.playerLeft.id, UserStatus.PLAYING);
-		this.userService.setStatus(game.playerRight.id, UserStatus.PLAYING);
-		server.to(game.id.toString()).emit('GameInfo', game)
-		console.log("startGame");
-		game.interval = setInterval(() => this.emitGameData(game, server), 16) as unknown as number;
-		console.log("startGame end");
-	}
+
 	async getData(game: Game): Promise<Game | undefined> {
 		// console.log("getData");
 
@@ -269,6 +239,7 @@ export class GameService {
 			console.log("game is finished");
 		}
 	}
+
 	removeGame(game: Game): boolean {
 		const index = this.gamesArr.indexOf(game, 0);
 		if (index > -1) {
@@ -277,9 +248,38 @@ export class GameService {
 		}
 		return false;
 	}
+
+	removePendingGame(user_id: number) {
+		const game = this.getGame(user_id)
+		if(game != undefined && game.playerRight == undefined) {
+			this.gameGateway.leaveRoom(game.id.toString());
+			this.removeGame(game);
+		}
+	}
+
+	handleKeypress(user_id: number, key: string){
+		const game = this.getGame(user_id)
+		if(game != undefined) {
+			if (key == "ArrowUp" || key == "w") {
+				this.movePaddleUp(game, this.getPlayerSide(game, user_id))
+			} else if (key == "ArrowDown" || key == "s") {
+				this.movePaddleDown(game, this.getPlayerSide(game, user_id))
+			}
+		}
+	}
+
+	getPlayerSide(game: Game, user_id: number) {
+		if (game != undefined) {
+			if (game.playerLeft.id == user_id) {
+				return Side.left
+			} else {
+				return Side.right
+			}
+		}
+	}
+
 	movePaddleUp(game: Game, side: Side) {
 		// console.log("movePaddleUp", side);
-
 		if (side == Side.left) {
 			if (game.paddleLeft.position.y > 0)
 				game.paddleLeft.position.y -= game.paddleLeft.speed;
@@ -291,7 +291,6 @@ export class GameService {
 	}
 	movePaddleDown(game: Game, side: Side) {
 		// console.log("movePaddleDown", side);
-
 		if (side == Side.left) {
 			if (game.paddleLeft.position.y < (480 - game.paddleLeft.height))
 				game.paddleLeft.position.y += game.paddleLeft.speed;

@@ -164,10 +164,10 @@ export default defineComponent({
       this.closeDmPopUp()
       if (isSelfInvite) return;
       this.$store.state.winner = null;
-      this.$store.state.socketGame.emit('GameRequestBackend', {id: this.user.id}, (r) => { 
+      this.$store.state.socketGame.emit('GameRequestBackend', {id: this.user.id}, (r) => {
         if (r != undefined) {
           this.showGame = !this.showGame
-          const isUserActivePlayer: boolean = r.playerLeft == this.$store.state.user.id || r.playerRight == this.$store.state.user.id
+          const isUserActivePlayer: boolean = r.playerLeft.id == this.$store.state.user.id || r.playerRight.id == this.$store.state.user.id
           if(!isSelfInvite && isUserActivePlayer)
             this.$store.state.pendingRequest = true;
           this.$store.state.game = r

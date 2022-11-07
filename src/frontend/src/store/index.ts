@@ -105,7 +105,6 @@ export default createStore<State>({
 
       state.socketGame.on('GameRequestFrontend',(user: User) => {
         state.gameRequest = user;
-        // console.log("id", state.gameRequest)
         console.log("receive askformatch");
       })
       state.socketGame.on('NowInGame', (cb) => {
