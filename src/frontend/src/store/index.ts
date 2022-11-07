@@ -62,7 +62,7 @@ export default createStore<State>({
     },
     logIn(state, user) {
       // console.log("logIn");
-      
+
       state.validated = true;
       state.user = user;
       state.socket = io(API_URL, {
@@ -71,7 +71,7 @@ export default createStore<State>({
           }
       })
       // console.log("default socket init");
-      
+
       state.socketChat = io(API_URL + "/chat", {
         auth: {
           id: document.cookie
@@ -126,7 +126,7 @@ export default createStore<State>({
     },
     setFriendsList(state, friendsList) {
       // console.log(friendsList);
-      
+
       state.friendsList = friendsList;
     },
     addFriend(state, user) {
@@ -143,7 +143,7 @@ export default createStore<State>({
 
       for (let i = 0; i < rooms.length; ++i)
       {
-        state.rooms.push(new Room(rooms[i]))
+        state.rooms[i] = new Room(rooms[i])
       }
       // state.rooms = rooms
       console.log("ROOMS: ", rooms, rooms[0] instanceof Room)
@@ -183,14 +183,14 @@ export default createStore<State>({
     },
     // askForMatch(){
     //   this.$store.state.socketGame.emit('Request', {id: this.user._id}, (r) => {
-        // this.$router.push('/play/')    
+        // this.$router.push('/play/')
         // this.showGame = !this.showGame
         // this.$store.state.game = r
     //   })
     //   console.log("AskForMatch");
     // }
   },
-  
+
   modules: {
   }
 })
