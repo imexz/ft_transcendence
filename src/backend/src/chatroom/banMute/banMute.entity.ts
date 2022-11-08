@@ -17,11 +17,4 @@ export class banMute{
 
     @CreateDateColumn()
     timestamp: Date;
-
-    @Column({
-        type: "enum",
-        enum: AdminAction,
-        default: AdminAction.muted
-    })
-    type: AdminAction
 }

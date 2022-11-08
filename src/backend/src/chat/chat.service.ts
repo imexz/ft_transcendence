@@ -12,21 +12,30 @@ import { Access } from 'src/chatroom/chatroom.entity';
 @Injectable()
 export class ChatService {
   async adminAction(action: AdminAction, roomId: number, UserId: number, adminId: number) {
-    const admins = await this.chatroomService.getRoomAdmins(roomId)
-    console.log("admins", admins, adminId);
+    const room = await this.chatroomService.getRoomWithAdmins(roomId)
+    console.log("admins", room.admins, adminId);
 
-    const isAdmin = admins.some(element => element.id === adminId );
+    const isAdmin = room.admins.some(element => element.id === adminId );
     console.log(isAdmin);
 
     if(isAdmin) {
       console.log("isAdmin");
-      if (action == AdminAction.baned || action == AdminAction.muted) {
-        this.banMuteService.action(action ,await this.usersService.getUser(UserId), await this.chatroomService.getRoom(roomId))
-        if(action == AdminAction.baned)
+      switch (action) {
+        case AdminAction.baned:
+          this.chatroomService.removeUserFromChatroom(await this.usersService.getUser(UserId), roomId)
           return true
-      } else if (action == AdminAction.toAdmin) {
-        this.chatroomService.addRoomAdmin(roomId, UserId)
+          break;
+        case AdminAction.muted:
+          this.banMuteService.mut(await this.usersService.getUser(UserId), room)
+          break;
+        case AdminAction.toAdmin:
+          this.chatroomService.addRoomAdmin(room, UserId)
+          break;
+
+        default:
+          break;
       }
+      // if(action == AdminAction.baned)
     }
     return false
   }
@@ -78,10 +87,10 @@ export class ChatService {
 
 
         async createMessage(user: User, roomId:number, content: string) {
-            const rooms = await this.chatroomService.getAllwithUserWriteAccess(user.id, roomId)
-            console.log("rooms=", rooms);
-            if(rooms.muted.find(elem => elem.user.id == user.id) == undefined) {
-              return await this.messageService.userAddMessageToRoom(user, content, rooms)
+            const object = await this.chatroomService.hasUserWriteAccess(user.id, roomId)
+            console.log("room=", object.chatroom);
+            if(object.allowed) {
+              return await this.messageService.userAddMessageToRoom(user, content, object.chatroom)
             }
         }
 

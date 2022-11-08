@@ -14,22 +14,27 @@ export class BanMuteService {
     constructor(
         @InjectRepository(banMute)
         private banMuteRepository: Repository<banMute>,
-        private chatroomService: ChatroomService
         ) {}
-
-    action(action: AdminAction, user: User, chatroom: chatroom) {
-        console.log("action", action);
         
-        var mute = this.banMuteRepository.create()
-        mute.user = user
-        mute.chatroom = chatroom
-        mute.type = action
-        this.banMuteRepository.save(mute)
-        if (action == AdminAction.baned) {
-            this.chatroomService.removeUserFromChatroom(user, chatroom.roomName)
+        mut( user: User, chatroom: chatroom) {
+            
+            var mute = this.banMuteRepository.create()
+            mute.user = user
+            mute.chatroom = chatroom
+            this.banMuteRepository.save(mute)
         }
-    }
-
+        
+        async unMute(userId: number, chatroom: chatroom) {
+            console.log("===unMute===");
+            await this.banMuteRepository.delete({
+                chatroom: {
+                    roomId: chatroom.roomId
+                },
+                user:{
+                    id: userId
+                } }
+            )
+        }
     // async test(chatroom_id: number) {
     //     return await this.banMuteRepository.createQueryBuilder("mute")
     //     .innerJoinAndSelect('mute.chatroom', 'chatroom', 'chatroom._id = :id', {id: chatroom_id} )

@@ -38,7 +38,7 @@
       <createRoomPopup @actions="createRoomActions"/>
     </div>
     <div v-if="roomInfoPopUp" class="roomInfoPopUp">
-      <roomInfoPopUp :roomInfo="roomInfoData" @action="roomInfoActions"/>
+      <roomInfoPopUp :room="roomInfoData" @action="roomInfoActions"/>
     </div>
   </div>
 </template>
@@ -304,7 +304,7 @@
           this.socket.emit(
             'roomInfo',
             {roomId: roomId},
-            data => { console.log(data), this.roomInfoData = data}
+            data => { console.log("roomInfoData", data), this.roomInfoData = data}
           );
         },
         roomInfoActions(emitMsg, userId, room){
