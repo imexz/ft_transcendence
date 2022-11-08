@@ -22,14 +22,11 @@ Starting a Game:
 
 Topics:
 
-leaveGame: remove Spectators in gameService.spectatorsMap
-check spactating mode
+sending someone spectating a gamerequest
 
-Reload during game with playerleft: doesnt render current game
+joinAndCreateGame function: x goes to queue, y invites x --> close searchbar
 
-When invited, inviting the other player back should not be possible
-
-joinAndCreateGame function: x goes to queue, y invites x --> frontend bug
+implement askForRematch
 
 Spectator: Winning Screen shows "askForRematch" Button
 
@@ -37,6 +34,10 @@ Search for player y, log out player y, invite player y to a match --> starts gam
 
 Change hitbox of paddles / collision control
 Limit serving angle
+
+implement game settings
+
+implement game customization
 
 Ideas:
     do not change view when adding user as friend
@@ -51,4 +52,8 @@ Done:
 <!-- x invites y, z invites x -> game starts for x and y, z spectates -->
 <!-- x invites y, z invites x, y denies -> x plays vs z -->
 <!-- viewRequest: when user in game and tries to invite/view game of third user ->cannot read undefined -->
+<!-- Reload during game with playerleft: doesnt render current game -->
+<!-- When invited, inviting the other player back should not be possible -->
+<!-- leaveGame: remove Spectators in gameService.spectatorsMap -->
+
 

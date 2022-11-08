@@ -103,8 +103,8 @@ export class GameService {
 		}
 		server.to(game.id.toString()).emit('updateGame', updatedGameData);
 		if (updatedGameData.score.scoreLeft === 3 || updatedGameData.score.scoreRight === 3) {
-			console.log("emitGameData: leaveRoom");
-			this.gameGateway.leaveRoom(game.id.toString());
+			console.log("emitGameData: closeRoom");
+			this.gameGateway.closeRoom(game.id.toString());
 		}
 	}
 
@@ -273,7 +273,7 @@ export class GameService {
 	removePendingGame(user_id: number) {
 		const game = this.getGame(user_id)
 		if(game != undefined && game.playerRight == undefined) {
-			this.gameGateway.leaveRoom(game.id.toString());
+			this.gameGateway.closeRoom(game.id.toString());
 			this.removeGame(game);
 		}
 	}

@@ -86,48 +86,34 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
   // used for proper game request and for spectating
   @SubscribeMessage('GameRequestBackend')
-  async gameRequest(
+  async handleGameRequest(
     @ConnectedSocket() client: Socket,
     @MessageBody('id') id?: number) {
 
 	let ret: undefined | GamePlayer;
 	const clientId: number = client.handshake.auth.id;
-	if (clientId === id) {
-		client.emit('NowInGame', false)
-		return undefined;
-	}
+
 	let game: Game | undefined = this.gameService.getGame(clientId)
-	// check if client is in a game
-	if (game == undefined) {
+	if (game != undefined) {
+		console.log("gameRequest: client has a game. Reject request");
+		ret = undefined
+	} else {
 		console.log("gameRequest: client has no game");
+		if (clientId === id) return undefined;
 		game = this.gameService.getGame(id);
-		// check if opponent (id) is in a game
 		if(game == undefined) {
 			console.log("gameRequest: opponent has no game");
 			const socket = await this.findSocketOfUser(id)
-			// set frontend var gameRequest as User who wants to play
 			socket.emit('GameRequestFrontend', client.handshake.auth as User)
 			game = await this.gameService.joinGameOrCreateGame(client.handshake.auth as User, this.server, id)
-			// client.emit('NowInGame', true) --> pushes to /play
-		} else { // opponent is playing
-			const isPlayer: boolean = clientId === game.playerLeft.id || clientId === game.playerRight.id;
-			if (isPlayer && game.interval == null) {
-				console.log("gameRequest: call startGame");
-				this.gameService.startGame(this.server, game);
-				this.server.to(game.id.toString()).emit('canceled')
-			} else if (!isPlayer) {
-				this.gameService.addUserToSpectators(clientId, game);
-			}
+		} else {
+			console.log("gameRequest: invited player has game. Specatating.");
+			client.rooms.forEach(roomId => { client.leave(roomId) });
+			this.gameService.addUserToSpectators(clientId, game);
 		}
 		ret = {playerLeft: game.playerLeft, playerRight: game.playerRight}
-	} else {
-		console.log("client has game");
-		ret = undefined
-		// this.gameService.startGame(this.server, game);
 	}
 	client.join(game.id.toString());
-	// client.emit('NowInGame', true)
-	// return {playerLeft: game.playerLeft, playerRight: game.playerRight}
 	return ret
   }
 
@@ -137,7 +123,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   ) {
     var game: Game = this.gameService.getGame(client.handshake.auth.id)
     if(game != undefined && game.interval == null) {
-		console.log('accept');
+	  console.log('accept');
 	  let socket = await this.findSocketOfUser(game.playerLeft.id)
 	  socket.emit('NowInGame', true)
       this.gameService.startGame(this.server, game)
@@ -150,7 +136,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     var game: Game = this.gameService.getGame(client.handshake.auth.id)
     if(game != undefined && game.interval == null) {
     	const socket = await this.findSocketOfUser(game.playerLeft.id)
-		this.leaveRoom(game.id.toString())
+		this.closeRoom(game.id.toString())
 		if (this.gameService.removeGame(game)) {
     		socket.emit('NowInGame', false)
     	}
@@ -162,22 +148,21 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
       this.gameService.removePendingGame(client.handshake.auth.id)
   }
 
-  leaveRoom(roomId: string) {
+  closeRoom(roomId: string) {
 	  console.log("closing room", roomId);
 	  this.server.in(roomId).socketsLeave(roomId);
   }
 
+  // emittable by playerLeft (while game is pending) and spectator
   @SubscribeMessage('leaveGame')
   async handleLeaveGame(@ConnectedSocket() client: Socket) {
 	console.log("leaveGame");
-	console.log(client.rooms);
-	client.rooms.forEach(element => {
-	//   if(element != client.id)
-		client.leave(element)
-	});
-	console.log(client.rooms);
-	let game = this.gameService.getGame(client.handshake.auth.id);
-	if (game != undefined && client.handshake.auth.id === game.playerLeft.id) {
+	const clientId: number = client.handshake.auth.id;
+
+	client.rooms.forEach(roomId => { client.leave(roomId) });
+	this.gameService.spectatorsMap.delete(clientId);
+	let game = this.gameService.getGame(clientId);
+	if (game != undefined && clientId === game.playerLeft.id) {
 		if (game.playerRight != undefined) {
 			const socket = await this.findSocketOfUser(game.playerRight.id)
 			socket.emit('canceled')

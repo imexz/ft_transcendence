@@ -52,7 +52,7 @@ export default defineComponent({
         }
     },
     created() {
-        },
+    },
     mounted() {
       this.initPixi();
       this.pixiApp.ticker.add(this.updatePixi)
@@ -61,18 +61,17 @@ export default defineComponent({
     unmounted() {
         this.$store.state.socketGame.off('updateGame')
     },
+
     methods: {
     initPixi(){
         let canvas: HTMLElement = document.getElementById('pixi')
-console.log("initPixi");
-
+		console.log("initPixi");
         this.pixiApp = new PIXI.Application({
           width: 640,
           height: 480,
           antialias: false,
           backgroundColor: this.styleData.bgColor,
           view: canvas as HTMLCanvasElement,
-
         })
 
         this.pixiScene = new PIXI.Graphics()
@@ -160,15 +159,15 @@ console.log("initPixi");
       updateData(data: any) {
         //this is updating the Date-> independent of drawing loop
         // console.log("callback updateGame");
-				if (data === undefined) {
+		if (data === undefined) {
           // console.log("data undefined");
           // this.gameExists = false;
-					this.left = 0;
-					this.right = 0;
-          return;
+			this.left = 0;
+			this.right = 0;
+        	return;
         }
-				this.gameData.score.scoreLeft = data.score.scoreLeft;
-				this.gameData.score.scoreRight = data.score.scoreRight;
+		this.gameData.score.scoreLeft = data.score.scoreLeft;
+		this.gameData.score.scoreRight = data.score.scoreRight;
         console.log(this.gameData.score.scoreLeft, this.gameData.score.scoreRight);
         this.gameData.ball = data.ball;
         this.gameData.paddleLeft = data.paddleLeft;
@@ -181,20 +180,15 @@ console.log("initPixi");
             this.styleData.fgColor = 0xe70038
             break;
         }
-        if (this.gameData.score.scoreLeft == 3 ||  this.gameData.score.scoreRight == 3) {
-
+        if (this.isGameFinished()) {
           this.$emit('assignWinner',this.gameData.score.scoreLeft == 3 ? this.$store.state.game.playerLeft : this.$store.state.game.playerRight)
           console.log("winner");
           this.$store.state.game = null
         }
-
-
-        // if (this.leftScore > 4 || this.rightScore > 4)
-        //   this.styleData.fgColor = 0xFF0000
-
-        // if ()
-
-      }
+      },
+	  isGameFinished(): boolean {
+		return this.gameData.score.scoreLeft == 3 || this.gameData.score.scoreRight == 3
+	  }
     }
 })
 </script>
