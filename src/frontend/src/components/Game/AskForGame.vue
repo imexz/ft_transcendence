@@ -1,7 +1,7 @@
 <template>
   <div class="gameInvitePopUp">
-    <UserSummary :user = this.$store.state.gameRequest />
-    <h4>want to play with you</h4>
+    <UserSummary :user = this.$store.state.requester />
+    <h4>wants to play with you</h4>
     <button @click="accept" class="gameButton">
       <font-awesome-icon icon="fa-solid fa-check" />
     </button>
@@ -23,12 +23,12 @@ export default defineComponent({
         accept(){
             this.$store.state.winner = null
             this.$store.state.socketGame.emit("accept")
-            this.$store.state.gameRequest = null
+            this.$store.state.requester = null
             this.$router.push('/play')
         },
         refuse(){
             this.$store.state.socketGame.emit("denied")
-            this.$store.state.gameRequest = null
+            this.$store.state.requester = null
         }
     }
 })

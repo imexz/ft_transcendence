@@ -2,7 +2,7 @@
     <div class="gameInvitePopUp">
         <h4>You have a pending game request</h4>
 		<button @click="cancelInvite">Cancel</button>
-        <!-- <UserSummary :user = this.$store.state.gameRequest /> -->
+        <!-- <UserSummary :user = this.$store.state.requester /> -->
     </div>
   </template>
 

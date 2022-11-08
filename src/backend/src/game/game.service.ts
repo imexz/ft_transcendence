@@ -37,10 +37,12 @@ export class GameService {
 	}
 
 	removeUserFromSpectators(userId: number, game: Game) {
-		this.spectatorsMap.delete(userId);
-		const index = game.spectators.indexOf(userId);
-		if (index > -1) {
-  			game.spectators.splice(index, 1);
+		if (game != undefined) {
+			this.spectatorsMap.delete(userId);
+			const index = game.spectators.indexOf(userId);
+			if (index > -1) {
+				game.spectators.splice(index, 1);
+			}
 		}
 	}
 
@@ -262,6 +264,7 @@ export class GameService {
 	}
 
 	removeGame(game: Game): boolean {
+		game.spectators.forEach((element: number) => {this.spectatorsMap.delete(element)})
 		const index = this.gamesArr.indexOf(game, 0);
 		if (index > -1) {
 			this.gamesArr.splice(index, 1);

@@ -67,7 +67,7 @@
       </button>
       <button
         class="dropdownElement"
-        @click="askForMatch">
+        @click="askForMatchOrSpectate">
         <font-awesome-icon icon="fa-solid fa-table-tennis-paddle-ball" />
       </button>
       <button
@@ -158,15 +158,16 @@ export default defineComponent({
       this.show = !this.show
     },
     // for match and spectate
-    askForMatch(){
+    askForMatchOrSpectate(){
       const isSelfInvite: boolean = this.user.id === this.$store.state.user.id
 
       this.closeDmPopUp()
       if (isSelfInvite) return;
       this.$store.state.winner = null;
 	  this.$store.state.pendingRequest = false;
-      this.$store.state.socketGame.emit('GameRequestBackend', {id: this.user.id}, (r) => {
+      this.$store.state.socketGame.emit('GameRequestBackend', {id: this.user.id}, (r: Game | undefined) => {
         if (r != undefined) {
+		  console.log('game returned');
           this.showGame = !this.showGame
           const isUserActivePlayer: boolean = r.playerLeft.id == this.$store.state.user.id || r.playerRight.id == this.$store.state.user.id
           const isUserPlayerLeft: boolean = r.playerLeft.id === this.$store.state.user.id
@@ -175,11 +176,11 @@ export default defineComponent({
             this.$store.state.pendingRequest = true;
 		  else if (!isUserActivePlayer)
 			this.$store.state.game = r
-		  this.$emit('actions')
-          this.$router.push("/play")
         }
-      })
-      console.log("AskForMatch");
+	})
+	this.$emit('actions')
+	this.$router.push("/play");
+    console.log("askForMatchOrSpectate");
     },
     viewGame(status){
       switch (status) {

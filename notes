@@ -22,6 +22,10 @@ Starting a Game:
 
 Topics:
 
+
+
+spectating with pending invite. denies, spectator still in field view
+
 sending someone spectating a gamerequest
 
 joinAndCreateGame function: x goes to queue, y invites x --> close searchbar

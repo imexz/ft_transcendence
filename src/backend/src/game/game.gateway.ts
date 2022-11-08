@@ -84,43 +84,39 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	console.log("isInGame end", client.rooms);
   }
 
-  // used for proper game request and for spectating
   @SubscribeMessage('GameRequestBackend')
   async handleGameRequest(
     @ConnectedSocket() client: Socket,
     @MessageBody('id') id?: number) {
 
-	let ret: undefined | GamePlayer;
+	let ret: undefined | GamePlayer = undefined;
 	const clientId: number = client.handshake.auth.id;
 
 	let game: Game | undefined = this.gameService.getGame(clientId)
 	if (game != undefined) {
 		console.log("gameRequest: client has a game. Reject request");
-		ret = undefined
 	} else {
 		console.log("gameRequest: client has no game");
-		if (clientId === id) return undefined;
+		if (clientId === id) return ret;
 		game = this.gameService.getGame(id);
 		if(game == undefined) {
 			console.log("gameRequest: opponent has no game");
 			const socket = await this.findSocketOfUser(id)
 			socket.emit('GameRequestFrontend', client.handshake.auth as User)
 			game = await this.gameService.joinGameOrCreateGame(client.handshake.auth as User, this.server, id)
+			ret = {playerLeft: game.playerLeft, playerRight: game.playerRight}
 		} else {
 			console.log("gameRequest: invited player has game. Specatating.");
 			client.rooms.forEach(roomId => { client.leave(roomId) });
 			this.gameService.addUserToSpectators(clientId, game);
 		}
-		ret = {playerLeft: game.playerLeft, playerRight: game.playerRight}
 	}
 	client.join(game.id.toString());
 	return ret
   }
 
   @SubscribeMessage('accept')
-  async handleAcceptGameRequest(
-    @ConnectedSocket() client: Socket,
-  ) {
+  async handleAcceptGameRequest(@ConnectedSocket() client: Socket) {
     var game: Game = this.gameService.getGame(client.handshake.auth.id)
     if(game != undefined && game.interval == null) {
 	  console.log('accept');
@@ -132,7 +128,6 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
   @SubscribeMessage('denied')
   async handleDenyGameRequest(@ConnectedSocket() client: Socket) {
-    // player was added to the game without doing anything
     var game: Game = this.gameService.getGame(client.handshake.auth.id)
     if(game != undefined && game.interval == null) {
     	const socket = await this.findSocketOfUser(game.playerLeft.id)
@@ -160,8 +155,9 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	const clientId: number = client.handshake.auth.id;
 
 	client.rooms.forEach(roomId => { client.leave(roomId) });
-	this.gameService.spectatorsMap.delete(clientId);
-	let game = this.gameService.getGame(clientId);
+	let game = this.gameService.spectatorsMap.get(clientId);
+	this.gameService.removeUserFromSpectators(clientId, game);
+	game = this.gameService.getGame(clientId);
 	if (game != undefined && clientId === game.playerLeft.id) {
 		if (game.playerRight != undefined) {
 			const socket = await this.findSocketOfUser(game.playerRight.id)
