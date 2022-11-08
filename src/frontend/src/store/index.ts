@@ -9,6 +9,7 @@ import { io, Socket } from 'socket.io-client'
 import { RequestEnum } from '@/enums/models/RequestEnum';
 import Game from '@/models/game';
 import Room from '@/models/room';
+import Message from '@/models/message';
 
 
 
@@ -62,7 +63,7 @@ export default createStore<State>({
     },
     logIn(state, user) {
       // console.log("logIn");
-      
+
       state.validated = true;
       state.user = user;
       state.socket = io(API_URL, {
@@ -71,7 +72,7 @@ export default createStore<State>({
           }
       })
       // console.log("default socket init");
-      
+
       state.socketChat = io(API_URL + "/chat", {
         auth: {
           id: document.cookie
@@ -93,7 +94,14 @@ export default createStore<State>({
       state.socketChat.on('newMessage',(data) => {
         console.log("newMessage received:");
 
-        console.log(state.rooms[data.roomId]/* .messages.push(data.message) */)
+        console.log(data.roomId, data.message)
+        state.rooms[data.roomId].messages[state.rooms[data.roomId].messages.length] = new Message(data.message)
+      })
+
+      state.socketChat.on('newRoom',(data) => {
+        console.log("newRoom received:", data);
+
+        state.rooms[state.rooms.length] = data
       })
 
 
@@ -126,7 +134,7 @@ export default createStore<State>({
     },
     setFriendsList(state, friendsList) {
       // console.log(friendsList);
-      
+
       state.friendsList = friendsList;
     },
     addFriend(state, user) {
@@ -139,14 +147,16 @@ export default createStore<State>({
     },
     setRooms(state, rooms: any) {
       state.rooms = [] as Room[]
-      // console.log(state.rooms instanceof Room);
-
       for (let i = 0; i < rooms.length; ++i)
       {
-        state.rooms.push(new Room(rooms[i]))
+        state.rooms[i] = new Room(rooms[i])
       }
-      // state.rooms = rooms
       console.log("ROOMS: ", rooms, rooms[0] instanceof Room)
+      console.log("state.ROOMS: ", state.rooms, state.rooms[0] instanceof Room)
+    },
+    addRoom(state, room: any) {
+      state.rooms[state.rooms.length] = new Room(room)
+      console.log("ROOM: ", room, room instanceof Room)
       console.log("state.ROOMS: ", state.rooms, state.rooms[0] instanceof Room)
     },
   },
@@ -181,16 +191,21 @@ export default createStore<State>({
       .then(response => { commit('setFriendsList', response.data)})
       .catch()
     },
+    updateRooms({ commit }, room ) {
+      console.log("index.rooms", room);
+      commit('addRoom', room);
+
+    },
     // askForMatch(){
     //   this.$store.state.socketGame.emit('Request', {id: this.user._id}, (r) => {
-        // this.$router.push('/play/')    
+        // this.$router.push('/play/')
         // this.showGame = !this.showGame
         // this.$store.state.game = r
     //   })
     //   console.log("AskForMatch");
     // }
   },
-  
+
   modules: {
   }
 })

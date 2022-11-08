@@ -9,8 +9,8 @@ module.exports = defineConfig({
       .tap(options => ({
         ...options,
         compilerOptions: {
-          // treat any tag that starts with ion- as custom elements
-          isCustomElement: tagName => tagName === 'vue-advanced-chat'        }
+          isCustomElement: tagName => tagName === 'vue-advanced-chat'
+        }
       }))
   },
   devServer: { port: 8080}

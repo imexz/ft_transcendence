@@ -7,16 +7,17 @@ import { MessageService } from 'src/message/message.service';
 import User from 'src/users/entitys/user.entity';
 import { BanMuteService } from 'src/chatroom/banMute/banMute.service';
 import { AdminAction } from 'src/users/entitys/admin.enum';
+import { Access } from 'src/chatroom/chatroom.entity';
 
 @Injectable()
 export class ChatService {
   async adminAction(action: AdminAction, roomId: number, UserId: number, adminId: number) {
     const room = await this.chatroomService.getRoomWithAdmins(roomId)
     console.log("admins", room.admins, adminId);
-    
+
     const isAdmin = room.admins.some(element => element.id === adminId );
     console.log(isAdmin);
-    
+
     if(isAdmin) {
       console.log("isAdmin");
       switch (action) {
@@ -30,7 +31,7 @@ export class ChatService {
         case AdminAction.toAdmin:
           this.chatroomService.addRoomAdmin(room, UserId)
           break;
-      
+
         default:
           break;
       }
@@ -45,7 +46,7 @@ export class ChatService {
     if(user != undefined && id != undefined)
     {
       // console.log(content);
-      
+
       const user1 = await this.usersService.getUser(id)
       const chatroom = await this.chatroomService.findOrCreatDM(user, user1)
       this.messageService.userAddMessageToRoom(user, content, chatroom.chatroom)
@@ -87,10 +88,14 @@ export class ChatService {
 
         async createMessage(user: User, roomId:number, content: string) {
             const object = await this.chatroomService.hasUserWriteAccess(user.id, roomId)
-            console.log("room=", object.chatroom);           
+            console.log("room=", object.chatroom);
             if(object.allowed) {
               return await this.messageService.userAddMessageToRoom(user, content, object.chatroom)
             }
+        }
+
+        async createRoom(user: User, room_name: string, access: Access, password?: string) {
+          return await this.chatroomService.addRoom(room_name, access, user, password)
         }
 
 

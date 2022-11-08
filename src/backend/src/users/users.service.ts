@@ -64,17 +64,17 @@ export class UsersService {
 	async getUserSocket(server, id: number){
 		const sockets = await server.fetchSockets();
 		// console.log("getUserSocket");
-		
+
 		for (const socket of sockets) {
             if(socket.handshake.auth.id == id)
             {
 				// console.log("found socket");
-				
+
               return socket
             }
 			// console.log(socket.handshake.auth.id);
-			
-        }		
+
+        }
 	}
 
 

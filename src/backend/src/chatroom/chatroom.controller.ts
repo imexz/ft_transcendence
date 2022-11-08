@@ -33,11 +33,13 @@ export class ChatroomController {
     {
         // console.log("password");
         // console.log(password);
+        console.log("new room: ", /* req,  */room_name, access);
+
         if(await this.chatroomService.addRoom(room_name, access, req.user, password) == undefined)
             throw new HttpException('Forbidden', HttpStatus.CONFLICT);
         // console.log("creat");
         // console.log(req.user);
-        
+
         return await this.chatroomService.getAll(req.user)
     }
 
