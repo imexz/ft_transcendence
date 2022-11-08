@@ -223,19 +223,19 @@ export class ChatGateway {
   @ConnectedSocket() client: Socket,
   @MessageBody('password') password?: string,
   ) {
-    console.log("createRoom");
-    console.log("roomName:", roomName);
-    console.log("access:", access);
-    console.log("user id:", client.handshake.auth.id);
+    // console.log("createRoom");
+    // console.log("roomName:", roomName);
+    // console.log("access:", access);
+    // console.log("user id:", client.handshake.auth.id);
 
     // const room_name = await this.chatService.getRoomName(roomId)
 
     const room = await this.chatService.createRoom(client.handshake.auth as User, roomName, access, password);
     if(room) {
       // console.log("emitting newRoom now"); //!!!!!!!!!!!!!!!!
-      // client.emit('newRoom', room);
+      this.server.emit('newRoom', room);
 
-      console.log("createRoom ende");
+      // console.log("createRoom ende");
       return room
     }
     else {

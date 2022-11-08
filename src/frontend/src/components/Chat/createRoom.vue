@@ -60,7 +60,7 @@ export default defineComponent({
           else
           {
             console.error("response was null");
-            this$emit('actions', 'error');
+            this.$emit('actions', 'error');
           }
 
         })

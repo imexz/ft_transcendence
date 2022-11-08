@@ -94,20 +94,14 @@ export default createStore<State>({
       state.socketChat.on('newMessage',(data) => {
         console.log("newMessage received:");
 
-        console.log(data.message)
+        console.log(data.roomId, data.message)
         state.rooms[data.roomId].messages[state.rooms[data.roomId].messages.length] = new Message(data.message)
       })
 
       state.socketChat.on('newRoom',(data) => {
         console.log("newRoom received:", data);
 
-        // console.warn(state.rooms.length);
-
-        // const test : Room = new Room(data)
-        // console.warn("here comes the room", test);
-
-        // state.rooms[state.rooms.length] = test
-        state.rooms[state.rooms.length] = data // !!!!!!!!! make sure to parse the data into a Room object
+        state.rooms[state.rooms.length] = data
       })
 
 
