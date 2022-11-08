@@ -1,7 +1,6 @@
 <template>
     <div class="room-input">
-      <form @submit.prevent="createRoom">
-        <div class="elem">
+        <div v-if="roomName == ''" class="elem">
           <input v-model="name" placeholder="Enter the name"/>
         </div>
         <div class="elem">
@@ -15,10 +14,12 @@
           <input v-if="access == Access.protected"  v-model="password" placeholder="Enter your password">
           <!-- <input v-else v-model="password" placeholder="Not password protected" disabled> -->
         </div>
-        <div class="btn">
-          <button class="elem2" type="submit">Create Room</button>
+        <div v-if="roomName == ''" class="btn">
+          <button class="elem2" type="submit" @click="createRoom">Create Room</button>
         </div>
-      </form>
+        <div v-else>
+          <button class="elem2" type="submit" @click="changeRoom">Change Room</button>
+        </div>
     </div>
 </template>
 
@@ -37,19 +38,37 @@ export default defineComponent({
           Access
       }
   },
+  mounted () {
+    console.log("romName = ", this.roomName);
+    
+  },
+  props: {
+    roomName: {
+      type: String,
+      default: ''
+    }
+  },
   methods: {
+    changeRoom(): void {
+      this.$store.state.socketChat.emit('createRoom', {roomName: this.roomName, access: this.access, password: this.password},  // !!!!!!!!!!!!!!!
+        response => {
+          if(response != null) {
+            console.log(response);
+            console.log("success");
+            // this.$emit('actions', 'success');
+            console.log("rooms now", response);
+          }
+          else
+          {
+            console.error("response was null");
+            this.$emit('actions', 'error');
+          }
+        })
+
+    },
     createRoom(): void{
       console.log("createRoom");
       this.$store.state.socketChat.emit('createRoom', {roomName: this.name, access: this.access, password: this.password},  // !!!!!!!!!!!!!!!
-    // old //
-      // VueAxios({
-      //   url: '/chatroom/creat',
-      //   baseURL: API_URL,
-      //   method: 'POST',
-      //   withCredentials: true,
-      //   data: { room_name: this.name, access: this.access, password: this.password}
-      // })
-    // old //
         response => {
           if(response != null)
             {console.log(response);
@@ -62,11 +81,7 @@ export default defineComponent({
             console.error("response was null");
             this.$emit('actions', 'error');
           }
-
         })
-      // old //
-        // .catch(error => { this.$emit('actions', 'error') })
-      // old //
       }
     },
 })

@@ -7,6 +7,9 @@
       </button>
     </div>
     <div class="headLine" >Role: {{getRole}} </div>
+    <div v-if="getRole == 'owner'">
+      <CreateRoom :roomName=room.roomName> </CreateRoom>
+    </div>
     <div class="userGroup">Admins</div>
     <div class="user" v-for="user in room?.admins">
       <UserSummary :user=user></UserSummary>
@@ -25,8 +28,9 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import UserSummary from '@/components/Profile/UserSummary.vue'
-import Room from '@/models/room';
+import Room, { Access } from '@/models/room';
 import User from '@/models/user';
+import CreateRoom from './createRoom.vue';
 
   enum AdminAction {
       muted,
@@ -83,6 +87,9 @@ export default defineComponent({
     }
   },
   methods: {
+    changeRoomAccess() {
+      this.$store.state.socketChat.emit('changeRoomAccess', {roomName: this.name, access: this.access, password: this.password},  // !!!!!!!!!!!!!!!
+    },
     reEmit(emiType: AdminAction, userId){
       console.log(emiType, userId);
       
@@ -94,6 +101,7 @@ export default defineComponent({
   },
   components: {
     UserSummary,
+    CreateRoom
   },
   props: {
     room: Object //Room

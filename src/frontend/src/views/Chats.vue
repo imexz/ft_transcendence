@@ -78,6 +78,7 @@
             { name: 'join', title: 'Join Room' },
             { name: 'leave', title: 'Leave Room' }
           ],
+          roomActionAdmin: { name: 'settings', title: 'Settings'},
           createRoomPopUp: ref(false),
           PoppupJoin: ref(false),
           roomInfoPopUp: ref(false),

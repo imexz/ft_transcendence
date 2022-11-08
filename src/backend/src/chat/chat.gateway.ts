@@ -77,21 +77,10 @@ export class ChatGateway {
     )
      {
       console.log("Tobi asys", roomId, typeof(roomId));
-
       console.log("join");
       console.log("roomIdGateway: ", roomId );
-
-
-      // console.log(client.handshake);
       console.log("roomId", roomId);
-
       const rooms = await this.chatService.getUserRooms(client.handshake.auth.id)
-
-      // console.log(rooms);
-
-
-
-
       var tmp = []
       for (let index = 0; index < rooms.length; index++) {
         tmp.push(rooms[index].roomId.toString())
@@ -223,24 +212,13 @@ export class ChatGateway {
   @ConnectedSocket() client: Socket,
   @MessageBody('password') password?: string,
   ) {
-    // console.log("createRoom");
-    // console.log("roomName:", roomName);
-    // console.log("access:", access);
-    // console.log("user id:", client.handshake.auth.id);
-
-    // const room_name = await this.chatService.getRoomName(roomId)
-
     const room = await this.chatService.createRoom(client.handshake.auth as User, roomName, access, password);
     if(room) {
-      // console.log("emitting newRoom now"); //!!!!!!!!!!!!!!!!
       this.server.emit('newRoom', room);
-
-      // console.log("createRoom ende");
       return room
     }
     else {
       console.log("room == empty");
-
     }
   }
 
@@ -262,10 +240,7 @@ export class ChatGateway {
     @MessageBody('reaction') reaction : any,
     @MessageBody('remove') remove : boolean,
   ) {
-      // console.log("createMessageReaction");
-      // console.log(messageId);
       this.chatService.createMessageReaction(messageId, reaction, remove);
-
 
   }
 
