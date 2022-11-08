@@ -31,13 +31,13 @@ export class ChatroomService {
   }
 
 
-  async createRoomInfo(roomId: number, id: any): Promise<{room: chatroom, isAdmin: boolean}> {
+  async createRoomInfo(roomId: number, id: any): Promise<chatroom> {
     const Room = await this.getRoomWithAdmins(roomId)
     if (Room != null)
     {
         let room = null
         room = Room.users.find(elem => elem.id == id) != undefined? Room : []
-        return { room:room,  isAdmin: room.admins.find(elem => elem.id == id) != undefined };
+        return room ;
     }
     throw new Error("room not found");
   }

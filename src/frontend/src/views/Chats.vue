@@ -38,7 +38,7 @@
       <createRoomPopup @actions="createRoomActions"/>
     </div>
     <div v-if="roomInfoPopUp" class="roomInfoPopUp">
-      <roomInfoPopUp :roomInfo="roomInfoData" @action="roomInfoActions"/>
+      <roomInfoPopUp :room="roomInfoData" @action="roomInfoActions"/>
     </div>
   </div>
 </template>
