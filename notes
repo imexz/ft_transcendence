@@ -22,7 +22,10 @@ Starting a Game:
 
 Topics:
 
+leaveGame: remove Spectators in gameService.spectatorsMap
+check spactating mode
 
+Reload during game with playerleft: doesnt render current game
 
 When invited, inviting the other player back should not be possible
 

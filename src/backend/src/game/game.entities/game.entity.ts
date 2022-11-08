@@ -33,10 +33,13 @@ export class Game extends GameData{
 	@Exclude()
 	interval: number | null = null;
 
+	@Exclude()
+	spectators: Array<number> = [];
+
 	@Column()
 	scoreLeft: number = 0;
 	@Column()
-	scoreRight: number = 0; 
+	scoreRight: number = 0;
 
 
 

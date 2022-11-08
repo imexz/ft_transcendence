@@ -22,6 +22,7 @@ export class GameService {
 
 	setup = new GameSetup;
 	gamesArr: Array<Game> = []
+	spectatorsMap = new Map<number, Game>;
 
 	@InjectRepository(Game)
 	private gameRepository: Repository<Game>
@@ -30,20 +31,40 @@ export class GameService {
 		return this.gamesArr.find((value: Game) =>  value.playerLeft?.id == user_id || value.playerRight?.id == user_id)
 	}
 
-	async joinGameOrCreateGame(user: User, server: Server, opponent_user_id?: number): Promise<Game> {
+	addUserToSpectators(userId: number, game: Game) {
+		this.spectatorsMap.set(userId, game);
+		game.spectators.push(userId);
+	}
+
+	removeUserFromSpectators(userId: number, game: Game) {
+		this.spectatorsMap.delete(userId);
+		const index = game.spectators.indexOf(userId);
+		if (index > -1) {
+  			game.spectators.splice(index, 1);
+		}
+	}
+
+	getSpectatedGame(userId: number): Game | undefined {
+		return this.spectatorsMap.get(userId)
+	}
+
+	clearSpectatorArr(game: Game) {
+		game.spectators.length = 0;
+	}
+
+	async joinGameOrCreateGame(user: User, server: Server, opponentUserId?: number): Promise<Game> {
 		let game = this.getGame(undefined) // checking for first game with missing (undefined) opponent
-		if (game == undefined || opponent_user_id) {
-			console.log("joinGameOrCreateGame game == undefined");
+		if (game == undefined || opponentUserId) {
 			game = await this.createGameInstance(user.id)
 			game.playerLeft = user
-			this.gamesArr.push(game)
-			// opponent_user_id is set when called via Frontend::askForMatch
-			if(opponent_user_id != undefined) {
-				const opponent = await this.userService.getUser(opponent_user_id)
+			// opponentUserId is set when called via Frontend::askForMatch
+			if(opponentUserId != undefined) {
+				const opponent = await this.userService.getUser(opponentUserId)
 				game.playerRight = opponent
 			}
-		} else { // game exists, join user and set as opponent
-			console.log("joinGameOrCreateGame: join existing game");
+			this.gamesArr.push(game)
+		} else { // queue game exists, join and set user as opponent
+			console.log("joinGameOrCreateGame: set User as playerRight");
 			game.playerRight = user
 		}
 		return game

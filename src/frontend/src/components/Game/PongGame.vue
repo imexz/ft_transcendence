@@ -1,10 +1,11 @@
 <template>
+<div v-if="dataRdy">
   <div v-show="this.$store.state.game != null">
-      <GamePlayers/>
-    <div v-if="this.$store.state.winner == null" class="gameCanvas">
-      <div>
+		<GamePlayers/>
+		<div v-if="this.$store.state.winner == null" class="gameCanvas">
+			<div>
         <Field @assignWinner="assignWinner"/>
-      </div>
+	</div>
       <div v-show="this.$store.state.user.id!=this.$store.state.game?.playerRight?.id && this.$store.state.user.id!=this.$store.state.game?.playerLeft?.id"  class="leaveGame">
         <button @click="leaveGame"> Leave </button>
       </div>
@@ -16,8 +17,9 @@
 	<button @click="leaveGame"> Leave </button>
   </div>
   <div v-if="this.$store.state.winner != null && this.$store.state.game == null">
-        <Result :winner = this.$store.state.winner @newGame="newGame" />
+	<Result :winner = this.$store.state.winner @newGame="newGame" />
   </div>
+</div>
 </template>
 
 <script lang="ts">
@@ -30,8 +32,9 @@
 
 
   export default defineComponent({
-  	data () {
+  	data() {
   		return {
+		dataRdy: false,
         fps: 0,
   		}
   	},
@@ -42,16 +45,14 @@
     },
   	created() {
   		console.log("in created");
-  		this.$store.state.socketGame.on('GameInfo', (game: Game) => {
-        console.log(game)
-        this.assignGame(game)
-		  });
-      if (this.$store.state.game == null && this.$store.state.winner == null) {
-        this.$store.state.socketGame.emit('isInGame');
-      }
   	},
-  	mounted() {
+  	async mounted() {
   		console.log("mounted");
+		await this.initGameInfoListener();
+      	if (this.$store.state.game == null && this.$store.state.winner == null) {
+        	this.$store.state.socketGame.emit('isInGame');
+     	}
+		this.dataRdy = true;
   	},
 		beforeUpdate() {
   		console.log("beforeUpdate");
@@ -68,6 +69,15 @@
       this.$store.state.socketGame.off('GameInfo')
   	},
   	methods: {
+	  async initGameInfoListener() {
+		while (!this.$store.state.socketGame) {
+			await new Promise(r => setTimeout(r, 100));
+		}
+		this.$store.state.socketGame.on('GameInfo', (game: Game) => {
+        	console.log(game)
+        	this.assignGame(game)
+		});
+	  },
       newGame(){
         console.log("newGame");
         this.$store.state.winner = null

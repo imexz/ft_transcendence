@@ -59,6 +59,7 @@ export default createStore<State>({
     logOut(state) {
       state.validated = false;
       state.socket.disconnect();
+	  state.socketGame.disconnect(); //added
     },
     logIn(state, user) {
       // console.log("logIn");
