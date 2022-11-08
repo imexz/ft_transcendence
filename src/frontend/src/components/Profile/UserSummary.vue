@@ -61,10 +61,10 @@
         @click="toggleDmPopUp">
         <font-awesome-icon icon="fa-solid fa-message" />
       </button>
-      <button
+      <!-- <button
         class="dropdownElement">
         <font-awesome-icon icon="fa-solid fa-ban" />
-      </button>
+      </button> -->
       <button
         class="dropdownElement"
         @click="askForMatchOrSpectate">
@@ -86,8 +86,8 @@ import { defineComponent } from 'vue';
 import { Status } from '@/enums/models/ResponseEnum';
 import ViewGamePopup from '../Game/ViewGamePopup.vue';
 import GamePlayers from '../Game/GamePlayers.vue';
-import { defineAsyncComponent } from 'vue'
-import{ UserStatus }from '@/models/user'
+import { defineAsyncComponent } from 'vue';
+import{ UserStatus }from '@/models/user';
 
 import Game from '@/models/game';
 

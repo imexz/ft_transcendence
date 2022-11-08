@@ -17,6 +17,7 @@ import { ChatroomModule } from './chatroom/chatroom.module';
 import { Friend } from './users/friends/friend.entity';
 import { FriendsModule } from './users/friends/friends.module';
 import { JwtModule } from '@nestjs/jwt';
+import { banMute } from './chatroom/banMute/banMute.entity';
 
 
 
@@ -33,7 +34,7 @@ import { JwtModule } from '@nestjs/jwt';
 			username: process.env.POSTGRES_USER,
 			password: process.env.POSTGRES_PASSWORD,
 			database: process.env.PGDATABASE,
-			entities: [User, fileEntity, message, chatroom, Game, Friend],
+			entities: [User, fileEntity, message, chatroom, Game, Friend, banMute],
 			ssl: false,
 			synchronize: true //  shouldn't be used in production
 		}),

@@ -50,6 +50,6 @@ export class GameData {
 	paddleRight: Paddle;
 	@Exclude()
 	score: Score;
-	// @Exclude()
+// @Exclude()
 	// finished: boolean = false;
 }

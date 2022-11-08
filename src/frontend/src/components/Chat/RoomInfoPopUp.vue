@@ -6,16 +6,17 @@
         <font-awesome-icon icon="fa-solid fa-x" />
       </button>
     </div>
-    <div class="headLine" >Role: {{admin?"Admin":"Member"}}</div>
+    <div class="headLine" >Role: {{getRole}} </div>
     <div class="userGroup">Admins</div>
-    <div class="user" v-for="user in roomInfo?.room.admins">
+    <div class="user" v-for="user in room?.admins">
       <UserSummary :user=user></UserSummary>
     </div>
     <div class="userGroup">Users</div>
-    <div class="user" v-for="user in roomInfo?.room.users">
+    <div class="user" v-for="user in room?.users">
       <UserSummary
         v-if="!room?.admins.some((us: User) => us.id == user.id)"
-        :user=user :extraButtons="admin?extraButtons:[]"
+        :user=user 
+        :extraButtons=extraButtons
         @action="reEmit"></UserSummary>
     </div>
   </div>
@@ -27,29 +28,47 @@ import UserSummary from '@/components/Profile/UserSummary.vue'
 import Room from '@/models/room';
 import User from '@/models/user';
 
-
+  enum AdminAction {
+      muted,
+      baned,
+      toAdmin
+  }
 export default defineComponent({
   data() {
     return {
-      room: null,
+      // room: null,
       admin: false as boolean,
       extraButtons: [
         {
           icon: "fa-solid fa-comment-slash",
-          emit: "mute"
+          emit: AdminAction.muted
         },
         {
           icon: "fa-solid fa-gavel",
-          emit: "ban"
+          emit: AdminAction.toAdmin
+        },
+        {
+          icon: "fa-solid fa-ban",
+          emit: AdminAction.baned
         }
-      ]
+      ],
+      AdminAction
     }
   },
   updated() {
-    this.room = this.roomInfo?.room;
-    this.admin = this.roomInfo?.isAdmin;
+    // this.room = this.roomInfo?.room;
   },
   computed: {
+    getRole(): string{
+      if (this.room?.owner.id == this.$store.state.user.id) {
+        return "owner"
+      }
+      if (this.room?.admins.find(elem => elem.id == this.$store.state.user.id)){
+        return "admin"
+      } else {
+        return "user"
+      }
+    },
     roomType() {
       switch(this.room?.access) {
         case 3 :
@@ -64,8 +83,10 @@ export default defineComponent({
     }
   },
   methods: {
-    reEmit(emitMsg, userId){
-      this.$emit("action", emitMsg, userId, this.room.roomId)
+    reEmit(emiType: AdminAction, userId){
+      console.log(emiType, userId);
+      
+      this.$store.state.socketChat.emit('action', {emiType, userId, roomId: this.room.roomId})
     },
     closePopUp(){
       this.$emit("action", "exit")
@@ -75,10 +96,7 @@ export default defineComponent({
     UserSummary,
   },
   props: {
-    roomInfo :{
-      type: Object,
-      default: null,
-    }
+    room: Object //Room
   }
 })
 

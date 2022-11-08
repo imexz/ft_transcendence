@@ -36,7 +36,8 @@ export default defineComponent({
             console.log("newGame");
 			// this.leaveRoom()
             this.$emit('newGame')
-        }
+        },
+        
     }
 })
 </script>

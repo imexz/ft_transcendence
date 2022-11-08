@@ -18,13 +18,16 @@ export default class Room {
         this.roomName = room.roomName
         this.roomId = room.roomId
         // this.messages = room.messages // run through for loop and convert to real Message object again
+        this.users = [] as User[]
+        for (let i = 0; i < room.users.length; ++i)
+        {
+            this.users[i] = new User(room.users[i])
+        }
         this.messages = [] as Message[]
-        this.users = room.users
         for (let i = 0; i < room.messages.length; ++i)
         {
             this.findUser(room.messages[i].senderId)
-            .then(user => (this.messages.push(new Message(room.messages[i], user))))
-            .catch(error => (console.error("User not found"))
+            .then(user => (this.messages[i] = new Message(room.messages[i], user)))
         }
         this.admins = room.admins
         // console.warn("Room constructor called", room);
@@ -54,12 +57,10 @@ export default class Room {
         }
         if (user == undefined)
         {
-            user = await VueAxios({
-                url: '/users/find/' + userId,
-                baseURL: API_URL,
-                method: 'GET',
-                withCredentials: true,
-              })
+            user = new User(await VueAxios({
+                        url: '/users/find/' + userId,
+                        baseURL: API_URL, method: 'GET',
+                        withCredentials: true}))
         }
 
         return user

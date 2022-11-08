@@ -1,6 +1,7 @@
 import User from "../users/entitys/user.entity";
 import { Column, Entity, JoinTable, ManyToMany, ManyToOne, OneToMany, OneToOne, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
 import { message } from "../message/message.entity";
+import { banMute } from "./banMute/banMute.entity";
 import { Exclude } from 'class-transformer';
 
 export enum Access {
@@ -9,6 +10,7 @@ export enum Access {
     protected,
     dm,
 }
+
 
 @Entity()
 export default class chatroom{
@@ -24,6 +26,10 @@ export default class chatroom{
     @ManyToMany(() => User, (User) => User.admin_of)
     admins: User[];
 
+    @OneToMany(() => banMute, (banMute) => banMute.chatroom)
+    muted: banMute[];
+
+
     @ManyToMany(() => User, (User) => User.chatrooms)
     users: User[];
 
@@ -37,5 +43,4 @@ export default class chatroom{
     @Exclude()
     @Column({nullable: true})
     hash: string
-
 }

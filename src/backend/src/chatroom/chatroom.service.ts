@@ -1,96 +1,100 @@
-import { Get, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import User from '../users/entitys/user.entity';
-import { Column, FindOptionsWhere, ManyToMany, Not, Repository } from 'typeorm';
+import { FindOptionsWhere, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Access } from './chatroom.entity';
 import chatroom from './chatroom.entity';
 import { message } from 'src/message/message.entity';
 import * as bcrypt from 'bcrypt';
-import { Status } from 'src/users/status_enum';
 import { UsersService } from 'src/users/users.service';
+import { BanMuteService } from './banMute/banMute.service';
+import { IsNull, Not } from "typeorm"
+import { banMute } from './banMute/banMute.entity';
 
 @Injectable()
 export class ChatroomService {
-
-
-  async createRoomInfo(roomId: number, id: any){
-
-    // console.log("createRoomInfoService");
-
-
-    const Room = await this.chatroomRepository.findOne({
-        where: {
-            roomId: roomId
-        },
-        relations: {
-            users: true,
-            admins: true
+  async addRoomAdmin(room: number | chatroom, userId: number) {
+    console.log("addRoomAdmin");
+   var tmpRoom
+    if(typeof room == 'number') {
+        tmpRoom = await this.getRoomWithAdmins(room)
+    } else {
+        tmpRoom = room
+    }
+    if (tmpRoom != undefined) {
+        const user = tmpRoom.admins.find(element => element.id == userId)
+        if (user == undefined) {
+            tmpRoom.admins.push(await this.usersService.getUser(userId))
+            this.chatroomRepository.save(tmpRoom)
         }
-    })
-    // console.log(Room)
+    }
+  }
 
+
+  async createRoomInfo(roomId: number, id: any): Promise<chatroom> {
+    const Room = await this.getRoomWithAdmins(roomId)
     if (Room != null)
     {
         let room = null
-        for(let k = 0; k < Room.users.length; ++k)
-        {
-            if (Room.users[k].id == id)
-            room = Room;
-        }
-        let isAdmin : Boolean
-
-        if (room == null)
-        {
-            room = []
-            return {room, isAdmin}
-        }
-
-        for(let j = 0; j < room.admins.length; ++j)
-        {
-            if (room.admins[j].id == id)
-                isAdmin = true
-        }
-
-        if (isAdmin == undefined)
-            isAdmin = false
-        // console.log("isAdmin:");
-        // console.log(isAdmin);
-
-        // console.log("end createRoomInfoService");
-        // console.log(room);
-
-        return { room, isAdmin };
+        room = Room.users.find(elem => elem.id == id) != undefined? Room : []
+        return room ;
     }
-    // console.log("end createRoomInfoService with error");
     throw new Error("room not found");
-
-    // const room = rooms.find(roomId)
-
-    // console.log(room);
-
-    // return room
   }
 
      async getAllwithUser(id: number) {
-        // console.log("getAllwithUser");
-        // console.log("id = ", id);
-
-        const test = await this.chatroomRepository.createQueryBuilder("chatroom")
-        // .leftJoinAndSelect('chatroom.users', 'users')
-        // .select('chatroom.users')
-        .innerJoinAndSelect('chatroom.users', 'user', 'user.id = :id', { id: id })
+        return await this.chatroomRepository.createQueryBuilder("chatroom")
+        .innerJoinAndSelect('chatroom.users', 'user', 'user.id = :user_id', { user_id: id })
         .getMany()
-            // .where("chatroom.users.id")
-            // .addSelect((subQuery) => {
-            //     return subQuery.select("user.id", "id").from("chatroom.users", "user").where({id: id})
-            // }, "name")
-            // .where(users )
+     }
 
-            // console.log(test);
-            return test
+    async hasUserWriteAccess(userId: number, roomId: number): Promise<{allowed: boolean, chatroom: chatroom}> {
+        console.log("getAllwithUserWriteAccess");
+        // console.log("id = ", id);
+        // const mute = this.banMuteService.test()
 
+        const room: chatroom = await this.chatroomRepository.findOne({
+            relations: {
+                users: true,
+                muted: {
+                    user: true
+                }
+
+            },
+            where: {
+                roomId: roomId,
+                users: {id: userId}
+            }
+        })
+
+        console.log("room= ", room);
+
+        const muted: banMute | undefined = room.muted.find(elem => elem.user.id == userId)
+
+        if(muted == undefined) {
+            return {allowed: true, chatroom: room}
+        } else if(new Date() > new Date(muted.timestamp.getTime() + 1 * 60000)) {
+            this.banMuteService.unMute(userId, room)
+            return {allowed: true, chatroom: room}
+        }
+        return {allowed: false,chatroom: room}
+
+        // if (new Date() > new Date(mutedUserRelation.created_at.getTime() + mutedUserRelation.muteTime * 60000)) {
+		// 	this.mutedService.deleteMuted(mutedUserRelation.roomMutedUsersId);
+		// 	return false;
+		// }
+
+
+
+    //    return await this.chatroomRepository.createQueryBuilder("chatroom")
+    //    .where('chatroom.roomId = :id', {id: roomId})
+    //    .innerJoinAndSelect('chatroom.users', 'user', 'user.id = :id1', { id1: id })
+    //    .leftJoinAndSelect('chatroom.muted', 'muted')
+
+    //    .getMany()
+        // .where('muted.user.id != :iid', {iid: id})
+        // .innerJoinAndSelect('chatroom.users', 'user', 'user._id = :id && muted._id != :id', { id: id })
     }
-
 
     async getRoomName(roomId: number): Promise<string> {
         // console.log("getRoomName");
@@ -111,7 +115,10 @@ export class ChatroomService {
                     admins: true,
                     users: true,
                     owner: true,
-                    messages: true
+                    messages: true,
+                    muted: {
+                        user: true
+                    }
                 }
             })
             if(chatroom == null && typeof room === 'string') {
@@ -136,7 +143,9 @@ export class ChatroomService {
                     admins: true,
                     users: true,
                     owner: true,
-                    messages: true
+                    messages: {
+                        sender: true
+                    }
                 },
                 where: {
                     users: [{id: user.id}, {id: user1.id}],
@@ -176,7 +185,6 @@ export class ChatroomService {
                 } else {
                     switch (ret.chatroom.access) {
                         case Access.protected:
-                            // bcrypt.compare()
                             if(await bcrypt.compare(password, ret.chatroom.hash) == false) {
                                 // console.log("result === false");
                                 return false
@@ -193,8 +201,19 @@ export class ChatroomService {
                             case Access.public:
 
                             default:
-                                if(ret.chatroom.users.indexOf(user) == -1)
+                                console.log(ret.chatroom.muted);
+
+                                if( ret.chatroom.users.indexOf(user) == -1 &&
+                                    (ret.chatroom.muted == undefined ||
+                                    ret.chatroom.muted.find((element) => element.user.id == user.id) == undefined))
+                                {
+                                    console.log("sucesfull joind");
+
                                     ret.chatroom.users.push(user)
+                                } else {
+                                    console.log("join goes wrong");
+
+                                }
                             break;
                     }
                 }
@@ -204,19 +223,20 @@ export class ChatroomService {
         }
     }
 
-    async removeUserFromChatroom(user: User, room_name: string) {
+    async removeUserFromChatroom(user: User, roomId: string | number) {
         // console.log("removeUserFromChatroom");
 
-        if(user != undefined && room_name != undefined) {
+        if(user != undefined && roomId != undefined) {
+            const test = typeof roomId === 'string' ? {roomName: roomId} : {roomId: roomId}
             const room = await this.chatroomRepository.findOne(
-                {where: {
-                    roomName: room_name
-            },
-            relations: {
-                owner: true,
-                admins: true,
-                users: true
-            }})
+                {
+                        where: test,
+                    relations: {
+                        owner: true,
+                        admins: true,
+                        users: true
+                    }
+                })
             if(room.owner.id == user.id) {
                 console.log("user is owner");
             }
@@ -245,7 +265,9 @@ export class ChatroomService {
     constructor(
         @InjectRepository(chatroom)
         private chatroomRepository: Repository<chatroom>,
-        private usersService: UsersService
+        private usersService: UsersService,
+        private banMuteService: BanMuteService
+        // private banMuteService: BanMuteService
     ){}
 
 
@@ -253,7 +275,7 @@ export class ChatroomService {
 
         const rooms = await this.chatroomRepository.createQueryBuilder("chatroom")
         .leftJoinAndSelect('chatroom.users', 'us')
-        .leftJoinAndSelect('chatroom.admins', 'admins', "us.id = :userid1", {userid1: user.id})
+        .leftJoinAndSelect('chatroom.admins', 'admins', "admins.id = :userid1", {userid1: user.id})
         .where("access IN (:...values)", { values: [ Access.protected, Access.public ] })
         .orWhere("us.id = :test", {test: user.id})
         .leftJoinAndSelect('chatroom.users', 'users', "us.id = :userid3", {userid3: user.id})
@@ -288,9 +310,21 @@ export class ChatroomService {
     async getRoom(room: string | number) {
         // console.log("before");
         const test = typeof room === 'string' ? {roomName: room} : {roomId: room}
-
         return await this.chatroomRepository.findOne({where: test})
-        // console.log("after");
+    }
+
+    async getRoomWithAdmins(roomId: number)  {
+        console.log("roomId= ", roomId);
+
+        return await this.chatroomRepository.findOne({where: {
+            roomId: roomId
+        },
+        relations: {
+            admins: true,
+            users: true,
+            owner: true
+        }})
+        // .where()
     }
 
     async addRoom(room_name: string, access: Access,  user: User, password?: string) {
