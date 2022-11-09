@@ -113,6 +113,10 @@
         Toast,
       },
       methods: {
+        async initChatInfoListener() {
+      while (!this.$store.state.socketChat || !this.$store.state.rooms) {
+        await new Promise(r => setTimeout(r, 100));
+      }},
         changeSuccess(msg: string) {
           this.showToast = true;
           this.toastMsg = msg;
@@ -414,7 +418,8 @@
         this.initSocket();
         console.log("beforeMount", this.socket);
       },
-      mounted() {
+      async mounted() {
+        await this.initChatInfoListener()
         console.log("MOUNT", this.socket)
         if (this.socket === null){
           this.$router.push('/login')
