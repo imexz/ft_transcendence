@@ -63,7 +63,7 @@ export default defineComponent({
       console.log("createRoom");
       this.$store.state.socketChat.emit('createOrChangeRoom', {roomName: this.name? this.name : this.roomName, access: this.access, password: this.password},  // !!!!!!!!!!!!!!!
         response => {
-          if(response != undefined)
+          if(response.chatroom != undefined)
           {
             switch (response.info) {
               case roomReturn.created:
@@ -77,14 +77,14 @@ export default defineComponent({
 
                 break;
               default:
-                // console.error("response was null");
-                // this.$emit('actions', 'error');
+                console.log("hit default in createOrChangeRoom");
+
                 break;
             }
           }
           else
           {
-            console.error("response was null");
+            console.log("response was null");
             this.$emit('actions', 'error');
           }
         })

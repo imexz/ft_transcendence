@@ -215,6 +215,8 @@ export class ChatGateway {
   @MessageBody('password') password?: string,
   ) {
     // console.log("roomName =", roomName);
+    if (roomName.length == 0 || access == undefined)
+      return {undefined}
 
     const room: {info: roomReturn, chatroom: chatroom} = await this.chatService.createRoom(client.handshake.auth as User, roomName, access, password);
     console.log(room);
