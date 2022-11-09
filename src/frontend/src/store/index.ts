@@ -114,7 +114,16 @@ export default createStore<State>({
 
       state.socketChat.on('newRoom',(data) => {
         console.log("newRoom received:", data);
-        state.rooms[state.rooms.length] = data
+        state.rooms[state.rooms.length] = new Room(data)
+      })
+
+      state.socketChat.on('changedRoom',(data) => {
+        console.log("changedRoom received:", data);
+        let room = state.rooms.find(elem => elem.roomId == data.roomId)
+        if (room)
+        {
+          room = new Room(data)
+        }
       })
 
 
