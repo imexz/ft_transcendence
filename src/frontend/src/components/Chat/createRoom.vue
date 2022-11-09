@@ -39,7 +39,7 @@ export default defineComponent({
   },
   methods: {
     createRoom(): void{
-      console.log("createRoom");
+      console.log("emit createRoom frontend");
       this.$store.state.socketChat.emit('createRoom', {roomName: this.name, access: this.access, password: this.password},  // !!!!!!!!!!!!!!!
     // old //
       // VueAxios({

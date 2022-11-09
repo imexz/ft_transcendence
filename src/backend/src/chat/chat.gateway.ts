@@ -107,6 +107,7 @@ export class ChatGateway {
 
       client.join(tmp)
       console.log("join after");
+      // return await this.chatService.ge
       return await this.chatService.findAllMessages(roomId, client.handshake.auth.id)
 
 
@@ -180,10 +181,10 @@ export class ChatGateway {
   @MessageBody('content') content: string,
   @ConnectedSocket() client: Socket,
   ) {
-    // console.log("createMessage");
-    // console.log(roomId);
-    // console.log(content);
-    // console.log(client.handshake.auth.id);
+    console.log("createMessage");
+    console.log(roomId);
+    console.log(content);
+    console.log(client.handshake.auth.id);
 
     // const room_name = await this.chatService.getRoomName(roomId)
 
@@ -223,7 +224,7 @@ export class ChatGateway {
   @ConnectedSocket() client: Socket,
   @MessageBody('password') password?: string,
   ) {
-    // console.log("createRoom");
+    console.log("createRoom");
     // console.log("roomName:", roomName);
     // console.log("access:", access);
     // console.log("user id:", client.handshake.auth.id);
@@ -234,16 +235,22 @@ export class ChatGateway {
 
     const room = await this.chatService.createRoom(client.handshake.auth as User, roomName, access, password);
     if(room) {
-      // console.log("emitting newRoom now"); //!!!!!!!!!!!!!!!!
-      this.server.emit('newRoom', room);
+      console.log("emitting newRoom now");
+      if (access != Access.private)
+      {
+        this.server.emit('newRoom', room);
+      }
+      else
+      {
+        client.emit('newRoom', room)
+      }
 
-      // console.log("createRoom ende");
-      return room
     }
     else {
-      console.log("room == empty");
-
+      console.log("room == empty", room);
     }
+    // console.log("createRoom ende");
+    return {room}
   }
 
   @SubscribeMessage('deleteMessage')

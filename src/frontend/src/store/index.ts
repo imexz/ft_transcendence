@@ -94,13 +94,19 @@ export default createStore<State>({
       state.socketChat.on('newMessage',(data) => {
         console.log("newMessage received:");
 
-        console.log(data.roomId, data.message)
-        state.rooms[data.roomId].messages[state.rooms[data.roomId].messages.length] = new Message(data.message)
+        let room = state.rooms.find(elem => elem.roomId == data.roomId)
+        if (room)
+        {
+          ++room.unreadCount
+          console.log(data.roomId, data.message, room.unreadCount)
+          room.messages[room.messages.length] = new Message(data.message)
+        }
+        else
+          console.log("room for new Message not found");
       })
 
       state.socketChat.on('newRoom',(data) => {
         console.log("newRoom received:", data);
-
         state.rooms[state.rooms.length] = data
       })
 

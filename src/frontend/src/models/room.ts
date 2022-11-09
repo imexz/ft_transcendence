@@ -30,6 +30,8 @@ export default class Room {
             .then(user => (this.messages[i] = new Message(room.messages[i], user)))
         }
         this.admins = room.admins
+        this.unreadCount = 0
+        this.typingUsers = []
         // console.warn("Room constructor called", room);
 
     }
@@ -42,6 +44,12 @@ export default class Room {
     admins: User[] = []
 
     messages: Message[] = []
+
+    unreadCount: number = 0
+
+    typingUsers: number [] = []
+
+    // messagesLoaded: boolean = false
 
     async findUser(userId : number): Promise<User>{
 
