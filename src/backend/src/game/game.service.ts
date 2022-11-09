@@ -78,9 +78,12 @@ export class GameService {
 		return new Game(userId, setup);
 	}
 
-	startGame(server: Server, game: Game) {
+	async startGame(server: Server, game: Game) {
 		if (game.playerLeft != undefined && game.playerRight != undefined) {
-			this.startEmittingGameData(server, game)
+			const socketPlayerLeft = await this.gameGateway.findSocketOfUser(game.playerLeft.id)
+			const socketPlayerRight = await this.gameGateway.findSocketOfUser(game.playerRight.id)
+			if (socketPlayerLeft && socketPlayerRight)
+				this.startEmittingGameData(server, game)
 		}
 	  }
 
@@ -274,6 +277,7 @@ export class GameService {
 	}
 
 	removePendingGame(user_id: number) {
+		console.log("removePendingGame");
 		const game = this.getGame(user_id)
 		if(game != undefined && game.playerRight == undefined) {
 			this.gameGateway.closeRoom(game.id.toString());

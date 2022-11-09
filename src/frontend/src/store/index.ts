@@ -59,6 +59,8 @@ export default createStore<State>({
   mutations: {
     logOut(state) {
       state.validated = false;
+      console.log("store logOut()");
+      state.socketGame.emit('quitPendingGame')
       state.socket.disconnect();
 	  state.socketGame.disconnect(); //added
     },
@@ -129,8 +131,8 @@ export default createStore<State>({
           router.push('/')
         }
       })
-	  state.socketGame.on('canceled', () => {
-		console.log("receive invite canceled");
+	  state.socketGame.on('resetRequester', () => {
+		console.log("receive resetRequester");
 		state.requester = null;
 		state.pendingRequest = false;
 	  })
