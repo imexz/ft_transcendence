@@ -276,14 +276,14 @@ export class GameService {
 		return false;
 	}
 
-	removePendingGame(user_id: number) {
-		console.log("removePendingGame");
-		const game = this.getGame(user_id)
-		if(game != undefined && game.playerRight == undefined) {
-			this.gameGateway.closeRoom(game.id.toString());
-			this.removeGame(game);
-		}
-	}
+	// removePendingGame(user_id: number) {
+	// 	console.log("removePendingGame");
+	// 	const game = this.getGame(user_id)
+	// 	if(game != undefined && game.playerRight == undefined) {
+	// 		this.gameGateway.closeRoom(game.id.toString());
+	// 		this.removeGame(game);
+	// 	}
+	// }
 
 	handleKeypress(user_id: number, key: string){
 		const game = this.getGame(user_id)

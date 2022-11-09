@@ -48,18 +48,16 @@
   	},
   	async mounted() {
   		console.log("mounted");
-		await this.initGameInfoListener();
-      	if (this.$store.state.game == null && this.$store.state.winner == null) {
-        	this.$store.state.socketGame.emit('isInGame');
+		  await this.initGameInfoListener();
+      if (this.$store.state.game == null && this.$store.state.winner == null) {
+        this.$store.state.socketGame.emit('isInGame');
      	}
 		this.dataRdy = true;
   	},
 		beforeUpdate() {
   		console.log("beforeUpdate");
       if (this.$store.state.game == null && this.$store.state.winner == null) {
-        this.$store.state.socketGame.emit('isInGame', (game: Game) => {
-          console.log(game);
-        });
+        this.$store.state.socketGame.emit('isInGame');
       }
 		console.log("leaving beforeUpdate");
 	  },
