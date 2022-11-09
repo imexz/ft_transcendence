@@ -22,7 +22,7 @@ export class ChatService {
       console.log("isAdmin");
       switch (action) {
         case AdminAction.baned:
-          this.chatroomService.removeUserFromChatroom(await this.usersService.getUser(UserId), roomId)
+          await this.chatroomService.removeUserFromChatroom(await this.usersService.getUser(UserId), roomId)
           return true
           break;
         case AdminAction.muted:
@@ -80,9 +80,9 @@ export class ChatService {
         private messageService: MessageService,
         ){}
 
-        async manageLeave(user_id: number, room_name: string) {
+        async manageLeave(user_id: number,roomId : number) {
             const user = await this.usersService.getUser(user_id)
-            await this.chatroomService.removeUserFromChatroom(user, room_name)
+            await this.chatroomService.removeUserFromChatroom(user, roomId)
         }
 
 

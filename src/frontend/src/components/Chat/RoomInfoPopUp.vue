@@ -68,7 +68,7 @@ export default defineComponent({
   },
   computed: {
     getRole(): string{
-      if (this.room?.owner.id == this.$store.state.user.id) {
+      if (this.room?.owner?.id == this.$store.state.user.id) {
         return "owner"
       }
       if (this.room?.admins.find(elem => elem.id == this.$store.state.user.id)){
