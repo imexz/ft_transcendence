@@ -1,24 +1,25 @@
 <template>
     <div class="room-input">
-      <form @submit.prevent="createRoom">
-        <div class="elem">
+        <div v-if="roomName == ''" class="elem">
           <input v-model="name" placeholder="Enter the name"/>
         </div>
         <div class="elem">
-          <select class="elem2" v-model="access" >
-            <option :value="Access.private"  >privat</option>
-            <option :value="Access.public" selected>public</option>
-            <option :value="Access.protected" >protected</option>
+          <select class="elem2" v-model="access">
+            <option :value="Access.private">privat</option>
+            <option :value="Access.public">public</option>
+            <option :value="Access.protected">protected</option>
           </select>
         </div>
         <div class="elem">
           <input v-if="access == Access.protected"  v-model="password" placeholder="Enter your password">
           <!-- <input v-else v-model="password" placeholder="Not password protected" disabled> -->
         </div>
-        <div class="btn">
-          <button class="elem2" type="submit">Create Room</button>
+        <div v-if="roomName == ''" class="btn">
+          <button class="elem2" type="submit" @click="createOrChangeRoom">Create Room</button>
         </div>
-      </form>
+        <div v-else>
+          <button class="elem2" type="submit" @click="createOrChangeRoom">Change Room</button>
+        </div>
     </div>
 </template>
 
@@ -27,6 +28,12 @@ import VueAxios from 'axios';
 import { API_URL } from '@/defines';
 import { ref, defineComponent } from 'vue'
 import { Access } from '@/models/room';
+
+
+export enum roomReturn {
+    created,
+    changed
+}
 
 export default defineComponent({
   data() {
@@ -37,38 +44,50 @@ export default defineComponent({
           Access
       }
   },
+  mounted () {
+    console.log("romName = ", this.roomName);
+    console.log("roomAccess = ", this.roomAccess);
+    this.access = this.roomAccess
+  },
+  props: {
+    roomName: {
+      type: String,
+      default: ''
+    },
+    roomAccess: {
+      type: Number
+    },
+  },
   methods: {
-    createRoom(): void{
-      console.log("emit createRoom frontend");
-      this.$store.state.socketChat.emit('createRoom', {roomName: this.name, access: this.access, password: this.password},  // !!!!!!!!!!!!!!!
-    // old //
-      // VueAxios({
-      //   url: '/chatroom/creat',
-      //   baseURL: API_URL,
-      //   method: 'POST',
-      //   withCredentials: true,
-      //   data: { room_name: this.name, access: this.access, password: this.password}
-      // })
-    // old //
+    createOrChangeRoom(): void{
+      console.log("createRoom");
+      this.$store.state.socketChat.emit('createOrChangeRoom', {roomName: this.name? this.name : this.roomName, access: this.access, password: this.password},  // !!!!!!!!!!!!!!!
         response => {
-          if(response.room != undefined)
+          if(response != undefined)
           {
-            console.log(response.room);
-            console.log("success");
-            this.$emit('actions', 'success');
-            // console.log("rooms before dispatch", response.room);
-            // this.$store.dispatch('updateRooms', response.room);
+            switch (response.info) {
+              case roomReturn.created:
+                console.log(response);
+                console.log("rooms before dispatch", response.chatroom);
+                this.$store.dispatch('updateRooms', response.chatroom);
+                break;
+              case roomReturn.changed:
+                console.log("success");
+                this.$emit('actions', 'change');
+
+                break;
+              default:
+                // console.error("response was null");
+                // this.$emit('actions', 'error');
+                break;
+            }
           }
           else
           {
-            console.log("room was undefined");
+            console.error("response was null");
             this.$emit('actions', 'error');
           }
-
         })
-      // old //
-        // .catch(error => { this.$emit('actions', 'error') })
-      // old //
       }
     },
 })

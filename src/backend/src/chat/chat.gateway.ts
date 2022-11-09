@@ -6,6 +6,7 @@ import { AuthService } from 'src/auth/auth.service';
 import User from 'src/users/entitys/user.entity';
 import chatroom, { Access } from 'src/chatroom/chatroom.entity';
 import { AdminAction } from 'src/users/entitys/admin.enum';
+import { roomReturn } from 'src/chatroom/chatroom.service';
 
 
 interface ServerToClientEvents {
@@ -77,21 +78,10 @@ export class ChatGateway {
     )
      {
       console.log("Tobi asys", roomId, typeof(roomId));
-
       console.log("join");
       console.log("roomIdGateway: ", roomId );
-
-
-      // console.log(client.handshake);
       console.log("roomId", roomId);
-
       const rooms = await this.chatService.getUserRooms(client.handshake.auth.id)
-
-      // console.log(rooms);
-
-
-
-
       var tmp = []
       for (let index = 0; index < rooms.length; index++) {
         tmp.push(rooms[index].roomId.toString())
@@ -217,37 +207,36 @@ export class ChatGateway {
     }
   }
 
-  @SubscribeMessage('createRoom')
+  @SubscribeMessage('createOrChangeRoom')
   async createRoom(
   @MessageBody('roomName') roomName: string,
   @MessageBody('access') access: Access,
   @ConnectedSocket() client: Socket,
   @MessageBody('password') password?: string,
   ) {
-    console.log("createRoom");
-    // console.log("roomName:", roomName);
-    // console.log("access:", access);
-    // console.log("user id:", client.handshake.auth.id);
+    // console.log("roomName =", roomName);
 
-    // const room_name = await this.chatService.getRoomName(roomId)
-    if (roomName.length == 0)
-      return {undefined}
+    const room: {info: roomReturn, chatroom: chatroom} = await this.chatService.createRoom(client.handshake.auth as User, roomName, access, password);
+    console.log(room);
 
-    const room = await this.chatService.createRoom(client.handshake.auth as User, roomName, access, password);
-    if(room) {
-      console.log("emitting newRoom now");
+    if(room.info == roomReturn.created) {
+      // this.server.emit('newRoom', room.chatroom);
       if (access != Access.private)
       {
-        this.server.emit('newRoom', room);
+        client.emit('newRoom', room.chatroom)
+        client.broadcast.emit('newRoom', {roomName: room.chatroom.roomName, roomId: room.chatroom.roomId});
       }
       else
       {
         client.emit('newRoom', room)
       }
+    } else if (room.info == roomReturn.changed) {
 
+      console.log("room changed");
+      this.server.emit('changedRoom', room.chatroom)
     }
     else {
-      console.log("room == empty", room);
+      console.log("room == empty");
     }
     // console.log("createRoom ende");
     return {room}
@@ -271,10 +260,7 @@ export class ChatGateway {
     @MessageBody('reaction') reaction : any,
     @MessageBody('remove') remove : boolean,
   ) {
-      // console.log("createMessageReaction");
-      // console.log(messageId);
       this.chatService.createMessageReaction(messageId, reaction, remove);
-
 
   }
 

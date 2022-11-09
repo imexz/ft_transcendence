@@ -23,7 +23,7 @@ export interface State {
   friendsList: User[] | null
   NrMessages: number
   NrFriendRequests: number
-  gameRequest: User | null
+  requester: User | null
   rooms: Room[]
   game: Game | null
   pendingRequest: boolean
@@ -33,8 +33,8 @@ export interface State {
 const storage = localStorage.getItem('user')
 const user = storage?JSON.parse(storage):null;
 const initialState = user?
-  {validated: true, user: user, socket: null,  socketChat: null,  socketGame: null, friendsList: null, NrMessages: 0, NrFriendRequests: 0, gameRequest: null, game: null, pendingRequest: false, winner: null}:
-  {validated: false, user: null,  socket: null,  socketChat: null,  socketGame: null, friendsList: null, NrMessages: 0, NrFriendRequests: 0, gameRequest: null, game: null, pendingRequest: false, winner: null};
+  {validated: true, user: user, socket: null,  socketChat: null,  socketGame: null, friendsList: null, NrMessages: 0, NrFriendRequests: 0, requester: null, game: null, pendingRequest: false, winner: null}:
+  {validated: false, user: null,  socket: null,  socketChat: null,  socketGame: null, friendsList: null, NrMessages: 0, NrFriendRequests: 0, requester: null, game: null, pendingRequest: false, winner: null};
 
 export default createStore<State>({
 
@@ -60,6 +60,7 @@ export default createStore<State>({
     logOut(state) {
       state.validated = false;
       state.socket.disconnect();
+	  state.socketGame.disconnect(); //added
     },
     logIn(state, user) {
       // console.log("logIn");
@@ -87,6 +88,12 @@ export default createStore<State>({
 
       console.log("game socket init");
       console.log(document.cookie);
+
+	  state.socketGame.on('disconnecting', () => {
+		console.log("game socket disconnecting");
+		console.log(state.socketGame.rooms);
+	  })
+
       state.socketChat.on('message',() => {
         state.NrMessages++
       })
@@ -112,21 +119,27 @@ export default createStore<State>({
 
 
       state.socketGame.on('GameRequestFrontend',(user: User) => {
-        state.gameRequest = user;
-        // console.log("id", state.gameRequest)
+        state.requester = user;
         console.log("receive askformatch");
       })
       state.socketGame.on('NowInGame', (cb) => {
         // state.game = game;
         console.log("receive NowInGame");
-        if (cb)
-          router.push('/play')
+        if (cb) {
+			state.pendingRequest = false;
+			router.push('/play')
+		}
         else {
           state.game = null;
           state.pendingRequest = false;
           router.push('/')
         }
       })
+	  state.socketGame.on('canceled', () => {
+		console.log("receive invite canceled");
+		state.requester = null;
+		state.pendingRequest = false;
+	  })
       state.socket.on('Request',(data) => {
         state.friendsList.push(data)
           console.log("receive  request");

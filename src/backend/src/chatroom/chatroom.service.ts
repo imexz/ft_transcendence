@@ -11,6 +11,11 @@ import { BanMuteService } from './banMute/banMute.service';
 import { IsNull, Not } from "typeorm"
 import { banMute } from './banMute/banMute.entity';
 
+export enum roomReturn {
+    created,
+    changed
+}
+
 @Injectable()
 export class ChatroomService {
   async addRoomAdmin(room: number | chatroom, userId: number) {
@@ -186,35 +191,27 @@ export class ChatroomService {
                     switch (ret.chatroom.access) {
                         case Access.protected:
                             if(await bcrypt.compare(password, ret.chatroom.hash) == false) {
-                                // console.log("result === false");
+                                console.log("result === false");
                                 return false
+                            } 
+
+                        case Access.public:
+
+                        default:
+                            console.log(ret.chatroom.muted);
+
+                            if( ret.chatroom.users.indexOf(user) == -1 &&
+                                (ret.chatroom.muted == undefined ||
+                                ret.chatroom.muted.find((element) => element.user.id == user.id) == undefined))
+                            {
+                                console.log("sucesfull joind");
+
+                                ret.chatroom.users.push(user)
                             } else {
-                                // console.log(result);
-                                // console.log(err);
-                                // console.log(password);
-                                // console.log(ret.chatroom.hash);
-                                // console.log(ret.chatroom);
-                                // console.log("result === true");
-                                // this.chatroomRepository.save(ret.chatroom)
+                                console.log("join goes wrong");
+
                             }
-
-                            case Access.public:
-
-                            default:
-                                console.log(ret.chatroom.muted);
-
-                                if( ret.chatroom.users.indexOf(user) == -1 &&
-                                    (ret.chatroom.muted == undefined ||
-                                    ret.chatroom.muted.find((element) => element.user.id == user.id) == undefined))
-                                {
-                                    console.log("sucesfull joind");
-
-                                    ret.chatroom.users.push(user)
-                                } else {
-                                    console.log("join goes wrong");
-
-                                }
-                            break;
+                        break;
                     }
                 }
                 await this.chatroomRepository.save(ret.chatroom)
@@ -313,51 +310,69 @@ export class ChatroomService {
         return await this.chatroomRepository.findOne({where: test})
     }
 
-    async getRoomWithAdmins(roomId: number)  {
-        console.log("roomId= ", roomId);
-
-        return await this.chatroomRepository.findOne({where: {
-            roomId: roomId
-        },
+    async getRoomWithAdmins(room: number | string)  {
+        console.log("roomId= ", room);
+        
+        const test = (typeof room === 'string') ? {roomName: room} : {roomId: room}
+        return await this.chatroomRepository.findOne({
+        where: test,
         relations: {
             admins: true,
             users: true,
             owner: true
         }})
-        // .where()
     }
 
-    async addRoom(room_name: string, access: Access,  user: User, password?: string) {
-        const room = await this.getRoom(room_name)
-        if(room == null) {
-            // console.log("room == null");
 
-            const room = this.chatroomRepository.create()
+
+    async addRoom(room_name: string, access: Access,  user: User, password?: string) : Promise<{ info: roomReturn; chatroom: chatroom; }> {
+        // console.log("room_name", room_name);
+        
+        var room = await this.getRoomWithAdmins(room_name)
+        if(room == undefined) {
+            console.log("room == null");
+            
+            room = this.chatroomRepository.create()
             room.roomName = room_name
             room.owner = user;
             room.admins = [user]
             room.users = [user]
             room.access = access
-            if (access == Access.protected && password) {
-                // console.log("password set");
-                bcrypt.hash(password, 10, async (err, hash: string) => {
-                    // console.log("room hash");
-                    if (err) {
-                        // console.log("error hashing");
-                        return undefined
-                    }
-                    room.hash = hash
-                    // console.log("geht");
-                    // console.log(room.hash)
-                    return await this.chatroomRepository.save(room);
-                })
-            } else {
-                // console.log("no password set");
+            if(access == Access.protected) {
+                this.setPasswordAndSave(password, room)
             }
-            // console.log("room hash after")
-            return await this.chatroomRepository.save(room);
+            return {info: roomReturn.created , chatroom: await this.chatroomRepository.save(room)}
+        } else if (room.admins.find(elem => elem.id == user.id) != undefined) {
+                console.log("set room = ", Access[access]);
+                room.access = access
+                if(access == Access.protected)
+                    this.setPasswordAndSave(password, room)
+            return  {info: roomReturn.changed , chatroom: await this.chatroomRepository.save(room)}
+        } else {
+            console.log("addRoom goes wrong");
+            
         }
         return undefined
+    }
+
+    setPasswordAndSave(password: string, room: chatroom) {
+        if (password) {
+            console.log("setPasswordAndSave");
+            
+            bcrypt.hash(password, 10, async (err, hash: string) => {
+                // console.log("room hash");
+                if (err) {
+                    // console.log("error hashing");
+                    return undefined
+                }
+                room.hash = hash
+                // console.log("geht");
+                // console.log(room.hash)
+                return await this.chatroomRepository.save(room);
+            })
+        } else {
+            console.log("no password set");
+        }
     }
 
     async removeRoom(room_name: string, user: User){
