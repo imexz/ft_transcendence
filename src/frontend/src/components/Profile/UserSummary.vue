@@ -88,6 +88,7 @@ import ViewGamePopup from '../Game/ViewGamePopup.vue';
 import GamePlayers from '../Game/GamePlayers.vue';
 import { defineAsyncComponent } from 'vue';
 import{ UserStatus }from '@/models/user';
+import { Socket } from 'socket.io'
 
 import Game from '@/models/game';
 
@@ -158,29 +159,30 @@ export default defineComponent({
       this.show = !this.show
     },
     // for match and spectate
-    askForMatchOrSpectate(){
+    async askForMatchOrSpectate(){
       const isSelfInvite: boolean = this.user.id === this.$store.state.user.id
 
       this.closeDmPopUp()
       if (isSelfInvite) return;
       this.$store.state.winner = null;
-	  this.$store.state.pendingRequest = false;
-      this.$store.state.socketGame.emit('GameRequestBackend', {id: this.user.id}, (r: Game | undefined) => {
-        if (r != undefined) {
-		  console.log('game returned');
+	    this.$store.state.pendingRequest = false;
+      this.$store.state.socketGame.emit('GameRequestBackend', {id: this.user.id}, (r) => {
+        if (r.playerLeft != undefined && r.playerRight != undefined) {
           this.showGame = !this.showGame
           const isUserActivePlayer: boolean = r.playerLeft.id == this.$store.state.user.id || r.playerRight.id == this.$store.state.user.id
           const isUserPlayerLeft: boolean = r.playerLeft.id === this.$store.state.user.id
-		  const isAskedUserActivePlayer: boolean = r.playerLeft.id === this.user.id || r.playerRight.id === this.user.id
+		      const isAskedUserActivePlayer: boolean = r.playerLeft.id === this.user.id || r.playerRight.id === this.user.id
           if(!isSelfInvite && isUserPlayerLeft && isAskedUserActivePlayer)
             this.$store.state.pendingRequest = true;
-		  else if (!isUserActivePlayer)
-			this.$store.state.game = r
+		      else if (!isUserActivePlayer)
+			      this.$store.state.game = r
         }
-	})
-	this.$emit('actions')
-	this.$router.push("/play");
-    console.log("askForMatchOrSpectate");
+        if (r.push) {
+          this.$emit('actions')
+          this.$router.push("/play");
+        }
+	    })
+      console.log("askForMatchOrSpectate");
     },
     viewGame(status){
       switch (status) {

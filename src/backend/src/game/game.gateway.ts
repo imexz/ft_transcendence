@@ -40,7 +40,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
   async handleConnection(@ConnectedSocket() socket: Socket) {
     console.log("client %s connected", socket?.handshake.auth.id);
-	this.authService.validateSocket(socket)
+	  this.authService.validateSocket(socket)
   }
 
   handleDisconnect(@ConnectedSocket() client: Socket) {
@@ -48,40 +48,45 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   }
 
   isSpectating(clientId: number): Game | undefined {
-	return this.gameService.getSpectatedGame(clientId);
+	  return this.gameService.getSpectatedGame(clientId);
   }
 
-  joinGameRoom(client: Socket, game: Game) {
-	console.log("joining existing gameRoom");
+  async joinGameRoom(client: Socket, game: Game) {
+	  console.log("joining existing gameRoom");
     client.join(game.id.toString());
-	if (game.interval == null) {
-		if (client.handshake.auth.id === game.playerRight?.id)
-			this.gameService.startGame(this.server, game);
-	} else {
-		client.emit('GameInfo', {playerLeft: game.playerLeft, playerRight: game.playerRight})
-	}
+	  if (game.interval == null) {
+		  if (client.handshake.auth.id === game.playerRight?.id) {
+        client.emit('resetRequester')
+			  await this.gameService.startGame(this.server, game);
+      }
+	  } else {
+	  	client.emit('GameInfo', {playerLeft: game.playerLeft, playerRight: game.playerRight})
+      client.emit('updatePaddle', {paddleLeft: game.paddleLeft, paddleRight: game.paddleRight})
+      client.emit('updateScore', {scoreLeft: game.score.scoreLeft, scoreRight: game.score.scoreRight})
+	  }
   }
 
   @SubscribeMessage('isInGame')
   async handleIsInGame(@ConnectedSocket() client: Socket) {
-	var game: Game | undefined
-	const clientId: number = client.handshake.auth.id;
+	  var game: Game | undefined
+	  const clientId: number = client.handshake.auth.id;
 
-	console.log("isInGame start", client.rooms);
-	game = this.gameService.getGame(clientId);
-	if (game == undefined) {
-		game = this.isSpectating(clientId);
-		if (game == undefined) {
-			console.log("no existing game for client available", clientId);
-			game = await this.gameService.joinGameOrCreateGame(client.handshake.auth as User, this.server)
-		} else {
-			console.log("client is spectating");
-		}
-	} else {
-		console.log("client is playing");
-	}
-	this.joinGameRoom(client, game);
-	console.log("isInGame end", client.rooms);
+	  console.log("isInGame start", client.rooms);
+	  game = this.gameService.getGame(clientId);
+	  if (game == undefined) {
+	  	game = this.isSpectating(clientId);
+	  	if (game == undefined) {
+	  		console.log("no existing game for client available", clientId);
+	  		game = await this.gameService.joinGameOrCreateGame(client.handshake.auth as User, this.server)
+	  	} else {
+	  		console.log("client is spectating");
+        client.emit('updatePaddle', {paddleLeft: game.paddleLeft, paddleRight: game.paddleRight})
+	  	}
+	  } else {
+	  	console.log("client is playing");
+	  }
+	  await this.joinGameRoom(client, game);
+	  console.log("isInGame end", client.rooms);
   }
 
   @SubscribeMessage('GameRequestBackend')
@@ -89,40 +94,50 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     @ConnectedSocket() client: Socket,
     @MessageBody('id') id?: number) {
 
-	let ret: undefined | GamePlayer = undefined;
-	const clientId: number = client.handshake.auth.id;
-
-	let game: Game | undefined = this.gameService.getGame(clientId)
-	if (game != undefined) {
-		console.log("gameRequest: client has a game. Reject request");
-	} else {
-		console.log("gameRequest: client has no game");
-		if (clientId === id) return ret;
-		game = this.gameService.getGame(id);
-		if(game == undefined) {
-			console.log("gameRequest: opponent has no game");
-			const socket = await this.findSocketOfUser(id)
-			socket.emit('GameRequestFrontend', client.handshake.auth as User)
-			game = await this.gameService.joinGameOrCreateGame(client.handshake.auth as User, this.server, id)
-			ret = {playerLeft: game.playerLeft, playerRight: game.playerRight}
-		} else {
-			console.log("gameRequest: invited player has game. Specatating.");
-			client.rooms.forEach(roomId => { client.leave(roomId) });
-			this.gameService.addUserToSpectators(clientId, game);
-		}
-	}
-	client.join(game.id.toString());
-	return ret
+	  let ret = { playerLeft: undefined, playerRight: undefined, push: false };
+	  const clientId: number = client.handshake.auth.id;
+      
+    if (clientId === id) return ret; // Selfinvite -> no push
+	  let game: Game | undefined = this.gameService.getGame(clientId)
+	  if (game != undefined) {
+	  	console.log("gameRequest: client has a game. Reject request");
+      return ret; // client in game -> no push
+	  } else {
+	  	console.log("gameRequest: client has no game");
+	  	game = this.gameService.getGame(id);
+	  	if(game == undefined) {
+	  		console.log("gameRequest: opponent has no game");
+	  		const socket = await this.findSocketOfUser(id)
+        if (socket == undefined) {
+          console.log("gameRequest: opponent is offline");
+          return ret; // offline opponent -> no push
+        } 
+	  		socket.emit('GameRequestFrontend', client.handshake.auth as User)
+	  		game = await this.gameService.joinGameOrCreateGame(client.handshake.auth as User, this.server, id)
+	  		// opponent has no game -> push to /play
+        ret = { playerLeft: game.playerLeft, playerRight: game.playerRight, push: true }
+	  	} else {
+        // opponent has game, -> push to /play
+        ret.push = true
+	  		console.log("gameRequest: invited player has game. Specatating.");
+	  		client.rooms.forEach(roomId => { if (client.id != roomId) client.leave(roomId) });
+	  		this.gameService.addUserToSpectators(clientId, game);
+	  	}
+	  }
+	  client.join(game.id.toString());
+	  return ret
   }
 
   @SubscribeMessage('accept')
   async handleAcceptGameRequest(@ConnectedSocket() client: Socket) {
     var game: Game = this.gameService.getGame(client.handshake.auth.id)
     if(game != undefined && game.interval == null) {
-	  console.log('accept');
-	  let socket = await this.findSocketOfUser(game.playerLeft.id)
-	  socket.emit('NowInGame', true)
-      this.gameService.startGame(this.server, game)
+	    console.log('accept');
+	    let socket = await this.findSocketOfUser(game.playerLeft.id)
+      if (socket != undefined) {
+	      socket.emit('NowInGame', true)
+        await this.gameService.startGame(this.server, game)
+      }
     }
   }
 
@@ -131,16 +146,12 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     var game: Game = this.gameService.getGame(client.handshake.auth.id)
     if(game != undefined && game.interval == null) {
     	const socket = await this.findSocketOfUser(game.playerLeft.id)
-		this.closeRoom(game.id.toString())
-		if (this.gameService.removeGame(game)) {
-    		socket.emit('NowInGame', false)
+		  this.closeRoom(game.id.toString())
+		  if (this.gameService.removeGame(game)) {
+        if (socket != undefined)
+    		  socket.emit('NowInGame', false)
     	}
     }
-  }
-
-  @SubscribeMessage('quitPendingGame')
-  quitPendingGame(@ConnectedSocket() client: Socket) {
-      this.gameService.removePendingGame(client.handshake.auth.id)
   }
 
   closeRoom(roomId: string) {
@@ -151,27 +162,32 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   // emittable by playerLeft (while game is pending) and spectator
   @SubscribeMessage('leaveGame')
   async handleLeaveGame(@ConnectedSocket() client: Socket) {
-	console.log("leaveGame");
-	const clientId: number = client.handshake.auth.id;
+	  console.log("leaveGame");
+	  const clientId: number = client.handshake.auth.id;
 
-	client.rooms.forEach(roomId => { client.leave(roomId) });
-	let game = this.gameService.spectatorsMap.get(clientId);
-	this.gameService.removeUserFromSpectators(clientId, game);
-	game = this.gameService.getGame(clientId);
-	if (game != undefined && clientId === game.playerLeft.id) {
-		if (game.playerRight != undefined) {
-			const socket = await this.findSocketOfUser(game.playerRight.id)
-			socket.emit('canceled')
-		}
-		this.gameService.removeGame(game);
-	}
-	console.log("leaveGame ende");
+	  client.rooms.forEach(roomId => { if (client.id != roomId) client.leave(roomId) });
+	  let game = this.gameService.spectatorsMap.get(clientId);
+	  this.gameService.removeUserFromSpectators(clientId, game);
+	  game = this.gameService.getGame(clientId);
+    if (game == undefined) return;
+    const isMatchDeletable: boolean = clientId === game.playerLeft.id && game.interval == null;
+	  if (isMatchDeletable) {
+	  	if (game.playerRight != undefined) {
+	  		const socket = await this.findSocketOfUser(game.playerRight.id)
+        if (socket != undefined)
+	  		  socket.emit('resetRequester')
+	  	}
+      this.closeRoom(game.id.toString())
+	  	this.gameService.removeGame(game);
+	  }
+	  console.log("leaveGame ende");
   }
 
   @SubscribeMessage('ViewGame')
   async viewRequest(
-  @ConnectedSocket() client: Socket,
-  @MessageBody('id') id?: number)
+    @ConnectedSocket() client: Socket,
+    @MessageBody('id') id?: number
+    )
   {
     const game: Game = this.gameService.getGame(id)
     if(game != undefined) {
@@ -187,6 +203,14 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   	this.gameService.handleKeypress(client.handshake.auth.id, key)
   }
 
+  @SubscribeMessage('statusRequest')
+  async getStatusRequest(userId: number) {
+    console.log("in statusRequest");
+    const socket = await this.findSocketOfUser(userId)
+    console.log(socket);
+    return {content: socket}
+  }
+
   async findSocketOfUser(userId: number) {
     const sockets = await this.server.fetchSockets();
     for (const socket of sockets) {
@@ -194,5 +218,6 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         return socket
       }
     }
+    return undefined
   }
 }

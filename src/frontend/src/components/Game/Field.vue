@@ -56,16 +56,20 @@ export default defineComponent({
     mounted() {
       this.initPixi();
       this.pixiApp.ticker.add(this.updatePixi)
-      this.$store.state.socketGame.on('updateGame', this.updateData)
+      this.$store.state.socketGame.on('updateBall', this.updateBall)
+      this.$store.state.socketGame.on('updatePaddle', this.updatePaddle)
+      this.$store.state.socketGame.on('updateScore', this.updateScore)
     },
     unmounted() {
-        this.$store.state.socketGame.off('updateGame')
+        this.$store.state.socketGame.off('updateBall')
+        this.$store.state.socketGame.off('updatePaddle')
+        this.$store.state.socketGame.off('updateScore')
     },
 
     methods: {
     initPixi(){
         let canvas: HTMLElement = document.getElementById('pixi')
-		console.log("initPixi");
+		    console.log("initPixi");
         this.pixiApp = new PIXI.Application({
           width: 640,
           height: 480,
@@ -156,22 +160,8 @@ export default defineComponent({
           this.pixiApp.renderer.width/4 * 3 - this.pixiScore.right.width/2;
         this.pixiScore.right.y = 5;
       },
-      updateData(data: any) {
-        //this is updating the Date-> independent of drawing loop
-        // console.log("callback updateGame");
-		if (data === undefined) {
-          // console.log("data undefined");
-          // this.gameExists = false;
-			this.left = 0;
-			this.right = 0;
-        	return;
-        }
-		this.gameData.score.scoreLeft = data.score.scoreLeft;
-		this.gameData.score.scoreRight = data.score.scoreRight;
-        console.log(this.gameData.score.scoreLeft, this.gameData.score.scoreRight);
-        this.gameData.ball = data.ball;
-        this.gameData.paddleLeft = data.paddleLeft;
-        this.gameData.paddleRight = data.paddleRight;
+      updateScore(data: any) {
+        this.gameData.score = data;
         switch(Math.max(this.gameData.score.scoreLeft, this.gameData.score.scoreRight)) {
           case 4:
             this.styleData.fgColor = 0xf5ac0e
@@ -186,9 +176,31 @@ export default defineComponent({
           this.$store.state.game = null
         }
       },
-	  isGameFinished(): boolean {
-		return this.gameData.score.scoreLeft == 3 || this.gameData.score.scoreRight == 3
-	  }
+      updatePaddle(data: any) {
+        this.gameData.paddleLeft = data.paddleLeft;
+        this.gameData.paddleRight = data.paddleRight;
+      },
+      updateBall(data: any) {
+        //this is updating the Date-> independent of drawing loop
+        // console.log("callback updateGame");
+		    if (data === undefined) {
+          // console.log("data undefined");
+          // this.gameExists = false;
+			    this.left = 0;
+			    this.right = 0;
+        	return;
+        }
+		    // this.gameData.score.scoreLeft = data.score.scoreLeft;
+		    // this.gameData.score.scoreRight = data.score.scoreRight;
+        // console.log(this.gameData.score.scoreLeft, this.gameData.score.scoreRight);
+        this.gameData.ball = data;
+        // this.gameData.paddleLeft = data.paddleLeft;
+        // this.gameData.paddleRight = data.paddleRight;
+        
+      },
+	    isGameFinished(): boolean {
+		    return this.gameData.score.scoreLeft == 3 || this.gameData.score.scoreRight == 3
+	    }
     }
 })
 </script>
