@@ -22,7 +22,6 @@ Starting a Game:
 
 Topics:
 
-emit only ball, paddle on demand
 
 implement askForRematch
 
@@ -57,5 +56,6 @@ Done:
 <!-- Search for player y, log out player y, invite player y to a match -> starts game... -->
 <!-- x creates match, logs out, y joins via queue. both stuck -->
 <!-- game started, log out playerLeft, play button -->
+<!-- emit only ball, paddle and score on demand -->
 
 

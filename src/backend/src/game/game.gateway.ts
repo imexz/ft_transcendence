@@ -61,6 +61,8 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
       }
 	  } else {
 	  	client.emit('GameInfo', {playerLeft: game.playerLeft, playerRight: game.playerRight})
+      client.emit('updatePaddle', {paddleLeft: game.paddleLeft, paddleRight: game.paddleRight})
+      client.emit('updateScore', {scoreLeft: game.score.scoreLeft, scoreRight: game.score.scoreRight})
 	  }
   }
 
@@ -78,6 +80,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	  		game = await this.gameService.joinGameOrCreateGame(client.handshake.auth as User, this.server)
 	  	} else {
 	  		console.log("client is spectating");
+        client.emit('updatePaddle', {paddleLeft: game.paddleLeft, paddleRight: game.paddleRight})
 	  	}
 	  } else {
 	  	console.log("client is playing");

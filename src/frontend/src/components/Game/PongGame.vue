@@ -63,7 +63,7 @@
 	  },
   	unmounted() {
   	  console.log("in unmount");
-      // this.$store.state.socketGame.off('GameInfo')
+      this.$store.state.socketGame?.off('GameInfo')
   	},
   	methods: {
 	    async initGameInfoListener() {

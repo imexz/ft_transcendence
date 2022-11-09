@@ -93,21 +93,18 @@ export class GameService {
 		server.to(game.id.toString()).emit('GameInfo', game)
 		console.log("startGame");
 		game.interval = setInterval(() => this.emitGameData(game, server), 16) as unknown as number;
+		this.gameGateway.server.to(game.id.toString()).emit('updatePaddle', {paddleRight: game.paddleRight, paddleLeft: game.paddleLeft})
 		console.log("startGame end");
 	}
 
 	async emitGameData(game: Game, server: Server) {
-		// console.log("emitGameData");
 		const tmpGame: Game = await this.getData(game)
-		const updatedGameData: GameData = {
-			ball: tmpGame.ball,
-			paddleLeft: tmpGame.paddleLeft,
-			paddleRight: tmpGame.paddleRight,
-			score: tmpGame.score,
-			// finished: tmpGame.finished,
+		const updatedBall = {
+			position: tmpGame.ball.position,
+			radius: tmpGame.ball.radius,
 		}
-		server.to(game.id.toString()).emit('updateGame', updatedGameData);
-		if (updatedGameData.score.scoreLeft === 3 || updatedGameData.score.scoreRight === 3) {
+		server.to(game.id.toString()).emit('updateBall', updatedBall);
+		if (tmpGame.score.scoreLeft === 3 || tmpGame.score.scoreRight === 3) {
 			console.log("emitGameData: closeRoom");
 			this.gameGateway.closeRoom(game.id.toString());
 		}
@@ -123,6 +120,7 @@ export class GameService {
 		this.collisionControl(game);
 		if (this.scored(game)){
 			this.reset(game);
+			this.gameGateway.server.to(game.id.toString()).emit('updateScore', {scoreLeft: game.score.scoreLeft, scoreRight: game.score.scoreRight})
 		}
 		await this.isGameFinished(game);
 		return game
@@ -276,15 +274,6 @@ export class GameService {
 		return false;
 	}
 
-	// removePendingGame(user_id: number) {
-	// 	console.log("removePendingGame");
-	// 	const game = this.getGame(user_id)
-	// 	if(game != undefined && game.playerRight == undefined) {
-	// 		this.gameGateway.closeRoom(game.id.toString());
-	// 		this.removeGame(game);
-	// 	}
-	// }
-
 	handleKeypress(user_id: number, key: string){
 		const game = this.getGame(user_id)
 		if(game != undefined) {
@@ -316,6 +305,7 @@ export class GameService {
 			if (game.paddleRight.position.y > 0)
 				game.paddleRight.position.y -= game.paddleRight.speed;
 		}
+		this.gameGateway.server.to(game.id.toString()).emit('updatePaddle', {paddleRight: game.paddleRight, paddleLeft: game.paddleLeft})
 	}
 	movePaddleDown(game: Game, side: Side) {
 		// console.log("movePaddleDown", side);
@@ -327,6 +317,7 @@ export class GameService {
 			if (game.paddleRight.position.y < (480 - game.paddleRight.height))
 				game.paddleRight.position.y += game.paddleRight.speed;
 		}
+		this.gameGateway.server.to(game.id.toString()).emit('updatePaddle', {paddleRight: game.paddleRight, paddleLeft: game.paddleLeft})
 	}
 
 	async getMatchHistory(user: User){
