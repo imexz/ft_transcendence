@@ -51,15 +51,17 @@ export default defineComponent({
       // })
     // old //
         response => {
-          if(response != null)
-            {console.log(response);
+          if(response.room != undefined)
+          {
+            console.log(response.room);
             console.log("success");
             this.$emit('actions', 'success');
-            console.log("rooms before dispatch", response);
-            this.$store.dispatch('updateRooms', response);}
+            // console.log("rooms before dispatch", response.room);
+            // this.$store.dispatch('updateRooms', response.room);
+          }
           else
           {
-            console.error("response was null");
+            console.log("room was undefined");
             this.$emit('actions', 'error');
           }
 

@@ -229,6 +229,8 @@ export class ChatGateway {
     // console.log("user id:", client.handshake.auth.id);
 
     // const room_name = await this.chatService.getRoomName(roomId)
+    if (roomName.length == 0)
+      return {undefined}
 
     const room = await this.chatService.createRoom(client.handshake.auth as User, roomName, access, password);
     if(room) {
