@@ -151,11 +151,6 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     }
   }
 
-  // @SubscribeMessage('quitPendingGame')
-  // quitPendingGame(@ConnectedSocket() client: Socket) {
-  //     this.gameService.removePendingGame(client.handshake.auth.id)
-  // }
-
   closeRoom(roomId: string) {
 	  console.log("closing room", roomId);
 	  this.server.in(roomId).socketsLeave(roomId);

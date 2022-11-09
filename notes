@@ -22,20 +22,13 @@ Starting a Game:
 
 Topics:
 
-x creates match, logs out, y joins via queue. both stuck
-
-game started, log out playerLeft, play button
-
-spectating with pending invite. denies, spectator still in field view
-
-sending someone spectating a gamerequest
-
+emit only ball, paddle on demand
 
 implement askForRematch
 
+spectating with pending invite. denies, spectator still in field view
 Spectator: Winning Screen shows "askForRematch" Button
-
-emit only ball, paddle on demand
+sending someone spectating a gamerequest
 
 Change hitbox of paddles / collision control
 Limit serving angle
@@ -62,5 +55,7 @@ Done:
 <!-- leaveGame: remove Spectators in gameService.spectatorsMap -->
 <!-- joinAndCreateGame function: x goes to queue, y invites x -> close searchbar -->
 <!-- Search for player y, log out player y, invite player y to a match -> starts game... -->
+<!-- x creates match, logs out, y joins via queue. both stuck -->
+<!-- game started, log out playerLeft, play button -->
 
 
