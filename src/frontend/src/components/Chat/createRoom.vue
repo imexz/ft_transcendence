@@ -4,10 +4,10 @@
           <input v-model="name" placeholder="Enter the name"/>
         </div>
         <div class="elem">
-          <select class="elem2" v-model="access" >
-            <option :value="Access.private"  >privat</option>
-            <option :value="Access.public" selected>public</option>
-            <option :value="Access.protected" >protected</option>
+          <select class="elem2" v-model="access">
+            <option :value="Access.private">privat</option>
+            <option :value="Access.public">public</option>
+            <option :value="Access.protected">protected</option>
           </select>
         </div>
         <div class="elem">
@@ -15,10 +15,10 @@
           <!-- <input v-else v-model="password" placeholder="Not password protected" disabled> -->
         </div>
         <div v-if="roomName == ''" class="btn">
-          <button class="elem2" type="submit" @click="createRoom">Create Room</button>
+          <button class="elem2" type="submit" @click="createOrChangeRoom">Create Room</button>
         </div>
         <div v-else>
-          <button class="elem2" type="submit" @click="changeRoom">Change Room</button>
+          <button class="elem2" type="submit" @click="createOrChangeRoom">Change Room</button>
         </div>
     </div>
 </template>
@@ -28,6 +28,12 @@ import VueAxios from 'axios';
 import { API_URL } from '@/defines';
 import { ref, defineComponent } from 'vue'
 import { Access } from '@/models/room';
+
+
+export enum roomReturn {
+    created,
+    changed
+}
 
 export default defineComponent({
   data() {
@@ -40,46 +46,41 @@ export default defineComponent({
   },
   mounted () {
     console.log("romName = ", this.roomName);
-    
+    console.log("roomAccess = ", this.roomAccess);
+    this.access = this.roomAccess 
   },
   props: {
     roomName: {
       type: String,
       default: ''
-    }
+    },
+    roomAccess: {
+      type: Number 
+    },
   },
   methods: {
-    changeRoom(): void {
-      this.$store.state.socketChat.emit('createRoom', {roomName: this.roomName, access: this.access, password: this.password},  // !!!!!!!!!!!!!!!
-        response => {
-          if(response != null) {
-            console.log(response);
-            console.log("success");
-            // this.$emit('actions', 'success');
-            console.log("rooms now", response);
-          }
-          else
-          {
-            console.error("response was null");
-            this.$emit('actions', 'error');
-          }
-        })
-
-    },
-    createRoom(): void{
+    createOrChangeRoom(): void{
       console.log("createRoom");
-      this.$store.state.socketChat.emit('createRoom', {roomName: this.name, access: this.access, password: this.password},  // !!!!!!!!!!!!!!!
+      this.$store.state.socketChat.emit('createOrChangeRoom', {roomName: this.name? this.name : this.roomName, access: this.access, password: this.password},  // !!!!!!!!!!!!!!!
         response => {
           if(response != null)
-            {console.log(response);
-            console.log("success");
-            this.$emit('actions', 'success');
-            console.log("rooms before dispatch", response);
-            this.$store.dispatch('updateRooms', response);}
-          else
           {
-            console.error("response was null");
-            this.$emit('actions', 'error');
+            switch (response.info) {
+              case roomReturn.created:
+                console.log(response);
+                console.log("rooms before dispatch", response.chatroom);
+                this.$store.dispatch('updateRooms', response.chatroom);
+                break;
+              case roomReturn.changed:
+                console.log("success");
+                this.$emit('actions', 'change');
+                
+                break;
+              default:
+                console.error("response was null");
+                this.$emit('actions', 'error');
+                break;
+            }
           }
         })
       }

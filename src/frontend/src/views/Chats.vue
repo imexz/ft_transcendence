@@ -301,11 +301,14 @@
           }
         },
         roomInfo({ roomId }) {
-          this.toggleRoomInfo();
           this.socket.emit(
             'roomInfo',
             {roomId: roomId},
-            data => { console.log("roomInfoData", data), this.roomInfoData = data}
+            data => { 
+              this.roomInfoData = data
+              console.log("roomInfoData", data)
+              this.toggleRoomInfo()
+            }
           );
         },
         roomInfoActions(emitMsg, userId, room){
@@ -348,11 +351,13 @@
           console.log("Requesting ban of:", userId, "in room:", roomId)
         },
         toggleRoomInfo() {
+          console.log("toggleRoomInfo");
           if (this.roomInfoPopUp)
             window.removeEventListener('click', this.hideRoomInfo)
           else
             window.addEventListener('click', this.hideRoomInfo)
           this.roomInfoPopUp = !this.roomInfoPopUp
+          console.log("toggleRoomInfo ende");
         },
         hideRoomInfo(e) {
           if (!this.$el.contains(e.target)) {

@@ -6,6 +6,7 @@ import { AuthService } from 'src/auth/auth.service';
 import User from 'src/users/entitys/user.entity';
 import chatroom, { Access } from 'src/chatroom/chatroom.entity';
 import { AdminAction } from 'src/users/entitys/admin.enum';
+import { roomReturn } from 'src/chatroom/chatroom.service';
 
 
 interface ServerToClientEvents {
@@ -205,17 +206,24 @@ export class ChatGateway {
     }
   }
 
-  @SubscribeMessage('createRoom')
+  @SubscribeMessage('createOrChangeRoom')
   async createRoom(
   @MessageBody('roomName') roomName: string,
   @MessageBody('access') access: Access,
   @ConnectedSocket() client: Socket,
   @MessageBody('password') password?: string,
   ) {
-    const room = await this.chatService.createRoom(client.handshake.auth as User, roomName, access, password);
-    if(room) {
-      this.server.emit('newRoom', room);
+    // console.log("roomName =", roomName);
+    
+    const room: {info: roomReturn, chatroom: chatroom} = await this.chatService.createRoom(client.handshake.auth as User, roomName, access, password);
+    console.log(room);
+    
+    if(room.info == roomReturn.created) {
+      this.server.emit('newRoom', room.chatroom);
       return room
+    } else if (room.info == roomReturn.changed) {
+      
+      console.log("room changed");
     }
     else {
       console.log("room == empty");

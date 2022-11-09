@@ -10,7 +10,7 @@
           <font-awesome-icon icon="fa-solid fa-x" />
         </button>
       </div>
-      <input 
+      <input
         type="text"
         class="searchInput"
         placeholder="username"
@@ -18,7 +18,7 @@
         ref="searchInput" />
       <div class="searchResults"
         v-if="searchQuery != ''">
-        <UserSummary
+        <UserSummary @actions="toggleSearchBar"
           class="searchResult"
           v-for="user in filteredUsers()"
           :user = user />
@@ -49,7 +49,7 @@ export default defineComponent({
   },
   methods: {
     filteredUsers() {
-      return this.users.filter((user) => 
+      return this.users.filter((user) =>
         user.username.toLowerCase().includes(this.searchQuery.toLocaleLowerCase()))
     },
     hideOnClick(e) {
@@ -122,7 +122,7 @@ export default defineComponent({
     background-color: var(--ft_dark);
     border-radius: 10px;
   }
-  
+
   .headLineWrapper {
     margin-top: 15px;
     margin-bottom: 15px;
@@ -153,10 +153,10 @@ export default defineComponent({
     color: var(--ft_dark);
     background-color: var(--ft_pink);
   }
-  
+
   .searchInput {
     height: 60px;
-    width: 380px; 
+    width: 380px;
     color: var(--ft_cyan);
     background-color: var(--ft_dark);
     font-size: 25px;

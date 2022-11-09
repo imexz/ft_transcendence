@@ -1,26 +1,28 @@
 <template>
+<div v-if="dataRdy">
   <div v-show="this.$store.state.game != null">
-      <GamePlayers/>
-    <div v-if="this.$store.state.winner == null" class="gameCanvas">
-      <div>
+		<GamePlayers/>
+		<div v-if="this.$store.state.winner == null" class="gameCanvas">
+			<div>
         <Field @assignWinner="assignWinner"/>
-      </div>
+	</div>
       <div v-show="this.$store.state.user.id!=this.$store.state.game?.playerRight?.id && this.$store.state.user.id!=this.$store.state.game?.playerLeft?.id"  class="leaveGame">
         <button @click="leaveGame"> Leave </button>
       </div>
     </div>
-	</div>
-	<div class="queue" v-show="this.$store.state.game == null && this.$store.state.winner == null">
-    <text> Waiting for a match... </text>
-		<button @click="leaveGame"> Leave </button>
-	</div>
-  <div v-if="this.$store.state.winner != null && this.$store.state.game == null">
-        <Result :winner = this.$store.state.winner @newGame="newGame" />
   </div>
+  <div class="queue" v-show="this.$store.state.game == null && this.$store.state.winner == null">
+    <text> Waiting for opponent... </text>
+	<br>
+	<button @click="leaveGame"> Leave </button>
+  </div>
+  <div v-if="this.$store.state.winner != null && this.$store.state.game == null">
+	<Result :winner = this.$store.state.winner @newGame="newGame" />
+  </div>
+</div>
 </template>
 
 <script lang="ts">
-  import { Socket } from "socket.io-client";
   import { defineComponent } from 'vue';
   import Game from '@/models/game';
   import GamePlayers from './GamePlayers.vue'
@@ -30,9 +32,9 @@
 
 
   export default defineComponent({
-  	data () {
+  	data() {
   		return {
-			  // winner: null as User,
+		dataRdy: false,
         fps: 0,
   		}
   	},
@@ -42,35 +44,40 @@
       Field
     },
   	created() {
-  		console.log("in created"); 
-  		this.$store.state.socketGame.on('Game', (game: Game) => {
-        console.log(game)
-        this.assignGame(game)
-		  });
-      if (this.$store.state.game == null && this.$store.state.winner == null) {
-        this.$store.state.socketGame.emit('checkGame', (game: Game) => {
-          console.log(game)
-        });
-      }
+  		console.log("in created");
   	},
-  	mounted() {
+  	async mounted() {
   		console.log("mounted");
+		await this.initGameInfoListener();
+      	if (this.$store.state.game == null && this.$store.state.winner == null) {
+        	this.$store.state.socketGame.emit('isInGame');
+     	}
+		this.dataRdy = true;
   	},
 		beforeUpdate() {
   		console.log("beforeUpdate");
       if (this.$store.state.game == null && this.$store.state.winner == null) {
-        this.$store.state.socketGame.emit('checkGame', (game: Game) => {
+        this.$store.state.socketGame.emit('isInGame', (game: Game) => {
           console.log(game);
         });
       }
-		  console.log("leaving beforeUpdate");
+		console.log("leaving beforeUpdate");
 	  },
   	unmounted() {
-  		console.log("in unmount");
-      this.$store.state.socketGame.emit('Quit')
-      this.$store.state.socketGame.off('Game')
+  	  console.log("in unmount");
+      this.$store.state.socketGame.emit('quitPendingGame')
+      this.$store.state.socketGame.off('GameInfo')
   	},
   	methods: {
+	  async initGameInfoListener() {
+		while (!this.$store.state.socketGame) {
+			await new Promise(r => setTimeout(r, 100));
+		}
+		this.$store.state.socketGame.on('GameInfo', (game: Game) => {
+        	console.log(game)
+        	this.assignGame(game)
+		});
+	  },
       newGame(){
         console.log("newGame");
         this.$store.state.winner = null
@@ -86,14 +93,16 @@
         }
       },
       keyEvents(event) {
-        if (!this.finished) {
+        // if (!this.finished) {
           console.log(event.key);
           this.$store.state.socketGame.emit('key', event.key)
-        }
+        // }
       },
       leaveGame() {
         this.$store.state.socketGame.emit('leaveGame');
         this.$store.state.game = null
+		this.$store.state.pendingRequest = false
+		this.$store.winner = null
         this.$router.push("/");
       }
   	}

@@ -8,7 +8,7 @@
     </div>
     <div class="headLine" >Role: {{getRole}} </div>
     <div v-if="getRole == 'owner'">
-      <CreateRoom :roomName=room.roomName> </CreateRoom>
+      <CreateRoom :roomName=room.roomName :roomAccess=room.access> </CreateRoom>
     </div>
     <div class="userGroup">Admins</div>
     <div class="user" v-for="user in room?.admins">
@@ -59,6 +59,10 @@ export default defineComponent({
       AdminAction
     }
   },
+  mounted() {
+    console.log("Room in room info");
+    
+  },
   updated() {
     // this.room = this.roomInfo?.room;
   },
@@ -87,9 +91,9 @@ export default defineComponent({
     }
   },
   methods: {
-    changeRoomAccess() {
-      this.$store.state.socketChat.emit('changeRoomAccess', {roomName: this.name, access: this.access, password: this.password},  // !!!!!!!!!!!!!!!
-    },
+    // changeRoomAccess() {
+    //   this.$store.state.socketChat.emit('changeRoomAccess', {roomName: this.name, access: this.access, password: this.password}  // !!!!!!!!!!!!!!!
+    // },
     reEmit(emiType: AdminAction, userId){
       console.log(emiType, userId);
       
