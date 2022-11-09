@@ -111,10 +111,10 @@ export class ChatGateway {
     console.log("hoho", roomId);
 
 
-    const room_name = await this.chatService.getRoomName(roomId)
+    // const room_name = await this.chatService.getRoomName(roomId)
 
-    client.leave(room_name);
-    this.chatService.manageLeave(client.handshake.auth.id, room_name)
+    client.leave(roomId.toString());
+    this.chatService.manageLeave(client.handshake.auth.id, roomId)
   }
 
   @SubscribeMessage('typing')

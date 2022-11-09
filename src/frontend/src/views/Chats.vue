@@ -301,15 +301,18 @@
           }
         },
         roomInfo({ roomId }) {
-          this.socket.emit(
-            'roomInfo',
-            {roomId: roomId},
-            data => { 
-              this.roomInfoData = data
-              console.log("roomInfoData", data)
+          // this.socket.emit(
+          //   'roomInfo',
+          //   {roomId: roomId},
+          //   data => { 
+          //     this.roomInfoData = data
+          //     console.log("roomInfoData", data)
+          //     this.toggleRoomInfo()
+          //   }
+          // );
+          this.roomInfoData = this.$store.state.rooms.find(elem => elem.roomId == roomId)
+          if(this.roomInfoData != undefined)
               this.toggleRoomInfo()
-            }
-          );
         },
         roomInfoActions(emitMsg, userId, room){
           switch(emitMsg){

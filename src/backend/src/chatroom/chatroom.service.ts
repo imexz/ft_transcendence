@@ -220,23 +220,24 @@ export class ChatroomService {
         }
     }
 
-    async removeUserFromChatroom(user: User, roomId: string | number) {
+    async removeUserFromChatroom(user: User, roomId: number) {
         // console.log("removeUserFromChatroom");
 
         if(user != undefined && roomId != undefined) {
-            const test = typeof roomId === 'string' ? {roomName: roomId} : {roomId: roomId}
             const room = await this.chatroomRepository.findOne(
                 {
-                        where: test,
+                    where: {
+                        roomId: roomId
+                    }, 
                     relations: {
                         owner: true,
                         admins: true,
                         users: true
                     }
                 })
-            if(room.owner.id == user.id) {
-                console.log("user is owner");
-            }
+            // if(room.owner.id == user.id) {
+            //     console.log("user is owner");
+            // }
             // console.log(user);
             // console.log(room.owner);
 
