@@ -21,14 +21,14 @@ export default defineComponent({
     },
     methods:{
         accept(){
-            this.$store.state.winner = null
-            this.$store.state.socketGame.emit("accept")
-            this.$store.state.requester = null
-            this.$router.push('/play')
+          this.$store.state.socketGame.emit("accept")
+          this.$store.state.winner = null
+          this.$store.state.requester = null
+          this.$router.push('/play')
         },
         refuse(){
-            this.$store.state.socketGame.emit("denied")
-            this.$store.state.requester = null
+          this.$store.state.socketGame.emit("denied")
+          this.$store.state.requester = null
         }
     }
 })

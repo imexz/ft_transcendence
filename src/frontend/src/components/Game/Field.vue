@@ -182,17 +182,6 @@ export default defineComponent({
         this.gameData.paddleRight = data.paddleRight;
       },
       updateBall(data: any) {
-        // console.log("ball");
-        // const currentTime = Date.now()
-
-        // const difference: number = currentTime - this.timestamp;
-        // console.log(difference >  0 ? 1000 / difference : "difference 0");
-        // // if (difference <= 0)
-        // //   return
-        
-        // this.timestamp = currentTime;
-        //this is updating the Date-> independent of drawing loop
-        // console.log("callback updateGame");
 		    if (data === undefined) {
           console.log("data undefined");
           // this.gameExists = false;
@@ -200,15 +189,7 @@ export default defineComponent({
 			    this.right = 0;
         	return;
         }
-		    // this.gameData.score.scoreLeft = data.score.scoreLeft;
-		    // this.gameData.score.scoreRight = data.score.scoreRight;
-        // console.log(this.gameData.score.scoreLeft, this.gameData.score.scoreRight);
-
         this.gameData.ball = data;
-        
-        // this.gameData.paddleLeft = data.paddleLeft;
-        // this.gameData.paddleRight = data.paddleRight;
-        
       },
 	    isGameFinished(): boolean {
 		    return this.gameData.score.scoreLeft == 3 || this.gameData.score.scoreRight == 3

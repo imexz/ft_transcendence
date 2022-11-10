@@ -3,15 +3,12 @@ import { Game, Side } from './game.entities/game.entity';
 import { Paddle } from './game.entities/paddle.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Socket, Server } from 'socket.io';
+import { Server, Socket } from 'socket.io';
 import { GameSetup } from './game.entities/setup.entity';
-import { QueueElem } from './game.interfaces/queueobj.interface'
 import { UsersService } from 'src/users/users.service';
 import User from 'src/users/entitys/user.entity';
-import { GameData } from './game.entities/gameData';
 import { UserStatus } from "../users/entitys/status.enum";
 import { GameGateway } from './game.gateway';
-import { Ball } from './game.entities/ball.entity';
 
 @Injectable()
 export class GameService {
@@ -112,12 +109,10 @@ export class GameService {
 	}	
 
 	async getData(game: Game): Promise<Game | undefined> {
-		// console.log("getData");
-
 		if (game == undefined) {
 			return undefined;
 		}
-		this.updateData(game)
+		this.updateBall(game)
 		this.collisionControl(game);
 		if (this.scored(game)){
 			this.reset(game);
@@ -126,23 +121,9 @@ export class GameService {
 		await this.isGameFinished(game);
 		return game
 	}
-	updateData(game: Game) {
-		// let game: Game = this.games.get(id);
+	updateBall(game: Game) {
 		game.ball.position.x += game.ball.direction.x;
 		game.ball.position.y += game.ball.direction.y;
-		// if (this.ball.direction.x > 0) {
-		// 	if (this.ball.position.x + this.ball.radius >= 640) {
-		// 		this.ball.position.x = 640 - this.ball.radius;
-		// 		this.ball.direction.x *= -1;
-		// 	}
-		// }
-		// else {
-		// 	if (this.ball.position.x - this.ball.radius <= 0) {
-		// 		this.ball.position.x = 0 + this.ball.radius;
-		// 		this.ball.direction.x *= -1;
-		// 	}
-
-		// }
 		if (game.ball.direction.y > 0) {
 			if (game.ball.position.y + game.ball.radius >= 480) {
 				game.ball.position.y = 480 - game.ball.radius;
@@ -155,7 +136,6 @@ export class GameService {
 				game.ball.direction.y *= -1;
 			}
 		}
-		// console.log("gameid: %d | ball: x %d, y %d", id, game.ball.position.x, game.ball.position.y);
 	}
 	isBallWithinPaddleRange(game: Game, paddle: Paddle): boolean {
 		return (game.ball.position.y >= paddle.position.y &&
@@ -163,7 +143,6 @@ export class GameService {
 	}
 	isBallAtPaddle(game: Game, paddle: Paddle): boolean {
 		let ret: boolean = false;
-		// let game: Game = this.games.get(id);
 		if (paddle.id == "left") {
 			ret = game.ball.position.x - game.ball.radius <= paddle.position.x + paddle.width;
 		} else if (paddle.id == "right") {
@@ -173,7 +152,6 @@ export class GameService {
 	}
 	calcAngle(game: Game, paddle: Paddle) {
 		var section: number;
-		// let game: Game = this.games.get(id);
 
 		section = paddle.height / 8;
 		if (this.isBallWithinPaddleRange(game, paddle)) {
@@ -186,12 +164,10 @@ export class GameService {
 	}
 	updateBallDirection(game: Game, paddle: Paddle) {
 		this.calcAngle(game, paddle);
-		// let game: Game = this.games.get(id);
 		game.ball.direction.x = game.ball.direction.speed * Math.cos(game.ball.direction.angle * (Math.PI / 180));
 		game.ball.direction.y = game.ball.direction.speed * Math.sin(game.ball.direction.angle * (Math.PI / 180));
 	}
 	collisionControl(game: Game) {
-		// var game: Game = this.games.get(id);
 		if (game.ball.direction.x > 0) {
 			if (this.isBallAtPaddle(game, game.paddleRight) &&
 				this.isBallWithinPaddleRange(game, game.paddleRight)) {
@@ -207,7 +183,6 @@ export class GameService {
 	}
 	scored(game: Game): boolean {
 		var ret: boolean = false;
-		// let game: Game = this.games.get(id);
 		if (game.ball.position.x - game.ball.radius <= 0) {
 			game.score.scoreRight += game.score.increaseRight;
 			game.scoreRight += game.score.increaseRight;
@@ -264,7 +239,7 @@ export class GameService {
 	}
 
 	removeGame(game: Game): boolean {
-		game.spectators.forEach((element: number) => {this.spectatorsMap.delete(element)})
+		game.spectators.forEach(async (element: number) =>  { this.spectatorsMap.delete(element) })
 		const index = this.gamesArr.indexOf(game, 0);
 		if (index > -1) {
 			this.gamesArr.splice(index, 1);
@@ -295,7 +270,6 @@ export class GameService {
 	}
 
 	movePaddleUp(game: Game, side: Side) {
-		// console.log("movePaddleUp", side);
 		if (side == Side.left) {
 			if (game.paddleLeft.position.y > 0)
 				game.paddleLeft.position.y -= game.paddleLeft.speed;
@@ -307,7 +281,6 @@ export class GameService {
 		this.gameGateway.server.to(game.id.toString()).emit('updatePaddle', {paddleRight: game.paddleRight, paddleLeft: game.paddleLeft})
 	}
 	movePaddleDown(game: Game, side: Side) {
-		// console.log("movePaddleDown", side);
 		if (side == Side.left) {
 			if (game.paddleLeft.position.y < (480 - game.paddleLeft.height))
 				game.paddleLeft.position.y += game.paddleLeft.speed;

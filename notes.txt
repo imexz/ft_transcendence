@@ -1,15 +1,14 @@
 Topics:
 
-
-spectating with pending invite. denies, spectator still in field view
-Spectator: Winning Screen shows "askForRematch" Button
-sending someone spectating a gamerequest
-
-Change hitbox of paddles / collision control
+invite spectating user. starts game if accepted, but spectator needs to reload..
 
 implement game settings
 
 implement game customization
+
+Change hitbox of paddles / collision control (?)
+
+
 
 Ideas:
     do not change view when adding user as friend
@@ -34,5 +33,8 @@ game started, log out playerLeft, play button
 emit only ball, paddle and score on demand 
 implement askForRematch
 Limit serving angle
+Spectator: Winning Screen disable "askForRematch" Button
+sending someone spectating a gamerequest
+spectating with pending invite. denies, spectator still in field view
 
 

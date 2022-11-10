@@ -35,9 +35,9 @@ export default defineComponent({
             
             if (this.$store.state.user.id === this.winner.id) {
                 user = this.loser;
-            } else {
+            } else if (this.$store.state.user.id === this.loser.id) {
                 user = this.winner;
-            }
+            } else { return }
             this.$store.state.pendingRequest = false;
             this.$store.state.socketGame.emit('GameRequestBackend', {id: user.id}, (r) => {
                 this.$store.state.winner = null;
