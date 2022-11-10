@@ -59,8 +59,10 @@ export default createStore<State>({
   mutations: {
     logOut(state) {
       state.validated = false;
+      console.log("store logOut()");
+      state.socketGame.emit('leaveGame')
       state.socket.disconnect();
-	  state.socketGame.disconnect(); //added
+	    state.socketGame.disconnect(); //added
     },
     logIn(state, user) {
       // console.log("logIn");
@@ -89,10 +91,10 @@ export default createStore<State>({
       console.log("game socket init");
       console.log(document.cookie);
 
-	  state.socketGame.on('disconnecting', () => {
-		console.log("game socket disconnecting");
-		console.log(state.socketGame.rooms);
-	  })
+	    state.socketGame.on('disconnecting', () => {
+		    console.log("game socket disconnecting");
+		    console.log(state.socketGame.rooms);
+	    })
 
       state.socketChat.on('message',() => {
         state.NrMessages++
@@ -101,16 +103,30 @@ export default createStore<State>({
       state.socketChat.on('newMessage',(data) => {
         console.log("newMessage received:");
 
-        console.log(data.roomId, data.message)
-        state.rooms[data.roomId].messages[state.rooms[data.roomId].messages.length] = new Message(data.message)
+        let room = state.rooms.find(elem => elem.roomId == data.roomId)
+        if (room)
+        {
+          ++room.unreadCount
+          console.log(data.roomId, data.message, room.unreadCount)
+          room.messages[room.messages.length] = new Message(data.message)
+        }
+        else
+          console.log("room for new Message not found");
       })
 
       state.socketChat.on('newRoom',(data) => {
         console.log("newRoom received:", data);
-
-        state.rooms[state.rooms.length] = data
+        state.rooms[state.rooms.length] = new Room(data)
       })
 
+      state.socketChat.on('changedRoom',(data) => {
+        console.log("changedRoom received:", data);
+        let room = state.rooms.find(elem => elem.roomId == data.roomId)
+        if (room)
+        {
+          room = new Room(data)
+        }
+      })
 
       state.socketGame.on('GameRequestFrontend',(user: User) => {
         state.requester = user;
@@ -120,23 +136,22 @@ export default createStore<State>({
         // state.game = game;
         console.log("receive NowInGame");
         if (cb) {
-			state.pendingRequest = false;
-			router.push('/play')
-		}
-        else {
+			    state.pendingRequest = false;
+			    router.push('/play')
+		    } else {
           state.game = null;
           state.pendingRequest = false;
           router.push('/')
         }
       })
-	  state.socketGame.on('canceled', () => {
-		console.log("receive invite canceled");
-		state.requester = null;
-		state.pendingRequest = false;
-	  })
+	    state.socketGame.on('resetRequester', () => {
+		    console.log("receive resetRequester");
+		    state.requester = null;
+		    state.pendingRequest = false;
+	    })
       state.socket.on('Request',(data) => {
         state.friendsList.push(data)
-          console.log("receive  request");
+        console.log("receive  request");
       })
     },
     changeUserName(state, username) {
@@ -147,7 +162,6 @@ export default createStore<State>({
     },
     setFriendsList(state, friendsList) {
       // console.log(friendsList);
-
       state.friendsList = friendsList;
     },
     addFriend(state, user) {
@@ -160,8 +174,7 @@ export default createStore<State>({
     },
     setRooms(state, rooms: any) {
       state.rooms = [] as Room[]
-      for (let i = 0; i < rooms.length; ++i)
-      {
+      for (let i = 0; i < rooms.length; ++i) {
         state.rooms[i] = new Room(rooms[i])
       }
       console.log("ROOMS: ", rooms, rooms[0] instanceof Room)
@@ -207,7 +220,6 @@ export default createStore<State>({
     updateRooms({ commit }, room ) {
       console.log("index.rooms", room);
       commit('addRoom', room);
-
     },
     // askForMatch(){
     //   this.$store.state.socketGame.emit('Request', {id: this.user._id}, (r) => {

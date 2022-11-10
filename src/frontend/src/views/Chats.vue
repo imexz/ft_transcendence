@@ -19,7 +19,9 @@
       :show-files="false"
       :show-reaction-emojis="true"
       :room-info-enabled="true"
+      :show-new-messages-divider="false"
       :styles="JSON.stringify(style)"
+      :spinner-icon-messages="{}"
       @send-message="sendMessage($event.detail[0])"
       @send-message-reaction="sendMessageReaction($event.detail[0])"
       @add-room="toggleCreateRoom"
@@ -114,6 +116,10 @@
         Toast,
       },
       methods: {
+        async initChatInfoListener() {
+      while (!this.$store.state.socketChat || !this.$store.state.rooms) {
+        await new Promise(r => setTimeout(r, 100));
+      }},
         changeSuccess(msg: string) {
           this.showToast = true;
           this.toastMsg = msg;
@@ -126,15 +132,15 @@
           this.toastMode = 'error';
           setTimeout(() => this.showToast = false, 2000);
         },
-        async putMessages({room}) {
+        putMessages({room}) {
           console.log("putMessages");
           this.currentRoomId = room.roomId
           this.updateMessages(room.roomId)
           // this.messagesLoaded = true;
         },
 
-        async updateMessages(roomId) {
-          console.log("updateMessages");
+        updateMessages(roomId) {
+          console.log("updateMessages", this.messagesLoaded);
           console.log(roomId);
           // this.socket.emit('findAllMessages', {roomId: roomId}, (response) => {
           //   console.log("mesages_old: ", response);
@@ -143,7 +149,7 @@
           //   this.messages = response;
           //   this.messagesLoaded = true;
           // })
-          console.log("rooms:", this.rooms);
+          // console.log("rooms:", this.rooms);
           for (let i = 0; i < this.rooms.length; ++i)
           {
             if (this.rooms[i].roomId == roomId) {
@@ -151,8 +157,13 @@
                 this.messages = this.rooms[i].messages
             }
           }
-          console.log("messages_new:", this.messages);
+          console.log("messages of room:", roomId, this.messages);
 
+          let room = this.$store.state.rooms.find(elem => elem.roomId == roomId)
+          // room.messagesLoaded = true
+          // console.warn(this.$store.state.rooms.find(elem => elem.roomId == roomId));
+
+          room.unreadCount = 0;
           this.messagesLoaded = true;
           console.log("endeende");
 
@@ -178,7 +189,7 @@
           })
         },
         toggleCreateRoom() {
-          console.log(this.createRoomPopUp)
+          console.log("pupUp isOpen:", this.createRoomPopUp)
           if (this.createRoomPopUp)
             window.removeEventListener('click', this.hideCreateRoom)
           else
@@ -251,7 +262,7 @@
                 // .catch()
             this.rooms = this.$store.getters.getRooms;
             this.fillMessagesData();
-            console.log("rooms: ", this.rooms);
+            console.log("get rooms: ", this.rooms);
 
         },
         initSocket(){
@@ -279,7 +290,7 @@
                     console.log(result);
                     console.log("roomIdFrontend", roomId);
 
-                    this.socket.emit('join', {roomId: roomId, password: result}, (response)=> {this.messages = response})
+                    this.socket.emit('join', {roomId: roomId, password: result}, (response)=> {this.room = response})
 
                     console.log(this.messages);
 
@@ -423,7 +434,8 @@
         this.initSocket();
         console.log("beforeMount", this.socket);
       },
-      mounted() {
+      async mounted() {
+        await this.initChatInfoListener()
         console.log("MOUNT", this.socket)
         if (this.socket === null){
           this.$router.push('/login')
@@ -435,17 +447,20 @@
           const room = this.rooms.find((room) => {
             return room.roomId === roomId
           })
-          console.log(room.roomId)
-          console.log(isTyping)
-          console.log(userId)
+          console.log("roomId", room.roomId)
+          console.log("bool", isTyping)
+          console.log("userId", userId)
 
-          console.log(room.typingUsers)
+          console.log("array of typing users", room.typingUsers)
           if(isTyping) {
-            console.log(room.typingUsers)
+            console.log("before", room.typingUsers)
             if(room.typingUsers == undefined || room.typingUsers.length == 0)
               room.typingUsers = [ userId ]
             else if(room.typingUsers.indexOf(userId) == -1)
-              room.typingUsers = [...room.typingUsers, userId]
+              room.typingUsers = [ ...room.typingUsers, userId ]
+
+            console.log("after", room.typingUsers);
+
 
           } else {
             const typingUsers = []
@@ -461,22 +476,22 @@
           console.log("ende typing");
         });
 
-        this.socket.on('message',({message, roomId}) => {
-          console.log('message');
-          console.log(message);
-          console.log(roomId);
-          console.log(this.currentRoomId);
-          if(this.currentRoomId == roomId) {
+        // this.socket.on('message',({message, roomId}) => {
+        //   console.log('message');
+        //   console.log(message);
+        //   console.log(roomId);
+        //   console.log(this.currentRoomId);
+        //   if(this.currentRoomId == roomId) {
 
-            console.log("this.currentRoomId == roomId");
-            this.addMessage(message)
-            console.log("this.currentRoomId == roomId behind");
-          } else {
-            console.log("message for an other room");
-          }
-          console.log("message ende");
+        //     console.log("this.currentRoomId == roomId");
+        //     this.addMessage(message)
+        //     console.log("this.currentRoomId == roomId behind");
+        //   } else {
+        //     console.log("message for an other room");
+        //   }
+        //   console.log("message ende");
 
-        });
+        // });
 
         this.getRooms();
         this.currentUserId = this.$store.getters.getUser.id;

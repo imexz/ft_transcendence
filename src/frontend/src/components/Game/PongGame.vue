@@ -34,7 +34,7 @@
   export default defineComponent({
   	data() {
   		return {
-		dataRdy: false,
+		    dataRdy: false,
         fps: 0,
   		}
   	},
@@ -48,36 +48,33 @@
   	},
   	async mounted() {
   		console.log("mounted");
-		await this.initGameInfoListener();
-      	if (this.$store.state.game == null && this.$store.state.winner == null) {
-        	this.$store.state.socketGame.emit('isInGame');
+		  await this.initGameInfoListener();
+      if (this.$store.state.game == null && this.$store.state.winner == null) {
+        this.$store.state.socketGame.emit('isInGame');
      	}
-		this.dataRdy = true;
+		  this.dataRdy = true;
   	},
 		beforeUpdate() {
   		console.log("beforeUpdate");
       if (this.$store.state.game == null && this.$store.state.winner == null) {
-        this.$store.state.socketGame.emit('isInGame', (game: Game) => {
-          console.log(game);
-        });
+        this.$store.state.socketGame.emit('isInGame');
       }
-		console.log("leaving beforeUpdate");
+		  console.log("leaving beforeUpdate");
 	  },
   	unmounted() {
   	  console.log("in unmount");
-      this.$store.state.socketGame.emit('quitPendingGame')
-      this.$store.state.socketGame.off('GameInfo')
+      this.$store.state.socketGame?.off('GameInfo')
   	},
   	methods: {
-	  async initGameInfoListener() {
-		while (!this.$store.state.socketGame) {
-			await new Promise(r => setTimeout(r, 100));
-		}
-		this.$store.state.socketGame.on('GameInfo', (game: Game) => {
-        	console.log(game)
-        	this.assignGame(game)
-		});
-	  },
+	    async initGameInfoListener() {
+		    while (!this.$store.state.socketGame) {
+		  	  await new Promise(r => setTimeout(r, 100));
+		    }
+		    this.$store.state.socketGame.on('GameInfo', (game: Game) => {
+          console.log(game)
+          this.assignGame(game)
+		    });
+	    },
       newGame(){
         console.log("newGame");
         this.$store.state.winner = null
@@ -89,7 +86,7 @@
       assignGame(game: Game) {
         this.$store.state.game = game
         if (this.$store.state.game.playerRight != undefined) {
-  			  document.addEventListener('keydown', this.keyEvents, false);
+  	  	  document.addEventListener('keydown', this.keyEvents, false);
         }
       },
       keyEvents(event) {
@@ -101,8 +98,8 @@
       leaveGame() {
         this.$store.state.socketGame.emit('leaveGame');
         this.$store.state.game = null
-		this.$store.state.pendingRequest = false
-		this.$store.winner = null
+		    this.$store.state.pendingRequest = false
+		    this.$store.winner = null
         this.$router.push("/");
       }
   	}

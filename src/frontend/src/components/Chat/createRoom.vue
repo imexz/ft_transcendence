@@ -47,7 +47,7 @@ export default defineComponent({
   mounted () {
     console.log("romName = ", this.roomName);
     console.log("roomAccess = ", this.roomAccess);
-    this.access = this.roomAccess 
+    this.access = this.roomAccess
   },
   props: {
     roomName: {
@@ -55,7 +55,7 @@ export default defineComponent({
       default: ''
     },
     roomAccess: {
-      type: Number 
+      type: Number
     },
   },
   methods: {
@@ -63,7 +63,7 @@ export default defineComponent({
       console.log("createRoom");
       this.$store.state.socketChat.emit('createOrChangeRoom', {roomName: this.name? this.name : this.roomName, access: this.access, password: this.password},  // !!!!!!!!!!!!!!!
         response => {
-          if(response != null)
+          if(response.chatroom != undefined)
           {
             switch (response.info) {
               case roomReturn.created:
@@ -74,13 +74,18 @@ export default defineComponent({
               case roomReturn.changed:
                 console.log("success");
                 this.$emit('actions', 'change');
-                
+
                 break;
               default:
-                console.error("response was null");
-                this.$emit('actions', 'error');
+                console.log("hit default in createOrChangeRoom");
+
                 break;
             }
+          }
+          else
+          {
+            console.log("response was null");
+            this.$emit('actions', 'error');
           }
         })
       }
