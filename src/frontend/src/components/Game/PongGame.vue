@@ -17,7 +17,7 @@
 	<button @click="leaveGame"> Leave </button>
   </div>
   <div v-if="this.$store.state.winner != null && this.$store.state.game == null">
-	<Result :winner = this.$store.state.winner @newGame="newGame" />
+	<Result :winner = this.$store.state.winner :loser = this.$store.state.loser @newGame="prepareNewGame" />
   </div>
 </div>
 </template>
@@ -49,15 +49,15 @@
   	async mounted() {
   		console.log("mounted");
 		  await this.initGameInfoListener();
-      if (this.$store.state.game == null && this.$store.state.winner == null) {
-        this.$store.state.socketGame.emit('isInGame');
-     	}
+      // if (this.$store.state.game == null && this.$store.state.winner == null) {
+      //   this.$store.state.socketGame.emit('isInGame');
+     	// }
 		  this.dataRdy = true;
   	},
-		beforeUpdate() {
+		async beforeUpdate() {
   		console.log("beforeUpdate");
       if (this.$store.state.game == null && this.$store.state.winner == null) {
-        this.$store.state.socketGame.emit('isInGame');
+        await this.$store.state.socketGame.emit('isInGame');
       }
 		  console.log("leaving beforeUpdate");
 	  },
@@ -75,13 +75,15 @@
           this.assignGame(game)
 		    });
 	    },
-      newGame(){
+      prepareNewGame(){
         console.log("newGame");
         this.$store.state.winner = null
+        this.$store.state.loser = null
       },
-      assignWinner(winner: User) {
+      assignWinner(data: {winner: User, loser: User}) {
         console.log("assignWinner");
-        this.$store.state.winner = winner
+        this.$store.state.winner = data.winner
+        this.$store.state.loser = data.loser
       },
       assignGame(game: Game) {
         this.$store.state.game = game
@@ -100,6 +102,7 @@
         this.$store.state.game = null
 		    this.$store.state.pendingRequest = false
 		    this.$store.winner = null
+        this.$store.loser = null
         this.$router.push("/");
       }
   	}
