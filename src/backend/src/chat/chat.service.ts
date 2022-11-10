@@ -2,12 +2,12 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { message } from '../message/message.entity';
 import { UsersService } from 'src/users/users.service';
-import { ChatroomService } from 'src/chatroom/chatroom.service';
+import { ChatroomService, roomReturn } from 'src/chatroom/chatroom.service';
 import { MessageService } from 'src/message/message.service';
 import User from 'src/users/entitys/user.entity';
 import { BanMuteService } from 'src/chatroom/banMute/banMute.service';
 import { AdminAction } from 'src/users/entitys/admin.enum';
-import { Access } from 'src/chatroom/chatroom.entity';
+import chatroom, { Access } from 'src/chatroom/chatroom.entity';
 
 @Injectable()
 export class ChatService {
@@ -26,7 +26,9 @@ export class ChatService {
           return true
           break;
         case AdminAction.muted:
+          
           this.banMuteService.mut(await this.usersService.getUser(UserId), room)
+
           break;
         case AdminAction.toAdmin:
           this.chatroomService.addRoomAdmin(room, UserId)
@@ -43,14 +45,20 @@ export class ChatService {
 
 
   async creatRoomDM(user: User, id: number, content: string) {
+    console.log("undefind = ", user, id );
+    
     if(user != undefined && id != undefined)
     {
       // console.log(content);
 
       const user1 = await this.usersService.getUser(id)
-      const chatroom = await this.chatroomService.findOrCreatDM(user, user1)
-      this.messageService.userAddMessageToRoom(user, content, chatroom.chatroom)
-    }
+      const chat: {info: roomReturn, chatroom: chatroom} = await this.chatroomService.findOrCreatDM(user, user1)
+      if(chat != undefined)
+        this.messageService.userAddMessageToRoom(user, content, chat.chatroom)
+      else 
+        console.log("chat == undeinfd");
+        
+      }
   }
 
   async createRoomInfo(roomId: number, id: any) {

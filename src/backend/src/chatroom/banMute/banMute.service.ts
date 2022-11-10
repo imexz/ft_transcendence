@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import User from 'src/users/entitys/user.entity';
-import chatroom from '../chatroom.entity';
+import chatroom, { Access } from '../chatroom.entity';
 import { ChatroomService } from '../chatroom.service';
 import { banMute } from './banMute.entity';
 import { AdminAction } from 'src/users/entitys/admin.enum';
@@ -16,7 +16,20 @@ export class BanMuteService {
         private banMuteRepository: Repository<banMute>,
         ) {}
         
-        mut( user: User, chatroom: chatroom) {
+        async mut( user: User, chatroom: chatroom) {
+            if (chatroom.access == Access.dm) {
+                const mute = await this.banMuteRepository.findOne({where: {
+                    chatroom: {
+                        roomId: chatroom.roomId
+                    },
+                    user:{
+                        id: user.id
+                    } 
+                }})
+                if (mute != undefined) {
+                    this.unMute(user.id, chatroom)
+                }
+            }
             
             var mute = this.banMuteRepository.create()
             mute.user = user
