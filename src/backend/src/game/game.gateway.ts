@@ -80,7 +80,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	  		game = await this.gameService.joinGameOrCreateGame(client.handshake.auth as User, this.server)
 	  	} else {
 	  		console.log("client is spectating");
-        client.emit('updatePaddle', {paddleLeft: game.paddleLeft, paddleRight: game.paddleRight})
+        // client.emit('updatePaddle', {paddleLeft: game.paddleLeft, paddleRight: game.paddleRight})
 	  	}
 	  } else {
 	  	console.log("client is playing");
@@ -125,6 +125,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	  	}
 	  }
 	  client.join(game.id.toString());
+    console.log("gameRequest end");
 	  return ret
   }
 

@@ -11,6 +11,7 @@ import User from 'src/users/entitys/user.entity';
 import { GameData } from './game.entities/gameData';
 import { UserStatus } from "../users/entitys/status.enum";
 import { GameGateway } from './game.gateway';
+import { Ball } from './game.entities/ball.entity';
 
 @Injectable()
 export class GameService {
@@ -92,7 +93,7 @@ export class GameService {
 		this.userService.setStatus(game.playerRight.id, UserStatus.PLAYING);
 		server.to(game.id.toString()).emit('GameInfo', game)
 		console.log("startGame");
-		game.interval = setInterval(() => this.emitGameData(game, server), 16) as unknown as number;
+		game.interval = setInterval(() => this.emitGameData(game, server), 1) as unknown as number;
 		this.gameGateway.server.to(game.id.toString()).emit('updatePaddle', {paddleRight: game.paddleRight, paddleLeft: game.paddleLeft})
 		console.log("startGame end");
 	}
@@ -108,7 +109,7 @@ export class GameService {
 			console.log("emitGameData: closeRoom");
 			this.gameGateway.closeRoom(game.id.toString());
 		}
-	}
+	}	
 
 	async getData(game: Game): Promise<Game | undefined> {
 		// console.log("getData");
@@ -219,22 +220,20 @@ export class GameService {
 		}
 		return ret;
 	}
+
+	isDirectionValid(angle: number): boolean {
+		return (angle <= Math.PI / 4 || angle >= 7 * Math.PI / 4 || (angle >= 3 * Math.PI / 4 && angle <= 5 * Math.PI / 4));
+	}
 	reset(game: Game) {
-		// let game: Game = this.games.get(id);
 		game.ball.position.x = this.setup.ballPos.x;
 		game.ball.position.y = this.setup.ballPos.y;
 		game.ball.direction.speed = this.setup.ballDir.speed;
 		do {
 			game.ball.direction.angle = Math.random() * 2 * Math.PI;
 			game.ball.direction.x = game.ball.direction.speed * Math.cos(game.ball.direction.angle);
-			game.ball.direction.y = game.ball.direction.speed * Math.sin(game.ball.direction.angle); // * 0.1
+			game.ball.direction.y = game.ball.direction.speed * Math.sin(game.ball.direction.angle);
 		}
-		while (game.ball.direction.x > 0.2 && game.ball.direction.x < -0.2 &&
-		 - 0.2 > game.ball.direction.y && game.ball.direction.y > 0.2 &&
-		 game.ball.direction.y > game.ball.direction.x * 10);
-		console.log(game.ball.direction.x, game.ball.direction.y);
-
-		// console.log("dir x: %d | dir y: %d | angle: %d", game.ball.direction.x, game.ball.direction.y, game.ball.direction.angle);
+		while (!this.isDirectionValid(game.ball.direction.angle));
 		game.ball.radius = this.setup.ballRadius;
 
 		game.paddleLeft.width = this.setup.paddleWidth;
