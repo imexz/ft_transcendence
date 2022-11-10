@@ -91,10 +91,10 @@ export class ChatGateway {
         tmp.push(rooms[index].roomId.toString())
       }
       const roomIdNumber: number = Number(roomId)
-      const testbool: boolean = await this.chatService.manageJoin(client.handshake.auth.id, roomIdNumber, password)
-      console.log("bool: ", testbool);
+      const room: chatroom = await this.chatService.manageJoin(client.handshake.auth.id, roomIdNumber, password)
+      console.log("bool: ", room);
 
-      if (roomId != undefined && testbool) {
+      if (roomId != undefined && room) {
         tmp.push(roomId.toString())
       }
       console.log("tmp = ", tmp);
@@ -102,7 +102,9 @@ export class ChatGateway {
       client.join(tmp)
       console.log("join after");
       // return await this.chatService.ge
-      return await this.chatService.findAllMessages(roomId, client.handshake.auth.id)
+      // return await this.chatService.findAllMessages(roomId, client.handshake.auth.id)
+
+      return {room: room}
 
 
   }
@@ -112,10 +114,7 @@ export class ChatGateway {
     @MessageBody() roomId: number,
     @ConnectedSocket() client:Socket,
   ) {
-    console.log("leave");
-    console.log("hoho", roomId);
-
-
+    console.log("leave room", roomId);
     // const room_name = await this.chatService.getRoomName(roomId)
 
     client.leave(roomId.toString());
@@ -157,17 +156,17 @@ export class ChatGateway {
 
   }
 
-  @SubscribeMessage('findAllMessages')
-  async findAllMessages(@MessageBody('roomId') roomId: number, @ConnectedSocket() client:Socket,) {
-    // console.log('findAllMessages');
-    // console.log(roomId);
-    // console.log(client.handshake);
-    console.log(client.handshake.auth.id);
+  // @SubscribeMessage('findAllMessages')
+  // async findAllMessages(@MessageBody('roomId') roomId: number, @ConnectedSocket() client:Socket,) {
+  //   // console.log('findAllMessages');
+  //   // console.log(roomId);
+  //   // console.log(client.handshake);
+  //   console.log(client.handshake.auth.id);
 
 
-    return await this.chatService.findAllMessages(roomId, client.handshake.auth.id);
-    // return {test};
-  }
+  //   return await this.chatService.findAllMessages(roomId, client.handshake.auth.id);
+  //   // return {test};
+  // }
 
   @SubscribeMessage('createMessage')
   async create(
@@ -246,6 +245,8 @@ export class ChatGateway {
     } else if (room.info == roomReturn.changed) {
 
       console.log("room changed");
+      // if (room.chatroom.access != Access.private)
+      client.broadcast.emit('changedRoom', {roomName: room.chatroom.roomName, roomId: room.chatroom.roomId, access: room.chatroom.access})
       this.server.to(room.chatroom.roomId.toString()).emit('changedRoom', room.chatroom)
     }
     else {

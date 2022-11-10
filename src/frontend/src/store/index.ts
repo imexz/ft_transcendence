@@ -8,7 +8,7 @@ import { API_URL } from '@/defines';
 import { io, Socket } from 'socket.io-client'
 import { RequestEnum } from '@/enums/models/RequestEnum';
 import Game from '@/models/game';
-import Room from '@/models/room';
+import Room, { Access } from '@/models/room';
 import Message from '@/models/message';
 
 
@@ -124,10 +124,10 @@ export default createStore<State>({
       state.socketChat.on('changedRoom',(data) => {
         console.log("changedRoom received:", data);
         let room = state.rooms.find(elem => elem.roomId == data.roomId)
-        if (room)
-        {
+        if (room && room.access != Access.private)
           room = new Room(data)
-        }
+        else if (room)
+          room = undefined
       })
 
       state.socketGame.on('GameRequestFrontend',(user: User) => {

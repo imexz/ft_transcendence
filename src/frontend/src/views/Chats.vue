@@ -285,12 +285,23 @@
                   console.log("next")
                   var result: string = undefined
                   if (this.rooms[index].access == Access.protected)
+                  {
+                    console.log(this.rooms[index]);
+
                     result = prompt("This room is protected\n password", "password") // @Tobi please rework this popup so it matches the style of our website, can be triggered by trying to join a protected room
+                  }
 
                     console.log(result);
                     console.log("roomIdFrontend", roomId);
 
-                    this.socket.emit('join', {roomId: roomId, password: result}, (response)=> {this.room = response})
+                    this.socket.emit('join', {roomId: roomId, password: result}, (response)=> {
+                      console.log("room after joining", response);
+                      this.$store.state.dispatch('changedRoom', response)
+                      console.log("@@@before update");
+
+                      this.updateMessages(roomId)
+                    })
+
 
                     console.log(this.messages);
 
@@ -303,8 +314,19 @@
               // this.updateMessages(roomId)
               break;
               case 'leave':
-                this.updateMessages(roomId)
+                // this.updateMessages(roomId)
                 this.socket.emit('leave', roomId)
+                let room : Room = this.$store.state.rooms.find(elem => elem.roomId == roomId)
+                if (room)
+                {
+                  room.users = []
+                  room.admins = []
+                  room.owner = undefined
+                  room.messages = []
+                }
+                let viewRoom = this.rooms.find(elem => elem.roomId == roomId)
+                if (viewRoom)
+                  viewRoom = room
                 break;
               default:
                 this.socket.emit(action.name, roomId)
@@ -429,6 +451,7 @@
       created() {
         console.log("created");
         this.$store.state.NrMessages = 0;
+        this.rooms = this.$store.state.getRooms // TB HERE
       },
       beforeMount() {
         this.initSocket();

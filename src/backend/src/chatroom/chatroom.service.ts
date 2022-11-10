@@ -141,7 +141,7 @@ export class ChatroomService {
 
     async findOrCreatDM(user: User, user1: User): Promise<{info: roomReturn, chatroom: chatroom}> {
         console.log("users = ", user, user1);
-        
+
         if (user != undefined && user1 != undefined)
         {
             var chatroom: chatroom[] = await this.chatroomRepository.find({
@@ -161,14 +161,14 @@ export class ChatroomService {
                 }
 
             })
-            chatroom.forEach(element => { 
+            chatroom.forEach(element => {
                 if (element.users.find( elem => elem.id == user.id) != undefined && element.users.find(elem => elem.id == user1.id) != undefined) {
                     return {info: roomReturn.changed, chatroom: chatroom}
                 }
             });
 
             console.log("dm room", chatroom);
-            
+
             // if(chatroom == undefined) {
             var tmpChatroom
             // console.log("chatroom == null");
@@ -191,7 +191,7 @@ export class ChatroomService {
         // return undefined
     }
 
-    async userToRoom(user: User, roomId: number, password?: string): Promise<boolean>
+    async userToRoom(user: User, roomId: number, password?: string): Promise<chatroom>
     {
         if(user != null) {
             var ret: { chatroom: chatroom, bool: boolean }
@@ -211,7 +211,7 @@ export class ChatroomService {
                         case Access.protected:
                             if(await bcrypt.compare(password, ret.chatroom.hash) == false) {
                                 console.log("result === false");
-                                return false
+                                return undefined
                             }
 
                         case Access.public:
@@ -234,7 +234,7 @@ export class ChatroomService {
                     }
                 }
                 await this.chatroomRepository.save(ret.chatroom)
-                return true
+                return ret.chatroom
             }
         }
     }
@@ -273,7 +273,7 @@ export class ChatroomService {
                     room.users.splice(index, 1)
                 }
                 // console.log(index);
-    
+
                 await this.chatroomRepository.save(room)
             }
 
@@ -298,6 +298,7 @@ export class ChatroomService {
         .where("access IN (:...values)", { values: [ Access.protected, Access.public ] })
         .orWhere("us.id = :test", {test: user.id})
         .leftJoinAndSelect('chatroom.users', 'users', "us.id = :userid3", {userid3: user.id})
+        .leftJoinAndSelect('chatroom.owner', 'owner', "owner.id = :userid4", {userid4: user.id})
         .leftJoinAndSelect('chatroom.messages', 'messages', "us.id = :userid2", {userid2: user.id})
         // .leftJoinAndMapOne('chatroom.messages."senderId"', 'chatroom.messages.user.id', 'message', "1 > 0")
         // .addSelect((sub) => {
@@ -369,6 +370,8 @@ export class ChatroomService {
                 room.access = access
                 if(access == Access.protected)
                     this.setPasswordAndSave(password, room)
+                else
+                    this.setPasswordAndSave(undefined, room)
             return  {info: roomReturn.changed , chatroom: await this.chatroomRepository.save(room)}
         } else {
             console.log("addRoom goes wrong");

@@ -43,20 +43,20 @@ export class MessageService {
         }
     }
 
-    async getAllMessagesOfRoom(roomId: number) {
-        const messages = await this.messageRepository.createQueryBuilder("messages")
-            .leftJoinAndSelect("messages.user", "user")
-            .select('CAST( messages.user_id AS varchar ) AS "senderId", messages.id, content, user.avatar_url AS avatar, messages.timestamp AS timestamp, user.username AS username')
-            // .select('messages.user_id AS "senderId", id, content, messages.user')
-            .where('messages.chatroom.roomId = :roomId', { roomId: roomId})
-            .orderBy('timestamp')
-            .getRawMany()
+    // async getAllMessagesOfRoom(roomId: number) {
+    //     const messages = await this.messageRepository.createQueryBuilder("messages")
+    //         .leftJoinAndSelect("messages.sender", "sender")
+    //         .select('CAST( messages.sender_id AS varchar ) AS "senderId", messages.id, content, user.avatar_url AS avatar, messages.timestamp AS timestamp, user.username AS username')
+    //         // .select('messages.user_id AS "senderId", id, content, messages.user')
+    //         .where('messages.chatroom.roomId = :roomId', { roomId: roomId})
+    //         .orderBy('timestamp')
+    //         .getRawMany()
 
         // console.log("getAllMessagesOfRoom");
         // console.log(roomId);
 
         // console.log(messages);
-        return messages
-    }
+        // return messages
+    // }
 
 }
