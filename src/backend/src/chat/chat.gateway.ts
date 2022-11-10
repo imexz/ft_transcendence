@@ -36,6 +36,10 @@ export class ChatGateway {
     // console.log("afterInit chat ");
 
   }
+  handleDisconnect() {
+    console.log("handleDisconnect");
+
+  }
 
 
   async handleConnection(socket) {
@@ -214,7 +218,9 @@ export class ChatGateway {
   @ConnectedSocket() client: Socket,
   @MessageBody('password') password?: string,
   ) {
-    // console.log("roomName =", roomName);
+    console.log("createOrChangeRoom");
+
+    console.log("roomName =", roomName, ",access =", access);
     if (roomName.length == 0 || access == undefined)
       return {undefined}
 
@@ -225,23 +231,28 @@ export class ChatGateway {
       // this.server.emit('newRoom', room.chatroom);
       if (access != Access.private)
       {
+        console.log("newRoom emitted", room.chatroom);
+
+        // this.server.to(room.chatroom.roomId.toString()).emit('newRoom', room.chatroom)
         client.emit('newRoom', room.chatroom)
-        client.broadcast.emit('newRoom', {roomName: room.chatroom.roomName, roomId: room.chatroom.roomId});
+        // console.log("ret:", ret);
+
+        client.broadcast.emit('newRoom', {roomName: room.chatroom.roomName, roomId: room.chatroom.roomId, access: room.chatroom.access});
       }
       else
       {
-        client.emit('newRoom', room)
+        client.emit('newRoom', room.chatroom)
       }
     } else if (room.info == roomReturn.changed) {
 
       console.log("room changed");
-      this.server.emit('changedRoom', room.chatroom)
+      this.server.to(room.chatroom.roomId.toString()).emit('changedRoom', room.chatroom)
     }
     else {
       console.log("room == empty");
     }
-    // console.log("createRoom ende");
-    return {room}
+    console.log("createRoom ende", room);
+    return room
   }
 
   @SubscribeMessage('deleteMessage')

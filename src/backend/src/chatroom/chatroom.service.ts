@@ -193,7 +193,7 @@ export class ChatroomService {
                             if(await bcrypt.compare(password, ret.chatroom.hash) == false) {
                                 console.log("result === false");
                                 return false
-                            } 
+                            }
 
                         case Access.public:
 
@@ -228,7 +228,7 @@ export class ChatroomService {
                 {
                     where: {
                         roomId: roomId
-                    }, 
+                    },
                     relations: {
                         owner: true,
                         admins: true,
@@ -312,8 +312,8 @@ export class ChatroomService {
     }
 
     async getRoomWithAdmins(room: number | string)  {
-        console.log("roomId= ", room);
-        
+        console.log("room= ", room, typeof room);
+
         const test = (typeof room === 'string') ? {roomName: room} : {roomId: room}
         return await this.chatroomRepository.findOne({
         where: test,
@@ -328,11 +328,11 @@ export class ChatroomService {
 
     async addRoom(room_name: string, access: Access,  user: User, password?: string) : Promise<{ info: roomReturn; chatroom: chatroom; }> {
         // console.log("room_name", room_name);
-        
+
         var room = await this.getRoomWithAdmins(room_name)
         if(room == undefined) {
             console.log("room == null");
-            
+
             room = this.chatroomRepository.create()
             room.roomName = room_name
             room.owner = user;
@@ -351,7 +351,7 @@ export class ChatroomService {
             return  {info: roomReturn.changed , chatroom: await this.chatroomRepository.save(room)}
         } else {
             console.log("addRoom goes wrong");
-            
+
         }
         return undefined
     }
@@ -359,7 +359,7 @@ export class ChatroomService {
     setPasswordAndSave(password: string, room: chatroom) {
         if (password) {
             console.log("setPasswordAndSave");
-            
+
             bcrypt.hash(password, 10, async (err, hash: string) => {
                 // console.log("room hash");
                 if (err) {

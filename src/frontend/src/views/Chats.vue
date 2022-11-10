@@ -315,14 +315,14 @@
           // this.socket.emit(
           //   'roomInfo',
           //   {roomId: roomId},
-          //   data => { 
+          //   data => {
           //     this.roomInfoData = data
           //     console.log("roomInfoData", data)
           //     this.toggleRoomInfo()
           //   }
           // );
           this.roomInfoData = this.$store.state.rooms.find(elem => elem.roomId == roomId)
-          if(this.roomInfoData != undefined)
+          if(this.roomInfoData != undefined && this.roomInfoData.users.find(elem => elem.id == this.currentUserId) != undefined)
               this.toggleRoomInfo()
         },
         roomInfoActions(emitMsg, userId, room){

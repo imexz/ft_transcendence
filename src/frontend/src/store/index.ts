@@ -115,8 +115,10 @@ export default createStore<State>({
       })
 
       state.socketChat.on('newRoom',(data) => {
-        console.log("newRoom received:", data);
+        console.log('newRoom');
         state.rooms[state.rooms.length] = new Room(data)
+        console.log("newRoom received:", state.rooms[state.rooms.length - 1]);
+        // state.dispatch('updateRooms', new Room(data))
       })
 
       state.socketChat.on('changedRoom',(data) => {
