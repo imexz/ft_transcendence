@@ -205,10 +205,10 @@ export class GameService {
 		game.ball.direction.speed = this.setup.ballDir.speed;
 		do {
 			game.ball.direction.angle = Math.random() * 2 * Math.PI;
-			game.ball.direction.x = game.ball.direction.speed * Math.cos(game.ball.direction.angle);
-			game.ball.direction.y = game.ball.direction.speed * Math.sin(game.ball.direction.angle);
 		}
 		while (!this.isDirectionValid(game.ball.direction.angle));
+		game.ball.direction.x = game.ball.direction.speed * Math.cos(game.ball.direction.angle);
+		game.ball.direction.y = game.ball.direction.speed * Math.sin(game.ball.direction.angle);
 		game.ball.radius = this.setup.ballRadius;
 
 		game.paddleLeft.width = this.setup.paddleWidth;
@@ -253,8 +253,10 @@ export class GameService {
 		if(game != undefined) {
 			if (key == "ArrowUp" || key == "w") {
 				this.movePaddleUp(game, this.getPlayerSide(game, user_id))
+				console.log("paddle Up");
 			} else if (key == "ArrowDown" || key == "s") {
 				this.movePaddleDown(game, this.getPlayerSide(game, user_id))
+				console.log("paddle Down");
 			}
 		}
 	}
