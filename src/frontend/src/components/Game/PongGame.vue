@@ -54,7 +54,7 @@
 		async beforeUpdate() {
   		console.log("beforeUpdate");
       if (this.$store.state.game == null && this.$store.state.winner == null) {
-        await this.$store.state.socketGame.emit('isInGame');
+        await this.$store.state.socketGame.emit('isInGame', {isCustomized: this.$store.state.customized});
       }
 		  console.log("leaving beforeUpdate");
 	  },
@@ -100,8 +100,7 @@
       leaveGame() {
         this.$store.state.socketGame.emit('leaveGame');
         this.$store.state.game = null
-		    this.$store.state.pendingRequest = false
-		    this.$store.winner = null
+		this.$store.winner = null
         this.$store.loser = null
         this.$router.push("/");
       }
