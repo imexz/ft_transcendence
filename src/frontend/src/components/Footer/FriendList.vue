@@ -15,7 +15,7 @@
             Friends
           </div>
           <div class="countBubble">
-            {{ $store.getters.getFriends?.length }}
+            {{ $store.state.friendsList?.length }}
           </div>
         </div>
       <div v-if="$store.state.NrFriendRequests" class="notificationCount">
@@ -31,13 +31,13 @@
             Friends
           </div>
           <div class="countBubble">
-            {{ $store.getters.getFriends?.length }}
+            {{ $store.state.friendsList?.length }}
           </div>
         </div>
       </button>
       <div class="friends">
         <UserSummary
-        v-for="user in $store.getters.getFriends"
+        v-for="user in $store.state.friendsList"
         :user = user as User ></UserSummary>
       </div>
     </div>

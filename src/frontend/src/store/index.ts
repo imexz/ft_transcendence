@@ -10,51 +10,45 @@ import { RequestEnum } from '@/enums/models/RequestEnum';
 import Game from '@/models/game';
 import Room, { Access } from '@/models/room';
 import Message from '@/models/message';
+import Chat from '@/models/chat';
 
 
-
+export enum changedRoom {
+  complet,
+  user,
+  admin,
+  owner,
+  access
+}
 
 export interface State {
   validated: boolean
   user: User
   socket: Socket | null
   socketGame: Socket | null
-  socketChat: Socket | null
+  // socketChat: Socket | null
   friendsList: User[] | null
-  NrMessages: number
+  // NrMessages: number
   NrFriendRequests: number
   requester: User | null
-  rooms: Room[]
+  // rooms: Room[]
   game: Game | null
   pendingRequest: boolean
   winner: User | null
+  chat: Chat
 }
 
 const storage = localStorage.getItem('user')
 const user = storage?JSON.parse(storage):null;
 const initialState = user?
-  {validated: true, user: user, socket: null,  socketChat: null,  socketGame: null, friendsList: null, NrMessages: 0, NrFriendRequests: 0, requester: null, game: null, pendingRequest: false, winner: null}:
-  {validated: false, user: null,  socket: null,  socketChat: null,  socketGame: null, friendsList: null, NrMessages: 0, NrFriendRequests: 0, requester: null, game: null, pendingRequest: false, winner: null};
+  {validated: true, user: user, socket: null,  socketGame: null, friendsList: null, NrFriendRequests: 0, requester: null, game: null, pendingRequest: false, winner: null, chat: null}:
+  {validated: false, user: null,  socket: null, socketGame: null, friendsList: null, NrFriendRequests: 0, requester: null, game: null, pendingRequest: false, winner: null, chat: null};
 
 export default createStore<State>({
 
   state: initialState,
   getters: {
-    isLogged(state) {
-      return state.validated
-    },
-    getUser(state) {
-      return state.user
-    },
-    getSocket(state) {
-      return state.socket
-    },
-    getFriends(state) {
-      return state.friendsList
-    },
-    getRooms(state) {
-      return state.rooms
-    }
+
   },
   mutations: {
     logOut(state) {
@@ -65,70 +59,32 @@ export default createStore<State>({
 	    state.socketGame.disconnect(); //added
     },
     logIn(state, user) {
+      
       // console.log("logIn");
-
+      
       state.validated = true;
       state.user = user;
+      console.log("logIn index", user);
+
       state.socket = io(API_URL, {
           auth: {
               id: document.cookie
           }
       })
-      // console.log("default socket init");
-
-      state.socketChat = io(API_URL + "/chat", {
-        auth: {
-          id: document.cookie
-        }
-      })
-      // console.log("chat socket init");
       state.socketGame = io(API_URL + "/game", {
         auth: {
           id: document.cookie
         }
       })
+      state.chat = new Chat()
 
-      console.log("game socket init");
+      // console.log("game socket init");
       console.log(document.cookie);
 
 	    state.socketGame.on('disconnecting', () => {
 		    console.log("game socket disconnecting");
-		    console.log(state.socketGame.rooms);
+		    console.log(state.socketGame);
 	    })
-
-      state.socketChat.on('message',() => {
-        state.NrMessages++
-      })
-
-      state.socketChat.on('newMessage',(data) => {
-        console.log("newMessage received:");
-
-        let room = state.rooms.find(elem => elem.roomId == data.roomId)
-        if (room)
-        {
-          ++room.unreadCount
-          console.log(data.roomId, data.message, room.unreadCount)
-          room.messages[room.messages.length] = new Message(data.message)
-        }
-        else
-          console.log("room for new Message not found");
-      })
-
-      state.socketChat.on('newRoom',(data) => {
-        console.log('newRoom');
-        state.rooms[state.rooms.length] = new Room(data)
-        console.log("newRoom received:", state.rooms[state.rooms.length - 1]);
-        // state.dispatch('updateRooms', new Room(data))
-      })
-
-      state.socketChat.on('changedRoom',(data) => {
-        console.log("changedRoom received:", data);
-        let room = state.rooms.find(elem => elem.roomId == data.roomId)
-        if (room && room.access != Access.private)
-          room = new Room(data)
-        else if (room)
-          room = undefined
-      })
 
       state.socketGame.on('GameRequestFrontend',(user: User) => {
         state.requester = user;
@@ -173,20 +129,8 @@ export default createStore<State>({
       const index = state.friendsList?.findIndex(element => element.id == id)
       if (index != -1)
         state.friendsList?.splice(state.friendsList?.findIndex(element => element.id == id) , 1)
-    },
-    setRooms(state, rooms: any) {
-      state.rooms = [] as Room[]
-      for (let i = 0; i < rooms.length; ++i) {
-        state.rooms[i] = new Room(rooms[i])
-      }
-      console.log("ROOMS: ", rooms, rooms[0] instanceof Room)
-      console.log("state.ROOMS: ", state.rooms, state.rooms[0] instanceof Room)
-    },
-    addRoom(state, room: any) {
-      state.rooms[state.rooms.length] = new Room(room)
-      console.log("ROOM: ", room, room instanceof Room)
-      console.log("state.ROOMS: ", state.rooms, state.rooms[0] instanceof Room)
-    },
+    }
+
   },
   actions: {
     logOut({ commit }) {
@@ -197,17 +141,27 @@ export default createStore<State>({
       if (router.currentRoute.value.path != '/login/tfa')
         router.push("/login");
     },
-    logIn({ commit }, user) {
-      commit('logIn', user);
-      localStorage.setItem('user', JSON.stringify(user));
-      VueAxios({
-        url: 'chatroom/all',
+    validateUser({ commit, dispatch }){
+      return VueAxios({
+        url: '/users/validate',
         baseURL: API_URL,
         method: 'GET',
-        withCredentials: true
+        withCredentials: true,
       })
-      .then(response => { commit('setRooms', response.data); console.log("rooms after api call: ", response.data);
-      })
+      .then(response => {
+        commit('logIn', response.data)
+        localStorage.setItem('user', JSON.stringify(user));
+        
+
+          return true
+        }
+      )
+      .catch(error => {
+        console.log(error);
+        
+          dispatch('logOut')
+        }
+      )
     },
     getFriendsList({ commit }) {
       VueAxios({
@@ -216,13 +170,13 @@ export default createStore<State>({
         method: 'GET',
         withCredentials: true,
       })
-      .then(response => { commit('setFriendsList', response.data)})
+      .then(response => { commit('setFriendsList', response.data) } )
       .catch()
-    },
-    updateRooms({ commit }, room ) {
-      console.log("index.rooms", room);
-      commit('addRoom', room);
-    },
+    }
+    // updateRooms({ commit }, room ) {
+    //   console.log("index.rooms", room);
+    //   // commit('addRoom', room);
+    // },
     // askForMatch(){
     //   this.$store.state.socketGame.emit('Request', {id: this.user._id}, (r) => {
         // this.$router.push('/play/')

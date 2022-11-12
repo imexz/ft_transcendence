@@ -61,7 +61,7 @@ export default defineComponent({
   methods: {
     createOrChangeRoom(): void{
       console.log("createRoom", this.roomName, this.name);
-      this.$store.state.socketChat.emit('createOrChangeRoom', {roomName: this.name? this.name : this.roomName, access: this.access, password: this.password},  // !!!!!!!!!!!!!!!
+      this.$store.state.chat.socketChat.emit('createOrChangeRoom', {roomName: this.name? this.name : this.roomName, access: this.access, password: this.password},  // !!!!!!!!!!!!!!!
         response => {
           console.log("RESPONSE: ", response.info);
 
@@ -70,7 +70,7 @@ export default defineComponent({
             switch (response.info) {
               case roomReturn.created:
                 console.log(response);
-                console.log("rooms before dispatch", response.chatroom);
+                // console.log("rooms before dispatch", response.chatroom);
                 this.$emit('actions', 'success');
                 // this.$store.dispatch('updateRooms', response.chatroom);
                 break;

@@ -34,7 +34,7 @@ export default defineComponent({
   methods: {
     fetchUser(): void {
       if (this.id == '0') {
-        this.user =this.$store.getters.getUser;
+        this.user =this.$store.state.user;
       }
       else {
       VueAxios({

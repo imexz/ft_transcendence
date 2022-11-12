@@ -117,13 +117,13 @@ export class ChatroomService {
             var chatroom = await this.chatroomRepository.findOne({
                 where: test,
                 relations: {
-                    admins: true,
+                    // admins: true,
                     users: true,
-                    owner: true,
+                    // owner: true,
                     messages: true,
-                    muted: {
-                        user: true
-                    }
+                    // muted: {
+                    //     user: true
+                    // }
                 }
             })
             if(chatroom == null && typeof room === 'string') {
@@ -219,9 +219,11 @@ export class ChatroomService {
                         default:
                             console.log(ret.chatroom.muted);
 
-                            if( ret.chatroom.users.indexOf(user) == -1 &&
-                                (ret.chatroom.muted == undefined ||
-                                ret.chatroom.muted.find((element) => element.user.id == user.id) == undefined))
+                            if( ret.chatroom.users.indexOf(user) == -1
+                            // &&
+                            //     (ret.chatroom.muted == undefined ||
+                            //     ret.chatroom.muted.find((element) => element.user.id == user.id) == undefined)
+                                )
                             {
                                 console.log("sucesfull joind");
 
