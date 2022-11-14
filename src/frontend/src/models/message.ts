@@ -3,7 +3,6 @@ import User from "./user";
 export default class Message {
     constructor(message: any, user?: User) {
 
-        // console.warn("constructor for message called", message);
         if (user != undefined)
         {
             this.avatar = user.avatar_url
@@ -18,8 +17,9 @@ export default class Message {
         this.content = message.content
         this.content = message.content
         this.senderId = message.senderId.toString()
-        const ts : Date = message.timestamp
+        let ts = new Date(message.timestamp)
         this.timestamp = ts.toLocaleString()
+        // console.warn("constructor for message called", this);
     }
 
     _id: number
