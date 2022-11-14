@@ -1,6 +1,6 @@
 <template>
   <div class="wrapper">
-    <div v-if="!this.$store.getters.isLogged">
+    <div v-if="this.$store.state.user == null">
       <div v-if=tfa>
         <h1>
           Please enter your Google Authenticator Code
@@ -35,6 +35,9 @@ export default defineComponent({
     login() {
       location.href = API_URL + '/auth/login'
     }
+  },
+  mounted() {
+    console.log("user = ", this.$store.state.user);
   }
 })
 

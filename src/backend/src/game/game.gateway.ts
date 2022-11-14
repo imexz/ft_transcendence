@@ -39,7 +39,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   afterInit() { console.log("GameGateway: After init"); }
 
   async handleConnection(@ConnectedSocket() socket: Socket) {
-    console.log("client %s connected", socket?.handshake.auth.id);
+    console.log("client %s connected", socket?.handshake.auth?.id);
 	  this.authService.validateSocket(socket)
   }
 

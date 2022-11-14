@@ -6,9 +6,9 @@
         class="currentUser topElement"
         :class="{'userActive': $route.name === 'me'}"
         @click="$router.push('/')">
-        <img :src="$store.getters.getUser.avatar_url" class="userPic">
+        <img :src="$store.state.user.avatar_url" class="userPic">
         <span class="userName">
-          {{ $store.getters.getUser.username }}
+          {{ $store.state.user.username }}
         </span>
       </div>
       <div v-else></div>
@@ -50,7 +50,7 @@ import SearchBar from '@/components/NavBar/SearchBar.vue';
 export default defineComponent({
   computed: {
     isLoggedIn(): boolean {
-        return store.state.validated;
+        return store.state.user != null;
     },
   },
   components: {

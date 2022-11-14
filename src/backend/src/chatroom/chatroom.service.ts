@@ -117,13 +117,13 @@ export class ChatroomService {
             var chatroom = await this.chatroomRepository.findOne({
                 where: test,
                 relations: {
-                    admins: true,
+                    // admins: true,
                     users: true,
-                    owner: true,
+                    // owner: true,
                     messages: true,
-                    muted: {
-                        user: true
-                    }
+                    // muted: {
+                    //     user: true
+                    // }
                 }
             })
             if(chatroom == null && typeof room === 'string') {
@@ -141,7 +141,7 @@ export class ChatroomService {
 
     async findOrCreatDM(user: User, user1: User): Promise<{info: roomReturn, chatroom: chatroom}> {
         console.log("users = ", user, user1);
-        
+
         if (user != undefined && user1 != undefined)
         {
             var chatroom: chatroom[] = await this.chatroomRepository.find({
@@ -161,14 +161,14 @@ export class ChatroomService {
                 }
 
             })
-            chatroom.forEach(element => { 
+            chatroom.forEach(element => {
                 if (element.users.find( elem => elem.id == user.id) != undefined && element.users.find(elem => elem.id == user1.id) != undefined) {
                     return {info: roomReturn.changed, chatroom: chatroom}
                 }
             });
 
             console.log("dm room", chatroom);
-            
+
             // if(chatroom == undefined) {
             var tmpChatroom
             // console.log("chatroom == null");
@@ -191,7 +191,7 @@ export class ChatroomService {
         // return undefined
     }
 
-    async userToRoom(user: User, roomId: number, password?: string): Promise<boolean>
+    async userToRoom(user: User, roomId: number, password?: string): Promise<chatroom>
     {
         if(user != null) {
             var ret: { chatroom: chatroom, bool: boolean }
@@ -211,17 +211,19 @@ export class ChatroomService {
                         case Access.protected:
                             if(await bcrypt.compare(password, ret.chatroom.hash) == false) {
                                 console.log("result === false");
-                                return false
-                            } 
+                                return undefined
+                            }
 
                         case Access.public:
 
                         default:
                             console.log(ret.chatroom.muted);
 
-                            if( ret.chatroom.users.indexOf(user) == -1 &&
-                                (ret.chatroom.muted == undefined ||
-                                ret.chatroom.muted.find((element) => element.user.id == user.id) == undefined))
+                            if( ret.chatroom.users.indexOf(user) == -1
+                            // &&
+                            //     (ret.chatroom.muted == undefined ||
+                            //     ret.chatroom.muted.find((element) => element.user.id == user.id) == undefined)
+                                )
                             {
                                 console.log("sucesfull joind");
 
@@ -234,7 +236,7 @@ export class ChatroomService {
                     }
                 }
                 await this.chatroomRepository.save(ret.chatroom)
-                return true
+                return ret.chatroom
             }
         }
     }
@@ -245,7 +247,7 @@ export class ChatroomService {
                 {
                     where: {
                         roomId: roomId
-                    }, 
+                    },
                     relations: {
                         owner: true,
                         admins: true,
@@ -271,7 +273,7 @@ export class ChatroomService {
                     room.users.splice(index, 1)
                 }
                 // console.log(index);
-    
+
                 await this.chatroomRepository.save(room)
             }
 
@@ -296,6 +298,7 @@ export class ChatroomService {
         .where("access IN (:...values)", { values: [ Access.protected, Access.public ] })
         .orWhere("us.id = :test", {test: user.id})
         .leftJoinAndSelect('chatroom.users', 'users', "us.id = :userid3", {userid3: user.id})
+        .leftJoinAndSelect('chatroom.owner', 'owner', "owner.id = :userid4", {userid4: user.id})
         .leftJoinAndSelect('chatroom.messages', 'messages', "us.id = :userid2", {userid2: user.id})
         // .leftJoinAndMapOne('chatroom.messages."senderId"', 'chatroom.messages.user.id', 'message', "1 > 0")
         // .addSelect((sub) => {
@@ -331,8 +334,8 @@ export class ChatroomService {
     }
 
     async getRoomWithAdmins(room: number | string)  {
-        console.log("roomId= ", room);
-        
+        console.log("room= ", room, typeof room);
+
         const test = (typeof room === 'string') ? {roomName: room} : {roomId: room}
         return await this.chatroomRepository.findOne({
         where: test,
@@ -347,11 +350,11 @@ export class ChatroomService {
 
     async addRoom(room_name: string, access: Access,  user: User, password?: string) : Promise<{ info: roomReturn; chatroom: chatroom; }> {
         // console.log("room_name", room_name);
-        
+
         var room = await this.getRoomWithAdmins(room_name)
         if(room == undefined) {
             console.log("room == null");
-            
+
             room = this.chatroomRepository.create()
             room.roomName = room_name
             room.owner = user;
@@ -367,10 +370,12 @@ export class ChatroomService {
                 room.access = access
                 if(access == Access.protected)
                     this.setPasswordAndSave(password, room)
+                else
+                    this.setPasswordAndSave(undefined, room)
             return  {info: roomReturn.changed , chatroom: await this.chatroomRepository.save(room)}
         } else {
             console.log("addRoom goes wrong");
-            
+
         }
         return undefined
     }
@@ -378,7 +383,7 @@ export class ChatroomService {
     setPasswordAndSave(password: string, room: chatroom) {
         if (password) {
             console.log("setPasswordAndSave");
-            
+
             bcrypt.hash(password, 10, async (err, hash: string) => {
                 // console.log("room hash");
                 if (err) {

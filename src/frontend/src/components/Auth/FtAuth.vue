@@ -1,7 +1,7 @@
 <template>
   <div>
     <Toast v-if="showToast" :msg=toastMsg :mode=toastMode />
-    <div v-if="!$store.getters.isLogged">
+    <div v-if="$store.state.user != null">
       <button 
         class="authButton"
         :class="{'linkActive': $route.name === 'login'}"
@@ -58,24 +58,37 @@ export default defineComponent({
         this.toastMode = mode;
         setTimeout(() => this.showToast = false, 2000);
     },
-    validateUser() {
-        VueAxios({
-          url: '/users/validate',
-          baseURL: API_URL,
-          method: 'GET',
-          withCredentials: true,
-        })
-        .then(response => (
-          this.$store.dispatch('logIn', response.data),
-          this.triggerToast('vaildated', 'success')))
-        .catch(error => (
-          console.log(error),
-          this.$store.dispatch('logOut'),
-          this.triggerToast('please log in', 'error')))
-    }
+    // validateUser() {
+    //     VueAxios({
+    //       url: '/users/validate',
+    //       baseURL: API_URL,
+    //       method: 'GET',
+    //       withCredentials: true,
+    //     })
+    //     .then(response => (
+    //       this.$store.dispatch('logIn', response.data),
+    //       this.triggerToast('vaildated', 'success')))
+    //     .catch(error => (
+    //       console.log(error),
+    //       this.$store.dispatch('logOut'),
+    //       this.triggerToast('please log in', 'error')))
+    // }
   },
   mounted(): void {
-    this.validateUser()
+    this.$store.dispatch('validateUser')
+    .then(ret => {
+      if (ret) { 
+        this.triggerToast('vaildated', 'success')
+      } else {
+        this.triggerToast('please log in', 'error')
+      }
+    }
+    )
+    // .chatch(
+    //   error => {console.log(error)
+    //   this.triggerToast('please log in', 'error')
+    //   }
+    // )
   }
 })
 

@@ -40,7 +40,7 @@
     </div>
     <div class="dropdownMenu" v-if="show">
       <button
-        v-if="$store.getters.getFriends != '' && $store.getters.getFriends.some((us: User) => us.id == user.id)"
+        v-if="$store.state.friendsList != '' && $store.state.friendsList.some((us: User) => us.id == user.id)"
         class="dropdownElement"
         @click="removeFriend">
         <font-awesome-icon icon="fa-solid fa-user-minus" />
@@ -221,7 +221,7 @@ export default defineComponent({
       console.log(this.msgText)
       this.closeDmPopUp()
       this.toggleDropdown()
-      this.$store.state.socketChat.emit('DM', {content: this.msgText, id: this.user.id})
+      this.$store.state.chat.socketChat.emit('DM', {content: this.msgText, id: this.user.id})
       this.msgText = ""
     }
 

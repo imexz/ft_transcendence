@@ -62,7 +62,7 @@ router.beforeEach(async (to) => {
   const publicPages = ['/login', '/login/tfa'];
   const authRequired = !publicPages.includes(to.path);
 
-  if (authRequired && !store.getters.isLogged) {
+  if (authRequired && store.state.user == null) {
     return '/login';
   }
 })

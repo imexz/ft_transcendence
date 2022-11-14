@@ -26,7 +26,7 @@ export class ChatService {
           return true
           break;
         case AdminAction.muted:
-          
+
           this.banMuteService.mut(await this.usersService.getUser(UserId), room)
 
           break;
@@ -46,7 +46,7 @@ export class ChatService {
 
   async creatRoomDM(user: User, id: number, content: string) {
     console.log("undefind = ", user, id );
-    
+
     if(user != undefined && id != undefined)
     {
       // console.log(content);
@@ -55,9 +55,9 @@ export class ChatService {
       const chat: {info: roomReturn, chatroom: chatroom} = await this.chatroomService.findOrCreatDM(user, user1)
       if(chat != undefined)
         this.messageService.userAddMessageToRoom(user, content, chat.chatroom)
-      else 
+      else
         console.log("chat == undeinfd");
-        
+
       }
   }
 
@@ -111,23 +111,23 @@ export class ChatService {
             console.log("roomIdmanageJoin: ", roomId);
 
             const user = await this.usersService.getUser(user_id)
-            const testbool2: boolean = await this.chatroomService.userToRoom(user, roomId, password);
-            console.log("testbool2: ", testbool2);
+            const room: chatroom = await this.chatroomService.userToRoom(user, roomId, password);
+            console.log("testbool2: ", room);
 
-            return testbool2
+            return room
         }
 
 
 
 
-        async findAllMessages(roomId: number, userId: number) {
-          const rooms = await this.chatroomService.getAllwithUser(userId)
-          for (let index = 0; index < rooms.length; index++) {
-            if(rooms[index].roomId == roomId) {
-              return await this.messageService.getAllMessagesOfRoom(roomId)
-            }
-          }
-        }
+        // async findAllMessages(roomId: number, userId: number) {
+        //   const rooms = await this.chatroomService.getAllwithUser(userId)
+        //   for (let index = 0; index < rooms.length; index++) {
+        //     if(rooms[index].roomId == roomId) {
+        //       return await this.messageService.getAllMessagesOfRoom(roomId)
+        //     }
+        //   }
+        // }
 
         async getClientName(id: number) {
             const user = await this.usersService.getUser(id)

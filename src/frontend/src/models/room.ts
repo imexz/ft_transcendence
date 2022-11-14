@@ -1,7 +1,7 @@
 import  User  from "./user";
 import  Message  from "./message";
-import UserService from "./user"
-import Toast from '@/components/Toast.vue'
+// import UserService from "./user"
+// import Toast from '@/components/Toast.vue'
 import VueAxios from 'axios';
 import { API_URL } from '@/defines';
 
@@ -17,37 +17,40 @@ export default class Room {
         this.access = room.access
         this.roomName = room.roomName
         this.roomId = room.roomId
-        // this.messages = room.messages // run through for loop and convert to real Message object again
         this.users = [] as User[]
-        for (let i = 0; i < room.users.length; ++i)
+        for (let i = 0; i < room.users?.length; ++i)
         {
             this.users[i] = new User(room.users[i])
         }
         this.messages = [] as Message[]
-        for (let i = 0; i < room.messages.length; ++i)
+        for (let i = 0; i < room.messages?.length; ++i)
         {
-            this.findUser(room.messages[i].senderId)
+            this.findUser(room.messages[i]?.senderId)
             .then(user => (this.messages[i] = new Message(room.messages[i], user)))
         }
         this.admins = room.admins
         this.unreadCount = 0
         this.typingUsers = []
+        this.owner = room.owner
         // console.warn("Room constructor called", room);
 
     }
 
-    access: Access = 0
+    access: Access  = 0
     roomId: number = null
     roomName: string = null
 
-    users: User[] = []
-    admins: User[] = []
+    users: User[] | undefined = []
+    admins: User[] | undefined = []
+    owner: User | undefined
 
-    messages: Message[] = []
+    messages: Message[] | undefined = []
 
-    unreadCount: number = 0
+    unreadCount: number | undefined = 0
 
-    typingUsers: number [] = []
+    typingUsers: number [] | undefined = []
+
+
 
     // messagesLoaded: boolean = false
 

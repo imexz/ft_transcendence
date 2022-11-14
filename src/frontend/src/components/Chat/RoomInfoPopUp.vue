@@ -67,10 +67,12 @@ export default defineComponent({
     }
   },
   mounted() {
-    console.log("Room in room info");
+    console.log("Room in room info", this.room);
     
   },
   updated() {
+    console.log("updated in room info");
+    
     // this.room = this.roomInfo?.room;
   },
   computed: {
@@ -99,12 +101,12 @@ export default defineComponent({
   },
   methods: {
     // changeRoomAccess() {
-    //   this.$store.state.socketChat.emit('changeRoomAccess', {roomName: this.name, access: this.access, password: this.password}  // !!!!!!!!!!!!!!!
+    //   this.$store.state.chat.socketChat.emit('changeRoomAccess', {roomName: this.name, access: this.access, password: this.password}  // !!!!!!!!!!!!!!!
     // },
     reEmit(emiType: AdminAction, userId){
       console.log(emiType, userId);
       
-      this.$store.state.socketChat.emit('action', {emiType, userId, roomId: this.room.roomId})
+      this.$store.state.chat.socketChat.emit('action', {emiType, userId, roomId: this.room.roomId})
     },
     closePopUp(){
       this.$emit("action", "exit")
