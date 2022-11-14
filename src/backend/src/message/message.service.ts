@@ -5,7 +5,7 @@ import { Repository } from 'typeorm';
 import { message } from './message.entity';
 import User from '../users/entitys/user.entity';
 import chatroom from 'src/chatroom/chatroom.entity';
-import { timestamp } from 'rxjs';
+// import { timestamp } from 'rxjs';
 
 @Injectable()
 export class MessageService {
@@ -33,7 +33,6 @@ export class MessageService {
 
     async userAddMessageToRoom(user: User, conntent: string, chatroom: chatroom) {
         if (user != undefined && chatroom != undefined && conntent != undefined) {
-
             var new_message = this.messageRepository.create({sender: user, chatroom: chatroom, content: conntent});
             // console.log(conntent);
             return await this.messageRepository.save(new_message);
