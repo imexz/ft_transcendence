@@ -242,8 +242,6 @@ export class ChatroomService {
     }
 
     async removeUserFromChatroom(user: User, roomId: number) {
-        // console.log("removeUserFromChatroom");
-
         if(user != undefined && roomId != undefined) {
             const room = await this.chatroomRepository.findOne(
                 {

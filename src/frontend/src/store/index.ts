@@ -36,13 +36,14 @@ export interface State {
   pendingRequest: boolean
   winner: User | null
   chat: Chat
+  loser: User | null
 }
 
 const storage = localStorage.getItem('user')
 const user = storage?JSON.parse(storage):null;
 const initialState = user?
-  {validated: true, user: user, socket: null,  socketGame: null, friendsList: null, NrFriendRequests: 0, requester: null, game: null, pendingRequest: false, winner: null, chat: null}:
-  {validated: false, user: null,  socket: null, socketGame: null, friendsList: null, NrFriendRequests: 0, requester: null, game: null, pendingRequest: false, winner: null, chat: null};
+{validated: true, user: user, socket: null,  socketChat: null,  socketGame: null, friendsList: null, NrMessages: 0, NrFriendRequests: 0, requester: null, game: null, pendingRequest: false, winner: null, loser: null}:
+{validated: false, user: null,  socket: null,  socketChat: null,  socketGame: null, friendsList: null, NrMessages: 0, NrFriendRequests: 0, requester: null, game: null, pendingRequest: false, winner: null, loser: null};
 
 export default createStore<State>({
 
@@ -172,19 +173,11 @@ export default createStore<State>({
       })
       .then(response => { commit('setFriendsList', response.data) } )
       .catch()
-    }
-    // updateRooms({ commit }, room ) {
-    //   console.log("index.rooms", room);
-    //   // commit('addRoom', room);
-    // },
-    // askForMatch(){
-    //   this.$store.state.socketGame.emit('Request', {id: this.user._id}, (r) => {
-        // this.$router.push('/play/')
-        // this.showGame = !this.showGame
-        // this.$store.state.game = r
-    //   })
-    //   console.log("AskForMatch");
-    // }
+    },
+    updateRooms({ commit }, room ) {
+      console.log("index.rooms", room);
+      commit('addRoom', room);
+    },
   },
 
   modules: {

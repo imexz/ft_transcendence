@@ -10,6 +10,7 @@ import * as PIXI from 'pixi.js';
 export default defineComponent({
     data() {
         return {
+        timestamp: Date,
         pixiApp: null,
         pixiScene: null,
         pixiScore: {
@@ -171,7 +172,7 @@ export default defineComponent({
             break;
         }
         if (this.isGameFinished()) {
-          this.$emit('assignWinner',this.gameData.score.scoreLeft == 3 ? this.$store.state.game.playerLeft : this.$store.state.game.playerRight)
+          this.$emit('assignWinner', this.assignWinnerAndLoser())
           console.log("winner");
           this.$store.state.game = null
         }
@@ -181,26 +182,25 @@ export default defineComponent({
         this.gameData.paddleRight = data.paddleRight;
       },
       updateBall(data: any) {
-        //this is updating the Date-> independent of drawing loop
-        // console.log("callback updateGame");
 		    if (data === undefined) {
-          // console.log("data undefined");
+          console.log("data undefined");
           // this.gameExists = false;
 			    this.left = 0;
 			    this.right = 0;
         	return;
         }
-		    // this.gameData.score.scoreLeft = data.score.scoreLeft;
-		    // this.gameData.score.scoreRight = data.score.scoreRight;
-        // console.log(this.gameData.score.scoreLeft, this.gameData.score.scoreRight);
         this.gameData.ball = data;
-        // this.gameData.paddleLeft = data.paddleLeft;
-        // this.gameData.paddleRight = data.paddleRight;
-        
       },
 	    isGameFinished(): boolean {
 		    return this.gameData.score.scoreLeft == 3 || this.gameData.score.scoreRight == 3
-	    }
+	    },
+      assignWinnerAndLoser() {
+        if (this.gameData.score.scoreLeft > this.gameData.score.scoreRight) {
+          return { winner: this.$store.state.game.playerLeft, loser: this.$store.state.game.playerRight }
+        } else {
+          return { winner: this.$store.state.game.playerRight, loser: this.$store.state.game.playerLeft }
+        }
+      }
     }
 })
 </script>

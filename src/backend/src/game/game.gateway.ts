@@ -80,7 +80,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	  		game = await this.gameService.joinGameOrCreateGame(client.handshake.auth as User, this.server)
 	  	} else {
 	  		console.log("client is spectating");
-        client.emit('updatePaddle', {paddleLeft: game.paddleLeft, paddleRight: game.paddleRight})
+        // client.emit('updatePaddle', {paddleLeft: game.paddleLeft, paddleRight: game.paddleRight})
 	  	}
 	  } else {
 	  	console.log("client is playing");
@@ -125,6 +125,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	  	}
 	  }
 	  client.join(game.id.toString());
+    console.log("gameRequest end");
 	  return ret
   }
 
@@ -145,6 +146,11 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   async handleDenyGameRequest(@ConnectedSocket() client: Socket) {
     var game: Game = this.gameService.getGame(client.handshake.auth.id)
     if(game != undefined && game.interval == null) {
+      game.spectators.forEach(async (element: number) =>  {
+        const socket = await this.findSocketOfUser(element);
+        if (socket)
+          socket.emit('NowInGame', false)
+      })
     	const socket = await this.findSocketOfUser(game.playerLeft.id)
 		  this.closeRoom(game.id.toString())
 		  if (this.gameService.removeGame(game)) {
@@ -177,6 +183,11 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         if (socket != undefined)
 	  		  socket.emit('resetRequester')
 	  	}
+      game.spectators.forEach(async (element: number) =>  {
+        const socket = await this.findSocketOfUser(element)
+        if (socket)
+          socket.emit('NowInGame', false);
+       })
       this.closeRoom(game.id.toString())
 	  	this.gameService.removeGame(game);
 	  }

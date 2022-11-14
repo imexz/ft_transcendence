@@ -28,6 +28,7 @@ export class BanMuteService {
                 }})
                 if (mute != undefined) {
                     this.unMute(user.id, chatroom)
+                    return
                 }
             }
             
@@ -48,12 +49,4 @@ export class BanMuteService {
                 } }
             )
         }
-    // async test(chatroom_id: number) {
-    //     return await this.banMuteRepository.createQueryBuilder("mute")
-    //     .innerJoinAndSelect('mute.chatroom', 'chatroom', 'chatroom._id = :id', {id: chatroom_id} )
-    // }
-    
-
-
-
 }
