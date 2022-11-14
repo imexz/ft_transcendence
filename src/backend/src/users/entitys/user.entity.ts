@@ -1,6 +1,6 @@
 import chatroom from "../../chatroom/chatroom.entity";
 import { message } from "../../message/message.entity";
-import { Entity, Column, PrimaryGeneratedColumn, JoinColumn, OneToOne, PrimaryColumn, OneToMany, ManyToMany, JoinTable, ManyToOne } from "typeorm";
+import { Entity, Column, PrimaryGeneratedColumn, JoinColumn, OneToMany, OneToOne, PrimaryColumn, ManyToMany, JoinTable, ManyToOne } from "typeorm";
 import { fileEntity } from "../../avatar/file.entitys";
 import { Exclude } from 'class-transformer';
 import { Game } from '../../game/game.entities/game.entity';
@@ -82,11 +82,12 @@ export default class User {
 	// @JoinTable()
 	// games?: Game[];
 
-	@OneToMany(() => Game, (game) => game.playerRight)
-	gamesAsRight?: Game[]
+	@OneToMany(() => Game, (game) => game.winner)
+	winns?: Game[]
 
-	@OneToMany(() => Game, (game) => game.playerLeft)
-	gamesAsLeft?: Game[]
+
+	@OneToMany(() => Game, (game) => game.loser)
+	loses?: Game[]
 
 	@Exclude()
 	@Column({ nullable: true })

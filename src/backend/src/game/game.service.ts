@@ -12,6 +12,8 @@ import { GameGateway } from './game.gateway';
 
 @Injectable()
 export class GameService {
+	
+	
 	constructor(
 		private userService: UsersService,
 		@Inject(forwardRef(() => GameGateway))
@@ -26,7 +28,7 @@ export class GameService {
 	private gameRepository: Repository<Game>
 
 	getGame(user_id: number | undefined): Game {
-		return this.gamesArr.find((value: Game) =>  value.playerLeft?.id == user_id || value.playerRight?.id == user_id)
+		return this.gamesArr.find((value: Game) =>  value.winner?.id == user_id || value.loser?.id == user_id)
 	}
 
 	addUserToSpectators(userId: number, game: Game) {
@@ -56,16 +58,16 @@ export class GameService {
 		let game = this.getGame(undefined) // checking for first game with missing (undefined) opponent
 		if (game == undefined || opponentUserId) {
 			game = await this.createGameInstance(user.id)
-			game.playerLeft = user
+			game.winner = user
 			// opponentUserId is set when called via Frontend::askForMatch
 			if(opponentUserId != undefined) {
 				const opponent = await this.userService.getUser(opponentUserId)
-				game.playerRight = opponent
+				game.loser = opponent
 			}
 			this.gamesArr.push(game)
 		} else { // queue game exists, join and set user as opponent
 			console.log("joinGameOrCreateGame: set User as playerRight");
-			game.playerRight = user
+			game.loser = user
 		}
 		return game
 	}
@@ -77,17 +79,17 @@ export class GameService {
 	}
 
 	async startGame(server: Server, game: Game) {
-		if (game.playerLeft != undefined && game.playerRight != undefined) {
-			const socketPlayerLeft = await this.gameGateway.findSocketOfUser(game.playerLeft.id)
-			const socketPlayerRight = await this.gameGateway.findSocketOfUser(game.playerRight.id)
+		if (game.winner != undefined && game.loser != undefined) {
+			const socketPlayerLeft = await this.gameGateway.findSocketOfUser(game.winner.id)
+			const socketPlayerRight = await this.gameGateway.findSocketOfUser(game.loser.id)
 			if (socketPlayerLeft && socketPlayerRight)
 				this.startEmittingGameData(server, game)
 		}
 	  }
 
 	async startEmittingGameData(server: Server, game: Game) {
-		this.userService.setStatus(game.playerLeft.id, UserStatus.PLAYING);
-		this.userService.setStatus(game.playerRight.id, UserStatus.PLAYING);
+		this.userService.setStatus(game.winner.id, UserStatus.PLAYING);
+		this.userService.setStatus(game.loser.id, UserStatus.PLAYING);
 		server.to(game.id.toString()).emit('GameInfo', game)
 		console.log("startGame");
 		game.interval = setInterval(() => this.emitGameData(game, server), 1) as unknown as number;
@@ -185,12 +187,12 @@ export class GameService {
 		var ret: boolean = false;
 		if (game.ball.position.x - game.ball.radius <= 0) {
 			game.score.scoreRight += game.score.increaseRight;
-			game.scoreRight += game.score.increaseRight;
+			game.scoreLoser += game.score.increaseRight;
 			ret = true;
 		}
 		else if (game.ball.position.x + game.ball.radius >= 640 ) {
 			game.score.scoreLeft += game.score.increaseLeft;
-			game.scoreLeft += game.score.increaseLeft;
+			game.scoreWinner += game.score.increaseLeft;
 			ret = true;
 		}
 		return ret;
@@ -226,13 +228,13 @@ export class GameService {
 			clearInterval(game.interval);
 			game.interval = null
 			let gameInstance: Game = this.gameRepository.create();
-			gameInstance.playerRight = game.playerRight;
-			gameInstance.playerLeft = game.playerLeft;
-			gameInstance.scoreLeft = game.scoreLeft;
-			gameInstance.scoreRight = game.scoreRight;
+			gameInstance.loser = game.loser;
+			gameInstance.winner = game.winner;
+			gameInstance.scoreWinner = game.scoreWinner;
+			gameInstance.scoreLoser = game.scoreLoser;
 			await this.gameRepository.save(gameInstance);
-			this.userService.setStatus(game.playerLeft.id, UserStatus.ONLINE)
-			this.userService.setStatus(game.playerRight.id, UserStatus.ONLINE)
+			this.userService.setStatus(game.winner.id, UserStatus.ONLINE)
+			this.userService.setStatus(game.loser.id, UserStatus.ONLINE)
 			this.removeGame(game)
 			console.log("game is finished");
 		}
@@ -261,7 +263,7 @@ export class GameService {
 
 	getPlayerSide(game: Game, user_id: number) {
 		if (game != undefined) {
-			if (game.playerLeft.id == user_id) {
+			if (game.winner.id == user_id) {
 				return Side.left
 			} else {
 				return Side.right
@@ -310,4 +312,5 @@ export class GameService {
 		// .select("'scoreLeft'")
 		.getMany()
 	}
+
 }

@@ -55,12 +55,12 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	  console.log("joining existing gameRoom");
     client.join(game.id.toString());
 	  if (game.interval == null) {
-		  if (client.handshake.auth.id === game.playerRight?.id) {
+		  if (client.handshake.auth.id === game.loser?.id) {
         client.emit('resetRequester')
 			  await this.gameService.startGame(this.server, game);
       }
 	  } else {
-	  	client.emit('GameInfo', {playerLeft: game.playerLeft, playerRight: game.playerRight})
+	  	client.emit('GameInfo', {playerLeft: game.winner, playerRight: game.loser})
       client.emit('updatePaddle', {paddleLeft: game.paddleLeft, paddleRight: game.paddleRight})
       client.emit('updateScore', {scoreLeft: game.score.scoreLeft, scoreRight: game.score.scoreRight})
 	  }
@@ -115,7 +115,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	  		socket.emit('GameRequestFrontend', client.handshake.auth as User)
 	  		game = await this.gameService.joinGameOrCreateGame(client.handshake.auth as User, this.server, id)
 	  		// opponent has no game -> push to /play
-        ret = { playerLeft: game.playerLeft, playerRight: game.playerRight, push: true }
+        ret = { playerLeft: game.winner, playerRight: game.loser, push: true }
 	  	} else {
         // opponent has game, -> push to /play
         ret.push = true
@@ -134,7 +134,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     var game: Game = this.gameService.getGame(client.handshake.auth.id)
     if(game != undefined && game.interval == null) {
 	    console.log('accept');
-	    let socket = await this.findSocketOfUser(game.playerLeft.id)
+	    let socket = await this.findSocketOfUser(game.winner.id)
       if (socket != undefined) {
 	      socket.emit('NowInGame', true)
         await this.gameService.startGame(this.server, game)
@@ -151,7 +151,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         if (socket)
           socket.emit('NowInGame', false)
       })
-    	const socket = await this.findSocketOfUser(game.playerLeft.id)
+    	const socket = await this.findSocketOfUser(game.winner.id)
 		  this.closeRoom(game.id.toString())
 		  if (this.gameService.removeGame(game)) {
         if (socket != undefined)
@@ -176,10 +176,10 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	  this.gameService.removeUserFromSpectators(clientId, game);
 	  game = this.gameService.getGame(clientId);
     if (game == undefined) return;
-    const isMatchDeletable: boolean = clientId === game.playerLeft.id && game.interval == null;
+    const isMatchDeletable: boolean = clientId === game.winner.id && game.interval == null;
 	  if (isMatchDeletable) {
-	  	if (game.playerRight != undefined) {
-	  		const socket = await this.findSocketOfUser(game.playerRight.id)
+	  	if (game.loser != undefined) {
+	  		const socket = await this.findSocketOfUser(game.loser.id)
         if (socket != undefined)
 	  		  socket.emit('resetRequester')
 	  	}
@@ -204,7 +204,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     if(game != undefined) {
       client.join(game.id.toString())
     }
-    return {playerLeft: game.playerLeft, playerRight: game.playerRight}
+    return {playerLeft: game.winner, playerRight: game.loser}
   }
 
   @SubscribeMessage('key')

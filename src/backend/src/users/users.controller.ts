@@ -30,6 +30,15 @@ export class UsersController {
 		return this.usersService.findAll(req.user.id)
 	}
 
+	@Get('topPlayer')
+	@UseGuards(JwtAuthGuard)
+	getTopPlayer(@Request() req){
+		// console.log(req);
+
+		return this.usersService.getTopPlayer()
+	}
+
+
 	@Post('addUser')
 	@UseGuards(JwtAuthGuard)
 	addUser(@Body() user: User){
