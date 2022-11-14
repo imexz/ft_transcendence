@@ -84,7 +84,7 @@
           roomActionAdmin: { name: 'settings', title: 'Settings'},
           createRoomPopUp: false as boolean,
           PoppupJoin: ref(false),
-          roomInfoPopUp: ref(false),
+          roomInfoPopUp: false,
           roomInfoData: null as Object | null,
           password: '',
           timeout: 0,
@@ -120,15 +120,16 @@
             if (currentRoom.messages.length < 1)
               return [] as Message[]
             return currentRoom.messages as Message[]
-          }
-          return [] as Message[]
+
+            // return this.$store.state.chat?.getMessages(this.currentRoomId)
+
         }
       },
       updated() {
 
         this.messagesLoaded = true
-        console.log("rooms = " , this.rooms)
-        console.log("messages = ", this.messages);
+        // console.log("rooms = " , this.rooms)
+        // console.log("messages = ", this.messages);
 
       },
       methods: {
@@ -364,7 +365,9 @@
           //     this.toggleRoomInfo()
           //   }
           // );
-          this.roomInfoData = this.$store.state.chat.getRoomInfo(roomId)
+          this.roomInfoData = this.$store.state.chat?.getRoomInfo(roomId)
+          console.log("roomInfoData", this.roomInfoData);
+
           if(this.roomInfoData != undefined && this.roomInfoData.users.find(elem => elem.id == this.currentUserId) != undefined)
               this.toggleRoomInfo()
         },
@@ -418,7 +421,8 @@
           console.log("toggleRoomInfo ende");
         },
         hideRoomInfo(e) {
-          if (!this.$el.contains(e.target)) {
+          console.log("hideRoomInfo");
+          if (this.$el.contains(e.target)) {
             this.toggleRoomInfo()
           }
         },
@@ -499,12 +503,14 @@
           console.log("array of typing users", room.typingUsers)
           if(isTyping) {
             console.log("before", room.typingUsers)
-            if(room.typingUsers == undefined || room.typingUsers.length == 0)
+            if(room.typingUsers == undefined || room.typingUsers.length == 0) {
               room.typingUsers = [ userId ]
-            else if(room.typingUsers.indexOf(userId) == -1)
+            }
+            else if(room.typingUsers.indexOf(userId) == -1) {
               room.typingUsers = [ ...room.typingUsers, userId ]
+            }
 
-            console.log("after", room.typingUsers);
+            console.log("after", room.typingUsers)
 
 
           } else {

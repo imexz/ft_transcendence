@@ -224,8 +224,8 @@ export class ChatGateway {
 
       console.log("room changed");
       // if (room.chatroom.access != Access.private)
-      client.broadcast.emit('changedRoom', {change: changedRoom.access, roomId: room.chatroom.roomId, data: room.chatroom.access})
-      this.server.to(room.chatroom.roomId.toString()).emit('changedRoom', {change: changedRoom.access, roomId: room.chatroom.roomId, data: room.chatroom.access})
+      client.broadcast.emit('UpdateRoom', {change: changedRoom.access, roomId: room.chatroom.roomId, data: room.chatroom.access})
+      this.server.to(room.chatroom.roomId.toString()).emit('UpdateRoom', {change: changedRoom.access, roomId: room.chatroom.roomId, data: room.chatroom.access})
     }
     else {
       console.log("room == empty");
