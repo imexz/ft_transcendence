@@ -47,10 +47,10 @@
 </template>
 
   <script lang="ts">
-  import { io, Socket } from 'socket.io-client';
+  // import { io, Socket } from 'socket.io-client';
   import { defineComponent, ref } from 'vue';
-  import VueAxios from 'axios';
-  import { API_URL } from '@/defines';
+  // import VueAxios from 'axios';
+  // import { API_URL } from '@/defines';
   import createRoomPopup from '@/components/Chat/createRoomPopup.vue';
   import joinRoomPopup from '@/components/Chat/joinRoomPopup.vue';
   import roomInfoPopUp from '@/components/Chat/RoomInfoPopUp.vue';
@@ -95,19 +95,6 @@
           showToast : ref<boolean | null>(false),
           toastMsg : ref<string>(''),
           toastMode : ref<string>(''),
-          // textMessages : {
-          //   ROOMS_EMPTY: 'Aucune conversation',
-          //   ROOM_EMPTY: 'Aucune conversation sélectionnée',
-          //   NEW_MESSAGES: 'Nouveaux messages',
-          //   MESSAGE_DELETED: 'Ce message a été supprimé',
-          //   MESSAGES_EMPTY: 'No Messages',
-          //   CONVERSATION_STARTED: 'La conversation a commencée le :',
-          //   TYPE_MESSAGE: 'Tapez votre message',
-          //   SEARCH: 'Rechercher',
-          //   IS_ONLINE: 'est en ligne',
-          //   LAST_SEEN: 'dernière connexion ',
-          //   IS_TYPING: 'est en train de taper...',
-          //   CANCEL_SELECT_MESSAGE: 'Annuler Sélection'}
           }
       },
       components:{
@@ -120,7 +107,7 @@
         rooms () {
           console.log("rooms computed");
           return this.$store.state.chat?.rooms
-          
+
         },
         messages () {
           console.log("messages computed");
@@ -130,7 +117,7 @@
       updated() {
 
         console.log("rooms = " , this.rooms)
-        
+
       },
       methods: {
         async initChatInfoListener() {

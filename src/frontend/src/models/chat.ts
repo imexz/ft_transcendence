@@ -12,7 +12,7 @@ import { ref }  from 'vue';
 export default class Chat{
     constructor() {
       console.log("constructor Caht");
-      
+
           VueAxios({
             url: 'chatroom/all',
             baseURL: API_URL,
@@ -28,14 +28,14 @@ export default class Chat{
               id: document.cookie
             }
           })
-     
+
           this.socketChat.on('message',() => {
             this.NrMessages.value++
           })
 
           this.socketChat.on('newMessage',(data) => {
             console.log("newMessage received:");
-    
+
             let room = this.rooms.value?.find(elem => elem.roomId == data.roomId)
             if (room)
             {
@@ -58,7 +58,7 @@ export default class Chat{
           this.socketChat.on('UpdateRoom',(obj: {change: changedRoom, roomId: number, data: any }) => {
             console.log("UpdateRoom received:", obj);
             console.log("enum test", changedRoom.complet, changedRoom.user);
-            
+
             let room = this.rooms?.value?.find(elem => elem.roomId == obj.roomId)
             if (room) {
               console.log("room found");
@@ -85,7 +85,7 @@ export default class Chat{
                   break;
               }
             }
-    
+
             // if (room && room.access != Access.private)
             //   room = new Room(data)
             // else if (room)
@@ -119,7 +119,7 @@ export default class Chat{
 
       leaveRoom(roomId: number) {
         this.socketChat.emit('leave', roomId)
-        let room : Room = this.getRoomInfo(roomId) 
+        let room : Room = this.getRoomInfo(roomId)
         if (room)
         {
           room.users = []
@@ -130,7 +130,7 @@ export default class Chat{
       }
 
       getRoomInfo(roomId: number): room {
-        return this.rooms?.value?.find(elem => elem.roomId == roomId)        
+        return this.rooms?.value?.find(elem => elem.roomId == roomId)
       }
 
       getMessages(roomId: number): Message[]{

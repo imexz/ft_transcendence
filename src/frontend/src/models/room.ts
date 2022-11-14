@@ -1,7 +1,7 @@
 import  User  from "./user";
 import  Message  from "./message";
-import UserService from "./user"
-import Toast from '@/components/Toast.vue'
+// import UserService from "./user"
+// import Toast from '@/components/Toast.vue'
 import VueAxios from 'axios';
 import { API_URL } from '@/defines';
 
@@ -17,7 +17,6 @@ export default class Room {
         this.access = room.access
         this.roomName = room.roomName
         this.roomId = room.roomId
-        // this.messages = room.messages // run through for loop and convert to real Message object again
         this.users = [] as User[]
         for (let i = 0; i < room.users?.length; ++i)
         {

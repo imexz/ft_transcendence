@@ -18,7 +18,8 @@ export default class Message {
         this.content = message.content
         this.content = message.content
         this.senderId = message.senderId.toString()
-        this.timestamp = message.timestamp
+        const ts : Date = message.timestamp
+        this.timestamp = ts.toLocaleString()
     }
 
     _id: number
