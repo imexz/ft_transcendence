@@ -116,6 +116,7 @@
 
             const currentRoom : Room = this.rooms.find(elem => elem.roomId == this.currentRoomId)
             console.log(currentRoom);
+            currentRoom.unreadCount = 0
             if (currentRoom.messages.length < 1)
               return [] as Message[]
             return currentRoom.messages as Message[]
@@ -189,9 +190,11 @@
           console.log(roomId);
           this.$store.state.chat.socketChat.emit('createMessage', { roomId: roomId, content: content}, (response) =>
           {
-            console.log("createMessage response");
-            console.log(response);
+            // console.log("createMessage response");
+            // console.log(response);
             // this.addMessage(response)
+            console.log("messages was sent");
+
           })
         },
         sendMessageReaction({ roomId, messageId, reaction, remove }) {

@@ -7,6 +7,7 @@ import User from './user';
 import VueAxios from 'axios';
 import room from './room';
 import { ref }  from 'vue';
+import store from '../store/index'
 
 
 export default class Chat{
@@ -39,7 +40,9 @@ export default class Chat{
             let room = this.rooms.value?.find(elem => elem.roomId == data.roomId)
             if (room)
             {
-              ++room.unreadCount
+              if (data.message.senderId != store.state.user.id)
+                room.unreadCount += 1
+
               console.log(data.roomId, data.message, room.unreadCount)
               room.messages = [...room.messages, new Message(data.message)]
             }
