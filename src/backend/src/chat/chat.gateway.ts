@@ -180,7 +180,7 @@ export class ChatGateway {
       // tmp.timestamp = tmp.timestamp. //TB resume work
 
       client.to(roomId.toString()).emit('message', {message: tmp, roomId});
-      client.to(roomId.toString()).emit('newMessage', {message: tmp, roomId});
+      this.server.to(roomId.toString()).emit('newMessage', {message: tmp, roomId});
       console.log("createMessage ende");
       return tmp;
     } else {
