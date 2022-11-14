@@ -110,13 +110,24 @@
 
         },
         messages () {
-          console.log("messages computed");
-          return this.$store.state.chat?.getMessages(this.currentRoomId)
+          if (this.currentRoomId)
+          {
+            console.log("messages computed for ", this.currentRoomId);
+
+            const currentRoom : Room = this.rooms.find(elem => elem.roomId == this.currentRoomId)
+            console.log(currentRoom);
+            if (currentRoom.messages.length < 1)
+              return [] as Message[]
+            return currentRoom.messages as Message[]
+          }
+          return [] as Message[]
         }
       },
       updated() {
 
+        this.messagesLoaded = true
         console.log("rooms = " , this.rooms)
+        console.log("messages = ", this.messages);
 
       },
       methods: {
