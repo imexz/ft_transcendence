@@ -130,7 +130,10 @@ export default class Chat{
       }
 
       getRoomInfo(roomId: number): room {
-        return this.rooms?.value?.find(elem => elem.roomId == roomId)
+        const test = this.rooms?.find(elem => elem.roomId == roomId)
+        console.log( "getRoomInfo", test, roomId, this.rooms ,this.rooms.value);
+        
+        return test 
       }
 
       getMessages(roomId: number): Message[]{

@@ -60,10 +60,12 @@ export default defineComponent({
     }
   },
   mounted() {
-    console.log("Room in room info");
+    console.log("Room in room info", this.room);
     
   },
   updated() {
+    console.log("updated in room info");
+    
     // this.room = this.roomInfo?.room;
   },
   computed: {
