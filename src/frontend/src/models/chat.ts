@@ -41,7 +41,7 @@ export default class Chat{
             {
               ++room.unreadCount
               console.log(data.roomId, data.message, room.unreadCount)
-              room.messages[room.messages.length] = new Message(data.message)
+              room.messages = [...room.messages, new Message(data.message)]
             }
             else
               console.log("room for new Message not found");
