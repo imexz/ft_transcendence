@@ -9,7 +9,7 @@ export class banMute{
     @PrimaryGeneratedColumn()
     id: number
 
-    @ManyToOne(() => User, (User) => User.banMute)  
+    @ManyToOne(() => User, (User) => User.banMute)
     user: User
 
     @ManyToOne(() => chatroom, (chatroom) => chatroom.muted)

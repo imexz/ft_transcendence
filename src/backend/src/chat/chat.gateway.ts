@@ -57,7 +57,7 @@ export class ChatGateway {
       const rooms = this.addUserRooms(socket)
     }
   }
-  
+
   async addUserRooms(client: Socket) {
     const rooms = await this.chatService.getUserRooms(client.handshake.auth.id)
     var tmp: string[] = []
@@ -75,10 +75,10 @@ export class ChatGateway {
     @MessageBody('password') password?: string,
     )
      {
-        if (roomId ) { 
+        if (roomId ) {
           const room: chatroom = await this.chatService.manageJoin(client.handshake.auth.id, roomId, password)
           // console.log("bool: ", room);
-    
+
           if (room) {
             await this.addUserRooms(client)
             console.log("UpdateRoom");
@@ -169,7 +169,7 @@ export class ChatGateway {
       _id: message._id,
       content: content,
       avatar: message.sender.avatar_url,
-      timestamp: message.timestamp,
+      timestamp: message.timestamp.toLocaleString(),
       username: message.sender.username }
 
       // console.log(test);
@@ -219,7 +219,7 @@ export class ChatGateway {
         client.emit('newRoom', room.chatroom)
       }
      this.addUserRooms(client)
-      
+
     } else if (room.info == roomReturn.changed) {
 
       console.log("room changed");
