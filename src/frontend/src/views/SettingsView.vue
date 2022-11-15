@@ -40,7 +40,7 @@
         <twoFaSettings/>
       </div>
     </div>
-    <!-- <div class="section">
+    <div class="section">
       <div class="sectionHeadline"> 
         <h2>API-Test (DEBUG ONLY!!)</h2>
       </div>
@@ -59,7 +59,7 @@
         <p>prints the store content to console</p>
         <button @click="show">show Store</button>       
       </div>
-    </div> -->
+    </div>
   </div>
 </template>
 

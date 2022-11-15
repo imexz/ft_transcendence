@@ -39,15 +39,16 @@ export default defineComponent({
     }
   },
   methods: {
-    logout(): void {
-        this.$store.dispatch('logOut');
-        this.$router.push('/login');
-        VueAxios({
-            url: '/auth/logout',
-            baseURL: API_URL,
-            method: 'GET',
-            withCredentials: true,
-        })
+    async logout() {
+      await VueAxios({
+          url: '/auth/logout',
+          baseURL: API_URL,
+          method: 'GET',
+          withCredentials: true,
+      })
+      console.log("hi");
+      this.$store.dispatch('logOut');
+      this.$router.push('/login');
     },
     authenticate() {
       location.href= API_URL + '/auth/login'
@@ -58,21 +59,6 @@ export default defineComponent({
         this.toastMode = mode;
         setTimeout(() => this.showToast = false, 2000);
     },
-    // validateUser() {
-    //     VueAxios({
-    //       url: '/users/validate',
-    //       baseURL: API_URL,
-    //       method: 'GET',
-    //       withCredentials: true,
-    //     })
-    //     .then(response => (
-    //       this.$store.dispatch('logIn', response.data),
-    //       this.triggerToast('vaildated', 'success')))
-    //     .catch(error => (
-    //       console.log(error),
-    //       this.$store.dispatch('logOut'),
-    //       this.triggerToast('please log in', 'error')))
-    // }
   },
   mounted(): void {
     this.$store.dispatch('validateUser')
@@ -84,11 +70,6 @@ export default defineComponent({
       }
     }
     )
-    // .chatch(
-    //   error => {console.log(error)
-    //   this.triggerToast('please log in', 'error')
-    //   }
-    // )
   }
 })
 

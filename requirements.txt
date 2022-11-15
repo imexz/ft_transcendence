@@ -1,0 +1,52 @@
+OverView
+
+[✘]Backend in NestJS
+[✘]Frontend in tsFramework
+[✘]all libs latest-stable Version
+[✘]PostgreSQL as DB
+[✘]website SPA,(use back+forward-Buttons)
+[✘]compatibel latest-stable Chrome
+[✘]user, no unhandled errors or warnings
+[✘]launch everything with docker-compose up --build
+
+Security
+
+[✘]any pw in db hashed
+[✘]protected against SQL injections 
+[✘]serverside validation for forms+user-input
+[✘].env file private
+
+User Account
+
+
+[✘]login via Oauth of 42Intra
+[✘]user can choose unique name
+[✘]user can upload avatar + default avatar
+[✘]user can enable 2FA
+[✘]user can add friends + view their status
+[✘]stats are displayed on user profile
+[✘]user has MatchHistory, anyone can view it
+
+Chat
+
+[✘]user can create channels (public, private, pw protected)
+[✘]user can dm other
+[✘]user can block other users(no more msg)
+[✘]channel creator is owner till leave
+    set, change, remove pw,
+    set other users as admin,
+    admin can ban + mute users
+[✘]user can invite users to play pong
+[✘]user can view other user profiles
+
+Game
+
+[✘]user can play live pong vs other users
+[✘]matchMakingSystem
+[✘]game be there
+[✘]game must be customizeable
+[✘]game must be responsive
+[✘]users can spectate other games
+
+
+[✔]

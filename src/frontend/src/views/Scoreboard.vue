@@ -1,8 +1,9 @@
 <template>
     <div class="friends">
-        <UserSummary
-        v-for="user in orderdUsers()"
-        :user = user as User ></UserSummary>
+      <div v-for="user in orderdUsers()">
+        <div>Wins: {{ user.winns }}</div>
+        <UserSummary :user = user as User />
+      </div>
       </div>
 </template>
 
@@ -13,11 +14,13 @@ import UserSummary from '@/components/Profile/UserSummary.vue';
 import VueAxios from 'axios';
 import { API_URL } from '@/defines';
 import { defineComponent } from 'vue';
+import { userInfo } from 'os';
 
 export default defineComponent({
     data() {
         return {
             users : [] as User[],
+            u : [],
         }
     },
     components: {
@@ -27,11 +30,11 @@ export default defineComponent({
         orderdUsers() {
             return this.users.sort((n1,n2) => {
                 if (n1.winns > n2.winns) {
-                    return 1;
+                    return -1;
                 }
 
                 if (n1.winns < n2.winns) {
-                    return -1;
+                    return 1;
                 }
                 return 0;
 
@@ -44,7 +47,7 @@ export default defineComponent({
             method: 'GET',
             withCredentials: true,
         })
-        .then(response => { this.users = response.data })
+        .then(response => { this.users = response.data})
         .catch()
         }
 
