@@ -75,11 +75,11 @@ export default class Chat{
                 case changedRoom.complet:
                   room = new Room(obj.data)
                   console.log("room now", room);
-                  this.rooms.forEach(element => {
+                  this.rooms.value.forEach(element => {
                     if (element.roomId == room.roomId)
                       element = room
                   });
-                  this.rooms = [...this.rooms]
+                  this.rooms.value = [...this.rooms.value]
                   console.log("complet", room);
                   break;
                 case changedRoom.user:
