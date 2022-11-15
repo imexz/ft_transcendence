@@ -26,7 +26,7 @@ export default defineComponent({
     methods: {
         orderdUsers() {
             return this.users.sort((n1,n2) => {
-                if (n1.winnes > n2.winns) {
+                if (n1.winns > n2.winns) {
                     return 1;
                 }
 

@@ -13,7 +13,4 @@ export class GameController {
 	{
 		return this.gameService.getMatchHistory(req.user)
 	}
-
-
-
 }
