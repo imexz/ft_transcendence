@@ -38,13 +38,19 @@ export default class Chat{
             console.log("newMessage received:");
 
             let room = this.rooms.value?.find(elem => elem.roomId == data.roomId)
+            console.log(room);
+
             if (room)
             {
               if (data.message.senderId != store.state.user.id)
-                room.unreadCount += 1
+              {
+                ++room.unreadCount
+              }
+              //   store.state.rooms.find(elem => elem.roomId == room.roomId).unreadCount++
 
               console.log(data.roomId, data.message, room.unreadCount)
               room.messages = [...room.messages, new Message(data.message)]
+              console.log("message was put to store");
             }
             else
               console.log("room for new Message not found");
@@ -69,7 +75,11 @@ export default class Chat{
                 case changedRoom.complet:
                   room = new Room(obj.data)
                   console.log("room now", room);
-                  this.rooms.value = [...this.rooms.value, room]
+                  this.rooms.forEach(element => {
+                    if (element.roomId == room.roomId)
+                      element = room
+                  });
+                  this.rooms = [...this.rooms]
                   console.log("complet", room);
                   break;
                 case changedRoom.user:
@@ -108,16 +118,16 @@ export default class Chat{
           room[i] = new Room(rooms[i])
         }
         this.rooms.value = room
-        console.log("ROOMS: ", rooms, rooms[0] instanceof Room)
-        console.log("this.ROOMS: ", this.rooms, this.rooms[0] instanceof Room)
+        // console.log("ROOMS: ", rooms, rooms[0] instanceof Room)
+        // console.log("this.ROOMS: ", this.rooms, this.rooms[0] instanceof Room)
       }
 
       addRoom(room: any) {
         // this.rooms[this.rooms.length] = new Room(room)
         this.rooms.value = [...this.rooms.value, new Room(room)]
         // this.rooms.$set(this.rooms, this.rooms.length, new Room(room))
-        console.log("ROOM: ", room, room instanceof Room)
-        console.log("this.ROOMS: ", this.rooms, this.rooms[0] instanceof Room)
+        // console.log("ROOM: ", room, room instanceof Room)
+        // console.log("this.ROOMS: ", this.rooms, this.rooms[0] instanceof Room)
       }
 
       leaveRoom(roomId: number) {
@@ -134,9 +144,9 @@ export default class Chat{
 
       getRoomInfo(roomId: number): room {
         const test = this.rooms?.find(elem => elem.roomId == roomId)
-        console.log( "getRoomInfo", test, roomId, this.rooms ,this.rooms.value);
-        
-        return test 
+        // console.log( "getRoomInfo", test, roomId, this.rooms ,this.rooms.value);
+
+        return test
       }
 
       getMessages(roomId: number): Message[]{
