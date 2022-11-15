@@ -3,7 +3,7 @@ import { Game, Side } from './game.entities/game.entity';
 import { Paddle } from './game.entities/paddle.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Server, Socket } from 'socket.io';
+import { Server } from 'socket.io';
 import { GameSetup } from './game.entities/setup.entity';
 import { UsersService } from 'src/users/users.service';
 import User from 'src/users/entitys/user.entity';
@@ -27,8 +27,15 @@ export class GameService {
 	@InjectRepository(Game)
 	private gameRepository: Repository<Game>
 
-	getGame(user_id: number | undefined): Game {
-		return this.gamesArr.find((value: Game) =>  value.winner?.id == user_id || value.loser?.id == user_id)
+	getGame(user_id: number | undefined, isCustomized: boolean = false): Game {
+		return this.gamesArr.find((value: Game) =>  {
+			const isPlayer: boolean = value.playerLeft?.id == user_id || value.playerRight?.id == user_id
+			if (user_id)
+				return isPlayer
+			else {
+				return isPlayer && value.isCustomized === isCustomized
+			}
+		})
 	}
 
 	addUserToSpectators(userId: number, game: Game) {
@@ -54,11 +61,11 @@ export class GameService {
 		game.spectators.length = 0;
 	}
 
-	async joinGameOrCreateGame(user: User, server: Server, opponentUserId?: number): Promise<Game> {
-		let game = this.getGame(undefined) // checking for first game with missing (undefined) opponent
+	async joinGameOrCreateGame(user: User, isCustomized: boolean, opponentUserId?: number): Promise<Game> {
+		let game = this.getGame(undefined, isCustomized) // checking for first game with missing (undefined) opponent
 		if (game == undefined || opponentUserId) {
-			game = await this.createGameInstance(user.id)
-			game.winner = user
+			game = await this.createGameInstance(user.id, isCustomized)
+			game.playerLeft = user
 			// opponentUserId is set when called via Frontend::askForMatch
 			if(opponentUserId != undefined) {
 				const opponent = await this.userService.getUser(opponentUserId)
@@ -71,11 +78,11 @@ export class GameService {
 		}
 		return game
 	}
-	async createGameInstance(userId: number): Promise<Game> {
+	async createGameInstance(userId: number, isCustomized: boolean): Promise<Game> {
 		console.log('inside createGameInstance()');
 		const setup = new GameSetup;
 		console.log('leaving createGameInstance()');
-		return new Game(userId, setup);
+		return new Game(userId, setup, isCustomized);
 	}
 
 	async startGame(server: Server, game: Game) {
@@ -108,7 +115,7 @@ export class GameService {
 			console.log("emitGameData: closeRoom");
 			this.gameGateway.closeRoom(game.id.toString());
 		}
-	}	
+	}
 
 	async getData(game: Game): Promise<Game | undefined> {
 		if (game == undefined) {
@@ -207,10 +214,10 @@ export class GameService {
 		game.ball.direction.speed = this.setup.ballDir.speed;
 		do {
 			game.ball.direction.angle = Math.random() * 2 * Math.PI;
-			game.ball.direction.x = game.ball.direction.speed * Math.cos(game.ball.direction.angle);
-			game.ball.direction.y = game.ball.direction.speed * Math.sin(game.ball.direction.angle);
 		}
 		while (!this.isDirectionValid(game.ball.direction.angle));
+		game.ball.direction.x = game.ball.direction.speed * Math.cos(game.ball.direction.angle);
+		game.ball.direction.y = game.ball.direction.speed * Math.sin(game.ball.direction.angle);
 		game.ball.radius = this.setup.ballRadius;
 
 		game.paddleLeft.width = this.setup.paddleWidth;
@@ -255,8 +262,10 @@ export class GameService {
 		if(game != undefined) {
 			if (key == "ArrowUp" || key == "w") {
 				this.movePaddleUp(game, this.getPlayerSide(game, user_id))
+				console.log("paddle Up");
 			} else if (key == "ArrowDown" || key == "s") {
 				this.movePaddleDown(game, this.getPlayerSide(game, user_id))
+				console.log("paddle Down");
 			}
 		}
 	}
