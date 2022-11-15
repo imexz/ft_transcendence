@@ -135,6 +135,7 @@ export default createStore<State>({
       commit('logOut');
       document.cookie = "Authentication=; expires=Thu, 01 Jan 1970 00:00:00 GMT;SameSite=Lax"
       localStorage.removeItem('user');
+      this.state.user = null;
       // console.log(router.currentRoute.value.path)
       if (router.currentRoute.value.path != '/login/tfa')
         router.push("/login");

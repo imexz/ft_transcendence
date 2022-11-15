@@ -1,7 +1,7 @@
 <template>
   <div>
     <Toast v-if="showToast" :msg=toastMsg :mode=toastMode />
-    <div v-if="$store.state.user != null">
+    <div v-if="$store.state.user == null">
       <button 
         class="authButton"
         :class="{'linkActive': $route.name === 'login'}"
