@@ -303,19 +303,19 @@ export class GameService {
 		this.gameGateway.server.to(game.id.toString()).emit('updatePaddle', {paddleRight: game.paddleRight, paddleLeft: game.paddleLeft})
 	}
 
-	async getMatchHistory(user: User){
-		if (user == undefined) {
-			console.log("user == undefind");
+	async getMatchHistory(userId: number){
+		if (userId == undefined) {
+			console.log("userId == undefind");
 		}
-		console.log("user.id", user.id, typeof(user.id));
+		console.log("userId", userId, typeof(userId));
 		return await this.gameRepository.createQueryBuilder("game")
 		// .innerJoinAndSelect("game.player", "player", "player.id = :id", { id: user.id})
-		.leftJoin('game.loser', 'tmp', 'tmp.id = :id', { id: user.id as number} )
-		.leftJoin('game.winner', 'tmp1', 'tmp1.id = :idd', { idd: user.id  as number})
-		.leftJoinAndSelect('game.loser', 'loser', 'loser.id != :iid', { iid: user.id} )
-		.leftJoinAndSelect('game.winner', 'winner', 'winner.id != :iidd', { iidd: user.id})
-		.where("game.loser.id = :te", {te: user.id})
-		.orWhere("game.winner.id = :te1", {te1: user.id})
+		.leftJoin('game.loser', 'tmp', 'tmp.id = :id', { id: userId as number} )
+		.leftJoin('game.winner', 'tmp1', 'tmp1.id = :idd', { idd: userId  as number})
+		.leftJoinAndSelect('game.loser', 'loser', 'loser.id != :iid', { iid: userId} )
+		.leftJoinAndSelect('game.winner', 'winner', 'winner.id != :iidd', { iidd: userId})
+		.where("game.loser.id = :te", {te: userId})
+		.orWhere("game.winner.id = :te1", {te1: userId})
 		// .innerJoinAndSelect("game.loser", "loser", "loser.id != :id", { id: user.id} )
 		// .innerJoinAndSelect("game.player", "player", "player.id != :id", { id: user.id})
 		// .select("'scoreWinner'")

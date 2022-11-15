@@ -9,8 +9,16 @@ export class GameController {
 	@Get()
 	@UseGuards(JwtAuthGuard)
 	@UseInterceptors(ClassSerializerInterceptor)
-	getMatchHistory(@Request() req)
+	getMyMatchHistory(@Request() req)
 	{
-		return this.gameService.getMatchHistory(req.user)
+		return this.gameService.getMatchHistory(req.user.id)
+	}
+
+	@Get(':id')
+	@UseGuards(JwtAuthGuard)
+	@UseInterceptors(ClassSerializerInterceptor)
+	getMatchHistory(@Param('id') id: number, @Request() req)
+	{
+		return this.gameService.getMatchHistory(id)
 	}
 }
