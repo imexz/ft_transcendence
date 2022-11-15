@@ -3,7 +3,7 @@ import { Game, Side } from './game.entities/game.entity';
 import { Paddle } from './game.entities/paddle.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Server, Socket } from 'socket.io';
+import { Server } from 'socket.io';
 import { GameSetup } from './game.entities/setup.entity';
 import { UsersService } from 'src/users/users.service';
 import User from 'src/users/entitys/user.entity';
@@ -12,6 +12,8 @@ import { GameGateway } from './game.gateway';
 
 @Injectable()
 export class GameService {
+	
+	
 	constructor(
 		private userService: UsersService,
 		@Inject(forwardRef(() => GameGateway))
@@ -25,8 +27,15 @@ export class GameService {
 	@InjectRepository(Game)
 	private gameRepository: Repository<Game>
 
-	getGame(user_id: number | undefined): Game {
-		return this.gamesArr.find((value: Game) =>  value.playerLeft?.id == user_id || value.playerRight?.id == user_id)
+	getGame(user_id: number | undefined, isCustomized: boolean = false): Game {
+		return this.gamesArr.find((value: Game) =>  {
+			const isPlayer: boolean = value.winner?.id == user_id || value.loser?.id == user_id
+			if (user_id)
+				return isPlayer
+			else {
+				return isPlayer && value.isCustomized === isCustomized
+			}
+		})
 	}
 
 	addUserToSpectators(userId: number, game: Game) {
@@ -52,42 +61,42 @@ export class GameService {
 		game.spectators.length = 0;
 	}
 
-	async joinGameOrCreateGame(user: User, server: Server, opponentUserId?: number): Promise<Game> {
-		let game = this.getGame(undefined) // checking for first game with missing (undefined) opponent
+	async joinGameOrCreateGame(user: User, isCustomized: boolean, opponentUserId?: number): Promise<Game> {
+		let game = this.getGame(undefined, isCustomized) // checking for first game with missing (undefined) opponent
 		if (game == undefined || opponentUserId) {
-			game = await this.createGameInstance(user.id)
-			game.playerLeft = user
+			game = await this.createGameInstance(user.id, isCustomized)
+			game.winner = user
 			// opponentUserId is set when called via Frontend::askForMatch
 			if(opponentUserId != undefined) {
 				const opponent = await this.userService.getUser(opponentUserId)
-				game.playerRight = opponent
+				game.loser = opponent
 			}
 			this.gamesArr.push(game)
 		} else { // queue game exists, join and set user as opponent
-			console.log("joinGameOrCreateGame: set User as playerRight");
-			game.playerRight = user
+			console.log("joinGameOrCreateGame: set User alosers ");
+			game.loser = user
 		}
 		return game
 	}
-	async createGameInstance(userId: number): Promise<Game> {
+	async createGameInstance(userId: number, isCustomized: boolean): Promise<Game> {
 		console.log('inside createGameInstance()');
 		const setup = new GameSetup;
 		console.log('leaving createGameInstance()');
-		return new Game(userId, setup);
+		return new Game(userId, setup, isCustomized);
 	}
 
 	async startGame(server: Server, game: Game) {
-		if (game.playerLeft != undefined && game.playerRight != undefined) {
-			const socketPlayerLeft = await this.gameGateway.findSocketOfUser(game.playerLeft.id)
-			const socketPlayerRight = await this.gameGateway.findSocketOfUser(game.playerRight.id)
-			if (socketPlayerLeft && socketPlayerRight)
+		if (game.winner != undefined && game.loser != undefined) {
+			const winner = await this.gameGateway.findSocketOfUser(game.winner.id)
+			const sloserocket = await this.gameGateway.findSocketOfUser(game.loser.id)
+			if (winner && sloserocket)
 				this.startEmittingGameData(server, game)
 		}
 	  }
 
 	async startEmittingGameData(server: Server, game: Game) {
-		this.userService.setStatus(game.playerLeft.id, UserStatus.PLAYING);
-		this.userService.setStatus(game.playerRight.id, UserStatus.PLAYING);
+		this.userService.setStatus(game.winner.id, UserStatus.PLAYING);
+		this.userService.setStatus(game.loser.id, UserStatus.PLAYING);
 		server.to(game.id.toString()).emit('GameInfo', game)
 		console.log("startGame");
 		game.interval = setInterval(() => this.emitGameData(game, server), 1) as unknown as number;
@@ -106,7 +115,7 @@ export class GameService {
 			console.log("emitGameData: closeRoom");
 			this.gameGateway.closeRoom(game.id.toString());
 		}
-	}	
+	}
 
 	async getData(game: Game): Promise<Game | undefined> {
 		if (game == undefined) {
@@ -116,7 +125,7 @@ export class GameService {
 		this.collisionControl(game);
 		if (this.scored(game)){
 			this.reset(game);
-			this.gameGateway.server.to(game.id.toString()).emit('updateScore', {scoreLeft: game.score.scoreLeft, scoreRight: game.score.scoreRight})
+			this.gameGateway.server.to(game.id.toString()).emit('updateScore', {scoreWinner: game.score.scoreLeft, scoreLoser: game.score.scoreRight})
 		}
 		await this.isGameFinished(game);
 		return game
@@ -185,12 +194,12 @@ export class GameService {
 		var ret: boolean = false;
 		if (game.ball.position.x - game.ball.radius <= 0) {
 			game.score.scoreRight += game.score.increaseRight;
-			game.scoreRight += game.score.increaseRight;
+			game.scoreLoser += game.score.increaseRight;
 			ret = true;
 		}
 		else if (game.ball.position.x + game.ball.radius >= 640 ) {
 			game.score.scoreLeft += game.score.increaseLeft;
-			game.scoreLeft += game.score.increaseLeft;
+			game.scoreWinner += game.score.increaseLeft;
 			ret = true;
 		}
 		return ret;
@@ -205,10 +214,10 @@ export class GameService {
 		game.ball.direction.speed = this.setup.ballDir.speed;
 		do {
 			game.ball.direction.angle = Math.random() * 2 * Math.PI;
-			game.ball.direction.x = game.ball.direction.speed * Math.cos(game.ball.direction.angle);
-			game.ball.direction.y = game.ball.direction.speed * Math.sin(game.ball.direction.angle);
 		}
 		while (!this.isDirectionValid(game.ball.direction.angle));
+		game.ball.direction.x = game.ball.direction.speed * Math.cos(game.ball.direction.angle);
+		game.ball.direction.y = game.ball.direction.speed * Math.sin(game.ball.direction.angle);
 		game.ball.radius = this.setup.ballRadius;
 
 		game.paddleLeft.width = this.setup.paddleWidth;
@@ -226,13 +235,13 @@ export class GameService {
 			clearInterval(game.interval);
 			game.interval = null
 			let gameInstance: Game = this.gameRepository.create();
-			gameInstance.playerRight = game.playerRight;
-			gameInstance.playerLeft = game.playerLeft;
-			gameInstance.scoreLeft = game.scoreLeft;
-			gameInstance.scoreRight = game.scoreRight;
+			gameInstance.loser = game.loser;
+			gameInstance.winner = game.winner;
+			gameInstance.scoreWinner = game.scoreWinner;
+			gameInstance.scoreLoser = game.scoreLoser;
 			await this.gameRepository.save(gameInstance);
-			this.userService.setStatus(game.playerLeft.id, UserStatus.ONLINE)
-			this.userService.setStatus(game.playerRight.id, UserStatus.ONLINE)
+			this.userService.setStatus(game.winner.id, UserStatus.ONLINE)
+			this.userService.setStatus(game.loser.id, UserStatus.ONLINE)
 			this.removeGame(game)
 			console.log("game is finished");
 		}
@@ -253,15 +262,17 @@ export class GameService {
 		if(game != undefined) {
 			if (key == "ArrowUp" || key == "w") {
 				this.movePaddleUp(game, this.getPlayerSide(game, user_id))
+				console.log("paddle Up");
 			} else if (key == "ArrowDown" || key == "s") {
 				this.movePaddleDown(game, this.getPlayerSide(game, user_id))
+				console.log("paddle Down");
 			}
 		}
 	}
 
 	getPlayerSide(game: Game, user_id: number) {
 		if (game != undefined) {
-			if (game.playerLeft.id == user_id) {
+			if (game.winner.id == user_id) {
 				return Side.left
 			} else {
 				return Side.right
@@ -292,22 +303,23 @@ export class GameService {
 		this.gameGateway.server.to(game.id.toString()).emit('updatePaddle', {paddleRight: game.paddleRight, paddleLeft: game.paddleLeft})
 	}
 
-	async getMatchHistory(user: User){
-		if (user == undefined) {
-			console.log("user == undefind");
+	async getMatchHistory(userId: number){
+		if (userId == undefined) {
+			console.log("userId == undefind");
 		}
-		console.log("user.id", user.id, typeof(user.id));
+		console.log("userId", userId, typeof(userId));
 		return await this.gameRepository.createQueryBuilder("game")
 		// .innerJoinAndSelect("game.player", "player", "player.id = :id", { id: user.id})
-		.leftJoin('game.playerRight', 'tmp', 'tmp.id = :id', { id: user.id as number} )
-		.leftJoin('game.playerLeft', 'tmp1', 'tmp1.id = :idd', { idd: user.id  as number})
-		.leftJoinAndSelect('game.playerRight', 'playerRight', 'playerRight.id != :iid', { iid: user.id} )
-		.leftJoinAndSelect('game.playerLeft', 'playerLeft', 'playerLeft.id != :iidd', { iidd: user.id})
-		.where("game.playerRight.id = :te", {te: user.id})
-		.orWhere("game.playerLeft.id = :te1", {te1: user.id})
-		// .innerJoinAndSelect("game.playerRight", "playerRight", "playerRight.id != :id", { id: user.id} )
+		.leftJoin('game.loser', 'tmp', 'tmp.id = :id', { id: userId as number} )
+		.leftJoin('game.winner', 'tmp1', 'tmp1.id = :idd', { idd: userId  as number})
+		.leftJoinAndSelect('game.loser', 'loser', 'loser.id != :iid', { iid: userId} )
+		.leftJoinAndSelect('game.winner', 'winner', 'winner.id != :iidd', { iidd: userId})
+		.where("game.loser.id = :te", {te: userId})
+		.orWhere("game.winner.id = :te1", {te1: userId})
+		// .innerJoinAndSelect("game.loser", "loser", "loser.id != :id", { id: user.id} )
 		// .innerJoinAndSelect("game.player", "player", "player.id != :id", { id: user.id})
-		// .select("'scoreLeft'")
+		// .select("'scoreWinner'")
 		.getMany()
 	}
+
 }

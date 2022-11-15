@@ -12,6 +12,7 @@ Change hitbox of paddles / collision control (?)
 
 Ideas:
     do not change view when adding user as friend
+    foot invite -> user menu -> dm 
 
 Done:
 After Game: invite winner to game (even if its the same person) 

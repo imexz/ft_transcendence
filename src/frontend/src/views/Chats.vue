@@ -151,6 +151,8 @@
             }
 
             // return this.$store.state.chat?.getMessages(this.currentRoomId)
+            // this.messages = this.$store.state.chat?.getMessages(this.currentRoomId)
+
             // console.log(new Date().getMilliseconds());
 
         },

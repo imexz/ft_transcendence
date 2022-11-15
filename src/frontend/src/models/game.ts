@@ -4,8 +4,8 @@ export default class Game {
     // constructor(parameters) {
         
     // }
-    playerRight: User
-    playerLeft: User
-    scoreLeft: number = 0;
-	scoreRight: number = 0;
+    winner: User
+    loser: User
+	scoreWinner: number = 0;
+    scoreLoser: number = 0;
 }
