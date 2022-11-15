@@ -30,11 +30,11 @@ User Account
 Chat
 
 [✔]user can create channels (public, private, pw protected)
-[✘]user can dm other
+[✘]user can dm other (toDo fix rooms not having names in store on creation)
 [✘]user can block other users(no more msg) (toDo add button switch + popUp on blocked user side)
-[✘]channel creator is owner till leave (toDo transfer ownership to other user)
+[✘]channel creator is owner till leave (toDo remove ownership)
     set, change, remove pw, (toDo public private changes needs work in backend)
-    set other users as admin, (toDo transfer admin if last admin leaves)
+    set other users as admin, (toDo discuss buttons)
     admin can ban + mute users
 [✔]user can invite users to play pong
 [✔]user can view other user profiles
