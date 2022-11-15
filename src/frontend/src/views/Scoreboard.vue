@@ -50,7 +50,6 @@ export default defineComponent({
         .then(response => { this.users = response.data})
         .catch()
         }
-
     },
     mounted() {
         this.getData()

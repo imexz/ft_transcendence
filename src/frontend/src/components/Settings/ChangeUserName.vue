@@ -43,12 +43,11 @@ export default defineComponent({
               this.$emit('success', 'name changed'),
               this.$store.commit('changeUserName', this.newName)
             })
-            .catch(error => { this.$emit('error', 'Internal Error') })
+            .catch(error => { this.$emit('error', 'name already in use') })
         }
     }
   }
 })
-
 </script>
 
 <style scoped>

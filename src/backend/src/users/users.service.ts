@@ -1,7 +1,7 @@
 import { InjectRepository } from "@nestjs/typeorm";
 import { Not } from "typeorm"
 import User from './entitys/user.entity';
-import { Injectable } from "@nestjs/common";
+import { Injectable, HttpException, HttpStatus } from "@nestjs/common";
 import { Repository } from "typeorm";
 import { fileEntity } from "../avatar/file.entitys"
 import { hostURL } from "../hostURL";
@@ -125,19 +125,23 @@ export class UsersService {
 		this.usersRepository.update(id, user)
 	}
 
-	async updateName(id: number, username: string)
+	async updateName(user: User, username: string)
 	{
-		const user = await this.usersRepository.findOneBy({id: id})
-		if (user == null)
-		{
-			return
-		}
+		// const user = await this.usersRepository.findOneBy({id: id})
+		// if (user == null)
+		// {
+		// 	return
+		// }
+		// user.username = username
 		user.username = username
-		return this.usersRepository.save(user)
+		try {
+			await this.usersRepository.save(user)
+		} catch (error) {
+			console.log(error);
+			throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
+		}
+		return 
 	}
-
-
-
 	// async addfriend(user_id: number, friend_id: number) {
 	// 	// console.log(user_id);
 	// 	// console.log(friend_id);
