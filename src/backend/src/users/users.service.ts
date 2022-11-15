@@ -10,6 +10,17 @@ import { UserStatus } from "./entitys/status.enum";
 
 @Injectable()
 export class UsersService {
+	getTopPlayer() {
+		const test = this.usersRepository.createQueryBuilder("user")
+			.loadRelationCountAndMap('user.winns','user.winns', 'test')
+			// .orderBy("winns", "DESC")
+			.limit(10)
+			.getMany()
+
+		console.log("getTopPlayer", test);
+		
+		return test
+	}
 
 	async setStatus(id: number , userStatus: UserStatus) {
 		this.usersRepository.update(id, {userStatus: userStatus})

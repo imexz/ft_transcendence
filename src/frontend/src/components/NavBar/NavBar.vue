@@ -33,6 +33,11 @@
           <font-awesome-icon icon="fa-solid fa-gear" />
         </router-link>
       </div>
+      <div class="topElement rightSideElement">
+        <router-link :to="'/scoreboard'" class="navButton ">
+          <font-awesome-icon icon="fa-solid fa-square" />
+        </router-link>
+      </div>
       <div>
         <FtAuth/>
       </div>

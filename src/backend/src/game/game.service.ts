@@ -12,6 +12,8 @@ import { GameGateway } from './game.gateway';
 
 @Injectable()
 export class GameService {
+	
+	
 	constructor(
 		private userService: UsersService,
 		@Inject(forwardRef(() => GameGateway))
@@ -27,7 +29,7 @@ export class GameService {
 
 	getGame(user_id: number | undefined, isCustomized: boolean = false): Game {
 		return this.gamesArr.find((value: Game) =>  {
-			const isPlayer: boolean = value.playerLeft?.id == user_id || value.playerRight?.id == user_id
+			const isPlayer: boolean = value.winner?.id == user_id || value.loser?.id == user_id
 			if (user_id)
 				return isPlayer
 			else {
@@ -63,16 +65,16 @@ export class GameService {
 		let game = this.getGame(undefined, isCustomized) // checking for first game with missing (undefined) opponent
 		if (game == undefined || opponentUserId) {
 			game = await this.createGameInstance(user.id, isCustomized)
-			game.playerLeft = user
+			game.winner = user
 			// opponentUserId is set when called via Frontend::askForMatch
 			if(opponentUserId != undefined) {
 				const opponent = await this.userService.getUser(opponentUserId)
-				game.playerRight = opponent
+				game.loser = opponent
 			}
 			this.gamesArr.push(game)
 		} else { // queue game exists, join and set user as opponent
-			console.log("joinGameOrCreateGame: set User as playerRight");
-			game.playerRight = user
+			console.log("joinGameOrCreateGame: set User alosers ");
+			game.loser = user
 		}
 		return game
 	}
@@ -84,17 +86,17 @@ export class GameService {
 	}
 
 	async startGame(server: Server, game: Game) {
-		if (game.playerLeft != undefined && game.playerRight != undefined) {
-			const socketPlayerLeft = await this.gameGateway.findSocketOfUser(game.playerLeft.id)
-			const socketPlayerRight = await this.gameGateway.findSocketOfUser(game.playerRight.id)
-			if (socketPlayerLeft && socketPlayerRight)
+		if (game.winner != undefined && game.loser != undefined) {
+			const winner = await this.gameGateway.findSocketOfUser(game.winner.id)
+			const sloserocket = await this.gameGateway.findSocketOfUser(game.loser.id)
+			if (winner && sloserocket)
 				this.startEmittingGameData(server, game)
 		}
 	  }
 
 	async startEmittingGameData(server: Server, game: Game) {
-		this.userService.setStatus(game.playerLeft.id, UserStatus.PLAYING);
-		this.userService.setStatus(game.playerRight.id, UserStatus.PLAYING);
+		this.userService.setStatus(game.winner.id, UserStatus.PLAYING);
+		this.userService.setStatus(game.loser.id, UserStatus.PLAYING);
 		server.to(game.id.toString()).emit('GameInfo', game)
 		console.log("startGame");
 		game.interval = setInterval(() => this.emitGameData(game, server), 1) as unknown as number;
@@ -123,7 +125,7 @@ export class GameService {
 		this.collisionControl(game);
 		if (this.scored(game)){
 			this.reset(game);
-			this.gameGateway.server.to(game.id.toString()).emit('updateScore', {scoreLeft: game.score.scoreLeft, scoreRight: game.score.scoreRight})
+			this.gameGateway.server.to(game.id.toString()).emit('updateScore', {scoreWinner: game.score.scoreLeft, scoreLoser: game.score.scoreRight})
 		}
 		await this.isGameFinished(game);
 		return game
@@ -192,12 +194,12 @@ export class GameService {
 		var ret: boolean = false;
 		if (game.ball.position.x - game.ball.radius <= 0) {
 			game.score.scoreRight += game.score.increaseRight;
-			game.scoreRight += game.score.increaseRight;
+			game.scoreLoser += game.score.increaseRight;
 			ret = true;
 		}
 		else if (game.ball.position.x + game.ball.radius >= 640 ) {
 			game.score.scoreLeft += game.score.increaseLeft;
-			game.scoreLeft += game.score.increaseLeft;
+			game.scoreWinner += game.score.increaseLeft;
 			ret = true;
 		}
 		return ret;
@@ -233,13 +235,13 @@ export class GameService {
 			clearInterval(game.interval);
 			game.interval = null
 			let gameInstance: Game = this.gameRepository.create();
-			gameInstance.playerRight = game.playerRight;
-			gameInstance.playerLeft = game.playerLeft;
-			gameInstance.scoreLeft = game.scoreLeft;
-			gameInstance.scoreRight = game.scoreRight;
+			gameInstance.loser = game.loser;
+			gameInstance.winner = game.winner;
+			gameInstance.scoreWinner = game.scoreWinner;
+			gameInstance.scoreLoser = game.scoreLoser;
 			await this.gameRepository.save(gameInstance);
-			this.userService.setStatus(game.playerLeft.id, UserStatus.ONLINE)
-			this.userService.setStatus(game.playerRight.id, UserStatus.ONLINE)
+			this.userService.setStatus(game.winner.id, UserStatus.ONLINE)
+			this.userService.setStatus(game.loser.id, UserStatus.ONLINE)
 			this.removeGame(game)
 			console.log("game is finished");
 		}
@@ -270,7 +272,7 @@ export class GameService {
 
 	getPlayerSide(game: Game, user_id: number) {
 		if (game != undefined) {
-			if (game.playerLeft.id == user_id) {
+			if (game.winner.id == user_id) {
 				return Side.left
 			} else {
 				return Side.right
@@ -308,15 +310,16 @@ export class GameService {
 		console.log("user.id", user.id, typeof(user.id));
 		return await this.gameRepository.createQueryBuilder("game")
 		// .innerJoinAndSelect("game.player", "player", "player.id = :id", { id: user.id})
-		.leftJoin('game.playerRight', 'tmp', 'tmp.id = :id', { id: user.id as number} )
-		.leftJoin('game.playerLeft', 'tmp1', 'tmp1.id = :idd', { idd: user.id  as number})
-		.leftJoinAndSelect('game.playerRight', 'playerRight', 'playerRight.id != :iid', { iid: user.id} )
-		.leftJoinAndSelect('game.playerLeft', 'playerLeft', 'playerLeft.id != :iidd', { iidd: user.id})
-		.where("game.playerRight.id = :te", {te: user.id})
-		.orWhere("game.playerLeft.id = :te1", {te1: user.id})
-		// .innerJoinAndSelect("game.playerRight", "playerRight", "playerRight.id != :id", { id: user.id} )
+		.leftJoin('game.loser', 'tmp', 'tmp.id = :id', { id: user.id as number} )
+		.leftJoin('game.winner', 'tmp1', 'tmp1.id = :idd', { idd: user.id  as number})
+		.leftJoinAndSelect('game.loser', 'loser', 'loser.id != :iid', { iid: user.id} )
+		.leftJoinAndSelect('game.winner', 'winner', 'winner.id != :iidd', { iidd: user.id})
+		.where("game.loser.id = :te", {te: user.id})
+		.orWhere("game.winner.id = :te1", {te1: user.id})
+		// .innerJoinAndSelect("game.loser", "loser", "loser.id != :id", { id: user.id} )
 		// .innerJoinAndSelect("game.player", "player", "player.id != :id", { id: user.id})
-		// .select("'scoreLeft'")
+		// .select("'scoreWinner'")
 		.getMany()
 	}
+
 }
