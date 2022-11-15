@@ -260,6 +260,11 @@ export class ChatroomService {
             // console.log(user);
             // console.log(room.owner);
             if(room.access != Access.dm) {
+                if (room.owner.id == user.id) {
+                    console.log("remove owner");
+                    
+                    room.owner = null
+                }
                 var index = room.admins.findIndex(object => {
                     return object.id === user.id
                 })
@@ -272,9 +277,8 @@ export class ChatroomService {
                 if(index != -1) {
                     room.users.splice(index, 1)
                 }
-                // console.log(index);
-
-                await this.chatroomRepository.save(room)
+                console.log(await this.chatroomRepository.save(room));
+                 
             }
 
         }
