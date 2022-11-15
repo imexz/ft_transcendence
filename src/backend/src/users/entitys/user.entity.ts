@@ -93,7 +93,7 @@ export default class User {
 	@Column({ nullable: true })
   	twoFactorAuthenticationSecret?: string;
 
-	@Exclude()
+	// @Exclude()
 	@Column({ default: false })
 	isTwoFactorAuthenticationEnabled: boolean;
 
