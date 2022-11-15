@@ -559,7 +559,8 @@
           //  console.log("mrmessiges", this.$store.state.NrMessages)
           // })
         }
-      }
+      },
+    }
     })
 </script>
 
