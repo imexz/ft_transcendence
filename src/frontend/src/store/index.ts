@@ -176,6 +176,9 @@ export default createStore<State>({
       console.log("index.rooms", room);
       commit('addRoom', room);
     },
+    logIn({ commit }, user) {
+      commit("logIn", user)
+    }
   },
 
   modules: {
