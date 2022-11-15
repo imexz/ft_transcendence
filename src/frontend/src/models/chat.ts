@@ -92,6 +92,13 @@ export default class Chat{
                   break;
                 case changedRoom.access:
                   console.log("access");
+                  if (obj.data == Access.private)
+                  {
+                    const index = this.rooms.value.indexOf(room)
+                    if( -1 != index) {
+                      this.rooms.value.splice(index, 1) //TB check if needs extra check if user is part of the room
+                    }
+                  }
                   room.access = obj.data as unknown as Access
                   break;
                 default:
