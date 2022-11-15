@@ -88,7 +88,7 @@
           roomInfoData: null as Object | null,
           password: '',
           timeout: 0,
-          typing: false,
+          // typing: false,
   		    socket: null,
           chatTheme: "dark",
           showEmojis: true,
@@ -246,24 +246,24 @@
         //   }
         //   console.log(this.PoppupJoin);
         // },
-        emitTyping({ roomId, message }) {
-          console.log("emitTyping");
-          console.log(roomId);
-          console.log(this.timeout);
-          if(this.typing == false)
-          {
-            this.$store.state.chat.socketChat.emit('typing', {isTyping: true, roomId: roomId});
-            this.typing = true
+        // emitTyping({ roomId, message }) {
+        //   console.log("emitTyping");
+        //   console.log(roomId);
+        //   console.log(this.timeout);
+        //   if(this.typing == false)
+        //   {
+        //     this.$store.state.chat.socketChat.emit('typing', {isTyping: true, roomId: roomId});
+        //     this.typing = true
 
-            this.timeout = setTimeout(() => {
-              if(this.typing == true) {
-                this.$store.state.chat.socketChat.emit('typing', { isTyping: false, roomId: roomId});
-                this.typing = false
-              }
-            }, 2000);
-          }
-          console.log("emit typing ende");
-        },
+        //     this.timeout = setTimeout(() => {
+        //       if(this.typing == true) {
+        //         this.$store.state.chat.socketChat.emit('typing', { isTyping: false, roomId: roomId});
+        //         this.typing = false
+        //       }
+        //     }, 2000);
+        //   }
+        //   console.log("emit typing ende");
+        // },
         fillMessagesData(){
           // this.rooms.forEach(
           //   messages => messages.forEach(
@@ -495,41 +495,42 @@
           return ;
         }
         this.$store.state.NrMessages = 0;
-        this.$store.state.chat.socketChat.on('typing',({ userId, isTyping , roomId}) => {
-          console.log('typing');
-          const room = this.rooms.find((room) => {
-            return room.roomId === roomId
-          })
-          console.log("roomId", room.roomId)
-          console.log("bool", isTyping)
-          console.log("userId", userId)
+        this.$store.state.chat.socketChat.off('message')
+        // this.$store.state.chat.socketChat.on('typing',({ userId, isTyping , roomId}) => {
+        //   console.log('typing');
+        //   const room = this.rooms.find((room) => {
+        //     return room.roomId === roomId
+        //   })
+        //   console.log("roomId", room.roomId)
+        //   console.log("bool", isTyping)
+        //   console.log("userId", userId)
 
-          console.log("array of typing users", room.typingUsers)
-          if(isTyping) {
-            console.log("before", room.typingUsers)
-            if(room.typingUsers == undefined || room.typingUsers.length == 0) {
-              room.typingUsers = [ userId ]
-            }
-            else if(room.typingUsers.indexOf(userId) == -1) {
-              room.typingUsers = [ ...room.typingUsers, userId ]
-            }
+        //   console.log("array of typing users", room.typingUsers)
+        //   if(isTyping) {
+        //     console.log("before", room.typingUsers)
+        //     if(room.typingUsers == undefined || room.typingUsers.length == 0) {
+        //       room.typingUsers = [ userId ]
+        //     }
+        //     else if(room.typingUsers.indexOf(userId) == -1) {
+        //       room.typingUsers = [ ...room.typingUsers, userId ]
+        //     }
 
-            console.log("after", room.typingUsers)
+        //     console.log("after", room.typingUsers)
 
 
-          } else {
-            const typingUsers = []
-            for (let i = 0; i < room.typingUsers.length; i++) {
-                if (room.typingUsers[i] != userId)
-                  typingUsers.push(room.typingUsers[i])
-              }
-              room.typingUsers = typingUsers
-          }
+        //   } else {
+        //     const typingUsers = []
+        //     for (let i = 0; i < room.typingUsers.length; i++) {
+        //         if (room.typingUsers[i] != userId)
+        //           typingUsers.push(room.typingUsers[i])
+        //       }
+        //       room.typingUsers = typingUsers
+        //   }
 
-          console.log("before ende typing");
-          console.log(room.typingUsers);
-          console.log("ende typing");
-        });
+        //   console.log("before ende typing");
+        //   console.log(room.typingUsers);
+        //   console.log("ende typing");
+        // });
 
         // this.$store.state.chat.socketChat.on('message',({message, roomId}) => {
         //   console.log('message');
@@ -555,8 +556,8 @@
         // console.log(this.currentUserId)
       },
       unmounted() {
-        if (this.$store.state.chat.socketChat) {
-          this.$store.state.chat.socketChat.off('typing')
+        // if (this.$store.state.chat.socketChat) {
+        //   this.$store.state.chat.socketChat.off('typing')
           // this.$store.state.chat.socketChat.off('message')
           // this.$store.state.chat.socketChat.on('message',() => {
           //   this.$store.state.NrMessages++

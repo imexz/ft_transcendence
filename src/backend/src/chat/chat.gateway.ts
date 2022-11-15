@@ -103,23 +103,23 @@ export class ChatGateway {
     this.chatService.manageLeave(client.handshake.auth.id, roomId)
   }
 
-  @SubscribeMessage('typing')
-  async typing(
-    @MessageBody('isTyping') isTyping: boolean,
-    @MessageBody('roomId') roomId: any,
-    @ConnectedSocket() client:Socket,
-  ) {
-    // console.log(roomId)
-    // console.log("typing")
+  // @SubscribeMessage('typing')
+  // async typing(
+  //   @MessageBody('isTyping') isTyping: boolean,
+  //   @MessageBody('roomId') roomId: any,
+  //   @ConnectedSocket() client:Socket,
+  // ) {
+  //   // console.log(roomId)
+  //   // console.log("typing")
 
-    // const name = await this.chatService.getClientName(client.handshake.auth.id);
-    // const room_name = await this.chatService.getRoomName(roomId)
-    // const name = client.Id
-    const userId = client.handshake.auth.id
-    client.to(roomId.toString()).emit('typing', { userId: userId , isTyping , roomId});
-    // console.log("recive and emit typing");
+  //   // const name = await this.chatService.getClientName(client.handshake.auth.id);
+  //   // const room_name = await this.chatService.getRoomName(roomId)
+  //   // const name = client.Id
+  //   const userId = client.handshake.auth.id
+  //   client.to(roomId.toString()).emit('typing', { userId: userId , isTyping , roomId});
+  //   // console.log("recive and emit typing");
 
-  }
+  // }
 
   @SubscribeMessage('action')
   async ban(
