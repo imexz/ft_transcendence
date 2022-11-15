@@ -30,7 +30,7 @@ export default class Room {
         }
         this.admins = room.admins
         this.unreadCount = 0
-        this.typingUsers = []
+        // this.typingUsers = []
         this.owner = room.owner
         // console.warn("Room constructor called", room);
 
@@ -48,7 +48,7 @@ export default class Room {
 
     unreadCount: number | undefined = 0
 
-    typingUsers: number [] | undefined = []
+    // typingUsers: number [] | undefined = []
 
 
 
