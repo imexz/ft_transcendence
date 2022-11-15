@@ -12,9 +12,10 @@ import { UserStatus } from "./entitys/status.enum";
 export class UsersService {
 	getTopPlayer() {
 		const test = this.usersRepository.createQueryBuilder("user")
-			.loadRelationCountAndMap('user.winns','user.winns', 'test')
+			.loadRelationCountAndMap('user.winns','user.winns')
+			.loadRelationCountAndMap('user.loses','user.loses')
 			// .orderBy("winns", "DESC")
-			.limit(10)
+			// .limit(10)
 			.getMany()
 
 		console.log("getTopPlayer", test);
