@@ -6,7 +6,7 @@ import Room, { Access } from './room';
 import User from './user';
 import VueAxios from 'axios';
 import room from './room';
-import { ref }  from 'vue';
+import { ref, reactive }  from 'vue';
 import store from '../store/index'
 
 
@@ -100,7 +100,7 @@ export default class Chat{
       socketChat: Socket | null
       NrMessages=ref<number>(0)
       rooms = ref<Room[]>([])
-
+      help = reactive({rooms: this.rooms})
 
       setRooms(rooms: any) {
         const room = [] as Room[]
@@ -133,10 +133,14 @@ export default class Chat{
       }
 
       getRoomInfo(roomId: number): room {
-        const test = this.rooms?.find(elem => elem.roomId == roomId)
+        // const rooms: Room[] = this.rooms
+        // console.log(rooms);
+        
+        console.log( "getRoomInfo",  roomId, this.rooms ,this.rooms.value);
+        const test: Room = this.help.rooms?.find(elem => elem.roomId == roomId)
         console.log( "getRoomInfo", test, roomId, this.rooms ,this.rooms.value);
         
-        return test 
+        return test
       }
 
       getMessages(roomId: number): Message[]{
