@@ -113,8 +113,15 @@
           // return this.$store.state.chat?.rooms
           this.rooms = this.$store.state.chat?.rooms
           this.rooms.forEach(element => {
-            element.unreadCount = this.$store.state.chat.rooms.find(elem => elem.roomId == element.roomId).unreadCount
+            let room = this.$store.state.chat.rooms.find(elem => elem.roomId == element.roomId)
+            element.unreadCount = room.unreadCount
             console.log("unreadCount updated", element.roomId, element.unreadCount);
+
+            element.users = room.users
+            console.log("users changed", element.roomId, element.users);
+
+            element.access = room.access
+            console.log("users changed", element.roomId, element.access);
 
           });
           this.rooms = [...this.rooms]

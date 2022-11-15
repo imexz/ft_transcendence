@@ -64,8 +64,8 @@ export default class Chat{
             // this.dispatch('updateRooms', new Room(data))
           })
 
-          this.socketChat.on('UpdateRoom',(obj: {change: changedRoom, roomId: number, data: any }) => {
-            console.log("UpdateRoom received:", obj);
+          this.socketChat.on('updateRoom',(obj: {change: changedRoom, roomId: number, data: any }) => {
+            console.log("updateRoom received:", obj);
             console.log("enum test", changedRoom.complet, changedRoom.user);
 
             let room = this.rooms?.value?.find(elem => elem.roomId == obj.roomId)
@@ -96,7 +96,7 @@ export default class Chat{
                   {
                     const index = this.rooms.value.indexOf(room)
                     if( -1 != index) {
-                      this.rooms.value.splice(index, 1) //TB check if needs extra check if user is part of the room
+                      this.rooms.value.splice(index, 1) // TB check if needs extra check if user is part of the room
                     }
                   }
                   room.access = obj.data as unknown as Access
@@ -131,6 +131,8 @@ export default class Chat{
 
       addRoom(room: any) {
         // this.rooms[this.rooms.length] = new Room(room)
+        console.log("adding room to store", room);
+
         this.rooms.value = [...this.rooms.value, new Room(room)]
         // this.rooms.$set(this.rooms, this.rooms.length, new Room(room))
         // console.log("ROOM: ", room, room instanceof Room)

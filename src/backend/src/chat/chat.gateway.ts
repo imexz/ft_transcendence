@@ -85,7 +85,7 @@ export class ChatGateway {
             console.log("UpdateRoom1");
             client.emit('UpdateRoom', {change: changedRoom.complet, roomId: roomId, data: room })
             console.log("UpdateRoom2");
-            client.to(roomId.toString()).emit('UpdateRoom', {change: changedRoom.user, roomId: roomId,  data: client.handshake.auth })
+            client.to(roomId.toString()).emit('updateRoom', {change: changedRoom.user, roomId: roomId,  data: client.handshake.auth })
             console.log("UpdateRoom3");
           }
         }
@@ -209,6 +209,8 @@ export class ChatGateway {
       }
       else
       {
+        console.log("before emit", room.chatroom); // TB check for roomName etc. maybe return is needed
+
         client.emit('newRoom', room.chatroom)
       }
      this.addUserRooms(client)
@@ -217,8 +219,8 @@ export class ChatGateway {
 
       console.log("room changed");
       // if (room.chatroom.access != Access.private)
-      client.broadcast.emit('UpdateRoom', {change: changedRoom.access, roomId: room.chatroom.roomId, data: room.chatroom.access})
-      this.server.to(room.chatroom.roomId.toString()).emit('UpdateRoom', {change: changedRoom.access, roomId: room.chatroom.roomId, data: room.chatroom.access})
+      client.broadcast.emit('updateRoom', {change: changedRoom.access, roomId: room.chatroom.roomId, data: room.chatroom.access})
+      this.server.to(room.chatroom.roomId.toString()).emit('updateRoom', {change: changedRoom.access, roomId: room.chatroom.roomId, data: room.chatroom.access})
     }
     else {
       console.log("room == empty");
@@ -265,7 +267,20 @@ export class ChatGateway {
     @MessageBody('content') content: string,
     @MessageBody('id') id: number,
   ) {
-    this.chatService.creatRoomDM(client.handshake.auth as User, id, content)
+
+    const room = await this.chatService.creatRoomDM(client.handshake.auth as User, id, content)
+    if (room && room.info == roomReturn.created)
+    {
+      client.emit('newRoom', room.chatroom)
+      const user = await this.findSocketOfUser(id)
+      if (user)
+        user.emit('newRoom', room.chatroom)
+    }
+    else if (room && room.info == roomReturn.changed) // TB maybe not needed here?!
+    {
+      client.emit('updateRoom', room.chatroom)
+    }
+    return {room}
   }
 
   async findSocketOfUser(userId: number) {

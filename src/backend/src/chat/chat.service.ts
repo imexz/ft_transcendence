@@ -54,11 +54,16 @@ export class ChatService {
       const user1 = await this.usersService.getUser(id)
       const chat: {info: roomReturn, chatroom: chatroom} = await this.chatroomService.findOrCreatDM(user, user1)
       if(chat != undefined)
+      {
         this.messageService.userAddMessageToRoom(user, content, chat.chatroom)
-      else
-        console.log("chat == undeinfd");
-
+        return chat
       }
+      else
+      {
+        console.log("chat == undeinfd");
+        return undefined
+      }
+    }
   }
 
   async createRoomInfo(roomId: number, id: any) {
