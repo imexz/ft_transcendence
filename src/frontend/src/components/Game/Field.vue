@@ -42,8 +42,8 @@ export default defineComponent({
             height: 0
           },
           score: {
-            scoreLeft: 0,
-	          scoreRight: 0
+            scoreWinner: 0,
+	          scoreLoser: 0
           }
         },
         styleData: {
@@ -139,7 +139,7 @@ export default defineComponent({
         this.pixiScene.endFill()
 
         //score
-        this.pixiScore.left.text = this.gameData?.score.scoreLeft;
+        this.pixiScore.left.text = this.gameData?.score.scoreWinner;
         this.pixiScore.left.style = {
           fill: this.styleData.fgColor,
           fontFamily: 'Arial',
@@ -150,7 +150,7 @@ export default defineComponent({
           this.pixiApp.renderer.width/4 - this.pixiScore.left.width/2;
         this.pixiScore.left.y = 5;
 
-        this.pixiScore.right.text = this.gameData?.score.scoreRight;
+        this.pixiScore.right.text = this.gameData?.score.scoreLoser;
         this.pixiScore.right.style = {
           fill: this.styleData.fgColor,
           fontFamily: 'Arial',
@@ -163,7 +163,7 @@ export default defineComponent({
       },
       updateScore(data: any) {
         this.gameData.score = data;
-        switch(Math.max(this.gameData.score.scoreLeft, this.gameData.score.scoreRight)) {
+        switch(Math.max(this.gameData.score.scoreWinner, this.gameData.score.scoreLoser)) {
           case 4:
             this.styleData.fgColor = 0xf5ac0e
             break;
@@ -192,13 +192,13 @@ export default defineComponent({
         this.gameData.ball = data;
       },
 	    isGameFinished(): boolean {
-		    return this.gameData.score.scoreLeft == 3 || this.gameData.score.scoreRight == 3
+		    return this.gameData.score.scoreWinner == 3 || this.gameData.score.scoreLoser == 3
 	    },
       assignWinnerAndLoser() {
-        if (this.gameData.score.scoreLeft > this.gameData.score.scoreRight) {
-          return { winner: this.$store.state.game.playerLeft, loser: this.$store.state.game.playerRight }
+        if (this.gameData.score.scoreWinner > this.gameData.score.scoreLoser) {
+          return { winner: this.$store.state.game.winner, loser: this.$store.state.game.loser }
         } else {
-          return { winner: this.$store.state.game.playerRight, loser: this.$store.state.game.playerLeft }
+          return { winner: this.$store.state.game.loser, loser: this.$store.state.game.winner }
         }
       }
     }

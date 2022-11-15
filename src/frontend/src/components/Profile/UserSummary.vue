@@ -166,9 +166,9 @@ export default defineComponent({
       if (isSelfInvite) return;
       this.$store.state.winner = null;
       this.$store.state.socketGame.emit('GameRequestBackend', {isCustomized: this.$store.state.customized, id: this.user.id}, (r) => {
-        if (r.playerLeft != undefined && r.playerRight != undefined) {
+        if (r.winner != undefined && r.loser != undefined) {
         	this.showGame = !this.showGame
-        	const isUserActivePlayer: boolean = r.playerLeft.id == this.$store.state.user.id || r.playerRight.id == this.$store.state.user.id
+        	const isUserActivePlayer: boolean = r.winner.id == this.$store.state.user.id || r.loser.id == this.$store.state.user.id
 			if (!isUserActivePlayer)
 				this.$store.state.game = r
         }

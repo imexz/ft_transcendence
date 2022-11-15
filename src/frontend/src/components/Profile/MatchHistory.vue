@@ -69,8 +69,8 @@ export default defineComponent({
           console.log("match Data", response.data);
           this.matchData = response.data
           this.matchData.forEach(match => {
-            if (match?.scoreLeft > match?.scoreRight && match?.playerLeft == null ||
-                match?.scoreLeft < match?.scoreRight && match?.playerRight == null)
+            if (match?.scoreWinner > match?.scoreLoser && match?.winner == null ||
+                match?.scoreWinner < match?.scoreLoser && match?.loser == null)
               this.winCount++;
             else
               this.lossCount++;

@@ -30,7 +30,7 @@ export class UsersController {
 		return this.usersService.findAll(req.user.id)
 	}
 
-	@Get('topPlayer')
+	@Get('allUserWinnes')
 	@UseGuards(JwtAuthGuard)
 	getTopPlayer(@Request() req){
 		// console.log(req);

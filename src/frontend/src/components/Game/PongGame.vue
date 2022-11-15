@@ -6,7 +6,7 @@
 			<div>
         <Field @assignWinner="assignWinner"/>
 	    </div>
-      <div v-show="this.$store.state.user.id!=this.$store.state.game?.playerRight?.id && this.$store.state.user.id!=this.$store.state.game?.playerLeft?.id"  class="leaveGame">
+      <div v-show="this.$store.state.user.id!=this.$store.state.game?.loser?.id && this.$store.state.user.id!=this.$store.state.game?.winner?.id"  class="leaveGame">
         <button @click="leaveGame"> Leave </button>
       </div>
     </div>
@@ -85,7 +85,7 @@
       },
       assignGame(game: Game) {
         this.$store.state.game = game
-        if (this.$store.state.game.playerRight != undefined) {
+        if (this.$store.state.game.loser != undefined) {
   	  	  document.addEventListener('keydown', this.keyEvents, false);
         }
       },

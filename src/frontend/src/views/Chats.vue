@@ -110,22 +110,22 @@
 
         },
         messages () {
-          if (this.currentRoomId)
-          {
-            console.log("messages computed for ", this.currentRoomId);
+          // if (this.currentRoomId)
+          // {
+          //   console.log("messages computed for ", this.currentRoomId);
 
-            const currentRoom : Room = this.rooms.find(elem => elem.roomId == this.currentRoomId)
-            console.log(currentRoom);
-            currentRoom.unreadCount = 0
-            if (currentRoom.messages.length < 1)
-              return [] as Message[]
-              else
-              return currentRoom.messages as Message[]
-            }
-            else
-              return [] as Message[]
+          //   const currentRoom : Room = this.rooms.find(elem => elem.roomId == this.currentRoomId)
+          //   console.log(currentRoom);
+          //   currentRoom.unreadCount = 0
+          //   if (currentRoom.messages.length < 1)
+          //     return [] as Message[]
+          //     else
+          //     return currentRoom.messages as Message[]
+          //   }
+          //   else
+          //     return [] as Message[]
 
-            // return this.$store.state.chat?.getMessages(this.currentRoomId)
+            return this.$store.state.chat?.getMessages(this.currentRoomId)
 
         }
       },
