@@ -35,7 +35,7 @@
       </div>
       <div class="topElement rightSideElement">
         <router-link :to="'/scoreboard'" class="navButton ">
-          <font-awesome-icon icon="fa-solid fa-square" />
+          <font-awesome-icon icon="fa-solid fa-trophy" />
         </router-link>
       </div>
       <div>
