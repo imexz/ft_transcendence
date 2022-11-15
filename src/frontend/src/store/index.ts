@@ -33,17 +33,17 @@ export interface State {
   requester: User | null
   // rooms: Room[]
   game: Game | null
-  pendingRequest: boolean
   winner: User | null
   chat: Chat
   loser: User | null
+  customized: boolean
 }
 
 const storage = localStorage.getItem('user')
 const user = storage?JSON.parse(storage):null;
 const initialState = user?
-{validated: true, user: user, socket: null,  socketChat: null,  socketGame: null, friendsList: null, NrMessages: 0, NrFriendRequests: 0, requester: null, game: null, pendingRequest: false, winner: null, loser: null}:
-{validated: false, user: null,  socket: null,  socketChat: null,  socketGame: null, friendsList: null, NrMessages: 0, NrFriendRequests: 0, requester: null, game: null, pendingRequest: false, winner: null, loser: null};
+{ validated: true, user: user, socket: null,  socketChat: null,  socketGame: null, friendsList: null, NrMessages: 0, NrFriendRequests: 0, requester: null, game: null, winner: null, loser: null, customized: false }:
+{ validated: false, user: null,  socket: null,  socketChat: null,  socketGame: null, friendsList: null, NrMessages: 0, NrFriendRequests: 0, requester: null, game: null, winner: null, loser: null, customized: false };
 
 export default createStore<State>({
 
@@ -60,9 +60,9 @@ export default createStore<State>({
 	    state.socketGame.disconnect(); //added
     },
     logIn(state, user) {
-      
+
       // console.log("logIn");
-      
+
       state.validated = true;
       state.user = user;
       console.log("logIn index", user);
@@ -95,18 +95,15 @@ export default createStore<State>({
         // state.game = game;
         console.log("receive NowInGame");
         if (cb) {
-			    state.pendingRequest = false;
 			    router.push('/play')
 		    } else {
           state.game = null;
-          state.pendingRequest = false;
           router.push('/')
         }
       })
 	    state.socketGame.on('resetRequester', () => {
 		    console.log("receive resetRequester");
 		    state.requester = null;
-		    state.pendingRequest = false;
 	    })
       state.socket.on('Request',(data) => {
         state.friendsList.push(data)
@@ -152,14 +149,14 @@ export default createStore<State>({
       .then(response => {
         commit('logIn', response.data)
         localStorage.setItem('user', JSON.stringify(user));
-        
+
 
           return true
         }
       )
       .catch(error => {
         console.log(error);
-        
+
           dispatch('logOut')
         }
       )

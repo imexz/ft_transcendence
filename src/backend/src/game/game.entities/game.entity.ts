@@ -39,11 +39,13 @@ export class Game extends GameData{
 	@Column()
 	scoreRight: number = 0;
 
+	@Exclude()
+	isCustomized: boolean = false;
 
 
-
-	constructor(gameid: number, gsetup: GameSetup) {
+	constructor(gameid: number, gsetup: GameSetup, isCustomized: boolean = false) {
 		super(gsetup);
 		this.id = gameid;
-		}
+		this.isCustomized = isCustomized;
+	}
 }

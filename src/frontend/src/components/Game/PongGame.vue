@@ -5,7 +5,7 @@
 		<div v-if="this.$store.state.winner == null" class="gameCanvas">
 			<div>
         <Field @assignWinner="assignWinner"/>
-	</div>
+	    </div>
       <div v-show="this.$store.state.user.id!=this.$store.state.game?.playerRight?.id && this.$store.state.user.id!=this.$store.state.game?.playerLeft?.id"  class="leaveGame">
         <button @click="leaveGame"> Leave </button>
       </div>
@@ -13,11 +13,11 @@
   </div>
   <div class="queue" v-show="this.$store.state.game == null && this.$store.state.winner == null">
     <text> Waiting for opponent... </text>
-	<br>
-	<button @click="leaveGame"> Leave </button>
+	  <br>
+	  <button @click="leaveGame"> Leave </button>
   </div>
   <div v-if="this.$store.state.winner != null && this.$store.state.game == null">
-	<Result :winner = this.$store.state.winner :loser = this.$store.state.loser @newGame="prepareNewGame" />
+	  <Result :winner = this.$store.state.winner :loser = this.$store.state.loser @newGame="prepareNewGame" />
   </div>
 </div>
 </template>
@@ -49,21 +49,19 @@
   	async mounted() {
   		console.log("mounted");
 		  await this.initGameInfoListener();
-      // if (this.$store.state.game == null && this.$store.state.winner == null) {
-      //   this.$store.state.socketGame.emit('isInGame');
-     	// }
 		  this.dataRdy = true;
   	},
 		async beforeUpdate() {
   		console.log("beforeUpdate");
       if (this.$store.state.game == null && this.$store.state.winner == null) {
-        await this.$store.state.socketGame.emit('isInGame');
+        await this.$store.state.socketGame.emit('isInGame', {isCustomized: this.$store.state.customized});
       }
 		  console.log("leaving beforeUpdate");
 	  },
   	unmounted() {
   	  console.log("in unmount");
       this.$store.state.socketGame?.off('GameInfo')
+      document.removeEventListener('keydown', this.keyEvents, false);
   	},
   	methods: {
 	    async initGameInfoListener() {
@@ -91,17 +89,18 @@
   	  	  document.addEventListener('keydown', this.keyEvents, false);
         }
       },
+      isValidKey(key) {
+        return  key == "w" || key == "s" || key == "ArrowUp" || key == "ArrowDown";
+      },
       keyEvents(event) {
-        // if (!this.finished) {
           console.log(event.key);
-          this.$store.state.socketGame.emit('key', event.key)
-        // }
+          if (this.isValidKey(event.key))
+            this.$store.state.socketGame.emit('key', event.key)
       },
       leaveGame() {
         this.$store.state.socketGame.emit('leaveGame');
         this.$store.state.game = null
-		    this.$store.state.pendingRequest = false
-		    this.$store.winner = null
+		this.$store.winner = null
         this.$store.loser = null
         this.$router.push("/");
       }

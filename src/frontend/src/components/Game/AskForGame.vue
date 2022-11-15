@@ -1,7 +1,10 @@
 <template>
   <div class="gameInvitePopUp">
     <UserSummary :user = this.$store.state.requester />
-    <h4>wants to play with you</h4>
+    <h4>wants to play a </h4>
+    <h4 v-show="this.isCustomRequest" v-once>customized </h4>
+    <h4>game</h4>
+	<br>
     <button @click="accept" class="gameButton">
       <font-awesome-icon icon="fa-solid fa-check" />
     </button>
@@ -16,9 +19,25 @@ import { defineComponent } from 'vue'
 import UserSummary from '../Profile/UserSummary.vue'
 
 export default defineComponent({
-    components: {
+
+	data() {
+		return {
+			isCustom: false,
+		}
+	},
+	computed: {
+		isCustomRequest() {
+			this.$store.state.socketGame.emit('isCustom', {id: this.$store.state.requester.id}, (cb: boolean) => {
+				console.log(cb);
+			})
+			// this.isCustom = true
+			return this.isCustom
+		}
+	},
+	components: {
         UserSummary,
     },
+
     methods:{
         accept(){
           this.$store.state.socketGame.emit("accept")
@@ -29,7 +48,7 @@ export default defineComponent({
         refuse(){
           this.$store.state.socketGame.emit("denied")
           this.$store.state.requester = null
-        }
+        },
     }
 })
 </script>
@@ -61,5 +80,6 @@ export default defineComponent({
 }
 .gameInvitePopUp h4 {
   margin: 2px;
+  display: inline;
 }
 </style>

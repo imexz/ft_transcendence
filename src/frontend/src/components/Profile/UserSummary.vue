@@ -165,21 +165,16 @@ export default defineComponent({
       this.closeDmPopUp()
       if (isSelfInvite) return;
       this.$store.state.winner = null;
-	    this.$store.state.pendingRequest = false;
-      this.$store.state.socketGame.emit('GameRequestBackend', {id: this.user.id}, (r) => {
+      this.$store.state.socketGame.emit('GameRequestBackend', {isCustomized: this.$store.state.customized, id: this.user.id}, (r) => {
         if (r.playerLeft != undefined && r.playerRight != undefined) {
-          this.showGame = !this.showGame
-          const isUserActivePlayer: boolean = r.playerLeft.id == this.$store.state.user.id || r.playerRight.id == this.$store.state.user.id
-          const isUserPlayerLeft: boolean = r.playerLeft.id === this.$store.state.user.id
-		      const isAskedUserActivePlayer: boolean = r.playerLeft.id === this.user.id || r.playerRight.id === this.user.id
-          if(!isSelfInvite && isUserPlayerLeft && isAskedUserActivePlayer)
-            this.$store.state.pendingRequest = true;
-		      else if (!isUserActivePlayer)
-			      this.$store.state.game = r
+        	this.showGame = !this.showGame
+        	const isUserActivePlayer: boolean = r.playerLeft.id == this.$store.state.user.id || r.playerRight.id == this.$store.state.user.id
+			if (!isUserActivePlayer)
+				this.$store.state.game = r
         }
         if (r.push) {
-          this.$emit('actions')
-          this.$router.push("/play");
+        	this.$emit('actions')
+        	this.$router.push("/play");
         }
 	    })
       console.log("askForMatchOrSpectate");
