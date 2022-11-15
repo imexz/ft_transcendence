@@ -172,13 +172,6 @@ export class ChatGateway {
       timestamp: message.timestamp.toLocaleString(),
       username: message.sender.username }
 
-      // console.log(test);
-      // console.log({tmp, roomId});
-      // console.log("timestamp before");
-      // console.log(tmp.timestamp);
-      // console.log("timestamp after");
-      // tmp.timestamp = tmp.timestamp. //TB resume work
-
       client.to(roomId.toString()).emit('message', {message: tmp, roomId});
       this.server.to(roomId.toString()).emit('newMessage', {message: tmp, roomId});
       console.log("createMessage ende");

@@ -76,7 +76,7 @@
           currentRoomId: '',
           rooms: [] as Room[],
           messages: [] as Message[],
-          messagesLoaded: false, //TB change this value to show a loading icon on the top of the chat
+          messagesLoaded: false,
           messageActions: [
             { name: 'deleteMessage' , title: 'delete message', onlyMe: true },
           ],
@@ -287,7 +287,7 @@
         //   if (this.PoppupJoin == false) {
         //     console.log("clicked on join");
 
-        //     this.$store.state.socket.emit('join', {roomId: roomId, password: this.password}) //TB is this used???
+        //     this.$store.state.socket.emit('join', {roomId: roomId, password: this.password})
         //   }
         //   console.log(this.PoppupJoin);
         // },
@@ -547,7 +547,7 @@
         console.log("created");
         this.$store.state.NrMessages = 0;
         // this.messages
-        // this.rooms = this.$store.state.getRooms // TB HERE
+        // this.rooms = this.$store.state.getRooms
       },
       beforeMount() {
         // this.initSocket();
