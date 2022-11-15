@@ -119,7 +119,11 @@
             currentRoom.unreadCount = 0
             if (currentRoom.messages.length < 1)
               return [] as Message[]
-            return currentRoom.messages as Message[]
+              else
+              return currentRoom.messages as Message[]
+            }
+            else
+              return [] as Message[]
 
             // return this.$store.state.chat?.getMessages(this.currentRoomId)
 
@@ -560,7 +564,6 @@
           // })
         }
       },
-    }
     })
 </script>
 
