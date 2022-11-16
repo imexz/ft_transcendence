@@ -1,6 +1,6 @@
 <template>
-	<!-- <div class="wrapper" v-if="!showGame"> -->
-	<div class="wrapper" v-if="this.$store.state.game == null && this.$store.state.showGame == false">
+  <div v-if="dataRdy">
+	<div class="wrapper" v-if="this.$store.state.showGame == false">
 		<h1>Game Settings</h1>
 		<div class="singleOption">
 			Score to Win
@@ -20,15 +20,15 @@
 		<div class="singleOption">
 			Enable slower serve
 			<br>
-			<button id="slowServeYes" @click="setSlowServe(true);" class="selected">Yes</button>
-			<button id="slowServeNo" @click="setSlowServe(false);" class>No</button>
+			<button id="slowServeYes" @click="setSlowServe(true);" class>Yes</button>
+			<button id="slowServeNo" @click="setSlowServe(false);" class="selected">No</button>
 		</div>
 		<div class="singleOption">
 			Who serves after score
 			<br>
 			<button id="lastScored" @click="setServing(1);" class>Last Scored</button>
-			<button id="alternate" @click="setServing(0);" class="selected">Alternate</button>
-			<button id="other" @click="setServing(2);" class>Other</button>
+			<button id="alternate" @click="setServing(0);" class>Alternate</button>
+			<button id="random" @click="setServing(2);" class="selected">Random</button>
 		</div>
 		<div class="singleOption">
 			<br>
@@ -43,23 +43,43 @@
 	<div v-else>
 		<PongGame />
 	</div>
-
+  </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
 import PongGame from './PongGame.vue';
+
+enum Serving {
+	LAST_SCORED,
+	ALTERNATE,
+	RANDOM
+}
+
 export default defineComponent({
 	data() {
 		return {
-			showGame: false as boolean,
-			scoreToWin: 10 as number,
-			enablePowerUp: false as boolean,
-			enableSlowServe: true as boolean,
-			serving: "alternate" as string,
+			dataRdy: false as boolean
 		};
 	},
+	async mounted() {
+		console.log("in mounted gameMenu");
+		await this.askBackendForGame()
+		this.dataRdy = true
+	},
 	methods: {
+		async askBackendForGame() {
+			while (!this.$store.state.socketGame) {
+				await new Promise(r => setTimeout(r, 100));
+			}
+			this.$store.state.socketGame.emit('hasGame', (cb) => {
+				if (cb.data) {
+					this.$store.state.showGame = true;
+				} else {
+					this.$store.state.showGame = false;
+				}
+			})
+		},
 		setScoreToWin(score: number) {
 			document.getElementById("score3").classList.remove("selected");
 			document.getElementById("score5").classList.remove("selected");
@@ -83,7 +103,9 @@ export default defineComponent({
 					document.getElementById("score20").classList.add("selected");
 					break;
 			}
-			this.scoreToWin = score;
+			this.$store.state.settings.scoreToWin = score;
+			console.log("scoreToWin set to",this.$store.state.settings.scoreToWin);
+			
 		},
 		setPowerUp(isSet: boolean) {
 			document.getElementById("powerupYes").classList.remove("selected");
@@ -92,7 +114,7 @@ export default defineComponent({
 				document.getElementById("powerupYes").classList.add("selected");
 			else
 				document.getElementById("powerupNo").classList.add("selected");
-			this.enablePowerUp = isSet;
+			this.$store.state.settings.enablePowerUp = isSet;
 		},
 		setSlowServe(isSet: boolean) {
 			document.getElementById("slowServeYes").classList.remove("selected");
@@ -101,31 +123,40 @@ export default defineComponent({
 				document.getElementById("slowServeYes").classList.add("selected");
 			else
 				document.getElementById("slowServeNo").classList.add("selected");
-			this.enableSlowServe = isSet;
+			this.$store.state.settings.enableSlowServe = isSet;
 		},
 		setServing(option: number) {
 			document.getElementById("lastScored").classList.remove("selected");
 			document.getElementById("alternate").classList.remove("selected");
-			document.getElementById("other").classList.remove("selected");
+			document.getElementById("random").classList.remove("selected");
 			switch (option) {
 				case 0:
 					document.getElementById("alternate").classList.add("selected");
-					this.serving = "alternate";
+					this.$store.state.settings.serving = Serving.ALTERNATE;
 					break;
 				case 1:
 					document.getElementById("lastScored").classList.add("selected");
-					this.serving = "lastScored";
+					this.$store.state.settings.serving = Serving.LAST_SCORED;
 					break;
 				case 2:
-					document.getElementById("other").classList.add("selected");
-					this.serving = "other";
+					document.getElementById("random").classList.add("selected");
+					this.$store.state.settings.serving = Serving.RANDOM;
 					break;
 			}
 		},
 		joinQueue() {
+			this.$store.state.isCustomized = this.isCustomized();
 			this.$store.state.showGame = true;
 		},
 		invitePlayer() {
+		},
+		isCustomized(): boolean {
+			if (this.$store.state.settings.scoreToWin != 10 ||
+				this.$store.state.settings.enablePowerUp == true ||
+				this.$store.state.settings.enableSlowServe == true ||
+				this.$store.state.settings.serving != Serving.RANDOM
+				) return true;
+			else return false;
 		},
 	},
 	components: { PongGame }

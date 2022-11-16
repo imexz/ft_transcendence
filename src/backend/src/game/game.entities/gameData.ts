@@ -3,18 +3,20 @@ import { Ball } from "./ball.entity";
 import { Paddle } from "./paddle.entity";
 import { Score } from "./score.entity";
 import { Column } from "typeorm";
-import { GameSetup, Serving } from "./setup.entity";
+import { GameSetup } from "./setup.entity";
 import { Exclude } from 'class-transformer';
+import { Settings } from "./settings";
 
 export class GameData {
 
-    constructor(gsetup: GameSetup) {
+    constructor(gsetup: GameSetup, settings: Settings) {
         // console.log("gsetup undefined");
         if (gsetup != undefined) {
             this.ball = new Ball()
             this.paddleLeft = new Paddle()
             this.paddleRight = new Paddle()
             this.score = new Score()
+            this.settings = new Settings()
 		
             this.ball.radius = gsetup.ballRadius;
             this.ball.position = gsetup.ballPos;
@@ -39,10 +41,10 @@ export class GameData {
             this.score.increaseLeft = gsetup.scoreIncrease;
             this.score.increaseRight = gsetup.scoreIncrease;
 
-            this.scoreToWin = gsetup.scoreToWin;
-            this.enablePowerUp = gsetup.enablePowerUp;
-            this.enableSlowServe = gsetup.enableSlowServe;
-            this.serving = gsetup.serving;
+            this.settings.scoreToWin = settings.scoreToWin;
+            this.settings.enablePowerUp = settings.enablePowerUp;
+            this.settings.enableSlowServe = settings.enableSlowServe;
+            this.settings.serving = settings.serving;
 
             // this.finished = false;
         }
@@ -56,13 +58,7 @@ export class GameData {
 	@Exclude()
 	score: Score;
     @Exclude()
-    scoreToWin: number;
-    @Exclude()
-    enablePowerUp: boolean;
-	@Exclude()
-    enableSlowServe: boolean;
-	@Exclude()
-    serving: Serving;
+    settings: Settings;
 // @Exclude()
 	// finished: boolean = false;
 }

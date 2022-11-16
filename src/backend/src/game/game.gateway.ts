@@ -61,8 +61,26 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	} else {
 		client.emit('GameInfo', {winner: game.winner, loser: game.loser})
 		client.emit('updatePaddle', {paddleLeft: game.paddleLeft, paddleRight: game.paddleRight})
-		client.emit('updateScore', {scoreLeft: game.score.scoreLeft, scoreRight: game.score.scoreRight})
+		client.emit('updateScore', {scoreWinner: game.score.scoreLeft, scoreLoser: game.score.scoreRight, scoreToWin: game.settings.scoreToWin})
 	}
+  }
+
+  @SubscribeMessage('hasGame')
+  handleHasGame(@ConnectedSocket() client: Socket) {
+	const clientId: number = client.handshake.auth.id;
+	let ret: boolean = false;
+
+	var game: Game | undefined = this.gameService.getGame(clientId);
+	if (game != undefined)
+		ret = true;
+	else {
+		game = this.isSpectating(clientId);
+		if (game != undefined) {
+			ret = true;
+		}
+	}
+	console.log("hasGame", ret);
+	return {data: ret};
   }
 
   @SubscribeMessage('isInGame')

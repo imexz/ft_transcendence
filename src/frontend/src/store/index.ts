@@ -11,6 +11,8 @@ import Game from '@/models/game';
 import Room, { Access } from '@/models/room';
 import Message from '@/models/message';
 import Chat from '@/models/chat';
+import { Settings } from '@/models/gameSettings';
+
 
 
 export enum changedRoom {
@@ -38,14 +40,14 @@ export interface State {
   loser: User | null
   customized: boolean
   showGame: boolean
-  
+  settings: Settings
 }
 
 const storage = localStorage.getItem('user')
 const user = storage?JSON.parse(storage):null;
 const initialState = user?
-{ validated: true, user: user, socket: null,  socketChat: null,  socketGame: null, friendsList: null, NrMessages: 0, NrFriendRequests: 0, requester: null, game: null, winner: null, loser: null, customized: false, showGame: false , chat: null}:
-{ validated: false, user: null,  socket: null,  socketChat: null,  socketGame: null, friendsList: null, NrMessages: 0, NrFriendRequests: 0, requester: null, game: null, winner: null, loser: null, customized: false, showGame: false , chat: null};
+{ validated: true, user: user, socket: null,  socketChat: null,  socketGame: null, friendsList: null, NrMessages: 0, NrFriendRequests: 0, requester: null, game: null, winner: null, loser: null, customized: false, showGame: false , chat: null, settings: new Settings()}:
+{ validated: false, user: null,  socket: null,  socketChat: null,  socketGame: null, friendsList: null, NrMessages: 0, NrFriendRequests: 0, requester: null, game: null, winner: null, loser: null, customized: false, showGame: false , chat: null, settings: new Settings()};
 
 export default createStore<State>({
 
@@ -79,6 +81,8 @@ export default createStore<State>({
           id: document.cookie
         }
       })
+      console.log("socketGame established");
+      
       state.chat = new Chat()
 
       // console.log("game socket init");
@@ -110,6 +114,11 @@ export default createStore<State>({
 		    console.log("receive resetRequester");
 		    state.requester = null;
 	    })
+      state.socketGame.on('requestSettings', (cb) => {
+        console.log('requestSettings', state.settings);
+        // state.socketGame.emit('responseSettings', {data: state.settings});
+        cb({data: state.settings})
+      })
       state.socket.on('Request',(data) => {
         state.friendsList.push(data)
         console.log("receive  request");

@@ -9,6 +9,7 @@ import { UsersService } from 'src/users/users.service';
 import User from 'src/users/entitys/user.entity';
 import { UserStatus } from "../users/entitys/status.enum";
 import { GameGateway } from './game.gateway';
+import { Settings } from './game.entities/settings';
 
 @Injectable()
 export class GameService {
@@ -65,6 +66,7 @@ export class GameService {
 		let game = this.getGame(undefined, isCustomized) // checking for first game with missing (undefined) opponent
 		if (game == undefined || opponentUserId) {
 			game = await this.createGameInstance(user.id, isCustomized)
+			console.log("joinGameOrCreateGame", game.settings);
 			game.winner = user
 			// opponentUserId is set when called via Frontend::askForMatch
 			if(opponentUserId != undefined) {
@@ -73,16 +75,32 @@ export class GameService {
 			}
 			this.gamesArr.push(game)
 		} else { // queue game exists, join and set user as opponent
-			console.log("joinGameOrCreateGame: set User alosers ");
+			console.log("joinGameOrCreateGame: set User as loser");
 			game.loser = user
 		}
 		return game
 	}
 	async createGameInstance(userId: number, isCustomized: boolean): Promise<Game> {
 		console.log('inside createGameInstance()');
-		const setup = new GameSetup(enableSlowServ,);
-		console.log('leaving createGameInstance()');
-		return new Game(userId, setup, isCustomized);
+		let settings = new Settings();
+		console.log("before", settings);
+		const socket = await this.gameGateway.findSocketOfUser(userId);
+		let receivedSettings: boolean = false;
+		if (socket) {
+			socket.emit('requestSettings', (cb) => {
+				console.log("callback", cb.data);
+				settings = cb.data;
+				receivedSettings = true;
+			});
+		} else {
+			console.log("no socket for", userId);
+		}
+		const setup = new GameSetup();
+		while (!receivedSettings) {
+			await new Promise(r => setTimeout(r, 10));
+		}
+		console.log('leaving createGameInstance()', settings);
+		return new Game(userId, setup, isCustomized, settings);
 	}
 
 	async startGame(server: Server, game: Game) {
@@ -99,7 +117,7 @@ export class GameService {
 		this.userService.setStatus(game.loser.id, UserStatus.PLAYING);
 		server.to(game.id.toString()).emit('GameInfo', game)
 		console.log("startGame");
-		game.interval = setInterval(() => this.emitGameData(game, server), 1) as unknown as number;
+		game.interval = setInterval(() => this.emitGameData(game, server), 16) as unknown as number;
 		this.gameGateway.server.to(game.id.toString()).emit('updatePaddle', {paddleRight: game.paddleRight, paddleLeft: game.paddleLeft})
 		console.log("startGame end");
 	}
@@ -111,7 +129,7 @@ export class GameService {
 			radius: tmpGame.ball.radius,
 		}
 		server.to(game.id.toString()).emit('updateBall', updatedBall);
-		if (tmpGame.score.scoreLeft === 3 || tmpGame.score.scoreRight === 3) {
+		if (tmpGame.score.scoreLeft === tmpGame.settings.scoreToWin || tmpGame.score.scoreRight === tmpGame.settings.scoreToWin) {
 			console.log("emitGameData: closeRoom");
 			this.gameGateway.closeRoom(game.id.toString());
 		}
@@ -125,7 +143,7 @@ export class GameService {
 		this.collisionControl(game);
 		if (this.scored(game)){
 			this.reset(game);
-			this.gameGateway.server.to(game.id.toString()).emit('updateScore', {scoreWinner: game.score.scoreLeft, scoreLoser: game.score.scoreRight})
+			this.gameGateway.server.to(game.id.toString()).emit('updateScore', {scoreWinner: game.score.scoreLeft, scoreLoser: game.score.scoreRight, scoreToWin: game.settings.scoreToWin})
 		}
 		await this.isGameFinished(game);
 		return game
@@ -231,10 +249,15 @@ export class GameService {
 		game.score.increaseRight = this.setup.scoreIncrease;
 	}
 	async isGameFinished(game: Game) {
-		if (game != undefined && (game.score.scoreLeft == 3 || game.score.scoreRight == 3)) {
+		if (game != undefined && (game.score.scoreLeft == game.settings.scoreToWin || game.score.scoreRight == game.settings.scoreToWin)) {
 			clearInterval(game.interval);
 			game.interval = null
 			let gameInstance: Game = this.gameRepository.create();
+			if (game.scoreWinner < game.scoreLoser) {
+				const tmp: User = game.winner;
+				game.winner = game.loser;
+				game.loser = tmp;
+			}
 			gameInstance.loser = game.loser;
 			gameInstance.winner = game.winner;
 			gameInstance.scoreWinner = game.scoreWinner;

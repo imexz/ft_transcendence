@@ -7,6 +7,7 @@ import { Paddle } from "./paddle.entity";
 import { Score } from "./score.entity";
 import { Exclude } from 'class-transformer';
 import { GameData } from "./gameData";
+import { Settings } from "./settings";
 
 
 export enum Side{
@@ -42,9 +43,8 @@ export class Game extends GameData{
 	@Exclude()
 	isCustomized: boolean = false;
 
-
-	constructor(gameid: number, gsetup: GameSetup, isCustomized: boolean = false) {
-		super(gsetup);
+	constructor(gameid: number, gsetup: GameSetup, isCustomized: boolean = false, settings: Settings) {
+		super(gsetup, settings);
 		this.id = gameid;
 		this.isCustomized = isCustomized;
 	}

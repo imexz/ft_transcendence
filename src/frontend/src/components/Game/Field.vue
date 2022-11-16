@@ -43,7 +43,8 @@ export default defineComponent({
           },
           score: {
             scoreWinner: 0,
-	          scoreLoser: 0
+	          scoreLoser: 0,
+            scoreToWin: 10
           }
         },
         styleData: {
@@ -162,6 +163,8 @@ export default defineComponent({
         this.pixiScore.right.y = 5;
       },
       updateScore(data: any) {
+        console.log(data);
+        
         this.gameData.score = data;
         switch(Math.max(this.gameData.score.scoreWinner, this.gameData.score.scoreLoser)) {
           case 4:
@@ -178,10 +181,14 @@ export default defineComponent({
         }
       },
       updatePaddle(data: any) {
+        console.log(data);
+        
         this.gameData.paddleLeft = data.paddleLeft;
         this.gameData.paddleRight = data.paddleRight;
       },
       updateBall(data: any) {
+        console.log(data);
+        
 		    if (data === undefined) {
           console.log("data undefined");
           // this.gameExists = false;
@@ -192,7 +199,8 @@ export default defineComponent({
         this.gameData.ball = data;
       },
 	    isGameFinished(): boolean {
-		    return this.gameData.score.scoreWinner == 3 || this.gameData.score.scoreLoser == 3
+		    return (this.gameData.score.scoreWinner == this.gameData.settings.scoreToWin ||
+                this.gameData.score.scoreLoser == this.gameData.settings.scoreToWin);
 	    },
       assignWinnerAndLoser() {
         if (this.gameData.score.scoreWinner > this.gameData.score.scoreLoser) {
