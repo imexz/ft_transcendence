@@ -100,7 +100,7 @@
       leaveGame() {
         this.$store.state.socketGame.emit('leaveGame');
         this.$store.state.game = null
-		this.$store.winner = null
+		    this.$store.winner = null
         this.$store.loser = null
         this.$router.push("/");
       }

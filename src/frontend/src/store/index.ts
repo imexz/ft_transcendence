@@ -29,13 +29,15 @@ export interface State {
   winner: User | null
   loser: User | null
   customized: boolean
+  showGame: boolean
+  
 }
 
 const storage = localStorage.getItem('user')
 const user = storage?JSON.parse(storage):null;
 const initialState = user?
-{ validated: true, user: user, socket: null,  socketChat: null,  socketGame: null, friendsList: null, NrMessages: 0, NrFriendRequests: 0, requester: null, game: null, winner: null, loser: null, customized: false }:
-{ validated: false, user: null,  socket: null,  socketChat: null,  socketGame: null, friendsList: null, NrMessages: 0, NrFriendRequests: 0, requester: null, game: null, winner: null, loser: null, customized: false };
+{ validated: true, user: user, socket: null,  socketChat: null,  socketGame: null, friendsList: null, NrMessages: 0, NrFriendRequests: 0, requester: null, game: null, winner: null, loser: null, customized: false, showGame: false }:
+{ validated: false, user: null,  socket: null,  socketChat: null,  socketGame: null, friendsList: null, NrMessages: 0, NrFriendRequests: 0, requester: null, game: null, winner: null, loser: null, customized: false, showGame: false };
 
 export default createStore<State>({
 
@@ -131,15 +133,18 @@ export default createStore<State>({
 
       state.socketGame.on('GameRequestFrontend',(user: User) => {
         state.requester = user;
+        state.showGame = true;
         console.log("receive askformatch");
       })
       state.socketGame.on('NowInGame', (cb) => {
         // state.game = game;
         console.log("receive NowInGame");
         if (cb) {
+          state.showGame = true;
 			    router.push('/play')
 		    } else {
           state.game = null;
+          state.showGame = false;
           router.push('/')
         }
       })

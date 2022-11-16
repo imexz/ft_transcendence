@@ -78,7 +78,7 @@ export class GameService {
 	}
 	async createGameInstance(userId: number, isCustomized: boolean): Promise<Game> {
 		console.log('inside createGameInstance()');
-		const setup = new GameSetup;
+		const setup = new GameSetup(enableSlowServ,);
 		console.log('leaving createGameInstance()');
 		return new Game(userId, setup, isCustomized);
 	}

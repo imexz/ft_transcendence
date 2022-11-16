@@ -1,5 +1,6 @@
 <template>
-	<div class="wrapper" v-if="!showGame">
+	<!-- <div class="wrapper" v-if="!showGame"> -->
+	<div class="wrapper" v-if="this.$store.state.game == null && this.$store.state.showGame == false">
 		<h1>Game Settings</h1>
 		<div class="singleOption">
 			Score to Win
@@ -122,7 +123,7 @@ export default defineComponent({
 			}
 		},
 		joinQueue() {
-			this.showGame = true;
+			this.$store.state.showGame = true;
 		},
 		invitePlayer() {
 		},

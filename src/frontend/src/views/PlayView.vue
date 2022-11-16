@@ -2,7 +2,8 @@
   <div class="gameWrapper">
     <div class="gameHeader"></div>
     <div class="game">
-      <PongGame />
+      <!-- <PongGame /> -->
+      <GameMenu/>
     </div>
   </div>
 </template>

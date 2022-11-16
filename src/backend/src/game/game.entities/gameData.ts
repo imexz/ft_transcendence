@@ -3,7 +3,7 @@ import { Ball } from "./ball.entity";
 import { Paddle } from "./paddle.entity";
 import { Score } from "./score.entity";
 import { Column } from "typeorm";
-import { GameSetup } from "./setup.entity";
+import { GameSetup, Serving } from "./setup.entity";
 import { Exclude } from 'class-transformer';
 
 export class GameData {
@@ -39,6 +39,11 @@ export class GameData {
             this.score.increaseLeft = gsetup.scoreIncrease;
             this.score.increaseRight = gsetup.scoreIncrease;
 
+            this.scoreToWin = gsetup.scoreToWin;
+            this.enablePowerUp = gsetup.enablePowerUp;
+            this.enableSlowServe = gsetup.enableSlowServe;
+            this.serving = gsetup.serving;
+
             // this.finished = false;
         }
     }
@@ -50,6 +55,14 @@ export class GameData {
 	paddleRight: Paddle;
 	@Exclude()
 	score: Score;
+    @Exclude()
+    scoreToWin: number;
+    @Exclude()
+    enablePowerUp: boolean;
+	@Exclude()
+    enableSlowServe: boolean;
+	@Exclude()
+    serving: Serving;
 // @Exclude()
 	// finished: boolean = false;
 }
