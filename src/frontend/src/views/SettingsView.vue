@@ -23,7 +23,7 @@
       <hr class="break"/>
       <div class="sectionContent">
         <span>
-          The image needs to be .jpg
+          The image needs to be a .jpeg file and can have a maximal size of 1GB 
         </span>
         <br/>
         <br/>     
