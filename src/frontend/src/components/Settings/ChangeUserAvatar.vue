@@ -17,7 +17,6 @@
 import VueAxios from 'axios';
 import { API_URL } from '@/defines';
 import { defineComponent } from 'vue';
-// Delta -> return new url
 
 export default defineComponent({
   data () {
@@ -34,9 +33,14 @@ export default defineComponent({
       if (this.selectedFile == null) {
         this.$emit('error', 'no file was selected')
       }
+      else if (this.selectedFile.type != 'image/jpeg') {
+        this.$emit('error', 'wrong file type')
+      }
+      else if (this.selectedFile.size > 1073741824) {
+        this.$emit('error', 'file to big')
+      }
       else {
         const fd = new FormData()
-        console.log(this.selectedFile.name);
         fd.append('image', this.selectedFile, this.selectedFile.name)
         VueAxios({
           url: '/avatar',
@@ -48,11 +52,10 @@ export default defineComponent({
         .then(response => { 
           this.$emit('success', 'avatar changed'),
           this.$store.state.user.avatar_url = API_URL + response.data})
-        .catch(error => { this.$emit('error', error)})
+        .catch(error => { this.$emit('error', 'Could not change Avatar') })
       }
     },
     uploadFile(event: any) {
-        console.log(event);
         this.selectedFile = event.target.files[0]
     },
     deleteFile() {
@@ -65,7 +68,7 @@ export default defineComponent({
       .then(response => {
         this.$store.state.user.avatar_url = response.data
         this.$emit('success', 'avatar was reset')})
-      .catch(error => {  this.$emit('error', error) })
+      .catch(error => { this.$emit('error', 'Could not restore Default') })
     }
   }
 })

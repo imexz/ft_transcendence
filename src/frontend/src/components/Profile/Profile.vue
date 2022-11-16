@@ -10,6 +10,9 @@
       <p>
         {{ user.username }}
       </p>
+      <p style="font-size: 14px">
+        {{ UserStatus[user?.userStatus] }}
+      </p>
     </div>
   </div>
 </template>
@@ -19,11 +22,13 @@ import User from '@/models/user';
 import { API_URL } from '@/defines';
 import VueAxios from 'axios';
 import { defineComponent } from 'vue';
+import { UserStatus } from '@/models/user';
 
 export default defineComponent({
   data() {
     return {
       user: null as User | null,
+      UserStatus: UserStatus,
     }
   },
   props: {
@@ -32,20 +37,16 @@ export default defineComponent({
       default: "0" },
   },
   methods: {
-    fetchUser(): void {
-      if (this.id == '0') {
-        this.user =this.$store.state.user;
-      }
-      else {
+    fetchUser(){
+      let uId = (this.id != "0")?this.id:this.$store.state.user.id
       VueAxios({
-          url: '/users/find/' + this.id,
+          url: '/users/find/' + uId,
           baseURL: API_URL,
           method: 'GET',
           withCredentials: true,
         })
           .then(response => { this.user = response.data })
           .catch()
-      }
     }
   },
   mounted() {

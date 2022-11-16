@@ -17,14 +17,13 @@ export class AvatarController {
     @UploadedFile(
       new ParseFilePipe({
         validators: [
-          new MaxFileSizeValidator({ maxSize: 1000000000 }),
+          new MaxFileSizeValidator({ maxSize: 1073741824 }),
           new FileTypeValidator({ fileType: 'jpeg' }),
         ]
       })
     )
     file: Express.Multer.File,
   ) {
-      // console.log(req.user);
       return await this.avatarService.add(req.user.id, file)
   }
 
