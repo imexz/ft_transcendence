@@ -46,15 +46,18 @@ export default defineComponent({
       extraButtons: [
         {
           icon: "fa-solid fa-comment-slash",
-          emit: AdminAction.muted
+          emit: AdminAction.muted,
+          tooltip: "Mute User"
         },
         {
           icon: "fa-solid fa-gavel",
-          emit: AdminAction.toAdmin
+          emit: AdminAction.toAdmin,
+          tooltip: "Make Admin"
         },
         {
           icon: "fa-solid fa-ban",
-          emit: AdminAction.baned
+          emit: AdminAction.baned,
+          tooltip: "Ban User"
         }
       ],
       AdminAction,

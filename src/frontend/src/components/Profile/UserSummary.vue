@@ -39,43 +39,71 @@
       </div>
     </div>
     <div class="dropdownMenu" v-if="show">
-      <button
-        v-if="$store.state.friendsList != '' && $store.state.friendsList.some((us: User) => us.id == user.id)"
-        class="dropdownElement"
-        @click="removeFriend">
-        <font-awesome-icon icon="fa-solid fa-user-minus" />
-      </button>
-      <button
-        v-else
-        class="dropdownElement"
-        @click="addFriend">
-        <font-awesome-icon icon="fa-solid fa-user-plus" />
-      </button>
-      <button
-        class="dropdownElement"
-        @click="viewProfile(user?.id)" >
-        <font-awesome-icon icon="fa-solid fa-eye" />
-      </button>
-      <button
-        class="dropdownElement"
-        @click="toggleDmPopUp">
-        <font-awesome-icon icon="fa-solid fa-message" />
-      </button>
+
+      <div class="box" v-if="$store.state.friendsList != '' && $store.state.friendsList.some((us: User) => us.id == user.id)">
+        <button
+          class="dropdownElement"
+          @click="removeFriend">
+          <font-awesome-icon icon="fa-solid fa-user-minus" />
+        </button>
+        <div class="tooltip">
+          Remove Friend
+        </div>
+      </div>
+      <div class="box" v-else>
+        <button
+          class="dropdownElement"
+          @click="addFriend">
+          <font-awesome-icon icon="fa-solid fa-user-plus" />
+        </button>
+        <div class="tooltip">
+          Add Friend
+        </div>
+      </div>
+      <div class="box">
+        <button
+          class="dropdownElement"
+          @click="viewProfile(user?.id)" >
+          <font-awesome-icon icon="fa-solid fa-eye" />
+        </button>
+        <div class="tooltip">
+          View Profile
+        </div>
+      </div>
+      <div class="box">
+        <button
+          class="dropdownElement"
+          @click="toggleDmPopUp">
+          <font-awesome-icon icon="fa-solid fa-message" />
+        </button>
+        <div class="tooltip">
+          Send DM
+        </div>
+      </div>
       <!-- <button
         class="dropdownElement">
         <font-awesome-icon icon="fa-solid fa-ban" />
       </button> -->
-      <button
-        class="dropdownElement"
-        @click="askForMatchOrSpectate">
-        <font-awesome-icon icon="fa-solid fa-table-tennis-paddle-ball" />
-      </button>
-      <button
-        v-for="button in extraButtons"
-        class="dropdownElement"
-        @click="customEmit(button.emit)">
-        <font-awesome-icon :icon="button.icon"/>
-      </button>
+      <div class="box">
+        <button
+          class="dropdownElement"
+          @click="askForMatchOrSpectate">
+          <font-awesome-icon icon="fa-solid fa-table-tennis-paddle-ball" />
+        </button>
+        <div class="tooltip right">
+          Spectate Match
+        </div>
+      </div>
+      <div class="box" v-for="button in extraButtons">
+        <button
+          class="dropdownElement"
+          @click="customEmit(button.emit)">
+          <font-awesome-icon :icon="button.icon"/>
+        </button>
+        <div class="tooltip right">
+          {{ button.tooltip }}
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -234,9 +262,7 @@ export default defineComponent({
   }
   .userSummary {
     position: relative;
-    /* width: 316px; */
     min-width: 253px;
-    /* width: 253px; */
     border: 2px solid;
     border-image: linear-gradient(90deg, var(--ft_cyan), var(--ft_pink)) 1;
   }
@@ -394,5 +420,31 @@ export default defineComponent({
   .exitButton:hover {
     color: var(--ft_dark);
     background-color: var(--ft_pink);
+  }
+
+  .box {
+    position: relative;
+    overflow: inherit;
+  }
+  .tooltip {
+    border: 1px solid var(--ft_cyan);
+    border-radius: 5px;
+    padding: 5px;
+    white-space: nowrap;
+    
+    background-color: black;
+    visibility: hidden;
+    position: absolute;
+    font-size: 15px;
+    font-weight: normal;
+  }
+  .left {
+    left: 0px;
+  }
+  .right {
+    right: 0px;
+  }
+  .box:hover .tooltip {
+    visibility: visible;
   }
 </style>
