@@ -146,7 +146,7 @@ export class ChatroomService {
         {
             var chatroom: chatroom[] = await this.chatroomRepository.find({
                 relations: {
-                    admins: true,
+                    // admins: true,
                     users: true,
                     // owner: true,
                     messages: true,
@@ -161,12 +161,14 @@ export class ChatroomService {
                 }
 
             })
-            chatroom.forEach(element => {
+            for (let element of chatroom) {                
+                console.log("room =", element);
                 if (element.users.find( elem => elem.id == user.id) != undefined && element.users.find(elem => elem.id == user1.id) != undefined) {
-                    return {info: roomReturn.changed, chatroom: chatroom}
+                    console.log("return" );
+                    
+                    return {info: roomReturn.changed, chatroom: element}
                 }
-            });
-
+            }
             console.log("dm room", chatroom);
 
             // if(chatroom == undefined) {
@@ -175,9 +177,10 @@ export class ChatroomService {
             tmpChatroom = await this.chatroomRepository.create()
             tmpChatroom.users = [user, user1]
             tmpChatroom.admins = [user, user1]
+            tmpChatroom.message = []
             // chatroom.owner = user
             tmpChatroom.access = Access.dm
-            await this.chatroomRepository.save(tmpChatroom)
+            tmpChatroom = await this.chatroomRepository.save(tmpChatroom)
             return {info: roomReturn.created, chatroom: tmpChatroom}
             // }
             // return chatroom;
