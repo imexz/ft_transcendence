@@ -22,12 +22,12 @@ export class Game extends GameData{
 	@PrimaryGeneratedColumn()
 	id: number;
 
-	@ManyToOne(() => User, (User) => User.gamesAsRight)
-	playerRight: User;
+	@ManyToOne(() => User, (user) => user.winns)
+	winner: User;
 
-	@ManyToOne(() => User, (User) => User.gamesAsLeft)
-	playerLeft: User;
-
+	@ManyToOne(() => User, (user) => user.loses)
+	loser: User;
+	
 	@Exclude()
 	interval: number | null = null;
 
@@ -35,9 +35,9 @@ export class Game extends GameData{
 	spectators: Array<number> = [];
 
 	@Column()
-	scoreLeft: number = 0;
+	scoreWinner: number = 0;
 	@Column()
-	scoreRight: number = 0;
+	scoreLoser: number = 0;
 
 	@Exclude()
 	isCustomized: boolean = false;

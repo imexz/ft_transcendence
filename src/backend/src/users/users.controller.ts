@@ -26,9 +26,18 @@ export class UsersController {
 	@UseGuards(JwtAuthGuard)
 	findAll(@Request() req){
 		// console.log(req);
-
+    
 		return this.usersService.findAll(req.user.id)
 	}
+
+	@Get('allUserWinnes')
+	@UseGuards(JwtAuthGuard)
+	getTopPlayer(@Request() req){
+		// console.log(req);
+
+		return this.usersService.getTopPlayer()
+	}
+
 
 	@Post('addUser')
 	@UseGuards(JwtAuthGuard)
@@ -69,12 +78,12 @@ export class UsersController {
 
 	@Post('update_name')
 	@UseGuards(JwtAuthGuard)
-	update_name(@Body("name") name, @Request() req) {
-		// console.log("inside update_name");
-		// console.log(req.user);
-		// console.log("inside update_name1");
+	async update_name(@Body("name") name, @Request() req) {
+		console.log("inside update_name");
+		console.log(req.user);
+		console.log("inside update_name1");
 
-		this.usersService.updateName(req.id, name);
+		return this.usersService.updateName(req.user, name);
 	}
 
 	@Delete()

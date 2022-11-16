@@ -7,11 +7,11 @@
       </button>
     </div>
     <div v-if="$store.state.game != null" class="txt">
-      <div v-if="userId != $store.state.game.playerRight.id">
-        Playing against {{$store.state.game.playerRight.username}}
+      <div v-if="userId != $store.state.game.loser.id">
+        Playing against {{$store.state.game.loser.username}}
       </div>
-      <div v-if="userId != $store.state.game.playerLeft.id">
-        Playing against {{$store.state.game.playerLeft.username}}
+      <div v-if="userId != $store.state.game.winner.id">
+        Playing against {{$store.state.game.winner.username}}
       </div>
     </div>
     <div>

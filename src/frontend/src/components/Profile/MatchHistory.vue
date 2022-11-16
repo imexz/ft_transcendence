@@ -41,7 +41,7 @@ export default defineComponent({
       matchData: [] as MatchData[],
       winCount: 0 as number,
       lossCount: 0 as number, 
-
+      lastId: "0" as string,
     }
   },
   props: {
@@ -58,30 +58,40 @@ export default defineComponent({
   methods: {
     initData() {
       VueAxios({
-        url: '/game',
+        url: ('/game/' + ((this.id == 0)?this.$store.state.user.id.toString():this.id)),
         baseURL: API_URL,
         method: 'Get',
         withCredentials: true,
       })
         .then(response => {
-        console.log(response);
+        this.lastId = this.id
         if(response != null)
-          console.log("match Data", response.data);
           this.matchData = response.data
-          this.matchData.forEach(match => {
-            if (match?.scoreLeft > match?.scoreRight && match?.playerLeft == null ||
-                match?.scoreLeft < match?.scoreRight && match?.playerRight == null)
-              this.winCount++;
-            else
-              this.lossCount++;
-          });
+          this.calcStats()
         })
         .catch(error => { this.$emit('actions', 'error') }) 
-    }
+      },
+      calcStats(){     
+        this.winCount = 0;
+        this.lossCount = 0;   
+        this.matchData.forEach(match => {
+          if (match?.scoreWinner > match?.scoreLoser && match?.winner == null ||
+              match?.scoreWinner < match?.scoreLoser && match?.loser == null)
+            this.winCount++;
+          else
+            this.lossCount++;
+        });
+    },
   },
   mounted() {
     this.initData()
+  },
+  updated() {
+    if (this.id != this.lastId) {
+      this.initData()
+    }
   }
+  
 })
 
 </script>

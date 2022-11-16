@@ -40,7 +40,5 @@ export class AvatarController {
   async deleteAvatar(@Request() req) {
     return await this.avatarService.delete(req.user.id)
   }
-
-
 }
 

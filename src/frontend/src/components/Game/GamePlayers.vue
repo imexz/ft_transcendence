@@ -1,13 +1,13 @@
 <template>
     <div class="matchInfo">
         <div>
-        <UserSummary class="test"  :user=this.$store.state.game?.playerLeft></UserSummary>
+        <UserSummary class="test"  :user=this.$store.state.game?.winner></UserSummary>
         </div>
         <div>
         vs
         </div>
         <div>
-        <UserSummary class="test" ref="summ" :user=this.$store.state.game?.playerRight></UserSummary> 
+        <UserSummary class="test" ref="summ" :user=this.$store.state.game?.loser></UserSummary> 
         </div>   
     </div>
 </template>

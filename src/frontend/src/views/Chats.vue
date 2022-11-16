@@ -1,5 +1,6 @@
 <template>
-  <div v-if="socket" class="chatWrapper">
+  <!-- <div v-if="socket" class="chatWrapper"> -->
+  <div class="chatWrapper">
     <div class="chatBanner"></div>
     <div class="headLine">
       <span>Chat</span>
@@ -8,8 +9,10 @@
     <vue-advanced-chat
       :height="height"
       :current-user-id="currentUserId"
-      :rooms="JSON.stringify(rooms)"
-      :messages="JSON.stringify(messages)"
+      :rooms.prop=rooms
+      :rooms = comprooms
+      :messages.prop= messages
+      :messages= compmessages
       :room-actions="JSON.stringify(roomActions)"
       :rooms-loaded="true"
       :messages-loaded="messagesLoaded"
@@ -22,12 +25,14 @@
       :show-new-messages-divider="false"
       :styles="JSON.stringify(style)"
       :spinner-icon-messages="{}"
+      :load-first-room="false"
+      :user-tags-enabled="false"
       @send-message="sendMessage($event.detail[0])"
       @send-message-reaction="sendMessageReaction($event.detail[0])"
       @add-room="toggleCreateRoom"
       @room-action-handler="roomActionHandler($event.detail[0])"
       @room-info="roomInfo($event.detail[0])"
-      @typing-message="emitTyping($event.detail[0])"
+      @toggle-rooms-list="toggleRoomsList($event.detail[0])"
       @fetch-messages="putMessages($event.detail[0])"
       @delete-message="deleteMessage($event.detail[0])"
       @message-action-handler="messageActionHandler($event.detail[0])"
@@ -46,10 +51,10 @@
 </template>
 
   <script lang="ts">
-  import { io, Socket } from 'socket.io-client';
+  // import { io, Socket } from 'socket.io-client';
   import { defineComponent, ref } from 'vue';
-  import VueAxios from 'axios';
-  import { API_URL } from '@/defines';
+  // import VueAxios from 'axios';
+  // import { API_URL } from '@/defines';
   import createRoomPopup from '@/components/Chat/createRoomPopup.vue';
   import joinRoomPopup from '@/components/Chat/joinRoomPopup.vue';
   import roomInfoPopUp from '@/components/Chat/RoomInfoPopUp.vue';
@@ -70,7 +75,7 @@
           currentUserId: '',
           currentRoomId: '',
           rooms: [] as Room[],
-          messages: [],
+          messages: [] as Message[],
           messagesLoaded: false, //TB change this value to show a loading icon on the top of the chat
           messageActions: [
             { name: 'deleteMessage' , title: 'delete message', onlyMe: true },
@@ -81,32 +86,19 @@
             { name: 'leave', title: 'Leave Room' }
           ],
           roomActionAdmin: { name: 'settings', title: 'Settings'},
-          createRoomPopUp: ref(false),
+          createRoomPopUp: false as boolean,
           PoppupJoin: ref(false),
-          roomInfoPopUp: ref(false),
+          roomInfoPopUp: false,
           roomInfoData: null as Object | null,
           password: '',
           timeout: 0,
-          typing: false,
+          // typing: false,
   		    socket: null,
           chatTheme: "dark",
           showEmojis: true,
           showToast : ref<boolean | null>(false),
           toastMsg : ref<string>(''),
           toastMode : ref<string>(''),
-          // textMessages : {
-          //   ROOMS_EMPTY: 'Aucune conversation',
-          //   ROOM_EMPTY: 'Aucune conversation sélectionnée',
-          //   NEW_MESSAGES: 'Nouveaux messages',
-          //   MESSAGE_DELETED: 'Ce message a été supprimé',
-          //   MESSAGES_EMPTY: 'No Messages',
-          //   CONVERSATION_STARTED: 'La conversation a commencée le :',
-          //   TYPE_MESSAGE: 'Tapez votre message',
-          //   SEARCH: 'Rechercher',
-          //   IS_ONLINE: 'est en ligne',
-          //   LAST_SEEN: 'dernière connexion ',
-          //   IS_TYPING: 'est en train de taper...',
-          //   CANCEL_SELECT_MESSAGE: 'Annuler Sélection'}
           }
       },
       components:{
@@ -115,11 +107,80 @@
         roomInfoPopUp,
         Toast,
       },
+      computed: {
+        comprooms () {
+          console.log("rooms computed", this.$store.state.chat?.rooms)
+          // return this.$store.state.chat?.rooms
+          this.rooms = this.$store.state.chat?.rooms
+          this.rooms.forEach(element => {
+            element.unreadCount = this.$store.state.chat.rooms.find(elem => elem.roomId == element.roomId).unreadCount
+            console.log("unreadCount updated", element.roomId, element.unreadCount);
+
+          });
+          this.rooms = [...this.rooms]
+        },
+        compmessages () {
+          // console.log(new Date().getMilliseconds());
+          this.messagesLoaded = false
+          if (this.currentRoomId)
+          {
+            console.log("messages computed for ", this.currentRoomId);
+
+            const currentRoom : Room = this.rooms.find(elem => elem.roomId == this.currentRoomId)
+            // console.log(currentRoom);
+            currentRoom.unreadCount = 0
+            if (currentRoom.messages.length < 1)
+            {
+              // return []
+              this.messages = []
+            }
+            else
+            {
+              // console.log("end compute", currentRoom.messages);
+
+              // return currentRoom.messages
+              this.messages = currentRoom.messages
+            }
+            }
+            else
+            {
+              console.log("messages computed empty");
+
+              // return []
+              this.messages = []
+            }
+
+            // return this.$store.state.chat?.getMessages(this.currentRoomId)
+            // this.messages = this.$store.state.chat?.getMessages(this.currentRoomId)
+
+            // console.log(new Date().getMilliseconds());
+
+        },
+        // unreadCount () {
+        //   this.$store.state.chat.rooms.forEach(element => {
+        //     if (element.unreadCount > 0)
+        //     {
+        //       var changedRoom = this.rooms.find(elem => elem.roomId == element.roomId)
+        //       console.log(changedRoom);
+        //     }
+
+        //   });
+        // }
+      },
+      updated() {
+
+        this.messagesLoaded = true
+        // console.log(new Date().getMilliseconds());
+        // console.log("rooms = " , this.rooms)
+        // console.log("messages = ", this.messages);
+
+      },
       methods: {
         async initChatInfoListener() {
-      while (!this.$store.state.socketChat || !this.$store.state.rooms) {
-        await new Promise(r => setTimeout(r, 100));
-      }},
+          while (!this.rooms) {
+            await new Promise(r => setTimeout(r, 10));
+          }
+        },
         changeSuccess(msg: string) {
           this.showToast = true;
           this.toastMsg = msg;
@@ -133,16 +194,22 @@
           setTimeout(() => this.showToast = false, 2000);
         },
         putMessages({room}) {
+          // console.log(new Date().getMilliseconds());
+          this.currentRoomId = undefined
+          // this.compmessages
+          this.messages = []
           console.log("putMessages");
           this.currentRoomId = room.roomId
-          this.updateMessages(room.roomId)
+          // console.log(new Date().getMilliseconds());
+
+          // this.updateMessages(room.roomId)
           // this.messagesLoaded = true;
         },
 
-        updateMessages(roomId) {
-          console.log("updateMessages", this.messagesLoaded);
-          console.log(roomId);
-          // this.socket.emit('findAllMessages', {roomId: roomId}, (response) => {
+        // updateMessages(roomId) {
+        //   console.log("updateMessages", this.messagesLoaded);
+        //   console.log(roomId);
+          // this.$store.state.chat.socketChat.emit('findAllMessages', {roomId: roomId}, (response) => {
           //   console.log("mesages_old: ", response);
 
           //   console.log(response, "ende");
@@ -150,50 +217,52 @@
           //   this.messagesLoaded = true;
           // })
           // console.log("rooms:", this.rooms);
-          for (let i = 0; i < this.rooms.length; ++i)
-          {
-            if (this.rooms[i].roomId == roomId) {
-              if(this.rooms[i].messages != undefined)
-                this.messages = this.rooms[i].messages
-            }
-          }
-          console.log("messages of room:", roomId, this.messages);
+          // for (let i = 0; i < this.rooms.length; ++i)
+          // {
+          //   if (this.rooms[i].roomId == roomId) {
+          //     if(this.rooms[i].messages != undefined)
+          //       this.messages = this.rooms[i].messages
+          //   }
+          // }
+          // console.log("messages of room:", roomId, this.messages);
 
-          let room = this.$store.state.rooms.find(elem => elem.roomId == roomId)
+          // let room = this.$store.state.chat.getRoomInfo(roomId)
           // room.messagesLoaded = true
           // console.warn(this.$store.state.rooms.find(elem => elem.roomId == roomId));
 
-          room.unreadCount = 0;
-          this.messagesLoaded = true;
-          console.log("endeende");
+        //   room.unreadCount = 0;
+        //   this.messagesLoaded = true;
+        //   console.log("endeende");
 
-        },
+        // },
         sendMessage({ roomId, content}) {
           console.log("createMessage");
           console.log(roomId);
-          this.socket.emit('createMessage', { roomId: roomId, content: content}, (response) =>
+          this.$store.state.chat.socketChat.emit('createMessage', { roomId: roomId, content: content}, (response) =>
           {
-            console.log("createMessage response");
-            console.log(response);
-            this.addMessage(response)
+            // console.log("createMessage response");
+            // console.log(response);
+            // this.addMessage(response)
+            console.log("messages was sent");
+
           })
         },
         sendMessageReaction({ roomId, messageId, reaction, remove }) {
           console.log("createMessageReaction");
           console.log(roomId);
-          this.socket.emit('createMessageReaction', { messageId: messageId, reaction: reaction, remove: remove}, (response) =>
+          this.$store.state.chat.socketChat.emit('createMessageReaction', { messageId: messageId, reaction: reaction, remove: remove}, (response) =>
           {
             console.log("createMessageReaction response");
             console.log(response);
-            this.addMessage(response)
+            // this.addMessage(response)
           })
         },
         toggleCreateRoom() {
           console.log("pupUp isOpen:", this.createRoomPopUp)
-          if (this.createRoomPopUp)
-            window.removeEventListener('click', this.hideCreateRoom)
-          else
-            window.addEventListener('click', this.hideCreateRoom)
+          // if (this.createRoomPopUp)
+          //   window.removeEventListener('click', this.hideCreateRoom)
+          // else
+          //   window.addEventListener('click', this.hideCreateRoom)
           this.createRoomPopUp = !this.createRoomPopUp
         },
         hideCreateRoom(e) {
@@ -205,41 +274,41 @@
         makePopupCreate() {
           console.log("makePopupCreate");
           this.PoppupCreate = !this.PoppupCreate
-          if (this.PoppupCreate == false) {
-            this.getRooms()
-            this.initSocket()
-          }
+          // if (this.PoppupCreate == false) {
+          //   // this.getRooms()
+          //   // this.initSocket()
+          // }
           console.log(this.PoppupCreate);
         },
-        makePopupJoin(roomId) {
-          console.log("makePopupJoin");
-          console.log(roomId)
-          this.PoppupJoin = !this.PoppupJoin
-          if (this.PoppupJoin == false) {
-            console.log("clicked on join");
+        // makePopupJoin(roomId) {
+        //   console.log("makePopupJoin");
+        //   console.log(roomId)
+        //   this.PoppupJoin = !this.PoppupJoin
+        //   if (this.PoppupJoin == false) {
+        //     console.log("clicked on join");
 
-            this.$store.state.socket.emit('join', {roomId: roomId, password: this.password}) //TB is this used???
-          }
-          console.log(this.PoppupJoin);
-        },
-        emitTyping({ roomId, message }) {
-          console.log("emitTyping");
-          console.log(roomId);
-          console.log(this.timeout);
-          if(this.typing == false)
-          {
-            this.socket.emit('typing', {isTyping: true, roomId: roomId});
-            this.typing = true
+        //     this.$store.state.socket.emit('join', {roomId: roomId, password: this.password}) //TB is this used???
+        //   }
+        //   console.log(this.PoppupJoin);
+        // },
+        // emitTyping({ roomId, message }) {
+        //   console.log("emitTyping");
+        //   console.log(roomId);
+        //   console.log(this.timeout);
+        //   if(this.typing == false)
+        //   {
+        //     this.$store.state.chat.socketChat.emit('typing', {isTyping: true, roomId: roomId});
+        //     this.typing = true
 
-            this.timeout = setTimeout(() => {
-              if(this.typing == true) {
-                this.socket.emit('typing', { isTyping: false, roomId: roomId});
-                this.typing = false
-              }
-            }, 2000);
-          }
-          console.log("emit typing ende");
-        },
+        //     this.timeout = setTimeout(() => {
+        //       if(this.typing == true) {
+        //         this.$store.state.chat.socketChat.emit('typing', { isTyping: false, roomId: roomId});
+        //         this.typing = false
+        //       }
+        //     }, 2000);
+        //   }
+        //   console.log("emit typing ende");
+        // },
         fillMessagesData(){
           // this.rooms.forEach(
           //   messages => messages.forEach(
@@ -247,31 +316,31 @@
           //   )
           // )
         },
-        getRooms(){
-            // VueAxios({
-            //     url: '/chatroom/all',
-            //     baseURL: API_URL,
-            //     method: 'GET',
-            //     withCredentials: true,
-            // })
-            //     .then(response => {
-            //     console.log(response.data);
+        // getRooms(){
+        //     // VueAxios({
+        //     //     url: '/chatroom/all',
+        //     //     baseURL: API_URL,
+        //     //     method: 'GET',
+        //     //     withCredentials: true,
+        //     // })
+        //     //     .then(response => {
+        //     //     console.log(response.data);
 
-                // this.rooms = response.data
-                // })
-                // .catch()
-            this.rooms = this.$store.getters.getRooms;
-            this.fillMessagesData();
-            console.log("get rooms: ", this.rooms);
+        //         // this.rooms = response.data
+        //         // })
+        //         // .catch()
+        //     this.rooms = this.$store.state.rooms;
+        //     this.fillMessagesData();
+        //     console.log("get rooms: ", this.rooms);
 
-        },
-        initSocket(){
-          this.socket = this.$store.state.socketChat
-          if (this.socket){
-            this.socket.off('message')
-          }
-          console.log("initSocket")
-        },
+        // },
+        // initSocket(){
+        //   this.$store.state.chat.socketChat = this.$store.state.chat.socketChat
+        //   if (this.$store.state.chat.socketChat){
+        //     this.$store.state.chat.socketChat.off('message')
+        //   }
+        //   console.log("initSocket")
+        // },
         async roomActionHandler({ roomId, action }) {
           console.log("roomActionHandler");
           console.log(action);
@@ -285,12 +354,24 @@
                   console.log("next")
                   var result: string = undefined
                   if (this.rooms[index].access == Access.protected)
+                  {
+                    console.log(this.rooms[index]);
+
                     result = prompt("This room is protected\n password", "password") // @Tobi please rework this popup so it matches the style of our website, can be triggered by trying to join a protected room
+                  }
 
                     console.log(result);
                     console.log("roomIdFrontend", roomId);
 
-                    this.socket.emit('join', {roomId: roomId, password: result}, (response)=> {this.room = response})
+                    this.$store.state.chat.socketChat.emit('join', {roomId: roomId, password: result}, (response)=> {
+                      // console.log("room after joining", response);
+                      // this.$store.state.dispatch('changedRoom', response)
+                      // this.$store.state.commit('updateRoom', response)
+                      // console.log("@@@before update");
+
+                      // this.updateMessages(roomId)
+                    })
+
 
                     console.log(this.messages);
 
@@ -303,26 +384,42 @@
               // this.updateMessages(roomId)
               break;
               case 'leave':
-                this.updateMessages(roomId)
-                this.socket.emit('leave', roomId)
+                // this.updateMessages(roomId)
+                // this.$store.state.chat.socketChat.emit('leave', roomId)
+                // let room : Room = this.$store.state.rooms.find(elem => elem.roomId == roomId)
+                // if (room)
+                // {
+                //   room.users = []
+                //   room.admins = []
+                //   room.owner = undefined
+                //   room.messages = []
+                // }
+                this.$store.state.chat.leaveRoom(roomId)
+                // let viewRoom = this.rooms.find(elem => elem.roomId == roomId)
+                // if (viewRoom)
+                //   viewRoom = room
                 break;
               default:
-                this.socket.emit(action.name, roomId)
+                console.log("Room action was not recognized");
+
+                this.$store.state.chat.socketChat.emit(action.name, roomId)
               break;
           }
         },
         roomInfo({ roomId }) {
-          // this.socket.emit(
+          // this.$store.state.chat.socketChat.emit(
           //   'roomInfo',
           //   {roomId: roomId},
-          //   data => { 
+          //   data => {
           //     this.roomInfoData = data
           //     console.log("roomInfoData", data)
           //     this.toggleRoomInfo()
           //   }
           // );
-          this.roomInfoData = this.$store.state.rooms.find(elem => elem.roomId == roomId)
-          if(this.roomInfoData != undefined)
+          this.roomInfoData = this.$store.state.chat?.getRoomInfo(roomId)
+          console.log("roomInfoData", this.roomInfoData);
+
+          if(this.roomInfoData != undefined && this.roomInfoData.users.findIndex(elem => elem.id == this.currentUserId) != -1)
               this.toggleRoomInfo()
         },
         roomInfoActions(emitMsg, userId, room){
@@ -341,9 +438,10 @@
         createRoomActions(emitMsg) {
           switch(emitMsg){
             case "success":
-              this.getRooms();
+              // this.getRooms();
               this.toggleCreateRoom();
               this.changeSuccess("Room created")
+              // this.rooms = this.$store.state.chat?.rooms
               break;
             case "error":
               this.toggleCreateRoom();
@@ -357,6 +455,24 @@
             default:
               break;
           }
+        },
+        toggleRoomsList(data) {
+          console.log("clicked on toggle rooms list",data);
+          // let old = this.currentRoomId
+          if (data.opened == true)
+          {
+            this.messages = []
+            this.putMessages({room: {roomId: this.currentRoomId}})
+            //   // this.currentRoomId = undefined
+          }
+          else
+          {
+            this.messages = []
+            this.putMessages({room: {roomId: this.currentRoomId}})
+            //   // this.currentRoomId = undefined
+          //   // this.currentRoomId = old
+          }
+
         },
         muteUser(userId, roomId){
           console.log("Requesting mute of:", userId, "in room:", roomId)
@@ -374,7 +490,8 @@
           console.log("toggleRoomInfo ende");
         },
         hideRoomInfo(e) {
-          if (!this.$el.contains(e.target)) {
+          console.log("hideRoomInfo");
+          if (this.$el.contains(e.target)) {
             this.toggleRoomInfo()
           }
         },
@@ -404,79 +521,84 @@
           {
             messages.splice(index , 1)
             this.messages = messages
-            this.socket.emit('deleteMessage', {messageId: message._id}, () => { console.log("success delete");})
+            this.$store.state.chat.socketChat.emit('deleteMessage', {messageId: message._id}, () => { console.log("success delete");})
           }
         },
-        addMessage(message) {
-          console.log("addMessage", message);
-          console.log(this.messages.length);
-          // let messages = [] as Message[]
-          // let i = 0
-          // for (; i < this.messages.length; i++) {
-          //   messages[i] = new Message(this.messages[i], this.Room.findUser(this.messages[i].senderId))
-          // }
-          // messages = this.messages;
-          this.messages[this.messages.length] = new Message(message)
-          // this.messages = messages
-          console.log(this.messages.length);
-          console.log(this.messages[this.messages.length - 1]);
-          console.log(this.messages[this.messages.length - 2]);
+        // addMessage(message) {
+        //   console.log("addMessage", message);
+        //   console.log(this.messages.length);
+        //   // let messages = [] as Message[]
+        //   // let i = 0
+        //   // for (; i < this.messages.length; i++) {
+        //   //   messages[i] = new Message(this.messages[i], this.Room.findUser(this.messages[i].senderId))
+        //   // }
+        //   // messages = this.messages;
+        //   this.messages[this.messages.length] = new Message(message)
+        //   // this.messages = messages
+        //   console.log(this.messages.length);
+        //   console.log(this.messages[this.messages.length - 1]);
+        //   console.log(this.messages[this.messages.length - 2]);
 
-          console.log("addMessage ende");
-        }
+        //   console.log("addMessage ende");
+        // }
 
       },
       created() {
         console.log("created");
         this.$store.state.NrMessages = 0;
+        // this.messages
+        // this.rooms = this.$store.state.getRooms // TB HERE
       },
       beforeMount() {
-        this.initSocket();
-        console.log("beforeMount", this.socket);
+        // this.initSocket();
+        // console.log("beforeMount", this.$store.state.chat.socketChat);
       },
       async mounted() {
         await this.initChatInfoListener()
-        console.log("MOUNT", this.socket)
-        if (this.socket === null){
+        console.log("MOUNT", this.$store.state.chat.socketChat)
+        if (this.$store.state.chat.socketChat === null){
           this.$router.push('/login')
           return ;
         }
         this.$store.state.NrMessages = 0;
-        this.socket.on('typing',({ userId, isTyping , roomId}) => {
-          console.log('typing');
-          const room = this.rooms.find((room) => {
-            return room.roomId === roomId
-          })
-          console.log("roomId", room.roomId)
-          console.log("bool", isTyping)
-          console.log("userId", userId)
+        this.$store.state.chat.socketChat.off('message')
+        // this.$store.state.chat.socketChat.on('typing',({ userId, isTyping , roomId}) => {
+        //   console.log('typing');
+        //   const room = this.rooms.find((room) => {
+        //     return room.roomId === roomId
+        //   })
+        //   console.log("roomId", room.roomId)
+        //   console.log("bool", isTyping)
+        //   console.log("userId", userId)
 
-          console.log("array of typing users", room.typingUsers)
-          if(isTyping) {
-            console.log("before", room.typingUsers)
-            if(room.typingUsers == undefined || room.typingUsers.length == 0)
-              room.typingUsers = [ userId ]
-            else if(room.typingUsers.indexOf(userId) == -1)
-              room.typingUsers = [ ...room.typingUsers, userId ]
+        //   console.log("array of typing users", room.typingUsers)
+        //   if(isTyping) {
+        //     console.log("before", room.typingUsers)
+        //     if(room.typingUsers == undefined || room.typingUsers.length == 0) {
+        //       room.typingUsers = [ userId ]
+        //     }
+        //     else if(room.typingUsers.indexOf(userId) == -1) {
+        //       room.typingUsers = [ ...room.typingUsers, userId ]
+        //     }
 
-            console.log("after", room.typingUsers);
+        //     console.log("after", room.typingUsers)
 
 
-          } else {
-            const typingUsers = []
-            for (let i = 0; i < room.typingUsers.length; i++) {
-                if (room.typingUsers[i] != userId)
-                  typingUsers.push(room.typingUsers[i])
-              }
-              room.typingUsers = typingUsers
-          }
+        //   } else {
+        //     const typingUsers = []
+        //     for (let i = 0; i < room.typingUsers.length; i++) {
+        //         if (room.typingUsers[i] != userId)
+        //           typingUsers.push(room.typingUsers[i])
+        //       }
+        //       room.typingUsers = typingUsers
+        //   }
 
-          console.log("before ende typing");
-          console.log(room.typingUsers);
-          console.log("ende typing");
-        });
+        //   console.log("before ende typing");
+        //   console.log(room.typingUsers);
+        //   console.log("ende typing");
+        // });
 
-        // this.socket.on('message',({message, roomId}) => {
+        // this.$store.state.chat.socketChat.on('message',({message, roomId}) => {
         //   console.log('message');
         //   console.log(message);
         //   console.log(roomId);
@@ -493,22 +615,22 @@
 
         // });
 
-        this.getRooms();
-        this.currentUserId = this.$store.getters.getUser.id;
+        // this.getRooms();
+        this.currentUserId = this.$store.state.user.id;
 
         console.log("mounted CHAT");
         // console.log(this.currentUserId)
       },
       unmounted() {
-        if (this.socket) {
-          this.socket.off('typing')
-          this.socket.off('message')
-          this.socket.on('message',() => {
+        // if (this.$store.state.chat.socketChat) {
+        //   this.$store.state.chat.socketChat.off('typing')
+          // this.$store.state.chat.socketChat.off('message')
+          this.$store.state.chat.socketChat.on('message',() => {
             this.$store.state.NrMessages++
-           console.log("mrmessiges", this.$store.state.NrMessages)
+          //  console.log("mrmessiges", this.$store.state.NrMessages)
           })
-        }
-      }
+        // }
+      },
     })
 </script>
 

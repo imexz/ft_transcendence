@@ -15,18 +15,18 @@ import User from "./user";
 
 export default class MatchData {
   constructor(
-    playerLeft: User,
-    playerRight: User,
-    scoreLeft : number,
-    scoreRight : number
+    winner: User,
+    loser: User,
+    scoreWinner : number,
+    scoreLoser : number
   ){
-    this.playerLeft = playerLeft
-    this.playerRight = playerRight
-    this.scoreLeft  = scoreLeft 
-    this.scoreRight  = scoreRight 
+    this.winner = winner
+    this.loser = loser
+    this.scoreWinner  = scoreWinner 
+    this.scoreLoser  = scoreLoser 
   }
-  playerLeft: User
-  playerRight: User
-  scoreLeft : number
-  scoreRight : number
+  winner: User
+  loser: User
+  scoreWinner : number
+  scoreLoser : number
 }

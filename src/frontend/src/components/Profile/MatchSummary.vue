@@ -5,7 +5,8 @@
       <span class="loss" v-else>Loss</span>
     </div>
     <div>
-      <span>{{ match.scoreLeft }} : {{ match.scoreRight }}</span>
+      <span v-if="win">{{ match.scoreWinner }} : {{ match.scoreLoser }}</span>
+      <span v-else>{{ match.scoreLoser }} : {{ match.scoreWinner }}</span>
     </div>
     <div>
       <UserSummary :user=get ></UserSummary>
@@ -32,18 +33,13 @@ export default defineComponent({
   components: {
     UserSummary,
   },
-  created() {
-    // console.log(this.match);
-    
-  },
   computed: {
       get() {
-        console.log("compute");
-        return this.match.playerLeft != null ? this.match.playerLeft : this.match.playerRight;
+        return this.match.winner != null ? this.match.winner : this.match.loser;
       },
       win() {
-        if (this.match?.scoreLeft > this.match?.scoreRight && this.match?.playerLeft == null ||
-        this.match?.scoreLeft < this.match?.scoreRight && this.match?.playerRight == null) {
+        if (this.match?.scoreWinner > this.match?.scoreLoser && this.match?.winner == null ||
+        this.match?.scoreWinner < this.match?.scoreLoser && this.match?.loser == null) {
           return true
       }
       return false

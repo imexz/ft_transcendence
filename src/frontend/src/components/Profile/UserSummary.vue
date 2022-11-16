@@ -40,7 +40,7 @@
     </div>
     <div class="dropdownMenu" v-if="show">
       <button
-        v-if="$store.getters.getFriends != '' && $store.getters.getFriends.some((us: User) => us.id == user.id)"
+        v-if="$store.state.friendsList != '' && $store.state.friendsList.some((us: User) => us.id == user.id)"
         class="dropdownElement"
         @click="removeFriend">
         <font-awesome-icon icon="fa-solid fa-user-minus" />
@@ -140,11 +140,10 @@ export default defineComponent({
       this.$store.commit("removeFriend", this.user.id)
     },
     viewProfile(id: number){
-      this.show = false;
+      this.toggleDropdown()
       this.$router.push('/profile/' + id.toString());
     },
     hideDropDown(e){
-      console.log("hi")
       if (!this.$el.contains(e.target))
         this.toggleDropdown()
     },
@@ -166,9 +165,9 @@ export default defineComponent({
       if (isSelfInvite) return;
       this.$store.state.winner = null;
       this.$store.state.socketGame.emit('GameRequestBackend', {isCustomized: this.$store.state.customized, id: this.user.id}, (r) => {
-        if (r.playerLeft != undefined && r.playerRight != undefined) {
+        if (r.winner != undefined && r.loser != undefined) {
         	this.showGame = !this.showGame
-        	const isUserActivePlayer: boolean = r.playerLeft.id == this.$store.state.user.id || r.playerRight.id == this.$store.state.user.id
+        	const isUserActivePlayer: boolean = r.winner.id == this.$store.state.user.id || r.loser.id == this.$store.state.user.id
 			if (!isUserActivePlayer)
 				this.$store.state.game = r
         }
@@ -216,7 +215,7 @@ export default defineComponent({
       console.log(this.msgText)
       this.closeDmPopUp()
       this.toggleDropdown()
-      this.$store.state.socketChat.emit('DM', {content: this.msgText, id: this.user.id})
+      this.$store.state.chat.socketChat.emit('DM', {content: this.msgText, id: this.user.id})
       this.msgText = ""
     }
 

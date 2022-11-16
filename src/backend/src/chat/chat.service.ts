@@ -2,16 +2,16 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { message } from '../message/message.entity';
 import { UsersService } from 'src/users/users.service';
-import { ChatroomService } from 'src/chatroom/chatroom.service';
+import { ChatroomService, roomReturn } from 'src/chatroom/chatroom.service';
 import { MessageService } from 'src/message/message.service';
 import User from 'src/users/entitys/user.entity';
 import { BanMuteService } from 'src/chatroom/banMute/banMute.service';
 import { AdminAction } from 'src/users/entitys/admin.enum';
-import { Access } from 'src/chatroom/chatroom.entity';
+import chatroom, { Access } from 'src/chatroom/chatroom.entity';
 
 @Injectable()
 export class ChatService {
-  async adminAction(action: AdminAction, roomId: number, UserId: number, adminId: number) {
+  async adminAction(action: AdminAction, roomId: number, UserId: number, adminId: number): Promise<boolean> {
     const room = await this.chatroomService.getRoomWithAdmins(roomId)
     console.log("admins", room.admins, adminId);
 
@@ -23,10 +23,11 @@ export class ChatService {
       switch (action) {
         case AdminAction.baned:
           await this.chatroomService.removeUserFromChatroom(await this.usersService.getUser(UserId), roomId)
-          return true
           break;
         case AdminAction.muted:
+
           this.banMuteService.mut(await this.usersService.getUser(UserId), room)
+
           break;
         case AdminAction.toAdmin:
           this.chatroomService.addRoomAdmin(room, UserId)
@@ -34,7 +35,8 @@ export class ChatService {
 
         default:
           break;
-      }
+        }
+        return true
       // if(action == AdminAction.baned)
     }
     return false
@@ -43,14 +45,20 @@ export class ChatService {
 
 
   async creatRoomDM(user: User, id: number, content: string) {
+    console.log("undefind = ", user, id );
+
     if(user != undefined && id != undefined)
     {
       // console.log(content);
 
       const user1 = await this.usersService.getUser(id)
-      const chatroom = await this.chatroomService.findOrCreatDM(user, user1)
-      this.messageService.userAddMessageToRoom(user, content, chatroom.chatroom)
-    }
+      const chat: {info: roomReturn, chatroom: chatroom} = await this.chatroomService.findOrCreatDM(user, user1)
+      if(chat != undefined)
+        this.messageService.userAddMessageToRoom(user, content, chat.chatroom)
+      else
+        console.log("chat == undeinfd");
+
+      }
   }
 
   async createRoomInfo(roomId: number, id: any) {
@@ -82,7 +90,7 @@ export class ChatService {
 
         async manageLeave(user_id: number,roomId : number) {
             const user = await this.usersService.getUser(user_id)
-            await this.chatroomService.removeUserFromChatroom(user, roomId)
+            return await this.chatroomService.removeUserFromChatroom(user, roomId)
         }
 
 
@@ -103,23 +111,23 @@ export class ChatService {
             console.log("roomIdmanageJoin: ", roomId);
 
             const user = await this.usersService.getUser(user_id)
-            const testbool2: boolean = await this.chatroomService.userToRoom(user, roomId, password);
-            console.log("testbool2: ", testbool2);
+            const room: chatroom = await this.chatroomService.userToRoom(user, roomId, password);
+            console.log("testbool2: ", room);
 
-            return testbool2
+            return room
         }
 
 
 
 
-        async findAllMessages(roomId: number, userId: number) {
-          const rooms = await this.chatroomService.getAllwithUser(userId)
-          for (let index = 0; index < rooms.length; index++) {
-            if(rooms[index].roomId == roomId) {
-              return await this.messageService.getAllMessagesOfRoom(roomId)
-            }
-          }
-        }
+        // async findAllMessages(roomId: number, userId: number) {
+        //   const rooms = await this.chatroomService.getAllwithUser(userId)
+        //   for (let index = 0; index < rooms.length; index++) {
+        //     if(rooms[index].roomId == roomId) {
+        //       return await this.messageService.getAllMessagesOfRoom(roomId)
+        //     }
+        //   }
+        // }
 
         async getClientName(id: number) {
             const user = await this.usersService.getUser(id)

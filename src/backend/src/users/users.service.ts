@@ -1,7 +1,7 @@
 import { InjectRepository } from "@nestjs/typeorm";
 import { Not } from "typeorm"
 import User from './entitys/user.entity';
-import { Injectable } from "@nestjs/common";
+import { Injectable, HttpException, HttpStatus } from "@nestjs/common";
 import { Repository } from "typeorm";
 import { fileEntity } from "../avatar/file.entitys"
 import { hostURL } from "../hostURL";
@@ -10,6 +10,18 @@ import { UserStatus } from "./entitys/status.enum";
 
 @Injectable()
 export class UsersService {
+	getTopPlayer() {
+		const test = this.usersRepository.createQueryBuilder("user")
+			.loadRelationCountAndMap('user.winns','user.winns')
+			.loadRelationCountAndMap('user.loses','user.loses')
+			// .orderBy("winns", "DESC")
+			// .limit(10)
+			.getMany()
+
+		console.log("getTopPlayer", test);
+		
+		return test
+	}
 
 	async setStatus(id: number , userStatus: UserStatus) {
 		this.usersRepository.update(id, {userStatus: userStatus})
@@ -82,7 +94,7 @@ export class UsersService {
 		await this.usersRepository.delete(id);
 	}
 
-	addUser(user: User): Promise<User> {
+	async addUser(user: User): Promise<User> {
 
 		if(user.avatar_url == null)
 		{
@@ -92,10 +104,28 @@ export class UsersService {
 		{
 			user.avatar_url_42intra = "https://cdn.intra.42.fr/users/0f2f1b9f30116d06e1e55bed9cf2cb46/casian.png"
 		}
-		const tmp = this.usersRepository.create(user);
-		return this.usersRepository.save(tmp);
+		tmp = this.usersRepository.create(user);
+		var tmp: User
+		var faild: boolean
 
+		do {
+			try {
+				tmp = await this.usersRepository.save(tmp);
+				faild = false
+				console.log("try block ende");
+				
+			} 
+			catch (error) {
+				console.log("fehler in init user");
+				tmp.username += "💩"
+				faild = true
+			}
+			
+		} while (faild);
+
+		return tmp
 	}
+
 
 	async updateAvatar(id: number, file: fileEntity) {
 		const user = await this.usersRepository.findOneBy({id: id})
@@ -113,19 +143,23 @@ export class UsersService {
 		this.usersRepository.update(id, user)
 	}
 
-	async updateName(id: number, username: string)
+	async updateName(user: User, username: string)
 	{
-		const user = await this.usersRepository.findOneBy({id: id})
-		if (user == null)
-		{
-			return
-		}
+		// const user = await this.usersRepository.findOneBy({id: id})
+		// if (user == null)
+		// {
+		// 	return
+		// }
+		// user.username = username
 		user.username = username
-		return this.usersRepository.save(user)
+		try {
+			await this.usersRepository.save(user)
+		} catch (error) {
+			console.log(error);
+			throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
+		}
+		return 
 	}
-
-
-
 	// async addfriend(user_id: number, friend_id: number) {
 	// 	// console.log(user_id);
 	// 	// console.log(friend_id);

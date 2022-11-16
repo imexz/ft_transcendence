@@ -48,6 +48,11 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import('../views/PlayView.vue')
   },
   {
+    path: '/scoreboard',
+    name: 'scoreboard',
+    component: () => import('../views/Scoreboard.vue')
+  },
+  {
     path: '/chat',
     name: 'Chats',
     component: () => import('../views/Chats.vue')
@@ -62,7 +67,7 @@ router.beforeEach(async (to) => {
   const publicPages = ['/login', '/login/tfa'];
   const authRequired = !publicPages.includes(to.path);
 
-  if (authRequired && !store.getters.isLogged) {
+  if (authRequired && store.state.user == null) {
     return '/login';
   }
 })

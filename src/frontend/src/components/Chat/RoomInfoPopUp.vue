@@ -12,12 +12,13 @@
     </div>
     <div class="userGroup">Admins</div>
     <div class="user" v-for="user in room?.admins">
-      <UserSummary :user=user></UserSummary>
+      <UserSummary v-if="room?.access == Access.dm && user.id != this.$store.state.user.id" :user=user :extraButtons=extraButtonsDm @action="reEmit"></UserSummary>
+      <UserSummary v-else :user=user></UserSummary>
     </div>
     <div class="userGroup">Users</div>
     <div class="user" v-for="user in room?.users">
       <UserSummary
-        v-if="!room?.admins.some((us: User) => us.id == user.id)"
+        v-if="!room?.admins?.some((us: User) => us.id == user.id)"
         :user=user 
         :extraButtons=extraButtons
         @action="reEmit"></UserSummary>
@@ -32,11 +33,11 @@ import Room, { Access } from '@/models/room';
 import User from '@/models/user';
 import CreateRoom from './createRoom.vue';
 
-  enum AdminAction {
-      muted,
-      baned,
-      toAdmin
-  }
+enum AdminAction {
+    muted,
+    baned,
+    toAdmin
+}
 export default defineComponent({
   data() {
     return {
@@ -56,14 +57,22 @@ export default defineComponent({
           emit: AdminAction.baned
         }
       ],
-      AdminAction
+      AdminAction,
+      Access,
+    extraButtonsDm: [
+      { icon: "fa-solid fa-comment-slash",
+        emit: AdminAction.muted
+      }
+    ]
     }
   },
   mounted() {
-    console.log("Room in room info");
+    console.log("Room in room info", this.room);
     
   },
   updated() {
+    console.log("updated in room info");
+    
     // this.room = this.roomInfo?.room;
   },
   computed: {
@@ -71,7 +80,7 @@ export default defineComponent({
       if (this.room?.owner?.id == this.$store.state.user.id) {
         return "owner"
       }
-      if (this.room?.admins.find(elem => elem.id == this.$store.state.user.id)){
+      if (this.room?.admins?.find(elem => elem.id == this.$store.state.user.id)){
         return "admin"
       } else {
         return "user"
@@ -79,11 +88,11 @@ export default defineComponent({
     },
     roomType() {
       switch(this.room?.access) {
-        case 3 :
+        case Access.dm :
           return "Direct Message"
-        case 2 :
+        case Access.protected :
           return "Protected Chatroom"
-        case 1 :
+        case Access.private:
           return "Private Chatroom"
         default :
           return "Public Chatroom"
@@ -92,12 +101,12 @@ export default defineComponent({
   },
   methods: {
     // changeRoomAccess() {
-    //   this.$store.state.socketChat.emit('changeRoomAccess', {roomName: this.name, access: this.access, password: this.password}  // !!!!!!!!!!!!!!!
+    //   this.$store.state.chat.socketChat.emit('changeRoomAccess', {roomName: this.name, access: this.access, password: this.password}  // !!!!!!!!!!!!!!!
     // },
     reEmit(emiType: AdminAction, userId){
       console.log(emiType, userId);
       
-      this.$store.state.socketChat.emit('action', {emiType, userId, roomId: this.room.roomId})
+      this.$store.state.chat.socketChat.emit('action', {emiType, userId, roomId: this.room.roomId})
     },
     closePopUp(){
       this.$emit("action", "exit")
