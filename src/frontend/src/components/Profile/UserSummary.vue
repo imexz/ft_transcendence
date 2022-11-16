@@ -140,11 +140,10 @@ export default defineComponent({
       this.$store.commit("removeFriend", this.user.id)
     },
     viewProfile(id: number){
-      this.show = false;
+      this.toggleDropdown()
       this.$router.push('/profile/' + id.toString());
     },
     hideDropDown(e){
-      console.log("hi")
       if (!this.$el.contains(e.target))
         this.toggleDropdown()
     },
