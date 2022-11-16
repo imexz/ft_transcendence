@@ -81,12 +81,12 @@ export class ChatGateway {
 
           if (room) {
             await this.addUserRooms(client)
-            console.log("UpdateRoom");
-            console.log("UpdateRoom1");
+            // console.log("UpdateRoom");
+            // console.log("UpdateRoom1");
             client.emit('UpdateRoom', {change: changedRoom.complet, roomId: roomId, data: room })
-            console.log("UpdateRoom2");
+            // console.log("UpdateRoom2");
             client.to(roomId.toString()).emit('UpdateRoom', {change: changedRoom.user, roomId: roomId,  data: client.handshake.auth })
-            console.log("UpdateRoom3");
+            // console.log("UpdateRoom3");
           }
         }
   }
@@ -100,7 +100,8 @@ export class ChatGateway {
     // const room_name = await this.chatService.getRoomName(roomId)
 
     client.leave(roomId.toString());
-    this.chatService.manageLeave(client.handshake.auth.id, roomId)
+    const room = await this.chatService.manageLeave(client.handshake.auth.id, roomId)
+    client.to(roomId.toString()).emit('UpdateRoom', {change: changedRoom.complet, roomId: roomId,  data: room })
   }
 
   // @SubscribeMessage('typing')
@@ -130,12 +131,22 @@ export class ChatGateway {
   ) {
     // console.log(roomId)
     console.log("ban")
-    if(await this.chatService.adminAction(emiType, roomId, muteUserId, client.handshake.auth.id) == true) {
+    if (await this.chatService.adminAction(emiType, roomId, muteUserId, client.handshake.auth.id)) {
+      
       const socket = await this.findSocketOfUser(muteUserId)
-      socket.leave(roomId.toString())
+      switch (emiType) {
+        case AdminAction.baned:
+          socket.leave(roomId.toString())
+          client.to(roomId.toString()).emit('UpdateRoom', {change: changedRoom.user, roomId: roomId,  data: {userId: muteUserId} }) 
+          break;
+        case AdminAction.toAdmin:
+          client.to(roomId.toString()).emit('UpdateRoom', {change: changedRoom.admin, roomId: roomId,  data: socket.handshake.auth })
+      
+        default:
+          break;
+      }
     }
     // console.log("recive and emit typing");
-
   }
 
   // @SubscribeMessage('findAllMessages')
@@ -207,11 +218,8 @@ export class ChatGateway {
     if(room.info == roomReturn.created) {
       if (access != Access.private)
       {
-        console.log("newRoom emitted", room.chatroom);
-
-        // this.server.to(room.chatroom.roomId.toString()).emit('newRoom', room.chatroom)
+        // console.log("newRoom emitted", room.chatroom);
         client.emit('newRoom', room.chatroom)
-        // console.log("ret:", ret);
         client.broadcast.emit('newRoom', {roomName: room.chatroom.roomName, roomId: room.chatroom.roomId, access: room.chatroom.access});
       }
       else
@@ -219,13 +227,16 @@ export class ChatGateway {
         client.emit('newRoom', room.chatroom)
       }
      this.addUserRooms(client)
-
     } else if (room.info == roomReturn.changed) {
-
+      // client.broadcast.emit('UpdateRoom', {change: changedRoom.access, roomId: room.chatroom.roomId, data: room.chatroom.access})
+      if (access != Access.private) {
+        // client.broadcast.emit('UpdateRoom', {change: changedRoom.access, roomId: room.chatroom.roomId, data: room.chatroom.access})
+        client.broadcast.emit('UpdateRoom', {change: changedRoom.complet, roomId: room.chatroom.roomId, data: room.chatroom})
+        // this.server.emit('UpdateRoom', {change: changedRoom.complet, roomId: room.chatroom.roomId, data: room.chatroom})  
+      } else {
+        client.broadcast.emit('UpdateRoom', {change: changedRoom.access, roomId: room.chatroom.roomId, data: Access.private})
+      }
       console.log("room changed");
-      // if (room.chatroom.access != Access.private)
-      client.broadcast.emit('UpdateRoom', {change: changedRoom.access, roomId: room.chatroom.roomId, data: room.chatroom.access})
-      this.server.to(room.chatroom.roomId.toString()).emit('UpdateRoom', {change: changedRoom.access, roomId: room.chatroom.roomId, data: room.chatroom.access})
     }
     else {
       console.log("room == empty");

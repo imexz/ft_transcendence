@@ -260,7 +260,7 @@ export class ChatroomService {
             // console.log(user);
             // console.log(room.owner);
             if(room.access != Access.dm) {
-                if (room.owner.id == user.id) {
+                if (room.owner?.id == user.id) {
                     console.log("remove owner");
                     
                     room.owner = null
@@ -279,6 +279,7 @@ export class ChatroomService {
                 }
                 console.log(await this.chatroomRepository.save(room));
                  
+                return room
             }
 
         }

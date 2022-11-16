@@ -11,7 +11,7 @@ import chatroom, { Access } from 'src/chatroom/chatroom.entity';
 
 @Injectable()
 export class ChatService {
-  async adminAction(action: AdminAction, roomId: number, UserId: number, adminId: number) {
+  async adminAction(action: AdminAction, roomId: number, UserId: number, adminId: number): Promise<boolean> {
     const room = await this.chatroomService.getRoomWithAdmins(roomId)
     console.log("admins", room.admins, adminId);
 
@@ -23,7 +23,6 @@ export class ChatService {
       switch (action) {
         case AdminAction.baned:
           await this.chatroomService.removeUserFromChatroom(await this.usersService.getUser(UserId), roomId)
-          return true
           break;
         case AdminAction.muted:
 
@@ -36,7 +35,8 @@ export class ChatService {
 
         default:
           break;
-      }
+        }
+        return true
       // if(action == AdminAction.baned)
     }
     return false
@@ -90,7 +90,7 @@ export class ChatService {
 
         async manageLeave(user_id: number,roomId : number) {
             const user = await this.usersService.getUser(user_id)
-            await this.chatroomService.removeUserFromChatroom(user, roomId)
+            return await this.chatroomService.removeUserFromChatroom(user, roomId)
         }
 
 
