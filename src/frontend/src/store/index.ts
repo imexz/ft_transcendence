@@ -156,7 +156,7 @@ export default createStore<State>({
         }
       )
       .catch(error => {
-        console.log(error);
+        // console.log(error);
 
           dispatch('logOut')
         }
