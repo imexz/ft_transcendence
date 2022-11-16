@@ -18,7 +18,7 @@
     <div class="userGroup">Users</div>
     <div class="user" v-for="user in room?.users">
       <UserSummary
-        v-if="!room?.admins.some((us: User) => us.id == user.id)"
+        v-if="!room?.admins?.some((us: User) => us.id == user.id)"
         :user=user 
         :extraButtons=extraButtons
         @action="reEmit"></UserSummary>
@@ -80,7 +80,7 @@ export default defineComponent({
       if (this.room?.owner?.id == this.$store.state.user.id) {
         return "owner"
       }
-      if (this.room?.admins.find(elem => elem.id == this.$store.state.user.id)){
+      if (this.room?.admins?.find(elem => elem.id == this.$store.state.user.id)){
         return "admin"
       } else {
         return "user"

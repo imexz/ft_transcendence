@@ -11,8 +11,15 @@ import store from '../store/index'
 
 
 export default class Chat{
-    constructor() {
-      console.log("constructor Caht");
+[x: string]: any;
+
+  socketChat: Socket | null
+  NrMessages=ref<number>(0)
+  rooms = ref<Room[]>([])
+  help = reactive({rooms: this.rooms})
+
+  constructor() {
+    console.log("constructor Caht");
 
           VueAxios({
             url: 'chatroom/all',
@@ -66,34 +73,42 @@ export default class Chat{
 
           this.socketChat.on('UpdateRoom',(obj: {change: changedRoom, roomId: number, data: any }) => {
             console.log("UpdateRoom received:", obj);
-            console.log("enum test", changedRoom.complet, changedRoom.user);
+            // console.log("enum test", changedRoom.complet, changedRoom.user);
 
             let room = this.rooms?.value?.find(elem => elem.roomId == obj.roomId)
             if (room) {
               console.log("room found");
               switch (obj.change) {
                 case changedRoom.complet:
-                  room = new Room(obj.data)
-                  console.log("room now", room);
-                  this.rooms.value.forEach(element => {
-                    if (element.roomId == room.roomId)
-                      element = room
-                  });
-                  this.rooms.value = [...this.rooms.value]
-                  console.log("complet", room);
+                  let roomIndex = this.rooms?.value?.findIndex(elem => elem.roomId == obj.roomId)
+                  if (roomIndex != -1) {
+                    
+                    this.rooms.value[roomIndex] = new Room(obj.data)
+                  }
+                  // console.log("room now", room);
+                  // this.rooms.value.forEach(element => {
+                    //   if (element.roomId == room.roomId)
+                    //     element = room
+                    // });
+                    this.rooms.value = [...this.rooms.value]
+                    console.log("over ride room", this.rooms.value);
+                  // console.log("complet", room);
                   break;
                 case changedRoom.user:
                   console.log("user");
-                  room.users.push(obj.data as unknown as User)
+                  this.UserToArray(obj.data, room.users)
                   break;
                 case changedRoom.admin:
-                  console.log("admin");
-                  room.admins.push(obj.data as unknown as User)
+                    console.log("admin");
+                    this.UserToArray(obj.data, room.admins)
                   break;
                 case changedRoom.access:
                   console.log("access");
-                  if (obj.data == Access.private)
+                  console.log("access", room.users, store.state.user?.id);
+                  if (obj.data == Access.private && room.users.findIndex(elem => elem.id == store.state.user?.id) == -1)
                   {
+                    console.log("remove room");
+                    
                     const index = this.rooms.value.indexOf(room)
                     if( -1 != index) {
                       this.rooms.value.splice(index, 1) //TB check if needs extra check if user is part of the room
@@ -103,8 +118,12 @@ export default class Chat{
                   break;
                 default:
                   break;
-              }
-            }
+              } 
+            } else {
+              if (changedRoom.complet == obj.change) {
+                 this.addRoom(obj.data)
+               } 
+             }
 
             // if (room && room.access != Access.private)
             //   room = new Room(data)
@@ -114,10 +133,15 @@ export default class Chat{
 
     }
 
-      socketChat: Socket | null
-      NrMessages=ref<number>(0)
-      rooms = ref<Room[]>([])
-      help = reactive({rooms: this.rooms})
+      UserToArray( user: User, users: User[]) {
+        const index = users.findIndex(elem => elem.id == user.id)
+        if (index == -1) {
+          users.push(user)
+        } else {
+          users.splice(index, 1)
+        }
+      }
+
 
       setRooms(rooms: any) {
         const room = [] as Room[]
@@ -150,13 +174,7 @@ export default class Chat{
       }
 
       getRoomInfo(roomId: number): room {
-        // const rooms: Room[] = this.rooms
-        // console.log(rooms);
-
-        // console.log( "getRoomInfo",  roomId, this.rooms ,this.rooms.value);
         const test: Room = this.help.rooms?.find(elem => elem.roomId == roomId)
-        // console.log( "getRoomInfo", test, roomId, this.rooms ,this.rooms.value);
-
         return test
       }
 
