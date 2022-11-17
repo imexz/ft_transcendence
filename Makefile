@@ -1,4 +1,4 @@
-all: build up 
+all: build up
 
 up:
 	docker compose up
@@ -10,7 +10,7 @@ down:
 	docker compose down
 
 clean:
-	docker system prune -f --volumes
+	docker system prune -a -f --volumes
 
 re: down clean build up
 
@@ -20,4 +20,4 @@ entry:
 backend:
 	docker compose up backend
 
-
+.PHONY: all up build down clean re entry backend
