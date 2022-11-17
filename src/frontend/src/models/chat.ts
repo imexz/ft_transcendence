@@ -14,7 +14,6 @@ export default class Chat{
 [x: string]: any;
 
   socketChat: Socket | null
-  NrMessages=ref<number>(0)
   rooms = ref<Room[]>([])
   help = reactive({rooms: this.rooms})
 
@@ -37,12 +36,14 @@ export default class Chat{
             }
           })
 
-          this.socketChat.on('message',() => {
-            this.NrMessages.value++
-          })
-
           this.socketChat.on('newMessage',(data) => {
             console.log("newMessage received:");
+
+            if (data.message.senderId != store.state.user.id)
+            {
+              if (store.state.NrMessages != undefined)
+                store.state.NrMessages++
+            }
 
             let room = this.rooms.value?.find(elem => elem.roomId == data.roomId)
             console.log(room);
@@ -82,7 +83,7 @@ export default class Chat{
                 case changedRoom.complet:
                   let roomIndex = this.rooms?.value?.findIndex(elem => elem.roomId == obj.roomId)
                   if (roomIndex != -1) {
-                    
+
                     this.rooms.value[roomIndex] = new Room(obj.data)
                   }
                   // console.log("room now", room);
@@ -108,21 +109,21 @@ export default class Chat{
                   if (obj.data == Access.private && room.users.findIndex(elem => elem.id == store.state.user?.id) == -1)
                   {
                     console.log("remove room");
-                    
+
                     const index = this.rooms.value.indexOf(room)
                     if( -1 != index) {
-                      this.rooms.value.splice(index, 1) //TB check if needs extra check if user is part of the room
+                      this.rooms.value.splice(index, 1) // TB check if needs extra check if user is part of the room
                     }
                   }
                   room.access = obj.data as unknown as Access
                   break;
                 default:
                   break;
-              } 
+              }
             } else {
               if (changedRoom.complet == obj.change) {
                  this.addRoom(obj.data)
-               } 
+               }
              }
 
             // if (room && room.access != Access.private)
@@ -155,6 +156,8 @@ export default class Chat{
 
       addRoom(room: any) {
         // this.rooms[this.rooms.length] = new Room(room)
+        console.log("adding room to store", room);
+
         this.rooms.value = [...this.rooms.value, new Room(room)]
         // this.rooms.$set(this.rooms, this.rooms.length, new Room(room))
         // console.log("ROOM: ", room, room instanceof Room)

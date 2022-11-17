@@ -76,7 +76,7 @@
           currentRoomId: '',
           rooms: [] as Room[],
           messages: [] as Message[],
-          messagesLoaded: false, //TB change this value to show a loading icon on the top of the chat
+          messagesLoaded: false,
           messageActions: [
             { name: 'deleteMessage' , title: 'delete message', onlyMe: true },
           ],
@@ -113,8 +113,15 @@
           // return this.$store.state.chat?.rooms
           this.rooms = this.$store.state.chat?.rooms
           this.rooms.forEach(element => {
-            element.unreadCount = this.$store.state.chat.rooms.find(elem => elem.roomId == element.roomId).unreadCount
+            let room = this.$store.state.chat.rooms.find(elem => elem.roomId == element.roomId)
+            element.unreadCount = room.unreadCount
             console.log("unreadCount updated", element.roomId, element.unreadCount);
+
+            element.users = room.users
+            console.log("users changed", element.roomId, element.users);
+
+            element.access = room.access
+            console.log("users changed", element.roomId, element.access);
 
           });
           this.rooms = [...this.rooms]
@@ -156,16 +163,6 @@
             // console.log(new Date().getMilliseconds());
 
         },
-        // unreadCount () {
-        //   this.$store.state.chat.rooms.forEach(element => {
-        //     if (element.unreadCount > 0)
-        //     {
-        //       var changedRoom = this.rooms.find(elem => elem.roomId == element.roomId)
-        //       console.log(changedRoom);
-        //     }
-
-        //   });
-        // }
       },
       updated() {
 
@@ -287,7 +284,7 @@
         //   if (this.PoppupJoin == false) {
         //     console.log("clicked on join");
 
-        //     this.$store.state.socket.emit('join', {roomId: roomId, password: this.password}) //TB is this used???
+        //     this.$store.state.socket.emit('join', {roomId: roomId, password: this.password})
         //   }
         //   console.log(this.PoppupJoin);
         // },
@@ -547,7 +544,7 @@
         console.log("created");
         this.$store.state.NrMessages = 0;
         // this.messages
-        // this.rooms = this.$store.state.getRooms // TB HERE
+        // this.rooms = this.$store.state.getRooms
       },
       beforeMount() {
         // this.initSocket();
@@ -555,13 +552,14 @@
       },
       async mounted() {
         await this.initChatInfoListener()
+        this.$store.state.NrMessages = undefined
         console.log("MOUNT", this.$store.state.chat.socketChat)
         if (this.$store.state.chat.socketChat === null){
           this.$router.push('/login')
           return ;
         }
-        this.$store.state.NrMessages = 0;
-        this.$store.state.chat.socketChat.off('message')
+        // this.$store.state.NrMessages = 0;
+        // this.$store.state.chat.socketChat.off('message')
         // this.$store.state.chat.socketChat.on('typing',({ userId, isTyping , roomId}) => {
         //   console.log('typing');
         //   const room = this.rooms.find((room) => {
@@ -622,14 +620,20 @@
         // console.log(this.currentUserId)
       },
       unmounted() {
+        console.log("unmounted CHAT");
+        this.$store.state.NrMessages = 0
+
         // if (this.$store.state.chat.socketChat) {
-        //   this.$store.state.chat.socketChat.off('typing')
-          // this.$store.state.chat.socketChat.off('message')
-          this.$store.state.chat.socketChat.on('message',() => {
-            this.$store.state.NrMessages++
-          //  console.log("mrmessiges", this.$store.state.NrMessages)
-          })
+        // //   this.$store.state.chat.socketChat.off('typing')
+        //   // this.$store.state.chat.socketChat.off('message')
+        //   this.$store.state.chat.socketChat.on('message',() => {
+        //     this.$store.state.NrMessages++
+        //     console.log("mrmessages", this.$store.state.NrMessages)
+        //   })
         // }
+        // else
+        //   console.warn("NO SOCKETCHAT FOUND!!");
+
       },
     })
 </script>
