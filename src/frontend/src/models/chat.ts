@@ -14,7 +14,6 @@ export default class Chat{
 [x: string]: any;
 
   socketChat: Socket | null
-  NrMessages=ref<number>(0)
   rooms = ref<Room[]>([])
   help = reactive({rooms: this.rooms})
 
@@ -37,12 +36,14 @@ export default class Chat{
             }
           })
 
-          this.socketChat.on('message',() => {
-            this.NrMessages.value++
-          })
-
           this.socketChat.on('newMessage',(data) => {
             console.log("newMessage received:");
+
+            if (data.message.senderId != store.state.user.id)
+            {
+              if (store.state.NrMessages != undefined)
+                store.state.NrMessages++
+            }
 
             let room = this.rooms.value?.find(elem => elem.roomId == data.roomId)
             console.log(room);

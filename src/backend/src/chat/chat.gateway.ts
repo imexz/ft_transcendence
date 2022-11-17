@@ -145,7 +145,6 @@ export class ChatGateway {
       timestamp: message.timestamp.toLocaleString(),
       username: message.sender.username }
 
-      client.to(roomId.toString()).emit('message', {message: tmp, roomId});
       this.server.to(roomId.toString()).emit('newMessage', {message: tmp, roomId});
       console.log("createMessage ende");
       return tmp;

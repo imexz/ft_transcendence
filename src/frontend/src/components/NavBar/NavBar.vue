@@ -1,7 +1,7 @@
 <template>
   <div class="topBar">
     <div class="child">
-      <div 
+      <div
         v-if=isLoggedIn
         class="currentUser topElement"
         :class="{'userActive': $route.name === 'me'}"
@@ -16,7 +16,7 @@
     <div class="child topElement">
       <router-link :to="'/play'" @click.native="this.$store.state.winner=null" class="playButton">PLAY</router-link>
     </div>
-    <div class="rightSide child">      
+    <div class="rightSide child">
       <div class="sb rightSideElement">
         <SearchBar></SearchBar>
       </div>
@@ -85,7 +85,7 @@ export default defineComponent({
 }
 .topElement:active {
   transform: translateY(1px);
-  
+
 }
 
 /* .sb {
@@ -142,7 +142,7 @@ export default defineComponent({
 
 .rightSide {
   display: flex;
-  justify-content: flex-end; 
+  justify-content: flex-end;
 }
 
 .rightSideElement {

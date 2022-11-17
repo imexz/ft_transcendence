@@ -163,16 +163,6 @@
             // console.log(new Date().getMilliseconds());
 
         },
-        // unreadCount () {
-        //   this.$store.state.chat.rooms.forEach(element => {
-        //     if (element.unreadCount > 0)
-        //     {
-        //       var changedRoom = this.rooms.find(elem => elem.roomId == element.roomId)
-        //       console.log(changedRoom);
-        //     }
-
-        //   });
-        // }
       },
       updated() {
 
@@ -562,13 +552,14 @@
       },
       async mounted() {
         await this.initChatInfoListener()
+        this.$store.state.NrMessages = undefined
         console.log("MOUNT", this.$store.state.chat.socketChat)
         if (this.$store.state.chat.socketChat === null){
           this.$router.push('/login')
           return ;
         }
-        this.$store.state.NrMessages = 0;
-        this.$store.state.chat.socketChat.off('message')
+        // this.$store.state.NrMessages = 0;
+        // this.$store.state.chat.socketChat.off('message')
         // this.$store.state.chat.socketChat.on('typing',({ userId, isTyping , roomId}) => {
         //   console.log('typing');
         //   const room = this.rooms.find((room) => {
@@ -629,14 +620,20 @@
         // console.log(this.currentUserId)
       },
       unmounted() {
+        console.log("unmounted CHAT");
+        this.$store.state.NrMessages = 0
+
         // if (this.$store.state.chat.socketChat) {
-        //   this.$store.state.chat.socketChat.off('typing')
-          // this.$store.state.chat.socketChat.off('message')
-          this.$store.state.chat.socketChat.on('message',() => {
-            this.$store.state.NrMessages++
-          //  console.log("mrmessiges", this.$store.state.NrMessages)
-          })
+        // //   this.$store.state.chat.socketChat.off('typing')
+        //   // this.$store.state.chat.socketChat.off('message')
+        //   this.$store.state.chat.socketChat.on('message',() => {
+        //     this.$store.state.NrMessages++
+        //     console.log("mrmessages", this.$store.state.NrMessages)
+        //   })
         // }
+        // else
+        //   console.warn("NO SOCKETCHAT FOUND!!");
+
       },
     })
 </script>

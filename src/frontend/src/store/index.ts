@@ -28,7 +28,7 @@ export interface State {
   socketGame: Socket | null
   // socketChat: Socket | null
   friendsList: User[] | null
-  // NrMessages: number
+  NrMessages: number
   NrFriendRequests: number
   requester: User | null
   // rooms: Room[]
