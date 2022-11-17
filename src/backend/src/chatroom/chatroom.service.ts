@@ -18,14 +18,14 @@ export enum roomReturn {
 
 @Injectable()
 export class ChatroomService {
-  async addRoomAdmin(room: number | chatroom, userId: number) {
+  async addRoomAdmin(room: chatroom, userId: number) {
     console.log("addRoomAdmin");
    var tmpRoom
-    if(typeof room == 'number') {
-        tmpRoom = await this.getRoomWithAdmins(room)
-    } else {
+//     if(typeof room == 'number') {
+//         tmpRoom = await this.getRoomWithAdmins(room)
+//     } else {
         tmpRoom = room
-    }
+//     }
     if (tmpRoom != undefined) {
         const user = tmpRoom.admins.find(element => element.id == userId)
         if (user == undefined) {
@@ -140,20 +140,19 @@ export class ChatroomService {
     }
 
     async findOrCreatDM(user: User, user1: User): Promise<{info: roomReturn, chatroom: chatroom}> {
-        console.log("users = ", user, user1);
+        // console.log("users = ", user, user1);
 
         if (user != undefined && user1 != undefined)
         {
             var chatroom: chatroom[] = await this.chatroomRepository.find({
                 relations: {
-                    admins: true,
+                    // admins: true,
                     users: true,
                     // owner: true,
                     messages: true,
                     muted: {
                         user: true
                     }
-
                 },
                 where: {
                     users: [{id: user.id}, {id: user1.id}],
@@ -161,12 +160,14 @@ export class ChatroomService {
                 }
 
             })
-            chatroom.forEach(element => {
+            for (let element of chatroom) {                
+                // console.log("room =", element);
                 if (element.users.find( elem => elem.id == user.id) != undefined && element.users.find(elem => elem.id == user1.id) != undefined) {
-                    return {info: roomReturn.changed, chatroom: chatroom}
+                    console.log("return" );
+                    
+                    return {info: roomReturn.changed, chatroom: element}
                 }
-            });
-
+            }
             console.log("dm room", chatroom);
 
             // if(chatroom == undefined) {
@@ -175,20 +176,12 @@ export class ChatroomService {
             tmpChatroom = await this.chatroomRepository.create()
             tmpChatroom.users = [user, user1]
             tmpChatroom.admins = [user, user1]
+            // tmpChatroom.messages = []
             // chatroom.owner = user
             tmpChatroom.access = Access.dm
-            await this.chatroomRepository.save(tmpChatroom)
+            tmpChatroom = await this.chatroomRepository.save(tmpChatroom)
             return {info: roomReturn.created, chatroom: tmpChatroom}
-            // }
-            // return chatroom;
-            // .where("post.authorId IN (:authors)", { authors: [3, 7, 9] })
-            // var chatroom = await this.chatroomRepository.createQueryBuilder("dm")
-            //     .innerJoinAndSelect("dm.users", "users", "user.id IN (:userAr)", {userAr: [user.id, user1.id]})
-            //     // .where("users.id == :usr", {usr: user} )
-            //     // .andWhere("users.id == :usr1", {usr1: user1})
-            //     .getOne()
         }
-        // return undefined
     }
 
     async userToRoom(user: User, roomId: number, password?: string): Promise<chatroom>
@@ -260,6 +253,11 @@ export class ChatroomService {
             // console.log(user);
             // console.log(room.owner);
             if(room.access != Access.dm) {
+                if (room.owner?.id == user.id) {
+                    console.log("remove owner");
+                    
+                    room.owner = null
+                }
                 var index = room.admins.findIndex(object => {
                     return object.id === user.id
                 })
@@ -272,9 +270,9 @@ export class ChatroomService {
                 if(index != -1) {
                     room.users.splice(index, 1)
                 }
-                // console.log(index);
-
-                await this.chatroomRepository.save(room)
+                console.log(await this.chatroomRepository.save(room));
+                 
+                return room
             }
 
         }

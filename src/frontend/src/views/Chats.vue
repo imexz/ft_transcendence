@@ -109,7 +109,7 @@
       },
       computed: {
         comprooms () {
-          console.log("rooms computed");
+          console.log("rooms computed", this.$store.state.chat?.rooms)
           // return this.$store.state.chat?.rooms
           this.rooms = this.$store.state.chat?.rooms
           this.rooms.forEach(element => {
@@ -250,7 +250,7 @@
             // console.log("createMessage response");
             // console.log(response);
             // this.addMessage(response)
-            console.log("messages was sent");
+            console.log("messages was sent", response);
 
           })
         },
@@ -426,7 +426,7 @@
           this.roomInfoData = this.$store.state.chat?.getRoomInfo(roomId)
           console.log("roomInfoData", this.roomInfoData);
 
-          if(this.roomInfoData != undefined && this.roomInfoData.users.find(elem => elem.id == this.currentUserId) != undefined)
+          if(this.roomInfoData != undefined && this.roomInfoData.users.findIndex(elem => elem.id == this.currentUserId) != -1)
               this.toggleRoomInfo()
         },
         roomInfoActions(emitMsg, userId, room){

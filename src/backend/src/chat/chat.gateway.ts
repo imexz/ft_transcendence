@@ -36,57 +36,46 @@ export class ChatGateway {
   @WebSocketServer()
   server: Server;
 
-  // Socket.use(() => {})
-
   constructor(private readonly chatService: ChatService, private authService: AuthService) {}
 
   afterInit() {
     // console.log("afterInit chat ");
 
   }
+
   handleDisconnect() {
     console.log("handleDisconnect");
 
   }
 
-
   async handleConnection(socket) {
-    // console.log('====connected chat====')
     if (await this.authService.validateSocket(socket)) {
-      // console.log("validate chat succes full");
       const rooms = this.addUserRooms(socket)
     }
   }
 
-  async addUserRooms(client: Socket) {
+  async addUserRooms(client: Socket | any) {
     const rooms = await this.chatService.getUserRooms(client.handshake.auth.id)
     var tmp: string[] = []
     for (let index = 0; index < rooms.length; index++) {
       tmp.push(rooms[index].roomId.toString())
     }
     client.join(tmp)
-}
+  }
 
   @SubscribeMessage('join')
   async joinRoom(
     @ConnectedSocket() client: Socket,
-    // @MessageBody('roomId') roomId: any,
     @MessageBody('roomId') roomId: number,
     @MessageBody('password') password?: string,
     )
      {
         if (roomId ) {
           const room: chatroom = await this.chatService.manageJoin(client.handshake.auth.id, roomId, password)
-          // console.log("bool: ", room);
-
           if (room) {
             await this.addUserRooms(client)
-            console.log("UpdateRoom");
-            console.log("UpdateRoom1");
             client.emit('UpdateRoom', {change: changedRoom.complet, roomId: roomId, data: room })
-            console.log("UpdateRoom2");
-            client.to(roomId.toString()).emit('updateRoom', {change: changedRoom.user, roomId: roomId,  data: client.handshake.auth })
-            console.log("UpdateRoom3");
+            client.to(roomId.toString()).emit('UpdateRoom', {change: changedRoom.user, roomId: roomId,  data: client.handshake.auth })
           }
         }
   }
@@ -97,29 +86,10 @@ export class ChatGateway {
     @ConnectedSocket() client:Socket,
   ) {
     console.log("leave room", roomId);
-    // const room_name = await this.chatService.getRoomName(roomId)
-
     client.leave(roomId.toString());
-    this.chatService.manageLeave(client.handshake.auth.id, roomId)
+    const room = await this.chatService.manageLeave(client.handshake.auth.id, roomId)
+    client.to(roomId.toString()).emit('UpdateRoom', {change: changedRoom.complet, roomId: roomId,  data: room })
   }
-
-  // @SubscribeMessage('typing')
-  // async typing(
-  //   @MessageBody('isTyping') isTyping: boolean,
-  //   @MessageBody('roomId') roomId: any,
-  //   @ConnectedSocket() client:Socket,
-  // ) {
-  //   // console.log(roomId)
-  //   // console.log("typing")
-
-  //   // const name = await this.chatService.getClientName(client.handshake.auth.id);
-  //   // const room_name = await this.chatService.getRoomName(roomId)
-  //   // const name = client.Id
-  //   const userId = client.handshake.auth.id
-  //   client.to(roomId.toString()).emit('typing', { userId: userId , isTyping , roomId});
-  //   // console.log("recive and emit typing");
-
-  // }
 
   @SubscribeMessage('action')
   async ban(
@@ -128,30 +98,33 @@ export class ChatGateway {
     @MessageBody('roomId') roomId: number,
     @ConnectedSocket() client:Socket,
   ) {
-    // console.log(roomId)
     console.log("ban")
-    if(await this.chatService.adminAction(emiType, roomId, muteUserId, client.handshake.auth.id) == true) {
-      const socket = await this.findSocketOfUser(muteUserId)
-      socket.leave(roomId.toString())
+
+    const socket = await this.findSocketOfUser(muteUserId)
+    const tmp = await this.chatService.adminAction(emiType, roomId, muteUserId, client.handshake.auth.id)
+    switch (tmp) {
+      case AdminAction.baned:
+        socket.leave(roomId.toString())
+        client.to(roomId.toString()).emit('UpdateRoom', {change: changedRoom.user, roomId: roomId,  data: {userId: muteUserId} })
+        break;
+      case AdminAction.toAdmin:
+        client.to(roomId.toString()).emit('UpdateRoom', {change: changedRoom.admin, roomId: roomId,  data: socket.handshake.auth })
+      case AdminAction.unMuted:
+        this.createMessage(roomId, "you are unmuted", client)
+        break
+      case AdminAction.muted:
+        this.createMessage(roomId, "you are muted", client)
+        break
+      default:
+        break;
     }
-    // console.log("recive and emit typing");
+    return tmp
 
   }
 
-  // @SubscribeMessage('findAllMessages')
-  // async findAllMessages(@MessageBody('roomId') roomId: number, @ConnectedSocket() client:Socket,) {
-  //   // console.log('findAllMessages');
-  //   // console.log(roomId);
-  //   // console.log(client.handshake);
-  //   console.log(client.handshake.auth.id);
-
-
-  //   return await this.chatService.findAllMessages(roomId, client.handshake.auth.id);
-  //   // return {test};
-  // }
 
   @SubscribeMessage('createMessage')
-  async create(
+  async createMessage(
   @MessageBody('roomId') roomId: number,
   @MessageBody('content') content: string,
   @ConnectedSocket() client: Socket,
@@ -200,11 +173,7 @@ export class ChatGateway {
     if(room.info == roomReturn.created) {
       if (access != Access.private)
       {
-        console.log("newRoom emitted", room.chatroom);
-
-        // this.server.to(room.chatroom.roomId.toString()).emit('newRoom', room.chatroom)
         client.emit('newRoom', room.chatroom)
-        // console.log("ret:", ret);
         client.broadcast.emit('newRoom', {roomName: room.chatroom.roomName, roomId: room.chatroom.roomId, access: room.chatroom.access});
       }
       else
@@ -214,13 +183,18 @@ export class ChatGateway {
         client.emit('newRoom', room.chatroom)
       }
      this.addUserRooms(client)
-
     } else if (room.info == roomReturn.changed) {
-
+      if (access != Access.private) {
+        client.broadcast.emit('UpdateRoom', {change: changedRoom.complet, roomId: room.chatroom.roomId, data: room.chatroom})
+      } else {
+        client.broadcast.emit('UpdateRoom', {change: changedRoom.access, roomId: room.chatroom.roomId, data: Access.private})
+      }
       console.log("room changed");
-      // if (room.chatroom.access != Access.private)
-      client.broadcast.emit('updateRoom', {change: changedRoom.access, roomId: room.chatroom.roomId, data: room.chatroom.access})
-      this.server.to(room.chatroom.roomId.toString()).emit('updateRoom', {change: changedRoom.access, roomId: room.chatroom.roomId, data: room.chatroom.access})
+
+      // maybe needed to not send private room info to the frontend // TB
+      // // if (room.chatroom.access != Access.private)
+      // client.broadcast.emit('updateRoom', {change: changedRoom.access, roomId: room.chatroom.roomId, data: room.chatroom.access})
+      // this.server.to(room.chatroom.roomId.toString()).emit('updateRoom', {change: changedRoom.access, roomId: room.chatroom.roomId, data: room.chatroom.access})
     }
     else {
       console.log("room == empty");
@@ -237,8 +211,6 @@ export class ChatGateway {
       console.log("delete found");
       console.log(messageId);
       this.chatService.deleteMessage(messageId, client.handshake.auth.id);
-
-
   }
 
   @SubscribeMessage('createMessageReaction')
@@ -248,7 +220,6 @@ export class ChatGateway {
     @MessageBody('remove') remove : boolean,
   ) {
       this.chatService.createMessageReaction(messageId, reaction, remove);
-
   }
 
   @SubscribeMessage('roomInfo')
@@ -267,20 +238,18 @@ export class ChatGateway {
     @MessageBody('content') content: string,
     @MessageBody('id') id: number,
   ) {
+    const room : {info: roomReturn, chatroom: chatroom} = await this.chatService.creatRoomDM(client.handshake.auth as User, id)
 
-    const room = await this.chatService.creatRoomDM(client.handshake.auth as User, id, content)
-    if (room && room.info == roomReturn.created)
-    {
+    if(room.info == roomReturn.created) {
+      const socket = await this.findSocketOfUser(id)
+      const toWait = Promise.all([this.addUserRooms(client), this.addUserRooms(socket)]);
+      room.chatroom.roomName = socket.handshake.auth.username
       client.emit('newRoom', room.chatroom)
-      const user = await this.findSocketOfUser(id)
-      if (user)
-        user.emit('newRoom', room.chatroom)
+      room.chatroom.roomName = client.handshake.auth.username
+      socket.emit('newRoom', room.chatroom)
+      await toWait
     }
-    else if (room && room.info == roomReturn.changed) // TB maybe not needed here?!
-    {
-      client.emit('updateRoom', room.chatroom)
-    }
-    return {room}
+    this.createMessage(room.chatroom.roomId, content, client)
   }
 
   async findSocketOfUser(userId: number) {
@@ -288,11 +257,9 @@ export class ChatGateway {
     for (const socket of sockets) {
       if(socket.handshake.auth.id == userId)
       {
-        console.log("gameRequest test");
+        // console.log("gameRequest test");
         return socket
       }
     }
   }
-
-
 }

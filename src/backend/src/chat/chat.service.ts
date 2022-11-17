@@ -11,7 +11,7 @@ import chatroom, { Access } from 'src/chatroom/chatroom.entity';
 
 @Injectable()
 export class ChatService {
-  async adminAction(action: AdminAction, roomId: number, UserId: number, adminId: number) {
+  async adminAction(action: AdminAction, roomId: number, UserId: number, adminId: number): Promise<AdminAction> {
     const room = await this.chatroomService.getRoomWithAdmins(roomId)
     console.log("admins", room.admins, adminId);
 
@@ -23,46 +23,27 @@ export class ChatService {
       switch (action) {
         case AdminAction.baned:
           await this.chatroomService.removeUserFromChatroom(await this.usersService.getUser(UserId), roomId)
-          return true
-          break;
+          return AdminAction.baned
         case AdminAction.muted:
-
-          this.banMuteService.mut(await this.usersService.getUser(UserId), room)
-
-          break;
+          return this.banMuteService.mut(await this.usersService.getUser(UserId), room)
         case AdminAction.toAdmin:
           this.chatroomService.addRoomAdmin(room, UserId)
-          break;
-
+          return AdminAction.toAdmin
         default:
           break;
-      }
-      // if(action == AdminAction.baned)
+        }
     }
-    return false
   }
 
 
 
-  async creatRoomDM(user: User, id: number, content: string) {
+  async creatRoomDM(user: User, id: number) {
     console.log("undefind = ", user, id );
 
     if(user != undefined && id != undefined)
     {
-      // console.log(content);
-
       const user1 = await this.usersService.getUser(id)
-      const chat: {info: roomReturn, chatroom: chatroom} = await this.chatroomService.findOrCreatDM(user, user1)
-      if(chat != undefined)
-      {
-        this.messageService.userAddMessageToRoom(user, content, chat.chatroom)
-        return chat
-      }
-      else
-      {
-        console.log("chat == undeinfd");
-        return undefined
-      }
+      return this.chatroomService.findOrCreatDM(user, user1)
     }
   }
 
@@ -95,7 +76,7 @@ export class ChatService {
 
         async manageLeave(user_id: number,roomId : number) {
             const user = await this.usersService.getUser(user_id)
-            await this.chatroomService.removeUserFromChatroom(user, roomId)
+            return await this.chatroomService.removeUserFromChatroom(user, roomId)
         }
 
 

@@ -18,7 +18,7 @@
     <div class="userGroup">Users</div>
     <div class="user" v-for="user in room?.users">
       <UserSummary
-        v-if="!room?.admins.some((us: User) => us.id == user.id)"
+        v-if="!room?.admins?.some((us: User) => us.id == user.id)"
         :user=user 
         :extraButtons=extraButtons
         @action="reEmit"></UserSummary>
@@ -36,7 +36,8 @@ import CreateRoom from './createRoom.vue';
 enum AdminAction {
     muted,
     baned,
-    toAdmin
+    toAdmin,
+    unMuted
 }
 export default defineComponent({
   data() {
@@ -46,15 +47,18 @@ export default defineComponent({
       extraButtons: [
         {
           icon: "fa-solid fa-comment-slash",
-          emit: AdminAction.muted
+          emit: AdminAction.muted,
+          tooltip: "Mute User"
         },
         {
           icon: "fa-solid fa-gavel",
-          emit: AdminAction.toAdmin
+          emit: AdminAction.toAdmin,
+          tooltip: "Make Admin"
         },
         {
           icon: "fa-solid fa-ban",
-          emit: AdminAction.baned
+          emit: AdminAction.baned,
+          tooltip: "Ban User"
         }
       ],
       AdminAction,
@@ -80,7 +84,7 @@ export default defineComponent({
       if (this.room?.owner?.id == this.$store.state.user.id) {
         return "owner"
       }
-      if (this.room?.admins.find(elem => elem.id == this.$store.state.user.id)){
+      if (this.room?.admins?.find(elem => elem.id == this.$store.state.user.id)){
         return "admin"
       } else {
         return "user"
@@ -106,7 +110,26 @@ export default defineComponent({
     reEmit(emiType: AdminAction, userId){
       console.log(emiType, userId);
       
-      this.$store.state.chat.socketChat.emit('action', {emiType, userId, roomId: this.room.roomId})
+      this.$store.state.chat.socketChat.emit('action', {emiType, userId, roomId: this.room.roomId}, (type) => {
+        console.log("return", type)
+        switch (type) {
+          case AdminAction.muted:
+            this.extraButtonsDm[0].icon = "fa-solid fa-gavel "
+            break;
+            case AdminAction.unMuted:
+              this.extraButtonsDm[0].icon = "fa-solid  fa-comment-slash "
+              // <font-awesome-icon icon="fa-solid fa-comment" />
+              
+          default:
+            break;
+        }
+        
+        if (type == AdminAction.muted) {
+          console.log("type muted")
+          
+        }
+
+      })
     },
     closePopUp(){
       this.$emit("action", "exit")

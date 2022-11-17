@@ -94,7 +94,7 @@ export class UsersService {
 		await this.usersRepository.delete(id);
 	}
 
-	addUser(user: User): Promise<User> {
+	async addUser(user: User): Promise<User> {
 
 		if(user.avatar_url == null)
 		{
@@ -104,10 +104,28 @@ export class UsersService {
 		{
 			user.avatar_url_42intra = "https://cdn.intra.42.fr/users/0f2f1b9f30116d06e1e55bed9cf2cb46/casian.png"
 		}
-		const tmp = this.usersRepository.create(user);
-		return this.usersRepository.save(tmp);
+		tmp = this.usersRepository.create(user);
+		var tmp: User
+		var faild: boolean
 
+		do {
+			try {
+				tmp = await this.usersRepository.save(tmp);
+				faild = false
+				console.log("try block ende");
+				
+			} 
+			catch (error) {
+				console.log("fehler in init user");
+				tmp.username += "💩"
+				faild = true
+			}
+			
+		} while (faild);
+
+		return tmp
 	}
+
 
 	async updateAvatar(id: number, file: fileEntity) {
 		const user = await this.usersRepository.findOneBy({id: id})
