@@ -148,14 +148,14 @@
               // return currentRoom.messages
               this.messages = currentRoom.messages
             }
-            }
-            else
-            {
-              console.log("messages computed empty");
+          }
+          else
+          {
+            console.log("messages computed empty");
 
-              // return []
-              this.messages = []
-            }
+            // return []
+            this.messages = []
+          }
 
             // return this.$store.state.chat?.getMessages(this.currentRoomId)
             // this.messages = this.$store.state.chat?.getMessages(this.currentRoomId)
