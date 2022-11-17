@@ -199,8 +199,8 @@ export default defineComponent({
         this.gameData.ball = data;
       },
 	    isGameFinished(): boolean {
-		    return (this.gameData.score.scoreWinner == this.gameData.settings.scoreToWin ||
-                this.gameData.score.scoreLoser == this.gameData.settings.scoreToWin);
+		    return (this.gameData.score.scoreWinner == this.gameData.score.scoreToWin ||
+                this.gameData.score.scoreLoser == this.gameData.score.scoreToWin);
 	    },
       assignWinnerAndLoser() {
         if (this.gameData.score.scoreWinner > this.gameData.score.scoreLoser) {

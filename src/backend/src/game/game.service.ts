@@ -66,7 +66,7 @@ export class GameService {
 		let game = this.getGame(undefined, isCustomized) // checking for first game with missing (undefined) opponent
 		if (game == undefined || opponentUserId) {
 			game = await this.createGameInstance(user.id, isCustomized)
-			console.log("joinGameOrCreateGame", game.settings);
+			// console.log("joinGameOrCreateGame", game.settings);
 			game.winner = user
 			// opponentUserId is set when called via Frontend::askForMatch
 			if(opponentUserId != undefined) {
@@ -83,12 +83,12 @@ export class GameService {
 	async createGameInstance(userId: number, isCustomized: boolean): Promise<Game> {
 		console.log('inside createGameInstance()');
 		let settings = new Settings();
-		console.log("before", settings);
+		// console.log("before", settings);
 		const socket = await this.gameGateway.findSocketOfUser(userId);
 		let receivedSettings: boolean = false;
 		if (socket) {
 			socket.emit('requestSettings', (cb) => {
-				console.log("callback", cb.data);
+				// console.log("callback", cb.data);
 				settings = cb.data;
 				receivedSettings = true;
 			});
@@ -99,7 +99,7 @@ export class GameService {
 		while (!receivedSettings) {
 			await new Promise(r => setTimeout(r, 10));
 		}
-		console.log('leaving createGameInstance()', settings);
+		// console.log('leaving createGameInstance()', settings);
 		return new Game(userId, setup, isCustomized, settings);
 	}
 
