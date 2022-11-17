@@ -137,7 +137,7 @@ export default class Chat{
       UserToArray( user: User, users: User[]) {
         const index = users.findIndex(elem => elem.id == user.id)
         if (index == -1) {
-          users.push(user)
+          users.push(new User(user))
         } else {
           users.splice(index, 1)
         }
