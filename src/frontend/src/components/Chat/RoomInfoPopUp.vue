@@ -114,7 +114,7 @@ export default defineComponent({
         console.log("return", type)
         switch (type) {
           case AdminAction.muted:
-            this.extraButtonsDm[0].icon = "fa-solid fa-comment "
+            this.extraButtonsDm[0].icon = "fa-solid fa-gavel "
             break;
             case AdminAction.unMuted:
               this.extraButtonsDm[0].icon = "fa-solid  fa-comment-slash "
