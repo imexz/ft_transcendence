@@ -11,7 +11,7 @@ import chatroom, { Access } from 'src/chatroom/chatroom.entity';
 
 @Injectable()
 export class ChatService {
-  async adminAction(action: AdminAction, roomId: number, UserId: number, adminId: number): Promise<boolean> {
+  async adminAction(action: AdminAction, roomId: number, UserId: number, adminId: number): Promise<AdminAction> {
     const room = await this.chatroomService.getRoomWithAdmins(roomId)
     console.log("admins", room.admins, adminId);
 
@@ -23,23 +23,16 @@ export class ChatService {
       switch (action) {
         case AdminAction.baned:
           await this.chatroomService.removeUserFromChatroom(await this.usersService.getUser(UserId), roomId)
-          break;
+          return AdminAction.baned
         case AdminAction.muted:
-
-          this.banMuteService.mut(await this.usersService.getUser(UserId), room)
-
-          break;
+          return this.banMuteService.mut(await this.usersService.getUser(UserId), room)
         case AdminAction.toAdmin:
           this.chatroomService.addRoomAdmin(room, UserId)
-          break;
-
+          return AdminAction.toAdmin
         default:
           break;
         }
-        return true
-      // if(action == AdminAction.baned)
     }
-    return false
   }
 
 

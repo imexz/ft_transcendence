@@ -18,14 +18,14 @@ export enum roomReturn {
 
 @Injectable()
 export class ChatroomService {
-  async addRoomAdmin(room: number | chatroom, userId: number) {
+  async addRoomAdmin(room: chatroom, userId: number) {
     console.log("addRoomAdmin");
    var tmpRoom
-    if(typeof room == 'number') {
-        tmpRoom = await this.getRoomWithAdmins(room)
-    } else {
+//     if(typeof room == 'number') {
+//         tmpRoom = await this.getRoomWithAdmins(room)
+//     } else {
         tmpRoom = room
-    }
+//     }
     if (tmpRoom != undefined) {
         const user = tmpRoom.admins.find(element => element.id == userId)
         if (user == undefined) {

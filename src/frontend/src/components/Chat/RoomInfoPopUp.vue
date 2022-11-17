@@ -36,7 +36,8 @@ import CreateRoom from './createRoom.vue';
 enum AdminAction {
     muted,
     baned,
-    toAdmin
+    toAdmin,
+    unMuted
 }
 export default defineComponent({
   data() {
@@ -109,7 +110,26 @@ export default defineComponent({
     reEmit(emiType: AdminAction, userId){
       console.log(emiType, userId);
       
-      this.$store.state.chat.socketChat.emit('action', {emiType, userId, roomId: this.room.roomId})
+      this.$store.state.chat.socketChat.emit('action', {emiType, userId, roomId: this.room.roomId}, (type) => {
+        console.log("return", type)
+        switch (type) {
+          case AdminAction.muted:
+            this.extraButtonsDm[0].icon = "fa-solid fa-comment "
+            break;
+            case AdminAction.unMuted:
+              this.extraButtonsDm[0].icon = "fa-solid  fa-comment-slash "
+              // <font-awesome-icon icon="fa-solid fa-comment" />
+              
+          default:
+            break;
+        }
+        
+        if (type == AdminAction.muted) {
+          console.log("type muted")
+          
+        }
+
+      })
     },
     closePopUp(){
       this.$emit("action", "exit")

@@ -99,21 +99,21 @@ export class ChatGateway {
     @ConnectedSocket() client:Socket,
   ) {
     console.log("ban")
-    if (await this.chatService.adminAction(emiType, roomId, muteUserId, client.handshake.auth.id)) {
       
-      const socket = await this.findSocketOfUser(muteUserId)
-      switch (emiType) {
-        case AdminAction.baned:
-          socket.leave(roomId.toString())
-          client.to(roomId.toString()).emit('UpdateRoom', {change: changedRoom.user, roomId: roomId,  data: {userId: muteUserId} }) 
-          break;
-        case AdminAction.toAdmin:
-          client.to(roomId.toString()).emit('UpdateRoom', {change: changedRoom.admin, roomId: roomId,  data: socket.handshake.auth })
-      
-        default:
-          break;
-      }
+    const socket = await this.findSocketOfUser(muteUserId)
+    const tmp = this.chatService.adminAction(emiType, roomId, muteUserId, client.handshake.auth.id)
+    switch (emiType) {
+      case AdminAction.baned:
+        socket.leave(roomId.toString())
+        client.to(roomId.toString()).emit('UpdateRoom', {change: changedRoom.user, roomId: roomId,  data: {userId: muteUserId} }) 
+        break;
+      case AdminAction.toAdmin:
+        client.to(roomId.toString()).emit('UpdateRoom', {change: changedRoom.admin, roomId: roomId,  data: socket.handshake.auth })
+      default:
+        break;
     }
+    return await tmp
+
   }
 
 

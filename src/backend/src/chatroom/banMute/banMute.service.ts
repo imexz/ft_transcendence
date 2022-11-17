@@ -16,7 +16,7 @@ export class BanMuteService {
         private banMuteRepository: Repository<banMute>,
         ) {}
         
-        async mut( user: User, chatroom: chatroom) {
+        async mut( user: User, chatroom: chatroom): Promise<AdminAction> {
             if (chatroom.access == Access.dm) {
                 const mute = await this.banMuteRepository.findOne({where: {
                     chatroom: {
@@ -28,7 +28,7 @@ export class BanMuteService {
                 }})
                 if (mute != undefined) {
                     this.unMute(user.id, chatroom)
-                    return
+                    return AdminAction.unMuted
                 }
             }
             
@@ -36,6 +36,7 @@ export class BanMuteService {
             mute.user = user
             mute.chatroom = chatroom
             this.banMuteRepository.save(mute)
+            return AdminAction.muted
         }
         
         async unMute(userId: number, chatroom: chatroom) {
