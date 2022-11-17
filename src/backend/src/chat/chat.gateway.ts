@@ -54,14 +54,14 @@ export class ChatGateway {
     }
   }
 
-  async addUserRooms(client: Socket) {
+  async addUserRooms(client: Socket | any) {
     const rooms = await this.chatService.getUserRooms(client.handshake.auth.id)
     var tmp: string[] = []
     for (let index = 0; index < rooms.length; index++) {
       tmp.push(rooms[index].roomId.toString())
     }
     client.join(tmp)
-}
+  }
 
   @SubscribeMessage('join')
   async joinRoom(
@@ -118,7 +118,7 @@ export class ChatGateway {
 
 
   @SubscribeMessage('createMessage')
-  async create(
+  async createMessage(
   @MessageBody('roomId') roomId: number,
   @MessageBody('content') content: string,
   @ConnectedSocket() client: Socket,
@@ -227,17 +227,18 @@ export class ChatGateway {
     @MessageBody('content') content: string,
     @MessageBody('id') id: number,
   ) {
-    const room : {info: roomReturn, chatroom: chatroom} = await this.chatService.creatRoomDM(client.handshake.auth as User, id, content)
-
-    if(await room.info == roomReturn.created) {
-      room.chatroom.messages = []
+    const room : {info: roomReturn, chatroom: chatroom} = await this.chatService.creatRoomDM(client.handshake.auth as User, id)
+        
+    if(room.info == roomReturn.created) {
       const socket = await this.findSocketOfUser(id)
+      const toWait = Promise.all([this.addUserRooms(client), this.addUserRooms(socket)]);
       room.chatroom.roomName = socket.handshake.auth.username
       client.emit('newRoom', room.chatroom)
       room.chatroom.roomName = client.handshake.auth.username
-      console.log("new Dm room ", room.chatroom);
       socket.emit('newRoom', room.chatroom)
+      await toWait
     }
+    this.createMessage(room.chatroom.roomId, content, client)
   }
 
   async findSocketOfUser(userId: number) {

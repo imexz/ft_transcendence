@@ -140,7 +140,7 @@ export class ChatroomService {
     }
 
     async findOrCreatDM(user: User, user1: User): Promise<{info: roomReturn, chatroom: chatroom}> {
-        console.log("users = ", user, user1);
+        // console.log("users = ", user, user1);
 
         if (user != undefined && user1 != undefined)
         {
@@ -153,7 +153,6 @@ export class ChatroomService {
                     muted: {
                         user: true
                     }
-
                 },
                 where: {
                     users: [{id: user.id}, {id: user1.id}],
@@ -162,7 +161,7 @@ export class ChatroomService {
 
             })
             for (let element of chatroom) {                
-                console.log("room =", element);
+                // console.log("room =", element);
                 if (element.users.find( elem => elem.id == user.id) != undefined && element.users.find(elem => elem.id == user1.id) != undefined) {
                     console.log("return" );
                     
@@ -177,21 +176,12 @@ export class ChatroomService {
             tmpChatroom = await this.chatroomRepository.create()
             tmpChatroom.users = [user, user1]
             tmpChatroom.admins = [user, user1]
-            tmpChatroom.message = []
+            // tmpChatroom.messages = []
             // chatroom.owner = user
             tmpChatroom.access = Access.dm
             tmpChatroom = await this.chatroomRepository.save(tmpChatroom)
             return {info: roomReturn.created, chatroom: tmpChatroom}
-            // }
-            // return chatroom;
-            // .where("post.authorId IN (:authors)", { authors: [3, 7, 9] })
-            // var chatroom = await this.chatroomRepository.createQueryBuilder("dm")
-            //     .innerJoinAndSelect("dm.users", "users", "user.id IN (:userAr)", {userAr: [user.id, user1.id]})
-            //     // .where("users.id == :usr", {usr: user} )
-            //     // .andWhere("users.id == :usr1", {usr1: user1})
-            //     .getOne()
         }
-        // return undefined
     }
 
     async userToRoom(user: User, roomId: number, password?: string): Promise<chatroom>

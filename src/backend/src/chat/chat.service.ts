@@ -44,22 +44,14 @@ export class ChatService {
 
 
 
-  async creatRoomDM(user: User, id: number, content: string) {
+  async creatRoomDM(user: User, id: number) {
     console.log("undefind = ", user, id );
 
     if(user != undefined && id != undefined)
     {
-      // console.log(content);
-
       const user1 = await this.usersService.getUser(id)
-      const chat: {info: roomReturn, chatroom: chatroom} = await this.chatroomService.findOrCreatDM(user, user1)
-      if(chat != undefined) {
-        await this.messageService.userAddMessageToRoom(user, content, chat.chatroom)
-        return { info: chat.info, chatroom: chat.chatroom }
-      }
-      else
-        console.log("chat == undeinfd");
-      }
+      return this.chatroomService.findOrCreatDM(user, user1)
+    }
   }
 
   async createRoomInfo(roomId: number, id: any) {

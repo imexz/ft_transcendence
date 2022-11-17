@@ -243,7 +243,7 @@
             // console.log("createMessage response");
             // console.log(response);
             // this.addMessage(response)
-            console.log("messages was sent");
+            console.log("messages was sent", response);
 
           })
         },

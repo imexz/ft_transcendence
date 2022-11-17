@@ -1,5 +1,5 @@
 import User from "../users/entitys/user.entity";
-import { Column, Entity, JoinTable, ManyToMany, ManyToOne, OneToMany, OneToOne, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
+import { Column,JoinColumn, Entity, JoinTable, ManyToMany, ManyToOne, OneToMany, OneToOne, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
 import { message } from "../message/message.entity";
 import { banMute } from "./banMute/banMute.entity";
 import { Exclude } from 'class-transformer';
@@ -34,7 +34,7 @@ export default class chatroom{
     users: User[];
 
     @OneToMany(() => message, (message) => message.chatroom)
-    @JoinTable()
+    @JoinColumn()
     messages: message[];
 
     @Column()
