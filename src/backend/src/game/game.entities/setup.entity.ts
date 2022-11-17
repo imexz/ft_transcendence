@@ -4,7 +4,7 @@ import { BallDirObj } from "../game.interfaces/balldirobj.interface";
 export class GameSetup {
 	ballPos: PosXY = {x: 340, y: 240};
 	ballRadius: number = 10;
-	ballSpeed: number = 0.25;
+	ballSpeed: number = 0.75;
 	angle: number = Math.random() * 2 * Math.PI;
 	ballDir: BallDirObj = {
 		angle: this.angle,
