@@ -1,28 +1,74 @@
 <template>
-  <div class="gameWrapper">
-    <div class="gameHeader"></div>
-    <div class="game">
-      <!-- <PongGame /> -->
-      <GameMenu/>
-    </div>
+  <div v-if="this.dataRdy">
+    <GameSettings />
   </div>
-</template>
-
-<script lang="ts">
-
-import PongGame from '@/components/Game/PongGame.vue';
-import { defineComponent } from 'vue';
-import GameMenu from '@/components/Game/GameMenu.vue';
-
-export default defineComponent({
-  components: {
-    PongGame,
-    GameMenu
-}
-})
-
-</script>
-
+  <div v-else>
+    <PongGame />
+  </div>
+  </template>
+  
+  <script lang="ts">
+  import { defineComponent } from 'vue';
+  import GameSettings from '../components/Game/GameSettings.vue';
+  import PongGame from '../components/Game/PongGame.vue';
+  
+  export default defineComponent({
+    data() {
+      return {
+        dataRdy: false as boolean
+      };
+    },
+    async mounted() {
+      console.log("in mounted gameMenu");
+      await this.askBackendForGame()
+      this.dataRdy = true
+    },
+    methods: {
+      async askBackendForGame() {
+        while (!this.$store.state.socketGame) {
+          await new Promise(r => setTimeout(r, 100));
+        }
+        this.$store.state.socketGame.emit('hasGame', (cb) => {
+          if (cb.data) {
+            this.$store.state.showGame = true;
+          } else {
+            this.$store.state.showGame = false;
+          }
+        })
+      },
+      
+    },
+    components: {
+      PongGame,
+      GameSettings
+    }
+  })
+  </script>
+  
+  <style>
+  .singleOption {
+    margin-top: 14px
+  }
+  
+  .singleOption>button {
+    font-size: 20px;
+    width: 102px;
+    margin-left: 0;
+    margin-right: 0;
+    margin-top: 4px;
+    padding-top: 5px
+  }
+  
+  .singleOption>button.selected {
+    font-size: 20px;
+    width: 102px;
+    background-color: lightgray;
+    color: black;
+    margin-left: 0;
+    margin-right: 0
+  }
+  </style>
+  
 <style scoped>
 
 .gameWrapper {
@@ -32,16 +78,4 @@ export default defineComponent({
   width: 800px;
 }
 
-/* .gameHeader {
-  width: 100%;
-  height: 170px;
-  border: 2px solid var(--ft_cyan);
-  border-radius: 10px 10px 0px 0px;
-} */
-/* .game {
-  width: 100%;
-  height: 800px;
-  border: 2px solid var(--ft_cyan);
-  border-radius: 10px;
-} */
 </style>

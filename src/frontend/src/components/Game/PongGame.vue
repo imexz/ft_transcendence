@@ -1,23 +1,23 @@
 <template>
-<div v-if="dataRdy">
+<div v-if="this.dataRdy">
   <div v-show="this.$store.state.game != null">
 		<GamePlayers/>
 		<div v-if="this.$store.state.winner == null" class="gameCanvas">
 			<div>
-        <Field @assignWinner="assignWinner"/>
+        <Field @assignWinner="this.assignWinner"/>
 	    </div>
       <div v-show="this.$store.state.user.id!=this.$store.state.game?.loser?.id && this.$store.state.user.id!=this.$store.state.game?.winner?.id"  class="leaveGame">
-        <button @click="leaveGame"> Leave </button>
+        <button @click="this.leaveGame"> Leave </button>
       </div>
     </div>
   </div>
   <div class="queue" v-show="this.$store.state.game == null && this.$store.state.winner == null">
     <text> Waiting for opponent... </text>
 	  <br>
-	  <button @click="leaveGame"> Leave </button>
+	  <button @click="this.leaveGame"> Leave </button>
   </div>
   <div v-if="this.$store.state.winner != null && this.$store.state.game == null">
-	  <Result :winner = this.$store.state.winner :loser = this.$store.state.loser @newGame="prepareNewGame" />
+	  <Result :winner = this.$store.state.winner :loser = this.$store.state.loser @newGame="this.prepareNewGame" />
   </div>
 </div>
 </template>
