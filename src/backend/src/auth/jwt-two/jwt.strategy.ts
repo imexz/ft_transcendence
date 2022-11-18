@@ -19,7 +19,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
             // jwtFromRequest: ExtractJwt.fromExtractors([(request: Request) => {
             //   return request?.cookies?.Authentication;
             // }]),
-            ignoreExpiration: true, // need to be false
+            ignoreExpiration: true, // need to be false !!!!!!!!!!!!!!!
             secretOrKey: process.env.JWT_PASSWORD
         })
     }
@@ -43,7 +43,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
           }
         } else {
           // console.log("user not found");
-          
+
         }
     }
 
