@@ -36,7 +36,10 @@ export class ChatGateway {
   @WebSocketServer()
   server: Server;
 
-  constructor(private readonly chatService: ChatService, private authService: AuthService) {}
+  constructor(
+    private readonly chatService: ChatService,
+    private authService: AuthService
+    ) {}
 
   afterInit() {
     // console.log("afterInit chat ");
@@ -88,7 +91,9 @@ export class ChatGateway {
     console.log("leave room", roomId);
     client.leave(roomId.toString());
     const room = await this.chatService.manageLeave(client.handshake.auth.id, roomId)
-    client.to(roomId.toString()).emit('UpdateRoom', {change: changedRoom.complet, roomId: roomId,  data: room })
+    console.log(room);
+    if (room)
+      client.to(roomId.toString()).emit('UpdateRoom', {change: changedRoom.user, roomId: roomId,  data: client.handshake.auth })
   }
 
   @SubscribeMessage('action')
@@ -98,23 +103,32 @@ export class ChatGateway {
     @MessageBody('roomId') roomId: number,
     @ConnectedSocket() client:Socket,
   ) {
-    console.log("ban")
 
     const socket = await this.findSocketOfUser(muteUserId)
     const tmp = await this.chatService.adminAction(emiType, roomId, muteUserId, client.handshake.auth.id)
     switch (tmp) {
       case AdminAction.baned:
+        console.log("case ban")
+        this.createSystemMessage(roomId, socket.handshake.auth.username + " was banned", client)
         socket.leave(roomId.toString())
-        client.to(roomId.toString()).emit('UpdateRoom', {change: changedRoom.user, roomId: roomId,  data: {userId: muteUserId} })
+        this.server.to(roomId.toString()).emit('UpdateRoom', {change: changedRoom.user, roomId: roomId,  data: {userId: muteUserId} })
         break;
-      case AdminAction.toAdmin:
-        client.to(roomId.toString()).emit('UpdateRoom', {change: changedRoom.admin, roomId: roomId,  data: socket.handshake.auth })
-      case AdminAction.unMuted:
-        this.createMessage(roomId, "you are unmuted", client)
-        break
-      case AdminAction.muted:
-        this.createMessage(roomId, "you are muted", client)
-        break
+
+        case AdminAction.toAdmin:
+        console.log("case toAdmin")
+        this.server.to(roomId.toString()).emit('UpdateRoom', {change: changedRoom.admin, roomId: roomId,  data: socket.handshake.auth })
+        break;
+
+        case AdminAction.unMuted:
+        console.log("case unMuted")
+        this.createSystemMessage(roomId, socket.handshake.auth.username + " was unmuted", client)
+        break;
+
+        case AdminAction.muted:
+          console.log("case muted")
+          this.createSystemMessage(roomId, socket.handshake.auth.username + " was muted for one minute", client)
+        break;
+
       default:
         break;
     }
@@ -122,6 +136,31 @@ export class ChatGateway {
 
   }
 
+  async createSystemMessage(
+    roomId: number,
+    content: string,
+    client: Socket
+    ) {
+      const system: boolean = true
+
+      const message = await this.chatService.createMessage(client.handshake.auth as User, roomId, content, system);
+    if(message) {
+      const tmp = {
+      senderId: -1,
+      _id: message._id,
+      content: content,
+      avatar: undefined,
+      timestamp: message.timestamp.toLocaleString(),
+      username: undefined,
+      system: true}
+
+      this.server.to(roomId.toString()).emit('newMessage', {message: tmp, roomId});
+      console.log("createSystemMessage ende");
+      // return tmp;
+    } else {
+      // console.log("message == empty");
+    }
+  }
 
   @SubscribeMessage('createMessage')
   async createMessage(
@@ -134,8 +173,9 @@ export class ChatGateway {
     console.log(content);
     console.log(client.handshake.auth.id);
     // const room_name = await this.chatService.getRoomName(roomId)
+    const system: boolean = false
 
-    const message = await this.chatService.createMessage(client.handshake.auth as User, roomId, content);
+    const message = await this.chatService.createMessage(client.handshake.auth as User, roomId, content, system);
     if(message) {
       const tmp = {
       senderId: client.handshake.auth.id.toString(),

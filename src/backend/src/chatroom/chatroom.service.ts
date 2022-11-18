@@ -53,7 +53,7 @@ export class ChatroomService {
         .getMany()
      }
 
-    async hasUserWriteAccess(userId: number, roomId: number): Promise<{allowed: boolean, chatroom: chatroom}> {
+    async hasUserWriteAccess(userId: number, roomId: number, system: boolean): Promise<{allowed: boolean, chatroom: chatroom}> {
         console.log("getAllwithUserWriteAccess");
         // console.log("id = ", id);
         // const mute = this.banMuteService.test()
@@ -71,6 +71,8 @@ export class ChatroomService {
                 users: {id: userId}
             }
         })
+        if (system)
+            return {allowed: true, chatroom: room}
 
         console.log("room= ", room);
 
@@ -160,11 +162,11 @@ export class ChatroomService {
                 }
 
             })
-            for (let element of chatroom) {                
+            for (let element of chatroom) {
                 // console.log("room =", element);
                 if (element.users.find( elem => elem.id == user.id) != undefined && element.users.find(elem => elem.id == user1.id) != undefined) {
                     console.log("return" );
-                    
+
                     return {info: roomReturn.changed, chatroom: element}
                 }
             }
@@ -235,6 +237,8 @@ export class ChatroomService {
     }
 
     async removeUserFromChatroom(user: User, roomId: number) {
+        console.log("removeUserFromChatroom");
+
         if(user != undefined && roomId != undefined) {
             const room = await this.chatroomRepository.findOne(
                 {
@@ -255,7 +259,7 @@ export class ChatroomService {
             if(room.access != Access.dm) {
                 if (room.owner?.id == user.id) {
                     console.log("remove owner");
-                    
+
                     room.owner = null
                 }
                 var index = room.admins.findIndex(object => {
@@ -267,11 +271,15 @@ export class ChatroomService {
                 index = room.users.findIndex(object => {
                     return object.id === user.id
                 })
+                console.log(index);
+
                 if(index != -1) {
                     room.users.splice(index, 1)
                 }
+                else
+                    return undefined
                 console.log(await this.chatroomRepository.save(room));
-                 
+
                 return room
             }
 

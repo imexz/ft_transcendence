@@ -20,7 +20,7 @@
       :username-options="JSON.stringify(usernameOptions)"
       :show-audio="false"
       :show-files="false"
-      :show-reaction-emojis="true"
+      :show-reaction-emojis="false"
       :room-info-enabled="true"
       :show-new-messages-divider="false"
       :styles="JSON.stringify(style)"

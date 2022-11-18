@@ -14,6 +14,7 @@ export class UsersController {
 
 	@Get('find/:id')
 	@UseGuards(JwtAuthGuard)
+	@UseInterceptors(ClassSerializerInterceptor)
 	findOne(@Param('id') params: number){
 		// console.log("findOne");
 		const user = this.usersService.getUser(params);
@@ -24,14 +25,16 @@ export class UsersController {
 
 	@Get('allUser')
 	@UseGuards(JwtAuthGuard)
+	@UseInterceptors(ClassSerializerInterceptor)
 	findAll(@Request() req){
 		// console.log(req);
-    
+
 		return this.usersService.findAll(req.user.id)
 	}
 
 	@Get('allUserWinnes')
 	@UseGuards(JwtAuthGuard)
+	@UseInterceptors(ClassSerializerInterceptor)
 	getTopPlayer(@Request() req){
 		// console.log(req);
 
@@ -41,6 +44,7 @@ export class UsersController {
 
 	@Post('addUser')
 	@UseGuards(JwtAuthGuard)
+	@UseInterceptors(ClassSerializerInterceptor)
 	addUser(@Body() user: User){
 		// console.log(user);
 		return  this.usersService.addUser(user);
@@ -70,8 +74,8 @@ export class UsersController {
 		// console.log("inside validate");
 		// console.log(req.user);
 		// console.log("inside validate1");
-		
-		
+
+
 		// console.log(user);
 		return await this.usersService.getUser(req.user.id)
 	}

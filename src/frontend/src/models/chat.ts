@@ -98,10 +98,16 @@ export default class Chat{
                 case changedRoom.user:
                   console.log("user");
                   this.UserToArray(obj.data, room.users)
-                  break;
+                  var index = room.admins.findIndex(elem => elem.id == obj.data.id)
+                  if (index != -1)
+                    this.removeUser(index, room.admins)
+                  break ;
                 case changedRoom.admin:
-                    console.log("admin");
-                    this.UserToArray(obj.data, room.admins)
+                  console.log("admin");
+                  this.UserToArray(obj.data, room.admins)
+                  var index = room.users.findIndex(elem => elem.id == obj.data.id)
+                  if (index != -1)
+                    this.removeUser(index, room.users)
                   break;
                 case changedRoom.access:
                   console.log("access");
@@ -137,12 +143,19 @@ export default class Chat{
       UserToArray( user: User, users: User[]) {
         const index = users.findIndex(elem => elem.id == user.id)
         if (index == -1) {
-          users.push(new User(user))
+          this.addUser(user, users)
         } else {
-          users.splice(index, 1)
+          this.removeUser(index, users)
         }
       }
 
+      addUser(user: User, users: User[]) {
+        users.push(new User(user))
+      }
+
+      removeUser(index: number, users: User[]) {
+        users.splice(index, 1)
+      }
 
       setRooms(rooms: any) {
         const room = [] as Room[]
