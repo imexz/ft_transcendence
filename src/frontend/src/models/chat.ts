@@ -98,8 +98,7 @@ export default class Chat{
                 case changedRoom.user:
                   console.log("user");
                   this.UserToArray(obj.data, room.users)
-                  var index = room.admins.findIndex(elem => elem.id == obj.data.id)
-                  if (index != -1)
+                  if (room.admins.findIndex(elem => elem.id == obj.data.id) != -1)
                     this.removeUser(index, room.admins)
                   break ;
                 case changedRoom.admin:
