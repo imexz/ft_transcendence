@@ -163,13 +163,14 @@ export default defineComponent({
 
       this.closeDmPopUp()
       if (isSelfInvite) return;
-      this.$store.state.winner = null;
+      // this.$store.state.winner = null;
+      this.$store.state.game = null
       this.$store.state.socketGame.emit('GameRequestBackend', {isCustomized: this.$store.state.customized, id: this.user.id}, (r) => {
         if (r.winner != undefined && r.loser != undefined) {
         	this.showGame = !this.showGame
-        	const isUserActivePlayer: boolean = r.winner.id == this.$store.state.user.id || r.loser.id == this.$store.state.user.id
-			if (!isUserActivePlayer)
-				this.$store.state.game = r
+          const isUserActivePlayer: boolean = r.winner.id == this.$store.state.user.id || r.loser.id == this.$store.state.user.id
+			    if (!isUserActivePlayer)
+				    this.$store.state.game = r
         }
         if (r.push) {
         	this.$emit('actions')
@@ -185,9 +186,11 @@ export default defineComponent({
           break;
         case 'view':
           this.$store.state.socketGame.emit('ViewGame', {id: this.user.id}, () => {
-            this.showGame = !this.showGame
-            this.$router.push('/play')
+              this.showGame = !this.showGame
+              this.$router.push('/play')
           });
+          // this.showGame = !this.showGame
+          // this.$router.push('/play')
           console.log("viewGame");
           break;
       }

@@ -43,9 +43,8 @@ export class Game extends GameData{
 	@Exclude()
 	isCustomized: boolean = false;
 
-	constructor(gameid: number, gsetup: GameSetup, isCustomized: boolean = false, settings: Settings) {
-		super(gsetup, settings);
+	constructor(gameid: number, settings: Settings) {
+		super(settings);
 		this.id = gameid;
-		this.isCustomized = isCustomized;
 	}
 }

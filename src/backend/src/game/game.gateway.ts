@@ -14,6 +14,7 @@ import { AuthService } from 'src/auth/auth.service';
 import { Game } from './game.entities/game.entity';
 import User from 'src/users/entitys/user.entity';
 import { forwardRef, Injectable, Inject } from '@nestjs/common';
+import { Settings } from './game.entities/settings';
 
 @WebSocketGateway({
 	namespace: 'game',
@@ -39,15 +40,16 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
   async handleConnection(@ConnectedSocket() socket: Socket) {
 	console.log("client %s connected", socket?.handshake.auth.id);
-	this.authService.validateSocket(socket)
+	if(await this.authService.validateSocket(socket)) {
+		const game = this.gameService.getGame(socket.handshake.auth.id)
+		if(game != undefined) {
+			this.joinGameRoom(socket, game)
+		}
+	}
   }
 
   handleDisconnect(@ConnectedSocket() client: Socket) {
 	console.log("client %s disconnected", client?.handshake.auth?.id);
-  }
-
-  isSpectating(clientId: number): Game | undefined {
-	return this.gameService.getSpectatedGame(clientId);
   }
 
   async joinGameRoom(client: Socket, game: Game) {
@@ -65,27 +67,30 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	}
   }
 
-  @SubscribeMessage('hasGame')
-  handleHasGame(@ConnectedSocket() client: Socket) {
-	const clientId: number = client.handshake.auth.id;
-	let ret: boolean = false;
+//   @SubscribeMessage('hasGame')
+//   handleHasGame(@ConnectedSocket() client: Socket) {
+// 	const clientId: number = client.handshake.auth.id;
+// 	let ret: boolean = false;
 
-	var game: Game | undefined = this.gameService.getGame(clientId);
-	if (game != undefined)
-		ret = true;
-	else {
-		game = this.isSpectating(clientId);
-		if (game != undefined) {
-			ret = true;
-		}
-	}
-	console.log("hasGame", ret);
-	return {data: ret};
-  }
+// 	var game: Game | undefined = this.gameService.getGame(clientId);
+// 	if (game != undefined)
+// 		ret = true;
+// 	else {
+// 		console.log("hasGame else");
+		
+// 		game = this.gameService.getSpectatedGame(clientId);
+// 		if (game != undefined) {
+// 			console.log("hasGame spectating");
+// 			// ret = true;
+// 		}		
+// 	}
+// 	// console.log("hasGame", ret);
+// 	return game;
+//   }
 
-  @SubscribeMessage('isInGame')
+  @SubscribeMessage('joinOrCreatGame')
   async handleIsInGame(@ConnectedSocket() client: Socket,
-  @MessageBody('isCustomized') isCustomized: boolean) {
+  @MessageBody('settings') settings: Settings) {
 	var game: Game | undefined
 	const clientId: number = client.handshake.auth.id;
 
@@ -93,10 +98,10 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
 	game = this.gameService.getGame(clientId);
 	if (game == undefined) {
-		game = this.isSpectating(clientId);
+		game = this.gameService.getSpectatedGame(clientId);
 		if (game == undefined) {
 			console.log("no existing game for client available", clientId);
-			game = await this.gameService.joinGameOrCreateGame(client.handshake.auth as User, isCustomized)
+			game = await this.gameService.joinGameOrCreateGame(client.handshake.auth as User, settings)
 		} else {
 			console.log("client is spectating");
 		}
@@ -110,10 +115,9 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   @SubscribeMessage('GameRequestBackend')
   async handleGameRequest(
 	@ConnectedSocket() client: Socket,
-	@MessageBody('isCustomized') isCustomized: boolean,
+	@MessageBody('settings') settings: Settings,
 	@MessageBody('id') id?: number,
   ) {
-
 	let ret = { winner: undefined, loser: undefined, push: false };
 	const clientId: number = client.handshake.auth.id;
 
@@ -132,17 +136,19 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 				console.log("gameRequest: opponent is offline");
 				return ret; // offline opponent -> no push
 			} else {
+				// TO DO game settings needed
 				socket.emit('GameRequestFrontend', client.handshake.auth as User)
-				game = await this.gameService.joinGameOrCreateGame(client.handshake.auth as User, isCustomized, id)
+				game = await this.gameService.joinGameOrCreateGame(client.handshake.auth as User, undefined, id)
 				// opponent has no game -> push to /play
 				ret = { winner: game.winner, loser: game.loser, push: true }
 			}
 		} else {
 			// opponent has game, -> push to /play
-			ret.push = true
+			// ret.push = true
+			ret = { winner: game.winner, loser: game.loser, push: false }
 			console.log("gameRequest: invited player has game. Specatating.");
 			client.rooms.forEach(roomId => { if (client.id != roomId) client.leave(roomId) });
-			this.gameService.addUserToSpectators(clientId, game);
+			// this.gameService.addUserToSpectators(clientId, game);
 		}
 	}
 	client.join(game.id.toString());
@@ -150,13 +156,13 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	return ret
   }
 
-  @SubscribeMessage('isCustom')
-  handleIsCustomRequest(@MessageBody('id') id: number) {
-	console.log('handleIsCustomRequest');
+//   @SubscribeMessage('isCustom')
+//   handleIsCustomRequest(@MessageBody('id') id: number) {
+// 	console.log('handleIsCustomRequest');
 
-	const game: Game = this.gameService.getGame(id)
-	return game.isCustomized === true ? true : false
-  }
+// 	const game: Game = this.gameService.getGame(id)
+// 	return game.settings === true ? true : false
+//   }
 
   @SubscribeMessage('accept')
   async handleAcceptGameRequest(@ConnectedSocket() client: Socket) {
@@ -232,6 +238,9 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	const game: Game = this.gameService.getGame(id)
 	if(game != undefined) {
 		client.join(game.id.toString())
+		console.log("add User to Spectator");
+		
+		this.gameService.addUserToSpectators(client.handshake.auth.id, game);
 	}
 	return {winner: game.winner, loser: game.loser}
   }
@@ -243,13 +252,13 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	this.gameService.handleKeypress(client.handshake.auth.id, key)
   }
 
-  @SubscribeMessage('statusRequest')
-  async getStatusRequest(userId: number) {
-	console.log("in statusRequest");
-	const socket = await this.findSocketOfUser(userId)
-	console.log(socket);
-	return {content: socket}
-  }
+//   @SubscribeMessage('statusRequest')
+//   async getStatusRequest(userId: number) {
+// 	console.log("in statusRequest");
+// 	const socket = await this.findSocketOfUser(userId)
+// 	console.log(socket);
+// 	return {content: socket}
+//   }
 
   async findSocketOfUser(userId: number) {
 	const sockets = await this.server.fetchSockets();

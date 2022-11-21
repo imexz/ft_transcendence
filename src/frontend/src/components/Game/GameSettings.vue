@@ -1,5 +1,5 @@
 <template>
-    <div class="wrapper" v-if="this.$store.state.showGame == false">
+    <div class="wrapper">
 		<h1>Game Settings</h1>
 		<div class="singleOption">
 			Score to Win
@@ -45,6 +45,7 @@
 import { defineComponent } from 'vue';
 import PongGame from './PongGame.vue';
 import GameSettings from './GameSettings.vue'
+import { Settings } from '@/models/gameSettings';
 
 enum Serving {
 	LAST_SCORED,
@@ -53,6 +54,12 @@ enum Serving {
 }
 
 export default defineComponent({
+    data() {
+        return {
+            settings: Settings
+        }
+    },
+
     methods: {
         setScoreToWin(score: number) {
                 document.getElementById("score3").classList.remove("selected");
@@ -77,8 +84,8 @@ export default defineComponent({
                         document.getElementById("score20").classList.add("selected");
                         break;
                 }
-                this.$store.state.settings.scoreToWin = score;
-                console.log("scoreToWin set to",this.$store.state.settings.scoreToWin);
+                this.settings.scoreToWin = score;
+                console.log("scoreToWin set to",this.settings.scoreToWin);
                 
             },
             setPowerUp(isSet: boolean) {
@@ -88,7 +95,7 @@ export default defineComponent({
                     document.getElementById("powerupYes").classList.add("selected");
                 else
                     document.getElementById("powerupNo").classList.add("selected");
-                this.$store.state.settings.enablePowerUp = isSet;
+                this.settings.enablePowerUp = isSet;
             },
             setSlowServe(isSet: boolean) {
                 document.getElementById("slowServeYes").classList.remove("selected");
@@ -97,7 +104,7 @@ export default defineComponent({
                     document.getElementById("slowServeYes").classList.add("selected");
                 else
                     document.getElementById("slowServeNo").classList.add("selected");
-                this.$store.state.settings.enableSlowServe = isSet;
+                this.settings.enableSlowServe = isSet;
             },
             setServing(option: number) {
                 document.getElementById("lastScored").classList.remove("selected");
@@ -106,32 +113,34 @@ export default defineComponent({
                 switch (option) {
                     case 0:
                         document.getElementById("alternate").classList.add("selected");
-                        this.$store.state.settings.serving = Serving.ALTERNATE;
+                        this.settings.serving = Serving.ALTERNATE;
                         break;
                     case 1:
                         document.getElementById("lastScored").classList.add("selected");
-                        this.$store.state.settings.serving = Serving.LAST_SCORED;
+                        this.settings.serving = Serving.LAST_SCORED;
                         break;
                     case 2:
                         document.getElementById("random").classList.add("selected");
-                        this.$store.state.settings.serving = Serving.RANDOM;
+                        this.settings.serving = Serving.RANDOM;
                         break;
                 }
             },
             joinQueue() {
-                this.$store.state.isCustomized = this.isCustomized();
-                this.$store.state.showGame = true;
+                this.$emit('action')
+                // this.$store.state.isCustomized = this.isCustomized();
+                // this.$store.state.showGame = true;
             },
             invitePlayer() {
+                this.$emit('action')
             },
-            isCustomized(): boolean {
-                if (this.$store.state.settings.scoreToWin != 10 ||
-                    this.$store.state.settings.enablePowerUp == true ||
-                    this.$store.state.settings.enableSlowServe == true ||
-                    this.$store.state.settings.serving != Serving.RANDOM
-                    ) return true;
-                else return false;
-            },
+            // isCustomized(): boolean {
+            //     if (this.settings.scoreToWin != 10 ||
+            //         this.settings.enablePowerUp == true ||
+            //         this.settings.enableSlowServe == true ||
+            //         this.settings.serving != Serving.RANDOM
+            //         ) return true;
+            //     else return false;
+            // },
     }
 })
 

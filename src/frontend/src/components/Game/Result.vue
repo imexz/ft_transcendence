@@ -1,10 +1,10 @@
 <template>
-    <user-summary :user=winner />
+    <user-summary :user= this.game.winner />
     <h1> won against </h1>
-    <user-summary :user=loser />
+    <user-summary :user=this.game.loser />
     <div>
-        <button @click="askForRematch"> ask for rematch </button>
-        <button @click="newGame"> new game</button>
+        <button @click="this.askForRematch"> ask for rematch </button>
+        <button @click="this.newGame"> new game</button>
     </div>
 </template>
 
@@ -12,15 +12,18 @@
 import User from '@/models/user'
 import { defineComponent } from 'vue'
 import UserSummary from '@/components/Profile/UserSummary.vue';
+import Game from '@/models/game';
+import { io, Socket } from 'socket.io-client'
+
 
 
 export default defineComponent({
-    props: {
-        winner: User,
-        loser: User,
-    },
     components: {
         UserSummary
+    },
+    props: {
+        game: Game,
+        socket: Socket
     },
 	unmounted() {
 		console.log("result.vue unmounted");
@@ -31,16 +34,21 @@ export default defineComponent({
 		},
 		askForRematch() {
 			console.log("askForRematch");
-            let user: User;
+            let userId: number;
 
-            if (this.$store.state.user.id === this.winner.id) {
-                user = this.loser;
-            } else if (this.$store.state.user.id === this.loser.id) {
-                user = this.winner;
+            if (this.$store.state.user.id === this.game.winner.id) {
+                userId = this.game.loser.id;
+            } else if (this.$store.state.user.id === this.game.loser.id) {
+                userId = this.game.winner.id;
             } else { return }
-            this.$store.state.socketGame.emit('GameRequestBackend', {isCustomized: this.$store.state.customized, id: user.id}, (r) => {
-                this.$store.state.winner = null;
+            console.log("userId= ", userId);
+            
+
+            // const tmp_user = this.$store.state.user.id === this.game.winner.id ? this.game.loser.id:  this.game.winner.id
+            this.$store.state.socketGame.emit('GameRequestBackend', {settings: undefined , id: userId}, (r) => {
+                // this.$store.state.winner = null;
 		    })
+            this.game = null
         },
         newGame() {
             console.log("newGame");

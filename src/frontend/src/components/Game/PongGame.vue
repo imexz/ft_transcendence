@@ -1,25 +1,23 @@
 <template>
-<div v-if="this.dataRdy">
-  <div v-show="this.$store.state.game != null">
-		<GamePlayers/>
-		<div v-if="this.$store.state.winner == null" class="gameCanvas">
-			<div>
-        <Field @assignWinner="this.assignWinner"/>
-	    </div>
-      <div v-show="this.$store.state.user.id!=this.$store.state.game?.loser?.id && this.$store.state.user.id!=this.$store.state.game?.winner?.id"  class="leaveGame">
-        <button @click="this.leaveGame"> Leave </button>
+<!-- <div v-if="this.dataRdy"> -->
+  <!-- <div class="queue" v-show="this.game == null">
+    <text> Waiting for opponent... </text>
+    <br>
+    <button @click="this.leaveGame"> Leave </button>
+  </div> -->
+  <div v-show="this.game.isFinished == false">
+		<GamePlayers :game = this.game />
+		<div class="gameCanvas">
+      <div>
+        <!-- <Field @assignWinner="this.assignWinner"/> -->
+        <Field :socket = "this.socket" />
       </div>
     </div>
   </div>
-  <div class="queue" v-show="this.$store.state.game == null && this.$store.state.winner == null">
-    <text> Waiting for opponent... </text>
-	  <br>
-	  <button @click="this.leaveGame"> Leave </button>
+  <div v-if="this.game?.isFinished">
+	  <Result :game = this.game :socket = this.socket @newGame="this.prepareNewGame" />
   </div>
-  <div v-if="this.$store.state.winner != null && this.$store.state.game == null">
-	  <Result :winner = this.$store.state.winner :loser = this.$store.state.loser @newGame="this.prepareNewGame" />
-  </div>
-</div>
+<!-- </div> -->
 </template>
 
 <script lang="ts">
@@ -28,7 +26,8 @@
   import GamePlayers from './GamePlayers.vue'
   import Result from './Result.vue'
   import Field from './Field.vue'
-  import User from "@/models/user";
+  import { Socket } from 'socket.io-client'
+
 
 
   export default defineComponent({
@@ -38,6 +37,10 @@
         fps: 0,
   		}
   	},
+    props: {
+      game: Game,
+      socket: Socket
+    },
   	components: {
       GamePlayers,
       Result,
@@ -48,62 +51,48 @@
   	},
   	async mounted() {
   		console.log("mounted");
-		  await this.initGameInfoListener();
+		  // await this.initGameInfoListener();
 		  this.dataRdy = true;
+      while (!this.socket) {
+		  	  await new Promise(r => 
+          {setTimeout(r, 100)
+          console.log("wait in ponggame")}
+          
+          );
+      }
   	},
 		async beforeUpdate() {
   		console.log("beforeUpdate");
-      if (this.$store.state.game == null && this.$store.state.winner == null) {
-        await this.$store.state.socketGame.emit('isInGame', {isCustomized: this.$store.state.customized});
-      }
+      // if (this.$store.state.game == null) {
+      //   await this.$store.state.socketGame.emit('joinOrCreatGame', {isCustomized: this.$store.state.customized});
+      // }
 		  console.log("leaving beforeUpdate");
 	  },
   	unmounted() {
   	  console.log("in unmount");
-      this.$store.state.socketGame?.off('GameInfo')
-      document.removeEventListener('keydown', this.keyEvents, false);
+      // this.$store.state.socketGame?.off('GameInfo')
+      // document.removeEventListener('keydown', this.keyEvents, false);
   	},
   	methods: {
-	    async initGameInfoListener() {
-		    while (!this.$store.state.socketGame) {
-		  	  await new Promise(r => setTimeout(r, 100));
-		    }
-		    this.$store.state.socketGame.on('GameInfo', (game: Game) => {
-          console.log(game)
-          this.assignGame(game)
-		    });
-	    },
+
       prepareNewGame(){
         console.log("newGame");
-        this.$store.state.winner = null
-        this.$store.state.loser = null
+        // this.$store.state.winner = null
+        // this.$store.state.loser = null
+        // this.$store.state.game = null
       },
-      assignWinner(data: {winner: User, loser: User}) {
-        console.log("assignWinner");
-        this.$store.state.winner = data.winner
-        this.$store.state.loser = data.loser
-      },
-      assignGame(game: Game) {
-        this.$store.state.game = game
-        if (this.$store.state.game.loser != undefined) {
-  	  	  document.addEventListener('keydown', this.keyEvents, false);
-        }
-      },
-      isValidKey(key) {
-        return  key == "w" || key == "s" || key == "ArrowUp" || key == "ArrowDown";
-      },
-      keyEvents(event) {
-          console.log(event.key);
-          if (this.isValidKey(event.key))
-            this.$store.state.socketGame.emit('key', event.key)
-      },
-      leaveGame() {
-        this.$store.state.socketGame.emit('leaveGame');
-        this.$store.state.game = null
-		    this.$store.winner = null
-        this.$store.loser = null
-        this.$router.push("/");
-      }
+      // assignWinner(data: {winner: User, loser: User}) {
+      //   console.log("assignWinner");
+      //   this.$store.state.winner = data.winner
+      //   this.$store.state.loser = data.loser
+      // },
+      // assignGame(game: Game) {
+        // this.$store.state.game = game
+        // this.$store.state.game.isFinished = false
+        // if (this.$store.state.game.loser != undefined) {
+  	  	//   document.addEventListener('keydown', this.keyEvents, false);
+        // }
+      // },
   	}
   })
 </script>

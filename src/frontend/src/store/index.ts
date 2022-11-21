@@ -27,20 +27,14 @@ export interface State {
   validated: boolean
   user: User
   socket: Socket | null
-  socketGame: Socket | null
-  // socketChat: Socket | null
   friendsList: User[] | null
-  // NrMessages: number
   NrFriendRequests: number
   requester: User | null
-  // rooms: Room[]
-  game: Game | null
-  winner: User | null
+  // game: Game | null
   chat: Chat
-  loser: User | null
-  customized: boolean
-  showGame: boolean
-  settings: Settings
+  // customized: boolean
+  // showGame: boolean
+  // settings: Settings
 }
 
 const storage = localStorage.getItem('user')
@@ -59,9 +53,9 @@ export default createStore<State>({
     logOut(state) {
       state.validated = false;
       console.log("store logOut()");
-      state.socketGame.emit('leaveGame')
+      // state.socketGame.emit('leaveGame')
       state.socket.disconnect();
-	    state.socketGame.disconnect(); //added
+      router.push('/')
     },
     logIn(state, user) {
 
@@ -76,11 +70,7 @@ export default createStore<State>({
               id: document.cookie
           }
       })
-      state.socketGame = io(API_URL + "/game", {
-        auth: {
-          id: document.cookie
-        }
-      })
+
       console.log("socketGame established");
       
       state.chat = new Chat()
@@ -88,36 +78,25 @@ export default createStore<State>({
       // console.log("game socket init");
       console.log(document.cookie);
 
-	    state.socketGame.on('disconnecting', () => {
-		    console.log("game socket disconnecting");
-		    console.log(state.socketGame);
-	    })
+	    // state.socketGame.on('disconnecting', () => {
+		  //   console.log("game socket disconnecting");
+		  //   console.log(state.socketGame);
+	    // })
 
-      state.socketGame.on('GameRequestFrontend',(user: User) => {
+      state.socket.on('GameRequestFrontend',(user: User) => {
+        console.log("GameRequestFrontend");
+        
         state.requester = user;
-        state.showGame = true;
+        // state.showGame = true;
         console.log("receive askformatch");
       })
-      state.socketGame.on('NowInGame', (cb) => {
-        // state.game = game;
-        console.log("receive NowInGame");
-        if (cb) {
-          state.showGame = true;
-			    router.push('/play')
-		    } else {
-          state.game = null;
-          state.showGame = false;
-          router.push('/')
-        }
+      state.socket.on('resetRequester', () => {
+        console.log("receive resetRequester");
+        state.requester = null;
       })
-	    state.socketGame.on('resetRequester', () => {
-		    console.log("receive resetRequester");
-		    state.requester = null;
-	    })
-      state.socketGame.on('requestSettings', (cb) => {
-        console.log('requestSettings', state.settings);
-        // state.socketGame.emit('responseSettings', {data: state.settings});
-        cb({data: state.settings})
+      state.socket.on('NowInGame', () => {
+        console.log("receive NowInGame");
+          router.push('/')
       })
       state.socket.on('Request',(data) => {
         state.friendsList.push(data)

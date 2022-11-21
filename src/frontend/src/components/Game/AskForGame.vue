@@ -41,7 +41,8 @@ export default defineComponent({
     methods:{
         accept(){
           this.$store.state.socketGame.emit("accept")
-          this.$store.state.winner = null
+          // this.$store.state.winner = null
+          // this.$store.state.game = null
           this.$store.state.requester = null
           this.$router.push('/play')
         },

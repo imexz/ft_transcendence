@@ -1,42 +1,94 @@
 <template>
-  <div v-if="this.dataRdy">
-    <GameSettings />
+  <div v-if="this.game && this.socketGame">
+    <PongGame :game = "this.game" :socket = "this.socketGame" />
+    <div v-show="this.$store.state.user.id!=this.game?.loser?.id && this.$store.state.user.id!=this.game?.winner?.id" class="leaveGame">
+        <button @click="this.leaveGame"> Leave </button>
+    </div>
+    <h1> test </h1> 
+
+  </div>
+  <div v-else-if="this.wait == true">
+    <text> Waiting for opponent... </text>
+    <br>
+    <button @click="this.leaveGame"> Leave </button>
   </div>
   <div v-else>
-    <PongGame />
+    <GameSettings @action="this.setWait()"/>
   </div>
-  </template>
+</template>
   
   <script lang="ts">
+  import Game from '@/models/game';
   import { defineComponent } from 'vue';
   import GameSettings from '../components/Game/GameSettings.vue';
   import PongGame from '../components/Game/PongGame.vue';
-  
+  import { io, Socket } from 'socket.io-client'
+  import { API_URL } from '@/defines';
+
+
   export default defineComponent({
     data() {
       return {
-        dataRdy: false as boolean
+        game: null as Game | null,
+        wait: false,
+        socketGame: null as Socket | null,
       };
     },
     async mounted() {
       console.log("in mounted gameMenu");
-      await this.askBackendForGame()
-      this.dataRdy = true
+      this.socketGame = io(API_URL + "/game", {
+        auth: {
+          id: document.cookie
+        }
+      })
+      
+      while (!this.socketGame) {
+		  	  await new Promise(r => {setTimeout(r, 100)
+            console.log("wait in playview");
+            
+          });
+      }
+      this.initGameInfoListener()
+      // await this.askBackendForGame()
     },
     methods: {
-      async askBackendForGame() {
-        while (!this.$store.state.socketGame) {
-          await new Promise(r => setTimeout(r, 100));
-        }
-        this.$store.state.socketGame.emit('hasGame', (cb) => {
-          if (cb.data) {
-            this.$store.state.showGame = true;
-          } else {
-            this.$store.state.showGame = false;
-          }
-        })
+      async setWait(){
+        await this.socketGame.emit('joinOrCreatGame', {isCustomized: this.$store.state.customized});
+        this.wait = true
       },
-      
+      // async askBackendForGame() {
+      //   while (!this.socketGame) {
+      //     await new Promise(r => setTimeout(r, 100));
+      //   }
+      //   this.socketGame.emit('hasGame', (game) => {
+      //     if (game) {
+      //       this.game = game
+      //     } else {
+      //       this.game = null
+      //     }
+      //   })
+      // },
+	    async initGameInfoListener() {
+		    this.socketGame.on('GameInfo', (game: Game) => {
+
+          console.log("GameInfo", game)
+          this.game = new Game()
+          this.game.winner = game.winner
+          this.game.loser = game.loser
+		    });
+		    this.socketGame.on('isFinished', () => {
+          this.game.isFinished = true
+		    });
+
+	    },
+      leaveGame() {
+        this.socketGame.emit('leaveGame');
+        this.game = null
+        // this.$router.push("/");
+      }
+    },
+    unmounted() {
+      this.socketGame.disconnect();
     },
     components: {
       PongGame,
