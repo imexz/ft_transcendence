@@ -22,6 +22,7 @@ import {
   faX,
   faCheck,
   faTrophy,
+  faComment,
 
   } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
@@ -45,6 +46,7 @@ library.add(
   faX,
   faCheck,
   faTrophy,
+  faComment,
 )
 
 

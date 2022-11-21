@@ -55,7 +55,8 @@ export default defineComponent({
       default: ''
     },
     roomAccess: {
-      type: Number
+      type: Number,
+      default: 0
     },
   },
   methods: {

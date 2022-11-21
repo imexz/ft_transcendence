@@ -60,7 +60,7 @@ export default defineComponent({
     this.fetchUser();
   },
   updated() {
-    if (this.user && ( parseInt(this.id) != this.user.id) )
+    if (this.user && ( parseInt(this.id) != this.user.id) && this.id != 0 )
       this.fetchUser();
   }
 })

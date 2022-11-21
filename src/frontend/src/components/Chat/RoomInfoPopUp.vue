@@ -30,6 +30,7 @@
 import { defineComponent } from 'vue';
 import UserSummary from '@/components/Profile/UserSummary.vue'
 import Room, { Access } from '@/models/room';
+import Button from '@/models/button';
 import User from '@/models/user';
 import CreateRoom from './createRoom.vue';
 
@@ -63,11 +64,13 @@ export default defineComponent({
       ],
       AdminAction,
       Access,
-    extraButtonsDm: [
-      { icon: "fa-solid fa-comment-slash",
-        emit: AdminAction.muted
-      }
-    ]
+      extraButtonsDm: [
+        {
+          icon: "fa-solid fa-comment-slash",
+          emit: AdminAction.muted,
+          tooltip: "Mute User"
+        }
+      ]
     }
   },
   mounted() {
@@ -114,11 +117,13 @@ export default defineComponent({
         console.log("return", type)
         switch (type) {
           case AdminAction.muted:
-            this.extraButtonsDm[0].icon = "fa-solid fa-gavel "
+            this.extraButtonsDm[0].icon = "fa-solid fa-comment"
+            this.extraButtonsDm[0].tooltip = "Unmute User"
             break;
-            case AdminAction.unMuted:
-              this.extraButtonsDm[0].icon = "fa-solid  fa-comment-slash "
-              // <font-awesome-icon icon="fa-solid fa-comment" />
+          case AdminAction.unMuted:
+            this.extraButtonsDm[0].icon = "fa-solid fa-comment-slash"
+            this.extraButtonsDm[0].tooltip = "Mute User"
+            // <font-awesome-icon icon="fa-solid fa-comment" />
 
           default:
             break;
