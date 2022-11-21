@@ -14,7 +14,6 @@ import UserSummary from '@/components/Profile/UserSummary.vue';
 import VueAxios from 'axios';
 import { API_URL } from '@/defines';
 import { defineComponent } from 'vue';
-import { userInfo } from 'os';
 
 export default defineComponent({
     data() {

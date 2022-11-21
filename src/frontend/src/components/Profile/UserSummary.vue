@@ -1,21 +1,5 @@
 <template>
   <div class="userSummary">
-    <div v-if="showDm" class="dmPopUp">
-      <div class="headLineWrapper">
-        <div class="headLine">Direct Message</div>
-        <button class="exitButton" @click="closeDmPopUp">
-          <font-awesome-icon icon="fa-solid fa-x" />
-        </button>
-      </div>
-      <form @submit.prevent="sendDm">
-        <textarea class="dmText" v-model="msgText" placeholder="your message" rows="4">
-        </textarea>
-        <button class="dmButton">Send</button>
-      </form>
-    </div>
-    <div v-if="showGame" class="dmPopUp">
-      <ViewGamePopup @actions="viewGame" :game="game" :userId="user.id" />
-    </div>
     <div class="normalView">
       <img :src="user?.avatar_url" alt="Avatar">
       <div>
@@ -34,76 +18,14 @@
           <font-awesome-icon icon="fa-solid fa-x" />
         </button>
       </div>
-      <div v-if="user?.id != this.$store.state.user.id" class="toggleDropdown" @click="toggleDropdown">
-        <font-awesome-icon icon="fa-solid fa-bars" />
+      <div>
+        <div v-if="user?.id != this.$store.state.user.id" class="toggleDropdown" @click="toggleDropdown">
+          <font-awesome-icon icon="fa-solid fa-bars" />
+        </div>
       </div>
     </div>
-    <div class="dropdownMenu" v-if="show">
-
-      <div class="box" v-if="$store.state.friendsList != '' && $store.state.friendsList.some((us: User) => us.id == user.id)">
-        <button
-          class="dropdownElement"
-          @click="removeFriend">
-          <font-awesome-icon icon="fa-solid fa-user-minus" />
-        </button>
-        <div class="tooltip">
-          Remove Friend
-        </div>
-      </div>
-      <div class="box" v-else>
-        <button
-          class="dropdownElement"
-          @click="addFriend">
-          <font-awesome-icon icon="fa-solid fa-user-plus" />
-        </button>
-        <div class="tooltip">
-          Add Friend
-        </div>
-      </div>
-      <div class="box">
-        <button
-          class="dropdownElement"
-          @click="viewProfile(user?.id)" >
-          <font-awesome-icon icon="fa-solid fa-eye" />
-        </button>
-        <div class="tooltip">
-          View Profile
-        </div>
-      </div>
-      <div class="box">
-        <button
-          class="dropdownElement"
-          @click="toggleDmPopUp">
-          <font-awesome-icon icon="fa-solid fa-message" />
-        </button>
-        <div class="tooltip">
-          Send DM
-        </div>
-      </div>
-      <!-- <button
-        class="dropdownElement">
-        <font-awesome-icon icon="fa-solid fa-ban" />
-      </button> -->
-      <div class="box">
-        <button
-          class="dropdownElement"
-          @click="askForMatchOrSpectate">
-          <font-awesome-icon icon="fa-solid fa-table-tennis-paddle-ball" />
-        </button>
-        <div class="tooltip right">
-          Spectate Match
-        </div>
-      </div>
-      <div class="box" v-for="button in extraButtons">
-        <button
-          class="dropdownElement"
-          @click="customEmit(button.emit)">
-          <font-awesome-icon :icon="button.icon"/>
-        </button>
-        <div class="tooltip right">
-          {{ button.tooltip }}
-        </div>
-      </div>
+    <div v-if="show" class="dropdownMenu">
+      <UserActionsPopup :user="user" :extraButtons="extraButtons" @action="popUpActions"/>
     </div>
   </div>
 </template>
@@ -113,16 +35,14 @@
 import { defineComponent } from 'vue';
 import { Status } from '@/enums/models/ResponseEnum';
 import ViewGamePopup from '../Game/ViewGamePopup.vue';
-import GamePlayers from '../Game/GamePlayers.vue';
-import { defineAsyncComponent } from 'vue';
 import{ UserStatus }from '@/models/user';
-import { Socket } from 'socket.io'
-
+import UserActionsPopup from '@/components/Profile/UserActionsPopup.vue';
 import Game from '@/models/game';
 
 export default defineComponent({
   components: {
     ViewGamePopup,
+    UserActionsPopup,
   },
   data() {
     return {
@@ -145,14 +65,23 @@ export default defineComponent({
       default: []
     },
   },
+  emits: ['action'],
   methods: {
-    customEmit(emitMsg){
-      this.$emit('action', emitMsg, this.user.id)
+    popUpActions(emit) {
+      switch(emit) {
+        case "viewProfile":
+          this.viewProfile(this.user.id);
+          break;
+        case "close":
+          this.toggleDropdown();
+          break;
+        default:
+          this.customEmit(emit);
+      }
     },
-    addFriend(): void {
-      this.$store.state.socket.emit('Request', {id: this.user.id})
-      this.user.friendStatus = Status.pending
-      this.$store.commit("addFriend", this.user)
+    customEmit(emitMsg){
+      console.log(emitMsg)
+      this.$emit('action', emitMsg, this.user.id)
     },
     response(status: Status){
       if(status == Status.accepted){
@@ -162,10 +91,6 @@ export default defineComponent({
       }
       this.$store.state.socket.emit('Response', {id: this.user.id, status: status})
       console.log("response", status)
-    },
-    removeFriend(){
-      this.$store.state.socket.emit('Remove', {id: this.user.id})
-      this.$store.commit("removeFriend", this.user.id)
     },
     viewProfile(id: number){
       this.toggleDropdown()
@@ -178,74 +103,13 @@ export default defineComponent({
     toggleDropdown() {
       if (this.show){
         window.removeEventListener('click', this.hideDropDown)
-        this.closeDmPopUp();
         this.showGame = false;
       }
       else
         window.addEventListener('click', this.hideDropDown)
       this.show = !this.show
     },
-    // for match and spectate
-    async askForMatchOrSpectate(){
-      const isSelfInvite: boolean = this.user.id === this.$store.state.user.id
-
-      this.closeDmPopUp()
-      if (isSelfInvite) return;
-      this.$store.state.winner = null;
-      this.$store.state.socketGame.emit('GameRequestBackend', {isCustomized: this.$store.state.customized, id: this.user.id}, (r) => {
-        if (r.winner != undefined && r.loser != undefined) {
-        	this.showGame = !this.showGame
-        	const isUserActivePlayer: boolean = r.winner.id == this.$store.state.user.id || r.loser.id == this.$store.state.user.id
-			if (!isUserActivePlayer)
-				this.$store.state.game = r
-        }
-        if (r.push) {
-        	this.$emit('actions')
-        	this.$router.push("/play");
-        }
-	    })
-      console.log("askForMatchOrSpectate");
-    },
-    viewGame(status){
-      switch (status) {
-        case 'exit':
-          this.showGame = false;
-          break;
-        case 'view':
-          this.$store.state.socketGame.emit('ViewGame', {id: this.user.id}, () => {
-            this.showGame = !this.showGame
-            this.$router.push('/play')
-          });
-          console.log("viewGame");
-          break;
-      }
-    },
-    openDmPopUp(){
-      window.addEventListener('click', this.hideDm)
-      this.showDm = true;
-      this.showGame = false;
-    },
-    closeDmPopUp(){
-      window.removeEventListener('click', this.hideDm)
-      this.showDm = false;
-    },
-    toggleDmPopUp(){
-      if (this.showDm)
-        this.closeDmPopUp()
-      else
-        this.openDmPopUp()
-    },
-    hideDm(e){
-      if (!this.$el.contains(e.target))
-        this.closePopUp()
-    },
-    sendDm(){
-      console.log(this.msgText)
-      this.closeDmPopUp()
-      this.toggleDropdown()
-      this.$store.state.chat.socketChat.emit('DM', {content: this.msgText, id: this.user.id})
-      this.msgText = ""
-    }
+   
 
   },
 })
