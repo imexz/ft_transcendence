@@ -209,30 +209,25 @@ export class ChatroomService {
                                 return undefined
                             }
 
-                        case Access.public:
-
                         default:
-                            console.log(ret.chatroom.muted);
+                            console.log(ret.chatroom.users, user);
 
-                            if( ret.chatroom.users.indexOf(user) == -1
-                            // &&
-                            //     (ret.chatroom.muted == undefined ||
-                            //     ret.chatroom.muted.find((element) => element.user.id == user.id) == undefined)
-                                )
-                            {
+                            if( ret.chatroom.users.findIndex(elem => elem.id == user.id) == -1) {
                                 console.log("sucesfull joind");
-
                                 ret.chatroom.users.push(user)
-                            } else {
+                            }
+                            else {
                                 console.log("join goes wrong");
+                                return undefined
 
                             }
-                        break;
+                            break;
                     }
                 }
                 await this.chatroomRepository.save(ret.chatroom)
                 return ret.chatroom
             }
+            return undefined
         }
     }
 
