@@ -34,8 +34,10 @@
           <font-awesome-icon icon="fa-solid fa-x" />
         </button>
       </div>
-      <div v-if="user?.id != this.$store.state.user.id" class="toggleDropdown" @click="toggleDropdown">
-        <font-awesome-icon icon="fa-solid fa-bars" />
+      <div>
+        <div v-if="user?.id != this.$store.state.user.id" class="toggleDropdown" @click="toggleDropdown">
+          <font-awesome-icon icon="fa-solid fa-bars" />
+        </div>
       </div>
     </div>
     <div class="dropdownMenu" v-if="show">
