@@ -53,7 +53,7 @@ export class ChatroomService {
         .getMany()
      }
 
-    async hasUserWriteAccess(userId: number, roomId: number): Promise<{allowed: boolean, chatroom: chatroom}> {
+    async hasUserWriteAccess(userId: number, roomId: number, system: boolean): Promise<{allowed: boolean, chatroom: chatroom}> {
         console.log("getAllwithUserWriteAccess");
         // console.log("id = ", id);
         // const mute = this.banMuteService.test()
@@ -71,6 +71,8 @@ export class ChatroomService {
                 users: {id: userId}
             }
         })
+        if (system)
+            return {allowed: true, chatroom: room}
 
         console.log("room= ", room);
 
@@ -119,6 +121,7 @@ export class ChatroomService {
                 relations: {
                     // admins: true,
                     users: true,
+                    bannedUsers: true,
                     // owner: true,
                     messages: true,
                     // muted: {
@@ -160,11 +163,11 @@ export class ChatroomService {
                 }
 
             })
-            for (let element of chatroom) {                
+            for (let element of chatroom) {
                 // console.log("room =", element);
                 if (element.users.find( elem => elem.id == user.id) != undefined && element.users.find(elem => elem.id == user1.id) != undefined) {
                     console.log("return" );
-                    
+
                     return {info: roomReturn.changed, chatroom: element}
                 }
             }
@@ -184,7 +187,7 @@ export class ChatroomService {
         }
     }
 
-    async userToRoom(user: User, roomId: number, password?: string): Promise<chatroom>
+    async userToRoom(user: User, roomId: number, password?: string): Promise<{banned:boolean, room: chatroom}>
     {
         if(user != null) {
             var ret: { chatroom: chatroom, bool: boolean }
@@ -207,34 +210,32 @@ export class ChatroomService {
                                 return undefined
                             }
 
-                        case Access.public:
-
                         default:
-                            console.log(ret.chatroom.muted);
+                            console.log(ret.chatroom.users, user);
 
-                            if( ret.chatroom.users.indexOf(user) == -1
-                            // &&
-                            //     (ret.chatroom.muted == undefined ||
-                            //     ret.chatroom.muted.find((element) => element.user.id == user.id) == undefined)
-                                )
-                            {
+                            if( ret.chatroom.users.findIndex(elem => elem.id == user.id) == -1 && ret.chatroom.bannedUsers.findIndex(elem => elem.id == user.id) == -1) {
                                 console.log("sucesfull joind");
-
                                 ret.chatroom.users.push(user)
-                            } else {
-                                console.log("join goes wrong");
-
                             }
-                        break;
+                            else if (ret.chatroom.users.findIndex(elem => elem.id == user.id) == -1 && ret.chatroom.bannedUsers.findIndex(elem => elem.id == user.id) != -1)
+                                return {banned: true, room: undefined}
+                            else {
+                                console.log("join goes wrong");
+                                return undefined
+                            }
+                            break;
                     }
                 }
                 await this.chatroomRepository.save(ret.chatroom)
-                return ret.chatroom
+                return {banned: false, room: ret.chatroom}
             }
+            return undefined
         }
     }
 
-    async removeUserFromChatroom(user: User, roomId: number) {
+    async removeUserFromChatroom(user: User, roomId: number, banned?: boolean) {
+        console.log("removeUserFromChatroom");
+
         if(user != undefined && roomId != undefined) {
             const room = await this.chatroomRepository.findOne(
                 {
@@ -244,9 +245,11 @@ export class ChatroomService {
                     relations: {
                         owner: true,
                         admins: true,
-                        users: true
+                        users: true,
+                        bannedUsers: true
                     }
                 })
+
             // if(room.owner.id == user.id) {
             //     console.log("user is owner");
             // }
@@ -255,7 +258,7 @@ export class ChatroomService {
             if(room.access != Access.dm) {
                 if (room.owner?.id == user.id) {
                     console.log("remove owner");
-                    
+
                     room.owner = null
                 }
                 var index = room.admins.findIndex(object => {
@@ -267,11 +270,19 @@ export class ChatroomService {
                 index = room.users.findIndex(object => {
                     return object.id === user.id
                 })
+                console.log(index);
+
                 if(index != -1) {
                     room.users.splice(index, 1)
                 }
-                console.log(await this.chatroomRepository.save(room));
-                 
+                else
+                    return undefined
+
+                if (banned == true)
+                    room.bannedUsers.push(user)
+
+                await this.chatroomRepository.save(room)
+
                 return room
             }
 

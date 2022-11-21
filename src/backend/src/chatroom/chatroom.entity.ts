@@ -33,6 +33,10 @@ export default class chatroom{
     @ManyToMany(() => User, (User) => User.chatrooms)
     users: User[];
 
+    @ManyToMany(() => User)
+    @JoinTable()
+    bannedUsers: User[];
+
     @OneToMany(() => message, (message) => message.chatroom)
     @JoinColumn()
     messages: message[];

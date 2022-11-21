@@ -19,11 +19,10 @@ export class ChatService {
     console.log(isAdmin);
 
     if(isAdmin) {
-      console.log("isAdmin");
       switch (action) {
-        case AdminAction.baned:
-          await this.chatroomService.removeUserFromChatroom(await this.usersService.getUser(UserId), roomId)
-          return AdminAction.baned
+        case AdminAction.banned:
+          await this.chatroomService.removeUserFromChatroom(await this.usersService.getUser(UserId), roomId, true)
+          return AdminAction.banned
         case AdminAction.muted:
           return this.banMuteService.mut(await this.usersService.getUser(UserId), room)
         case AdminAction.toAdmin:
@@ -38,7 +37,6 @@ export class ChatService {
 
 
   async creatRoomDM(user: User, id: number) {
-    console.log("undefind = ", user, id );
 
     if(user != undefined && id != undefined)
     {
@@ -80,12 +78,14 @@ export class ChatService {
         }
 
 
-        async createMessage(user: User, roomId:number, content: string) {
-            const object = await this.chatroomService.hasUserWriteAccess(user.id, roomId)
-            console.log("room=", object.chatroom);
+        async createMessage(user: User, roomId:number, content: string, system: boolean) {
+            const object = await this.chatroomService.hasUserWriteAccess(user.id, roomId, system)
             if(object.allowed) {
-              return await this.messageService.userAddMessageToRoom(user, content, object.chatroom)
+              if (system)
+                user = undefined
+              return await this.messageService.userAddMessageToRoom(user, content, object.chatroom, system)
             }
+
         }
 
         async createRoom(user: User, room_name: string, access: Access, password?: string) {
@@ -94,26 +94,13 @@ export class ChatService {
 
 
         async manageJoin(user_id: number, roomId: number, password?: string) {
-            console.log("roomIdmanageJoin: ", roomId);
 
             const user = await this.usersService.getUser(user_id)
-            const room: chatroom = await this.chatroomService.userToRoom(user, roomId, password);
-            console.log("testbool2: ", room);
-
-            return room
+            return await this.chatroomService.userToRoom(user, roomId, password);
         }
 
 
 
-
-        // async findAllMessages(roomId: number, userId: number) {
-        //   const rooms = await this.chatroomService.getAllwithUser(userId)
-        //   for (let index = 0; index < rooms.length; index++) {
-        //     if(rooms[index].roomId == roomId) {
-        //       return await this.messageService.getAllMessagesOfRoom(roomId)
-        //     }
-        //   }
-        // }
 
         async getClientName(id: number) {
             const user = await this.usersService.getUser(id)
