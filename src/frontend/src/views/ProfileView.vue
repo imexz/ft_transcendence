@@ -14,6 +14,7 @@
   import Profile from '@/components/Profile/Profile.vue';
   import MatchHisory from '@/components/Profile/MatchHistory.vue'
   import { defineComponent } from 'vue';
+  import UserActionsPopup from '@/components/Profile/UserActionsPopup.vue';
 
 export default defineComponent({
   props: {
@@ -22,7 +23,8 @@ export default defineComponent({
   components : {
     UserSummary,
     Profile,
-    MatchHisory
+    MatchHisory,
+    UserActionsPopup,
   }
 })
 

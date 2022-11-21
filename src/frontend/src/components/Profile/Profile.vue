@@ -15,6 +15,9 @@
       </p>
     </div>
   </div>
+  <div v-if="id!=$store.state.user.id && id !='0'" class="userActions">
+    <UserActionsPopup v-if="user != null" :user="user"/>
+  </div>
 </template>
 
 <script lang="ts">
@@ -23,6 +26,7 @@ import { API_URL } from '@/defines';
 import VueAxios from 'axios';
 import { defineComponent } from 'vue';
 import { UserStatus } from '@/models/user';
+import UserActionsPopup from '@/components/Profile/UserActionsPopup.vue';
 
 export default defineComponent({
   data() {
@@ -30,6 +34,9 @@ export default defineComponent({
       user: null as User | null,
       UserStatus: UserStatus,
     }
+  },
+  components: {
+    UserActionsPopup,
   },
   props: {
     id: {
@@ -64,7 +71,6 @@ export default defineComponent({
 
   .profile {
     position: relative;
-    top: 10px;
     display: flex;
     justify-content: flex-start;
     align-items: center;
@@ -101,7 +107,15 @@ export default defineComponent({
     border: 2px solid var(--ft_cyan);
     border-radius: 10px 10px 0px 10px;
     border-bottom: none;
-    /* border-image-slice: 1;
-    border-image-source: linear-gradient(var(--ft_cyan), var(--ft_pink)); */
+  }
+
+  .userActions {
+    position: relative;
+    width: 776px;
+    border: 2px solid var(--ft_cyan);
+    border-radius: 10px;
+    margin-top: 20px;
+    padding: 10px;
+
   }
 </style>
