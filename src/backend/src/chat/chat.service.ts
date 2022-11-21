@@ -20,9 +20,9 @@ export class ChatService {
 
     if(isAdmin) {
       switch (action) {
-        case AdminAction.baned:
-          await this.chatroomService.removeUserFromChatroom(await this.usersService.getUser(UserId), roomId)
-          return AdminAction.baned
+        case AdminAction.banned:
+          await this.chatroomService.removeUserFromChatroom(await this.usersService.getUser(UserId), roomId, true)
+          return AdminAction.banned
         case AdminAction.muted:
           return this.banMuteService.mut(await this.usersService.getUser(UserId), room)
         case AdminAction.toAdmin:
@@ -96,9 +96,7 @@ export class ChatService {
         async manageJoin(user_id: number, roomId: number, password?: string) {
 
             const user = await this.usersService.getUser(user_id)
-            const room: chatroom = await this.chatroomService.userToRoom(user, roomId, password);
-
-            return room
+            return await this.chatroomService.userToRoom(user, roomId, password);
         }
 
 

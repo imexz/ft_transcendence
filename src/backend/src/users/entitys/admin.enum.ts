@@ -1,6 +1,6 @@
 export enum AdminAction {
     muted,
-    baned,
+    banned,
     toAdmin,
     unMuted
 }

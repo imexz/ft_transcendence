@@ -121,6 +121,7 @@ export class ChatroomService {
                 relations: {
                     // admins: true,
                     users: true,
+                    bannedUsers: true,
                     // owner: true,
                     messages: true,
                     // muted: {
@@ -186,7 +187,7 @@ export class ChatroomService {
         }
     }
 
-    async userToRoom(user: User, roomId: number, password?: string): Promise<chatroom>
+    async userToRoom(user: User, roomId: number, password?: string): Promise<{banned:boolean, room: chatroom}>
     {
         if(user != null) {
             var ret: { chatroom: chatroom, bool: boolean }
@@ -212,26 +213,27 @@ export class ChatroomService {
                         default:
                             console.log(ret.chatroom.users, user);
 
-                            if( ret.chatroom.users.findIndex(elem => elem.id == user.id) == -1) {
+                            if( ret.chatroom.users.findIndex(elem => elem.id == user.id) == -1 && ret.chatroom.bannedUsers.findIndex(elem => elem.id == user.id) == -1) {
                                 console.log("sucesfull joind");
                                 ret.chatroom.users.push(user)
                             }
+                            else if (ret.chatroom.users.findIndex(elem => elem.id == user.id) == -1 && ret.chatroom.bannedUsers.findIndex(elem => elem.id == user.id) != -1)
+                                return {banned: true, room: undefined}
                             else {
                                 console.log("join goes wrong");
                                 return undefined
-
                             }
                             break;
                     }
                 }
                 await this.chatroomRepository.save(ret.chatroom)
-                return ret.chatroom
+                return {banned: false, room: ret.chatroom}
             }
             return undefined
         }
     }
 
-    async removeUserFromChatroom(user: User, roomId: number) {
+    async removeUserFromChatroom(user: User, roomId: number, banned?: boolean) {
         console.log("removeUserFromChatroom");
 
         if(user != undefined && roomId != undefined) {
@@ -243,9 +245,11 @@ export class ChatroomService {
                     relations: {
                         owner: true,
                         admins: true,
-                        users: true
+                        users: true,
+                        bannedUsers: true
                     }
                 })
+
             // if(room.owner.id == user.id) {
             //     console.log("user is owner");
             // }
@@ -273,6 +277,11 @@ export class ChatroomService {
                 }
                 else
                     return undefined
+
+                // add user to bannedUsers
+                if (banned == true)
+                    room.bannedUsers.push(user)
+
                 console.log(await this.chatroomRepository.save(room));
 
                 return room

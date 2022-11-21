@@ -19,7 +19,7 @@
     <div class="user" v-for="user in room?.users">
       <UserSummary
         v-if="!room?.admins?.some((us: User) => us.id == user.id)"
-        :user=user 
+        :user=user
         :extraButtons=extraButtons
         @action="reEmit"></UserSummary>
     </div>
@@ -35,7 +35,7 @@ import CreateRoom from './createRoom.vue';
 
 enum AdminAction {
     muted,
-    baned,
+    banned,
     toAdmin,
     unMuted
 }
@@ -57,7 +57,7 @@ export default defineComponent({
         },
         {
           icon: "fa-solid fa-ban",
-          emit: AdminAction.baned,
+          emit: AdminAction.banned,
           tooltip: "Ban User"
         }
       ],
@@ -72,11 +72,11 @@ export default defineComponent({
   },
   mounted() {
     console.log("Room in room info", this.room);
-    
+
   },
   updated() {
     console.log("updated in room info");
-    
+
     // this.room = this.roomInfo?.room;
   },
   computed: {
@@ -109,7 +109,7 @@ export default defineComponent({
     // },
     reEmit(emiType: AdminAction, userId){
       console.log(emiType, userId);
-      
+
       this.$store.state.chat.socketChat.emit('action', {emiType, userId, roomId: this.room.roomId}, (type) => {
         console.log("return", type)
         switch (type) {
@@ -119,14 +119,14 @@ export default defineComponent({
             case AdminAction.unMuted:
               this.extraButtonsDm[0].icon = "fa-solid  fa-comment-slash "
               // <font-awesome-icon icon="fa-solid fa-comment" />
-              
+
           default:
             break;
         }
-        
+
         if (type == AdminAction.muted) {
           console.log("type muted")
-          
+
         }
 
       })

@@ -74,14 +74,19 @@ export class ChatGateway {
     )
      {
         if (roomId ) {
-          const room: chatroom = await this.chatService.manageJoin(client.handshake.auth.id, roomId, password)
-          if (room) {
+          const data: {banned: boolean, room: chatroom} = await this.chatService.manageJoin(client.handshake.auth.id, roomId, password)
+          if (data.banned != undefined && data.banned == false && data.room) {
             await this.addUserRooms(client)
-            client.emit('UpdateRoom', {change: changedRoom.complet, roomId: roomId, data: room })
+            client.emit('UpdateRoom', {change: changedRoom.complet, roomId: roomId, data: data.room })
             client.to(roomId.toString()).emit('UpdateRoom', {change: changedRoom.user, roomId: roomId,  data: client.handshake.auth })
+            this.createSystemMessage(roomId, client.handshake.auth.username + " joined the conversation", client)
+          }
+          else if (data.banned != undefined && data.banned == true)
+          {
+            this.server.to(client.id.toString()).emit("banned", {roomId: roomId, roomName: await this.chatService.getRoomName(roomId)})
           }
         }
-  }
+      }
 
       @SubscribeMessage('leave')
       async leaveRoom(
@@ -110,16 +115,17 @@ export class ChatGateway {
     const socket = await this.findSocketOfUser(muteUserId)
     const tmp = await this.chatService.adminAction(emiType, roomId, muteUserId, client.handshake.auth.id)
     switch (tmp) {
-      case AdminAction.baned:
+      case AdminAction.banned:
         console.log("case ban")
         this.createSystemMessage(roomId, socket.handshake.auth.username + " was banned", client)
         socket.leave(roomId.toString())
-        this.server.to(roomId.toString()).emit('UpdateRoom', {change: changedRoom.user, roomId: roomId,  data: {userId: muteUserId} })
+        this.server.to(roomId.toString()).emit('UpdateRoom', {change: changedRoom.user, roomId: roomId,  data: {id: muteUserId} })
+        this.server.to(socket.id.toString()).emit('banned', {roomId: roomId, roomName: this.chatService.getRoomName(roomId)})
         break;
 
         case AdminAction.toAdmin:
         console.log("case toAdmin")
-        this.server.to(roomId.toString()).emit('UpdateRoom', {change: changedRoom.admin, roomId: roomId,  data: socket.handshake.auth })
+        this.server.to(roomId.toString()).emit('UpdateRoom', {change: changedRoom.admin, roomId: roomId,  data: socket.handshake.auth})
         break;
 
         case AdminAction.unMuted:
