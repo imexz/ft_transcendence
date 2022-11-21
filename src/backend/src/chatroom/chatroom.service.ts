@@ -278,11 +278,10 @@ export class ChatroomService {
                 else
                     return undefined
 
-                // add user to bannedUsers
                 if (banned == true)
                     room.bannedUsers.push(user)
 
-                console.log(await this.chatroomRepository.save(room));
+                await this.chatroomRepository.save(room)
 
                 return room
             }

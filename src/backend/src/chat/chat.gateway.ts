@@ -211,7 +211,7 @@ export class ChatGateway {
   ) {
     console.log("createOrChangeRoom");
 
-    console.log("roomName =", roomName, ",access =", access);
+    // console.log("roomName =", roomName, ",access =", access);
     if (roomName.length == 0 || access == undefined)
       return {undefined}
 
@@ -226,7 +226,7 @@ export class ChatGateway {
       }
       else
       {
-        console.log("before emit", room.chatroom); // TB check for roomName etc. maybe return is needed
+        console.log("before emit", room.chatroom);
 
         client.emit('newRoom', room.chatroom)
       }
@@ -235,19 +235,13 @@ export class ChatGateway {
       if (access != Access.private) {
         client.broadcast.emit('UpdateRoom', {change: changedRoom.complet, roomId: room.chatroom.roomId, data: room.chatroom})
       } else {
-        client.broadcast.emit('UpdateRoom', {change: changedRoom.access, roomId: room.chatroom.roomId, data: Access.private})
+        client.broadcast.emit('UpdateRoom', {change: changedRoom.access, roomId: room.chatroom.roomId, data: Access.private}) // TB maybe need some work when a room turns to private
       }
       console.log("room changed");
-
-      // maybe needed to not send private room info to the frontend // TB
-      // // if (room.chatroom.access != Access.private)
-      // client.broadcast.emit('updateRoom', {change: changedRoom.access, roomId: room.chatroom.roomId, data: room.chatroom.access})
-      // this.server.to(room.chatroom.roomId.toString()).emit('updateRoom', {change: changedRoom.access, roomId: room.chatroom.roomId, data: room.chatroom.access})
     }
     else {
       console.log("room == empty");
     }
-    console.log("createRoom ende", room);
     return room
   }
 
@@ -256,7 +250,6 @@ export class ChatGateway {
     @MessageBody('messageId') messageId : number,
     @ConnectedSocket() client: Socket,
   ) {
-      console.log("delete found");
       console.log(messageId);
       this.chatService.deleteMessage(messageId, client.handshake.auth.id);
   }

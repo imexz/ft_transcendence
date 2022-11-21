@@ -46,7 +46,6 @@ export default class Chat{
             }
 
             let room = this.rooms.value?.find(elem => elem.roomId == data.roomId)
-            console.log(room);
 
             if (room)
             {
@@ -54,11 +53,7 @@ export default class Chat{
               {
                 ++room.unreadCount
               }
-              //   store.state.rooms.find(elem => elem.roomId == room.roomId).unreadCount++
-
-              console.log(data.roomId, data.message, room.unreadCount)
               room.messages = [...room.messages, new Message(data.message)]
-              console.log("message was put to store");
             }
             else
               console.log("room for new Message not found");
@@ -66,15 +61,11 @@ export default class Chat{
 
           this.socketChat.on('newRoom',(data) => {
             console.log('newRoom');
-            // this.rooms[this.rooms.length] = new Room(data)
             this.addRoom(data)
-            // console.log("newRoom received:", this.rooms[this.rooms.length - 1]);
-            // this.dispatch('updateRooms', new Room(data))
           })
 
           this.socketChat.on('UpdateRoom',(obj: {change: changedRoom, roomId: number, data: any }) => {
             console.log("UpdateRoom received:", obj);
-            // console.log("enum test", changedRoom.complet, changedRoom.user);
 
             let room = this.rooms?.value?.find(elem => elem.roomId == obj.roomId)
             if (room) {
@@ -109,15 +100,12 @@ export default class Chat{
                     this.removeUser(index, room.users)
                   break;
                 case changedRoom.access:
-                  console.log("access");
                   console.log("access", room.users, store.state.user?.id);
                   if (obj.data == Access.private && room.users.findIndex(elem => elem.id == store.state.user?.id) == -1)
                   {
-                    console.log("remove room");
-
                     const index = this.rooms.value.indexOf(room)
                     if( -1 != index) {
-                      this.rooms.value.splice(index, 1) // TB check if needs extra check if user is part of the room
+                      this.rooms.value.splice(index, 1)
                     }
                   }
                   room.access = obj.data as unknown as Access
@@ -146,7 +134,6 @@ export default class Chat{
               room.owner = undefined
               room.messages = []
             }
-            console.log(data);
 
             let roomName = data.roomName
             console.warn("YOU ARE BANNED FROM " + roomName);
