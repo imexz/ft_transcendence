@@ -25,8 +25,13 @@ export default class Room {
         this.messages = [] as Message[]
         for (let i = 0; i < room.messages?.length; ++i)
         {
-            this.findUser(room.messages[i]?.senderId)
-            .then(user => (this.messages[i] = new Message(room.messages[i], user)))
+            if (room.messages[i].senderId != undefined)
+            {
+                this.findUser(room.messages[i]?.senderId)
+                .then(user => (this.messages[i] = new Message(room.messages[i], user)))
+            }
+            else
+                this.messages[i] = new Message(room.messages[i])
         }
         this.admins = room.admins
         this.unreadCount = 0
@@ -68,10 +73,12 @@ export default class Room {
         }
         if (user == undefined)
         {
-            user = new User(await VueAxios({
-                        url: '/users/find/' + userId,
-                        baseURL: API_URL, method: 'GET',
-                        withCredentials: true}))
+            let apiUser = await VueAxios({
+                url: '/users/find/' + userId,
+                baseURL: API_URL, method: 'GET',
+                withCredentials: true})
+
+            user = new User(apiUser.data)
         }
 
         return user

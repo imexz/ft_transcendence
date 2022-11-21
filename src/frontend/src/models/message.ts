@@ -15,11 +15,20 @@ export default class Message {
         }
         this._id = message._id
         this.content = message.content
-        this.content = message.content
-        this.senderId = message.senderId.toString()
         let ts = new Date(message.timestamp)
         this.timestamp = ts.toLocaleString()
         // console.warn("constructor for message called", this);
+        // if (message.system != undefined)
+        //     this.system = message.system
+        // else
+        //     this.system = false
+        if (message.senderId == null || message.senderId == -1)
+        {
+            this.system = true
+            this.senderId = "System"
+        }
+        else
+            this.senderId = message.senderId.toString()
     }
 
     _id: number
@@ -28,5 +37,6 @@ export default class Message {
     senderId: string
     timestamp: string
     username: string
+    system: boolean = false
 
 }

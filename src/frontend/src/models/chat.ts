@@ -46,7 +46,6 @@ export default class Chat{
             }
 
             let room = this.rooms.value?.find(elem => elem.roomId == data.roomId)
-            console.log(room);
 
             if (room)
             {
@@ -54,11 +53,7 @@ export default class Chat{
               {
                 ++room.unreadCount
               }
-              //   store.state.rooms.find(elem => elem.roomId == room.roomId).unreadCount++
-
-              console.log(data.roomId, data.message, room.unreadCount)
               room.messages = [...room.messages, new Message(data.message)]
-              console.log("message was put to store");
             }
             else
               console.log("room for new Message not found");
@@ -66,15 +61,11 @@ export default class Chat{
 
           this.socketChat.on('newRoom',(data) => {
             console.log('newRoom');
-            // this.rooms[this.rooms.length] = new Room(data)
             this.addRoom(data)
-            // console.log("newRoom received:", this.rooms[this.rooms.length - 1]);
-            // this.dispatch('updateRooms', new Room(data))
           })
 
           this.socketChat.on('UpdateRoom',(obj: {change: changedRoom, roomId: number, data: any }) => {
             console.log("UpdateRoom received:", obj);
-            // console.log("enum test", changedRoom.complet, changedRoom.user);
 
             let room = this.rooms?.value?.find(elem => elem.roomId == obj.roomId)
             if (room) {
@@ -98,21 +89,23 @@ export default class Chat{
                 case changedRoom.user:
                   console.log("user");
                   this.UserToArray(obj.data, room.users)
-                  break;
+                  if (room.admins.findIndex(elem => elem.id == obj.data.id) != -1)
+                    this.removeUser(index, room.admins)
+                  break ;
                 case changedRoom.admin:
-                    console.log("admin");
-                    this.UserToArray(obj.data, room.admins)
+                  console.log("admin");
+                  this.UserToArray(obj.data, room.admins)
+                  var index = room.users.findIndex(elem => elem.id == obj.data.id)
+                  if (index != -1)
+                    this.removeUser(index, room.users)
                   break;
                 case changedRoom.access:
-                  console.log("access");
                   console.log("access", room.users, store.state.user?.id);
                   if (obj.data == Access.private && room.users.findIndex(elem => elem.id == store.state.user?.id) == -1)
                   {
-                    console.log("remove room");
-
                     const index = this.rooms.value.indexOf(room)
                     if( -1 != index) {
-                      this.rooms.value.splice(index, 1) // TB check if needs extra check if user is part of the room
+                      this.rooms.value.splice(index, 1)
                     }
                   }
                   room.access = obj.data as unknown as Access
@@ -132,17 +125,41 @@ export default class Chat{
             //   room = undefined
           })
 
+          this.socketChat.on("banned", (data: {roomId: number, roomName: string}) => {
+            let room : Room = this.getRoomInfo(data.roomId)
+            if (room)
+            {
+              room.users = []
+              room.admins = []
+              room.owner = undefined
+              room.messages = []
+            }
+
+            let roomName = data.roomName
+            console.warn("YOU ARE BANNED FROM " + roomName);
+
+            // @Tobi show "You are banned from room.roomName" banner for this user
+
+          })
+
     }
 
       UserToArray( user: User, users: User[]) {
         const index = users.findIndex(elem => elem.id == user.id)
         if (index == -1) {
-          users.push(user)
+          this.addUser(user, users)
         } else {
-          users.splice(index, 1)
+          this.removeUser(index, users)
         }
       }
 
+      addUser(user: User, users: User[]) {
+        users.push(new User(user))
+      }
+
+      removeUser(index: number, users: User[]) {
+        users.splice(index, 1)
+      }
 
       setRooms(rooms: any) {
         const room = [] as Room[]

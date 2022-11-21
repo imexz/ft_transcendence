@@ -20,7 +20,7 @@
       :username-options="JSON.stringify(usernameOptions)"
       :show-audio="false"
       :show-files="false"
-      :show-reaction-emojis="true"
+      :show-reaction-emojis="false"
       :room-info-enabled="true"
       :show-new-messages-divider="false"
       :styles="JSON.stringify(style)"
@@ -148,14 +148,14 @@
               // return currentRoom.messages
               this.messages = currentRoom.messages
             }
-            }
-            else
-            {
-              console.log("messages computed empty");
+          }
+          else
+          {
+            console.log("messages computed empty");
 
-              // return []
-              this.messages = []
-            }
+            // return []
+            this.messages = []
+          }
 
             // return this.$store.state.chat?.getMessages(this.currentRoomId)
             // this.messages = this.$store.state.chat?.getMessages(this.currentRoomId)
@@ -203,35 +203,6 @@
           // this.messagesLoaded = true;
         },
 
-        // updateMessages(roomId) {
-        //   console.log("updateMessages", this.messagesLoaded);
-        //   console.log(roomId);
-          // this.$store.state.chat.socketChat.emit('findAllMessages', {roomId: roomId}, (response) => {
-          //   console.log("mesages_old: ", response);
-
-          //   console.log(response, "ende");
-          //   this.messages = response;
-          //   this.messagesLoaded = true;
-          // })
-          // console.log("rooms:", this.rooms);
-          // for (let i = 0; i < this.rooms.length; ++i)
-          // {
-          //   if (this.rooms[i].roomId == roomId) {
-          //     if(this.rooms[i].messages != undefined)
-          //       this.messages = this.rooms[i].messages
-          //   }
-          // }
-          // console.log("messages of room:", roomId, this.messages);
-
-          // let room = this.$store.state.chat.getRoomInfo(roomId)
-          // room.messagesLoaded = true
-          // console.warn(this.$store.state.rooms.find(elem => elem.roomId == roomId));
-
-        //   room.unreadCount = 0;
-        //   this.messagesLoaded = true;
-        //   console.log("endeende");
-
-        // },
         sendMessage({ roomId, content}) {
           console.log("createMessage");
           console.log(roomId);

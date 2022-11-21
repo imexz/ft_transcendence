@@ -31,13 +31,13 @@ export class MessageService {
         })
     }
 
-    async userAddMessageToRoom(user: User, conntent: string, chatroom: chatroom): Promise<message> {
-        if (user != undefined && chatroom != undefined && conntent != undefined) {
+    async userAddMessageToRoom(user: User, conntent: string, chatroom: chatroom, system: boolean): Promise<message> {
+        if ((system || user !== undefined) && chatroom != undefined && conntent != undefined) {
             var new_message = this.messageRepository.create({sender: user, chatroom: chatroom, content: conntent});
             // console.log(conntent);
             const message = await this.messageRepository.save(new_message);
             console.log("userAddMessageToRoom", message);
-            
+
             return message
         } else {
             // console.log("userAddMessageToRoom goes wrong");
