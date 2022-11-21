@@ -83,17 +83,20 @@ export class ChatGateway {
         }
   }
 
-  @SubscribeMessage('leave')
-  async leaveRoom(
-    @MessageBody() roomId: number,
-    @ConnectedSocket() client:Socket,
-  ) {
-    console.log("leave room", roomId);
-    client.leave(roomId.toString());
-    const room = await this.chatService.manageLeave(client.handshake.auth.id, roomId)
-    console.log(room);
-    if (room)
-      client.to(roomId.toString()).emit('UpdateRoom', {change: changedRoom.user, roomId: roomId,  data: client.handshake.auth })
+      @SubscribeMessage('leave')
+      async leaveRoom(
+        @MessageBody() roomId: number,
+        @ConnectedSocket() client: Socket,
+        ) {
+          console.log("leave room", roomId);
+          this.createSystemMessage(roomId, client.handshake.auth.username + " left the conversation", client)
+          client.leave(roomId.toString());
+          const room = await this.chatService.manageLeave(client.handshake.auth.id, roomId)
+          console.log(room);
+        if (room) {
+          client.to(roomId.toString()).emit('UpdateRoom', {change: changedRoom.user, roomId: roomId,  data: client.handshake.auth})
+          // this.server.to(client).emit('UpdateRoom', {change: changedRoom.complet, roomId: roomId, data: client.handshake.auth})
+        }
   }
 
   @SubscribeMessage('action')
