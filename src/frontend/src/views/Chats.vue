@@ -1,9 +1,7 @@
 <template>
-  <!-- <div v-if="socket" class="chatWrapper"> -->
-  <div class="chatWrapper">
-    <div class="chatBanner"></div>
-    <div class="headLine">
-      <span>Chat</span>
+  <div id="content">
+    <div id="banner">
+      <div id="bannerName">Chat</div>
     </div>
     <div>
     <vue-advanced-chat
@@ -601,45 +599,65 @@
 
 <style scoped>
 
-  .chatWrapper {
-    position: relative;
-    width: 800px;
-    margin: auto;
-    margin-top: 80px;
-    margin-bottom: 80px;
-    z-index: 1;
-  }
 
-  .headLine {
-    position: absolute;
-    top: 129px;
-    left: 325px;
-    width: 150px;
-    height: 41px;
-    font-size: 30px;
-    font-weight: bold;
-    background-color: var(--ft_dark);
-    border: 2px solid var(--ft_cyan);
-    border-radius: 10px 10px 0px 0px;
-    border-bottom: none;
-  }
+#content {
+  position: relative;
+  width: 800px;
+  margin: auto;
+  margin-top: 70px;
+  border: 2px solid var(--ft_cyan);
+  border-radius: 10px;
+  margin-bottom: 80px;
+  z-index: 1;
+}
 
-  .chatBanner {
-    width: 100%;
-    height: 170px;
-    background: url(@/assets/chatBanner.png);
-    background-size: cover;
-    background-position: 0px 420px;
-    border: 2px solid var(--ft_cyan);
-    border-bottom: none;
-    border-radius: 10px 10px 0px 0px ;
-  }
   .chatFooter {
     width: 100%;
     height: 20px;
-    border: 2px solid var(--ft_cyan);
-    border-radius: 0px 0px 10px 10px;
-    border-top: none;
+    border-top: 1px solid var(--ft_cyan);
   }
+
+  #banner {
+  width: 100%;
+  height: 250px;
+
+  background: url(@/assets/chatBanner.png);
+  background-size: cover;
+  background-position: 100px 470px;
+
+  border-radius: 10px 10px 0px 0px;
+
+  border-bottom: 2px solid var(--ft_cyan);
+
+  position: relative;
+}
+
+#bannerName {
+  position: absolute;
+  left: 0px;
+  top: 60%;
+
+  background-color: var(--ft_dark);
+
+  font-size: 30px;
+  font-weight: bold;
+
+  padding: 10px;
+  border: 1px solid var(--ft_cyan);
+  border-left: none;
+  border-radius: 0px 5px 5px 0px;
+
+  animation: slideOut 200ms ease-in-out forwards;
+  transform-origin: left center; 
+}
+
+@keyframes slideOut {
+  0% {
+    transform: scaleX(0);
+  }
+  100% {
+    transform: scaleX(1);
+  }
+}
 
 </style>
