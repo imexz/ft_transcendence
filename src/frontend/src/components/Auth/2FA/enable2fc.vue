@@ -18,7 +18,7 @@
 import VueAxios from 'axios';
 import { API_URL } from '@/defines';
 import { defineComponent, ref } from 'vue';
-import Toast from '@/components/Toast.vue'
+import Toast from '@/components/Footer/Toast.vue'
 
 export default defineComponent({
   data() {

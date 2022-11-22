@@ -1,6 +1,5 @@
 <template>
   <div>
-    <Toast v-if="showToast" :msg=toastMsg :mode=toastMode />
     <div v-if="$store.state.user == null">
       <button 
         class="authButton"
@@ -22,21 +21,11 @@
 import VueAxios from 'axios';
 import { API_URL } from '@/defines';
 import EnableTwoFA from '@/components/Auth/2FA/enable2fc.vue';
-import Toast from '@/components/Toast.vue'
-import { ref }  from 'vue';
 import { defineComponent } from 'vue';
 
 export default defineComponent({
   components: {
     EnableTwoFA,
-    Toast,
-  },
-  data() {
-    return {
-      showToast : ref(false),
-      toastMsg : ref(''),
-      toastMode : ref(''),
-    }
   },
   methods: {
     async logout() {
@@ -46,7 +35,6 @@ export default defineComponent({
           method: 'GET',
           withCredentials: true,
       })
-      console.log("hi");
       this.$store.dispatch('logOut');
       this.$router.push('/login');
     },
@@ -54,10 +42,7 @@ export default defineComponent({
       location.href= API_URL + '/auth/login'
     },
     triggerToast(msg: string, mode: string) {
-        this.showToast = true;
-        this.toastMsg = msg;
-        this.toastMode = mode;
-        setTimeout(() => this.showToast = false, 2000);
+      this.$store.dispatch('triggerToast', {show: true, msg: msg, mode: mode})
     },
   },
   mounted(): void {
