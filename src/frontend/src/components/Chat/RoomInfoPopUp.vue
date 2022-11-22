@@ -107,9 +107,6 @@ export default defineComponent({
     }
   },
   methods: {
-    // changeRoomAccess() {
-    //   this.$store.state.chat.socketChat.emit('changeRoomAccess', {roomName: this.name, access: this.access, password: this.password}  // !!!!!!!!!!!!!!!
-    // },
     reEmit(emiType: AdminAction, userId){
       console.log(emiType, userId);
 

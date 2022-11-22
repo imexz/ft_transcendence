@@ -62,7 +62,7 @@ export default defineComponent({
   methods: {
     createOrChangeRoom(): void{
       console.log("createRoom", this.roomName, this.name);
-      this.$store.state.chat.socketChat.emit('createOrChangeRoom', {roomName: this.name? this.name : this.roomName, access: this.access, password: this.password},  // !!!!!!!!!!!!!!!
+      this.$store.state.chat.socketChat.emit('createOrChangeRoom', {roomName: this.name? this.name : this.roomName, access: this.access, password: this.password},
         response => {
           console.log("RESPONSE: ", response.info);
 
