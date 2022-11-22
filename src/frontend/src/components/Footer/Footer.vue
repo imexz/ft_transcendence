@@ -1,6 +1,7 @@
 <template>
   <div class="footer">
       <AskForGame v-if="this.$store.state.requester != null"/>
+      <Toast/>
       <FriendList v-if="$store.state.validated"></FriendList>
   </div>
 </template>
@@ -10,11 +11,13 @@
 import { defineComponent } from 'vue';
 import FriendList from '@/components/Footer/FriendList.vue';
 import AskForGame from '@/components/Game/AskForGame.vue'
+import Toast from '@/components/Footer/Toast.vue'
 
 export default defineComponent({
   components: {
     FriendList,
     AskForGame,
+    Toast,
   }
 })
 </script>
@@ -27,9 +30,6 @@ export default defineComponent({
     z-index: 11;
     position: fixed;
     bottom: 0px;
-    /* height: 62px; */
     width: 100%;
-    /* background-color: var(--dark);
-    border-top: 2px solid var(--hot); */
   }
 </style>

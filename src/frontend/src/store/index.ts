@@ -37,13 +37,40 @@ export interface State {
   chat: Chat
   loser: User | null
   customized: boolean
+
+  toastShow: boolean
+  toastMode: string
+  toastMsg: string
 }
 
-const storage = localStorage.getItem('user')
+const storage = localStorage.getItem('user');
 const user = storage?JSON.parse(storage):null;
-const initialState = user?
-{ validated: true, user: user, socket: null,  socketChat: null,  socketGame: null, friendsList: null, NrMessages: 0, NrFriendRequests: 0, requester: null, game: null, winner: null, loser: null, customized: false, chat: null }:
-{ validated: false, user: null,  socket: null,  socketChat: null,  socketGame: null, friendsList: null, NrMessages: 0, NrFriendRequests: 0, requester: null, game: null, winner: null, loser: null, customized: false, chat: null };
+const initialState = {
+  validated: false,
+  user: null,
+  socket: null,
+  socketChat: null,
+  socketGame: null,
+  friendsList: null,
+  NrMessages: 0,
+  NrFriendRequests: 0,
+  requester: null,
+  game: null,
+  winner: null,
+  loser: null,
+  customized: false,
+  chat: null,
+  toastShow: false,
+  toastMode: "",
+  toastMsg: "",
+}
+if (user != null) {
+  initialState.user = user;
+  initialState.validated = true;
+}
+// { validated: true, user: user, socket: null,  socketChat: null,  socketGame: null, friendsList: null, NrMessages: 0, NrFriendRequests: 0, requester: null, game: null, winner: null, loser: null, customized: false, chat: null }:
+// { validated: false, user: null,  socket: null,  socketChat: null,  socketGame: null, friendsList: null, NrMessages: 0, NrFriendRequests: 0, requester: null, game: null, winner: null, loser: null, customized: false, chat: null };
+
 
 export default createStore<State>({
 
@@ -127,8 +154,12 @@ export default createStore<State>({
       const index = state.friendsList?.findIndex(element => element.id == id)
       if (index != -1)
         state.friendsList?.splice(state.friendsList?.findIndex(element => element.id == id) , 1)
-    }
-
+    },
+    changeToast(state, toastObj: {show: boolean, mode: string, msg: string}) {
+      state.toastShow = toastObj.show;
+      state.toastMode = toastObj.mode;
+      state.toastMsg = toastObj.msg;
+    },
   },
   actions: {
     logOut({ commit }) {
@@ -178,6 +209,19 @@ export default createStore<State>({
     },
     logIn({ commit }, user) {
       commit("logIn", user)
+    },
+    triggerToast({commit}, toastObj:{show: boolean, mode: string, msg: string}) {
+      console.warn("stroe", toastObj)
+      commit('changeToast', toastObj);
+      const toastReset = {
+        show: false,
+        mode: "",
+        msg: ""
+      }
+      setTimeout(() => this.commit('changeToast', {
+                                                show: false,
+                                                mode: '',
+                                                msg: ''}), 2200)
     }
   },
 

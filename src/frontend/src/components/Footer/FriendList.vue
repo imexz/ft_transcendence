@@ -90,7 +90,7 @@ export default defineComponent({
     border: 2px solid var(--cold);
     border-bottom: none;
     border-radius: 10px 10px 0px 0px;
-    animation: growUp 200ms ease-in-out forwards;
+    animation: growUp 350ms ease-in-out forwards;
     transform-origin: bottom center;
   }
 
@@ -149,10 +149,13 @@ export default defineComponent({
   
   @keyframes growUp {
     0% {
-      transform: scaleY(0)
+      transform: scaleY(0);
+    }
+    70% {
+      transform: scaleY(1.2);
     }
     100% {
-      transform: scaleY(1)
+      transform: scaleY(1);
     }
   }
   .text {

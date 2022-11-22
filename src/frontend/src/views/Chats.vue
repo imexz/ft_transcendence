@@ -40,7 +40,6 @@
     </vue-advanced-chat>
   </div>
     <div class="chatFooter"></div>
-    <Toast v-if="showToast" :msg=toastMsg :mode=toastMode />
     <div v-if="createRoomPopUp" class="createRoomPopUp">
       <createRoomPopup @actions="createRoomActions"/>
     </div>
@@ -59,7 +58,7 @@
   import joinRoomPopup from '@/components/Chat/joinRoomPopup.vue';
   import roomInfoPopUp from '@/components/Chat/RoomInfoPopUp.vue';
   import { customChatStyle } from "@/styles/chatStyle";
-  import Toast from "@/components/Toast.vue";
+  import Toast from "@/components/Footer/Toast.vue";
   import Message from '@/models/message';
   import Room from '@/models/room';
   import { Access } from '@/models/room';
@@ -96,9 +95,6 @@
   		    socket: null,
           chatTheme: "dark",
           showEmojis: true,
-          showToast : ref<boolean | null>(false),
-          toastMsg : ref<string>(''),
-          toastMode : ref<string>(''),
           }
       },
       components:{
@@ -179,16 +175,10 @@
           }
         },
         changeSuccess(msg: string) {
-          this.showToast = true;
-          this.toastMsg = msg;
-          this.toastMode = 'success';
-          setTimeout(() => this.showToast = false, 2000);
+          this.$store.dispatch('triggerToast', {msg: msg, mode: 'success', show: true})
         },
-        changeError(errorMsg: string) {
-          this.showToast = true;
-          this.toastMsg = errorMsg;
-          this.toastMode = 'error';
-          setTimeout(() => this.showToast = false, 2000);
+        changeError(msg: string) {
+          this.$store.dispatch('triggerToast', {msg: msg, mode: 'error', show: true})
         },
         putMessages({room}) {
           // console.log(new Date().getMilliseconds());

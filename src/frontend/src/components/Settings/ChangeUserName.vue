@@ -24,7 +24,6 @@ export default defineComponent({
   },
   methods: {
     changeUserName(): void {
-      console.log(this.newName.length, maxLenUserName)
       if (this.newName === ''){
         this.$emit('error', 'Empty Name')
       }
