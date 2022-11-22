@@ -58,7 +58,7 @@ export class ChatroomService {
         // console.log("id = ", id);
         // const mute = this.banMuteService.test()
 
-        const room: chatroom = await this.chatroomRepository.findOne({
+        let room: chatroom = await this.chatroomRepository.findOne({
             relations: {
                 users: true,
                 muted: {
@@ -68,15 +68,16 @@ export class ChatroomService {
             },
             where: {
                 roomId: roomId,
-                users: {id: userId}
             }
         })
-        if (system)
+        if (system != undefined && system == true)
             return {allowed: true, chatroom: room}
+        else if (room.users.findIndex(elem => elem.id == userId) == -1)
+            room = null
 
         console.log("room= ", room);
 
-        const muted: banMute | undefined = room.muted.find(elem => elem.user.id == userId)
+        const muted: banMute | undefined = room?.muted?.find(elem => elem.user.id == userId)
 
         if(muted == undefined) {
             return {allowed: true, chatroom: room}

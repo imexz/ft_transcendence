@@ -31,34 +31,20 @@ export class MessageService {
         })
     }
 
-    async userAddMessageToRoom(user: User, conntent: string, chatroom: chatroom, system: boolean): Promise<message> {
-        if ((system || user !== undefined) && chatroom != undefined && conntent != undefined) {
-            var new_message = this.messageRepository.create({sender: user, chatroom: chatroom, content: conntent});
-            // console.log(conntent);
+    async userAddMessageToRoom(user: User, content: string, chatroom: chatroom, system: boolean): Promise<message> {
+        if ((system || user !== undefined) && chatroom != undefined && content != undefined) {
+            if (system == true)
+                user = undefined
+
+            var new_message = this.messageRepository.create({sender: user, chatroom: chatroom, content: content});
             const message = await this.messageRepository.save(new_message);
             console.log("userAddMessageToRoom", message);
 
             return message
         } else {
-            // console.log("userAddMessageToRoom goes wrong");
-
+            console.log("userAddMessageToRoom goes wrong");
+            return undefined
         }
     }
-
-    // async getAllMessagesOfRoom(roomId: number) {
-    //     const messages = await this.messageRepository.createQueryBuilder("messages")
-    //         .leftJoinAndSelect("messages.sender", "sender")
-    //         .select('CAST( messages.sender_id AS varchar ) AS "senderId", messages.id, content, user.avatar_url AS avatar, messages.timestamp AS timestamp, user.username AS username')
-    //         // .select('messages.user_id AS "senderId", id, content, messages.user')
-    //         .where('messages.chatroom.roomId = :roomId', { roomId: roomId})
-    //         .orderBy('timestamp')
-    //         .getRawMany()
-
-        // console.log("getAllMessagesOfRoom");
-        // console.log(roomId);
-
-        // console.log(messages);
-        // return messages
-    // }
 
 }

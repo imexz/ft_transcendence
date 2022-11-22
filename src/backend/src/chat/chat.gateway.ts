@@ -75,13 +75,13 @@ export class ChatGateway {
      {
         if (roomId ) {
           const data: {banned: boolean, room: chatroom} = await this.chatService.manageJoin(client.handshake.auth.id, roomId, password)
-          if (data.banned != undefined && data.banned == false && data.room) {
+          if (data != undefined && data.banned != undefined && data.banned == false && data.room) {
             await this.addUserRooms(client)
             client.emit('UpdateRoom', {change: changedRoom.complet, roomId: roomId, data: data.room })
             client.to(roomId.toString()).emit('UpdateRoom', {change: changedRoom.user, roomId: roomId,  data: client.handshake.auth })
             this.createSystemMessage(roomId, client.handshake.auth.username + " joined the conversation", client)
           }
-          else if (data.banned != undefined && data.banned == true)
+          else if (data != undefined && data.banned != undefined && data.banned == true)
           {
             this.server.to(client.id.toString()).emit("banned", {roomId: roomId, roomName: await this.chatService.getRoomName(roomId)})
           }
@@ -94,14 +94,15 @@ export class ChatGateway {
         @ConnectedSocket() client: Socket,
         ) {
           console.log("leave room", roomId);
-          this.createSystemMessage(roomId, client.handshake.auth.username + " left the conversation", client)
           client.leave(roomId.toString());
           const room = await this.chatService.manageLeave(client.handshake.auth.id, roomId)
-          console.log(room);
-        if (room) {
-          client.to(roomId.toString()).emit('UpdateRoom', {change: changedRoom.user, roomId: roomId,  data: client.handshake.auth})
-          // this.server.to(client).emit('UpdateRoom', {change: changedRoom.complet, roomId: roomId, data: client.handshake.auth})
-        }
+          if (room) {
+            this.server.to(roomId.toString()).emit('UpdateRoom', {change: changedRoom.user, roomId: roomId,  data: client.handshake.auth})
+            this.createSystemMessage(roomId, client.handshake.auth.username + " left the conversation", client)
+            return true
+          }
+          else
+            return false
   }
 
   @SubscribeMessage('action')
@@ -150,9 +151,7 @@ export class ChatGateway {
     content: string,
     client: Socket
     ) {
-      const system: boolean = true
-
-      const message = await this.chatService.createMessage(client.handshake.auth as User, roomId, content, system);
+      const message = await this.chatService.createMessage(client.handshake.auth as User, roomId, content, true);
     if(message) {
       const tmp = {
       senderId: -1,

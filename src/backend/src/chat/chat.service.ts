@@ -80,8 +80,8 @@ export class ChatService {
 
         async createMessage(user: User, roomId:number, content: string, system: boolean) {
             const object = await this.chatroomService.hasUserWriteAccess(user.id, roomId, system)
-            if(object.allowed) {
-              if (system)
+            if(object.allowed || system == true) {
+              if (system == true)
                 user = undefined
               return await this.messageService.userAddMessageToRoom(user, content, object.chatroom, system)
             }
