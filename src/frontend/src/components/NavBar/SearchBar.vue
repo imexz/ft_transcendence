@@ -81,7 +81,7 @@ export default defineComponent({
         withCredentials: true,
       })
         .then(response => { this.users = response.data })
-        .catch()
+        .catch(response => {console.log("not logged in", response)})
     }
   },
   mounted() {

@@ -182,15 +182,22 @@ export default class Chat{
       }
 
       leaveRoom(roomId: number) {
-        this.socketChat.emit('leave', roomId)
-        let room : Room = this.getRoomInfo(roomId)
-        if (room)
-        {
-          room.users = []
-          room.admins = []
-          room.owner = undefined
-          room.messages = []
-        }
+        this.socketChat.emit('leave', roomId, (response) => {
+          let room : Room = this.getRoomInfo(roomId)
+          console.log("RESPONSE HERE AFTER LEAVE", response);
+          if (response == true) {
+            if (room) {
+              room.users = []
+              room.admins = []
+              room.owner = undefined
+              room.messages = []
+            }
+            // @Tobi maybe show toast "Success, you left the room room.roomName"
+            else {
+              //@Tobi maybe show toast "Failure, you are not able to leave the room room.roomName"
+            }
+          }
+        })
       }
 
       getRoomInfo(roomId: number): room {
