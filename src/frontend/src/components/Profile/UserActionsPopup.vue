@@ -86,7 +86,7 @@ import { Status } from '@/enums/models/ResponseEnum';
 import ViewGamePopup from '../Game/ViewGamePopup.vue';
 import Game from '@/models/game';
 import Button from '@/models/button';
-import User from '@/models/user' 
+import User from '@/models/user'
 
 export default defineComponent({
   data() {
@@ -114,7 +114,7 @@ export default defineComponent({
   emits: ['action'],
   methods: {
     toggleDropDown() {
-      this.$emit("action", 'close')
+      this.$emit('action', 'close')
     },
     removeFriend() {
       this.$store.state.socket.emit('Remove', {id: this.user.id})
@@ -307,7 +307,7 @@ export default defineComponent({
     border-radius: 5px;
     padding: 5px;
     white-space: nowrap;
-    
+
     background-color: black;
     visibility: hidden;
     position: absolute;
