@@ -83,7 +83,7 @@ export class ChatGateway {
           }
           else if (data != undefined && data.banned != undefined && data.banned == true)
           {
-            this.server.to(client.id.toString()).emit("banned", {roomId: roomId, roomName: await this.chatService.getRoomName(roomId)})
+            this.server.to(client.id.toString()).emit('banned', {roomId: roomId})
           }
         }
       }
@@ -121,7 +121,7 @@ export class ChatGateway {
         this.createSystemMessage(roomId, socket.handshake.auth.username + " was banned", client)
         socket.leave(roomId.toString())
         this.server.to(roomId.toString()).emit('UpdateRoom', {change: changedRoom.user, roomId: roomId,  data: {id: muteUserId} })
-        this.server.to(socket.id.toString()).emit('banned', {roomId: roomId, roomName: this.chatService.getRoomName(roomId)})
+        this.server.to(socket.id.toString()).emit('banned', {roomId: roomId})
         break;
 
         case AdminAction.toAdmin:

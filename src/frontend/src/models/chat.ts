@@ -125,7 +125,7 @@ export default class Chat{
             //   room = undefined
           })
 
-          this.socketChat.on("banned", (data: {roomId: number, roomName: string}) => {
+          this.socketChat.on("banned", (data: {roomId: number}) => {
             let room : Room = this.getRoomInfo(data.roomId)
             if (room)
             {
@@ -135,8 +135,7 @@ export default class Chat{
               room.messages = []
             }
 
-            let roomName = data.roomName
-            console.warn("YOU ARE BANNED FROM " + roomName);
+            console.warn("YOU ARE BANNED FROM " + room.roomName);
 
             // @Tobi show "You are banned from room.roomName" banner for this user
 
