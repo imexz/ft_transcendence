@@ -1,5 +1,4 @@
 <template>
-  <Toast v-if="showToast" :msg=toastMsg :mode=toastMode />
   <div class="wrapper">
     <h1>Settings</h1>
     <div class="section">
@@ -36,7 +35,6 @@
       </div>
       <hr class="break"/>
       <div class="sectionContent">
-        <!-- <EnableTwoFA/> -->
         <twoFaSettings/>
       </div>
     </div>
@@ -69,8 +67,6 @@ import ChangeUserName from '@/components/Settings/ChangeUserName.vue';
 import twoFaSettings from '@/components/Auth/2FA/twoFaSettings.vue';
 import ChangeUserAvatar from '@/components/Settings/ChangeUserAvatar.vue';
 import EnableTwoFA from '@/components/Auth/2FA/enable2fc.vue';
-import Toast from '@/components/Toast.vue'
-import { ref } from 'vue';
 import { defineComponent } from 'vue';
 import { maxLenUserName } from '@/defines';
 
@@ -80,13 +76,9 @@ export default defineComponent({
     ChangeUserAvatar,
     EnableTwoFA,
     twoFaSettings,
-    Toast,
   },
   data() {
     return {
-      showToast : ref<boolean | null>(false),
-      toastMsg : ref<string>(''),
-      toastMode : ref<string>(''),
       len: maxLenUserName as number,
     }
   },
@@ -95,16 +87,10 @@ export default defineComponent({
       console.log(this.$store.state);
     },
     changeSuccess(msg: string) {
-      this.showToast = true;
-      this.toastMsg = msg;
-      this.toastMode = 'success';
-      setTimeout(() => this.showToast = false, 2000);
+      this.$store.dispatch('triggerToast', {show: true, mode: 'success', msg: msg})
     },
-    changeError(errorMsg: string) {
-      this.showToast = true;
-      this.toastMsg = errorMsg;
-      this.toastMode = 'error';
-      setTimeout(() => this.showToast = false, 2000);
+    changeError(msg: string) {
+      this.$store.dispatch('triggerToast', {show: true, mode: 'error', msg: msg})
     }
   }
 })
@@ -115,7 +101,6 @@ export default defineComponent({
   .wrapper {
     width: 800px;
     margin: auto;
-    /* margin-top: 10px; */
     margin-bottom: 80px;
     display: flex;
     flex-direction: column;

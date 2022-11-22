@@ -1,5 +1,4 @@
 <template>
-  <Toast v-if="showToast" :msg=toastMsg :mode=toastMode />
     <div>
         <div v-if="showQr == false && $store.state.user.isTwoFactorAuthenticationEnabled == false">
             <div> With 2-factor authentication, an extra layer of security is added to your account to prevent someone from logging in, even if they have your password. This extra security measure requires you to verify your identity using a randomized 6-digit code Google Authenticator generate to log in.</div>
@@ -29,8 +28,7 @@
 <script lang="ts">
 import VueAxios from 'axios';
 import { API_URL } from '@/defines';
-import { defineComponent, ref } from 'vue';
-import Toast from '@/components/Toast.vue';
+import { defineComponent } from 'vue';
 
 export default defineComponent({    
     data() {
@@ -38,23 +36,14 @@ export default defineComponent({
             showQr: false,
             QR : API_URL + '/twofa/generate',
             twoFactorAuthenticationCode: '',
-            showToast: ref(false),
-            toastMsg: ref(''),
-            toastMode: ref('')
         }
-    },
-    components: {
-        Toast
     },
     methods: {
         toggleQr: function () {
             this.showQr = !this.showQr;
         },
         triggerToast(msg: string, mode: string) {
-            this.showToast = true;
-            this.toastMsg = msg;
-            this.toastMode = mode;
-            setTimeout(() => this.showToast = false, 2000);
+          this.$store.dispatch('triggerToast', {msg: msg, mode: mode, show: true})
         },
         on() {
             VueAxios({

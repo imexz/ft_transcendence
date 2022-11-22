@@ -80,7 +80,6 @@ export default defineComponent({
       }
     },
     customEmit(emitMsg){
-      console.log(emitMsg)
       this.$emit('action', emitMsg, this.user.id)
     },
     response(status: Status){
@@ -90,7 +89,6 @@ export default defineComponent({
         this.$store.commit("removeFriend", this.user.id)
       }
       this.$store.state.socket.emit('Response', {id: this.user.id, status: status})
-      console.log("response", status)
     },
     viewProfile(id: number){
       this.toggleDropdown()

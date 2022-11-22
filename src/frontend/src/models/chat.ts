@@ -135,11 +135,9 @@ export default class Chat{
               room.messages = []
             }
 
-            let roomName = data.roomName
-            console.warn("YOU ARE BANNED FROM " + roomName);
-
-            // @Tobi show "You are banned from room.roomName" banner for this user
-
+            let roomName = room.roomName
+            const msg = "You are banned from " + roomName;
+            store.dispatch('triggerToast', {show: true, mode: 'banned', msg: msg})
           })
 
     }
@@ -191,11 +189,11 @@ export default class Chat{
               room.admins = []
               room.owner = undefined
               room.messages = []
+              store.dispatch('triggerToast', {show: true, mode: 'success', msg: "You left " + room.roomName})
             }
-            // @Tobi maybe show toast "Success, you left the room room.roomName"
-            else {
-              //@Tobi maybe show toast "Failure, you are not able to leave the room room.roomName"
-            }
+          }
+          else {
+            store.dispatch('triggerToast', {show: true, mode: 'error', msg: "You can not leave " + room.roomName})
           }
         })
       }
