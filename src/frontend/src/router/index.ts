@@ -14,10 +14,7 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/api_test',
     name: 'api_test',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/ApiTestView.vue')
+    component: () => import('../views/ApiTestView.vue')
   },
   {
     path: '/login',
@@ -66,9 +63,10 @@ const router = createRouter({
 router.beforeEach(async (to) => {
   const publicPages = ['/login', '/login/tfa'];
   const authRequired = !publicPages.includes(to.path);
-
   if (authRequired && store.state.user == null) {
-    return '/login';
+    await store.dispatch('validateUser')
+    if (store.state.user == null)
+      return '/login';
   }
 })
 

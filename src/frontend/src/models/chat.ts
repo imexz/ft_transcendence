@@ -133,11 +133,10 @@ export default class Chat{
               room.admins = []
               room.owner = undefined
               room.messages = []
+              const msg = "You are banned from " + room.roomName;
+              store.dispatch('triggerToast', {show: true, mode: 'banned', msg: msg})
             }
 
-            let roomName = room.roomName
-            const msg = "You are banned from " + roomName;
-            store.dispatch('triggerToast', {show: true, mode: 'banned', msg: msg})
           })
 
     }

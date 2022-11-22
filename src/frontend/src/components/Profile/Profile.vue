@@ -15,7 +15,7 @@
       </p>
     </div>
   </div>
-  <div v-if="id!=$store.state.user.id && id !='0'" class="userActions">
+  <div v-if="id!=$store.state.user?.id && id !='0'" class="userActions">
     <UserActionsPopup v-if="user != null" :user="user"/>
   </div>
 </template>
@@ -45,7 +45,7 @@ export default defineComponent({
   },
   methods: {
     fetchUser(){
-      let uId = (this.id != "0")?this.id:this.$store.state.user.id
+      let uId = (this.id != "0")?this.id:this.$store.state?.user.id
       VueAxios({
           url: '/users/find/' + uId,
           baseURL: API_URL,
