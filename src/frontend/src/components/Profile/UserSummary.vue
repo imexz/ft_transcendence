@@ -1,22 +1,24 @@
 <template>
   <div class="userSummary">
-    <div class="normalView">
-      <img :src="user?.avatar_url" alt="Avatar">
-      <div>
-        <div>
-          <span>{{ user?.username }}</span>
+    <div class="userInfoBar">
+      <img id="userAvatar" :src="user?.avatar_url" alt="Avatar">
+      <div id="middleSection">
+        <div id="userName">
+          <div>
+            <span>{{ user?.username }}</span>
+          </div>
+          <div style="margin-top: -15px">
+            <text class="status"> {{ UserStatus[user?.userStatus] }} </text>
+          </div>
         </div>
-        <div style="margin-top: -15px">
-          <text class="status"> {{ UserStatus[user?.userStatus] }} </text>
+        <div v-if="user?.friendStatus == Status.requsted" >
+          <button @click="response(2)" class="friendButton">
+            <font-awesome-icon icon="fa-solid fa-check" />
+          </button>
+          <button @click="response(3)" class="friendButton">
+            <font-awesome-icon icon="fa-solid fa-x" />
+          </button>
         </div>
-      </div>
-      <div v-if="user?.friendStatus == Status.requsted" >
-        <button @click="response(2)" class="friendButton">
-          <font-awesome-icon icon="fa-solid fa-check" />
-        </button>
-        <button @click="response(3)" class="friendButton">
-          <font-awesome-icon icon="fa-solid fa-x" />
-        </button>
       </div>
       <div>
         <div v-if="user?.id != this.$store.state.user.id" class="toggleDropdown" @click="toggleDropdown">
@@ -107,20 +109,28 @@ export default defineComponent({
         window.addEventListener('click', this.hideDropDown)
       this.show = !this.show
     },
-   
-
   },
 })
 
 </script>
 
 <style scoped>
-  img {
+  #userAvatar {
     width: 50px;
     height: 50px;
     border-radius: 50%;
     border: 1px solid var(--ft_cyan);
     object-fit: cover;
+  }
+
+  #userName {
+    overflow: hidden;
+  }
+
+  #middleSection {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
   }
   .userSummary {
     position: relative;
@@ -128,13 +138,12 @@ export default defineComponent({
     border: 2px solid;
     border-image: linear-gradient(90deg, var(--ft_cyan), var(--ft_pink)) 1;
   }
-  .normalView {
+  .userInfoBar {
     padding: 5px;
     font-size: 25px;
     font-weight: bold;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: 50px auto 50px;
   }
   .dropdownMenu {
     display: flex;
@@ -148,23 +157,13 @@ export default defineComponent({
     left: -2px;
     z-index: 1;
   }
-  .dropdownElement {
-    /* width: 17%; */
-    font-size: 25px;
-    font-weight: bold;
-    text-align: center;
-    color: var(--ft_cyan);
-    background-color: var(--ft_dark);
-    border: 1px solid var(--ft_cyan);
-    border-radius: 5px;
-    margin: 3px;
-  }
   .toggleDropdown {
     padding: 10px;
-    align-items: center;
-    display: flex;
     border: 1px solid var(--ft_cyan);
     border-radius: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
   .toggleDropdown:active {
     transform: translateY(1px);
@@ -173,62 +172,6 @@ export default defineComponent({
   .toggleDropdown:hover {
     color: var(--ft_dark_purple);
     background-color: var(--ft_cyan);
-  }
-  .dropdownElement:active {
-    transform: translateY(1px);
-  }
-  .dropdownElement:hover {
-    background-color: var(--ft_dark_purple);
-
-  }
-  .dmPopUp {
-    position: absolute;
-    top: 108px;
-    left: -2px;
-    width: 100%;
-    /* height: 350px; */
-    color: var(--ft_cyan);
-    background-color: var(--ft_dark);
-    border: 1px solid var(--ft_cyan);
-    border-radius: 5px;
-    z-index: 11;
-  }
-  .txt {
-    font-size: 25px;
-    font-weight: bold;
-    width: 100%;
-    border-bottom: 1px solid var(--ft_cyan);
-    padding-top: 10px;
-    padding-bottom: 10px;
-  }
-
-  .dmButton {
-    color: var(--ft_cyan);
-    border: 1px solid var(--ft_cyan);
-    border-radius: 5px;
-    background-color: var(--ft_dark);
-    padding: 5px 8px;
-    font-size: 15px;
-    margin: 10px 0px 10px 0px;
-  }
-  .dmButton:active {
-    transform: translateY(1px);
-  }
-  .dmButton:hover {
-    color: var(--ft_dark);
-    background-color: var(--ft_cyan);
-  }
-
-  .dmText {
-    font-family: Avenir, Helvetica, Arial, sans-serif;
-    resize: none;
-    color: var(--ft_cyan);
-    background-color: var(--ft_dark);
-    padding: 5px 8px;
-    border-color: var(--ft_cyan);
-    border-radius: 5px;
-    margin-top: 10px;
-    width: 85%;
   }
 
   .status {
@@ -253,60 +196,4 @@ export default defineComponent({
     color: var(--ft_dark);
   }
 
-  .headLineWrapper {
-    margin-top: 15px;
-    margin-bottom: 15px;
-    padding-bottom: 10px;
-    padding-left: 15px;
-    padding-right: 15px;
-    border-bottom: 1px solid var(--ft_cyan);
-    display: flex;
-    justify-content: space-between;
-  }
-
-  .headLine {
-    font-size: 25px;
-    font-weight: bold;
-  }
-
-  .exitButton {
-    height: 30px;
-    width: 30px;
-    font-weight: bold;
-    padding: 3px;
-    border-radius: 50%;
-    border: 2px solid var(--ft_pink);
-    color: var(--ft_pink);
-    background-color: var(--ft_dark);
-  }
-  .exitButton:hover {
-    color: var(--ft_dark);
-    background-color: var(--ft_pink);
-  }
-
-  .box {
-    position: relative;
-    overflow: inherit;
-  }
-  .tooltip {
-    border: 1px solid var(--ft_cyan);
-    border-radius: 5px;
-    padding: 5px;
-    white-space: nowrap;
-    
-    background-color: black;
-    visibility: hidden;
-    position: absolute;
-    font-size: 15px;
-    font-weight: normal;
-  }
-  .left {
-    left: 0px;
-  }
-  .right {
-    right: 0px;
-  }
-  .box:hover .tooltip {
-    visibility: visible;
-  }
 </style>

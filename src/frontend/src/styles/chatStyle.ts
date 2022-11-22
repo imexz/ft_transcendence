@@ -13,8 +13,8 @@ export const customChatStyle = {
 },
 
 container: {
-  border: '2px solid #0cfbfe',
-  borderRadius: '0px',
+  border: '0px solid #0cfbfe',
+  borderRadius: '0px 0px 10px 10px',
   boxShadow:
     '0px 1px 2px 0px rgba(0, 0, 0, 0.14), 0px 1px 5px 0px rgba(0, 0, 0, 0.12)'
 },
