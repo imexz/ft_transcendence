@@ -22,7 +22,7 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
 			profileFields: {
 				'name.givenName': 'login', //username
 				'id': function (obj) { return String(obj.id); },
-				'image_url': 'image_url',
+				'image_url': function (obj) { return obj.image.link},
 			}
 		});
 	}
