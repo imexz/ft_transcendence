@@ -135,13 +135,9 @@ export default class Chat{
               room.messages = []
             }
 
-            let roomName = data.roomName
-            console.warn("YOU ARE BANNED FROM " + roomName);
-            const msg = "YOU ARE BANNED FROM " + roomName;
-            console.log(msg)
+            let roomName = room.roomName
+            const msg = "You are banned from " + roomName;
             store.dispatch('triggerToast', {show: true, mode: 'banned', msg: msg})
-            // @Tobi show "You are banned from room.roomName" banner for this user
-
           })
 
     }
