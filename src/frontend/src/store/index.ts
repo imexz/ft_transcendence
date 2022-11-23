@@ -119,6 +119,8 @@ export default createStore<State>({
 	    })
       state.socket.on('Request',(data) => {
         state.friendsList.push(data)
+        state.NrFriendRequests++
+        console.log("receive  request");
       })
       state.socket.on('updateFriend', (data) => {
         console.log("updateFriend", data);

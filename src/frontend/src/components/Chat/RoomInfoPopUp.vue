@@ -134,7 +134,7 @@ export default defineComponent({
       })
     },
     closePopUp(){
-      this.$emit("action", "exit")
+      this.$emit('action', "exit")
     }
   },
   components: {
