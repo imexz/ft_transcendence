@@ -37,13 +37,37 @@ export interface State {
   chat: Chat
   loser: User | null
   customized: boolean
+
+  toastShow: boolean
+  toastMode: string
+  toastMsg: string
 }
 
-const storage = localStorage.getItem('user')
+const storage = localStorage.getItem('user');
 const user = storage?JSON.parse(storage):null;
-const initialState = user?
-{ validated: true, user: user, socket: null,  socketChat: null,  socketGame: null, friendsList: null, NrMessages: 0, NrFriendRequests: 0, requester: null, game: null, winner: null, loser: null, customized: false, chat: null }:
-{ validated: false, user: null,  socket: null,  socketChat: null,  socketGame: null, friendsList: null, NrMessages: 0, NrFriendRequests: 0, requester: null, game: null, winner: null, loser: null, customized: false, chat: null };
+const initialState = {
+  validated: false,
+  user: null,
+  socket: null,
+  socketChat: null,
+  socketGame: null,
+  friendsList: null,
+  NrMessages: 0,
+  NrFriendRequests: 0,
+  requester: null,
+  game: null,
+  winner: null,
+  loser: null,
+  customized: false,
+  chat: null,
+  toastShow: false,
+  toastMode: "",
+  toastMsg: "",
+}
+if (user != null) {
+  initialState.user = user;
+  initialState.validated = true;
+}
 
 export default createStore<State>({
 
@@ -54,19 +78,13 @@ export default createStore<State>({
   mutations: {
     logOut(state) {
       state.validated = false;
-      console.log("store logOut()");
       state.socketGame?.emit('leaveGame')
       state.socket?.disconnect();
-	    state.socketGame?.disconnect(); //added
+	    state.socketGame?.disconnect();
     },
     logIn(state, user) {
-
-      // console.log("logIn");
-
       state.validated = true;
       state.user = user;
-      console.log("logIn index", user);
-
       state.socket = io(API_URL, {
           auth: {
               id: document.cookie
@@ -79,9 +97,6 @@ export default createStore<State>({
       })
       state.chat = new Chat()
 
-      // console.log("game socket init");
-      console.log(document.cookie);
-
 	    state.socketGame.on('disconnecting', () => {
 		    console.log("game socket disconnecting");
 		    console.log(state.socketGame);
@@ -89,11 +104,8 @@ export default createStore<State>({
 
       state.socketGame.on('GameRequestFrontend',(user: User) => {
         state.requester = user;
-        console.log("receive askformatch");
       })
       state.socketGame.on('NowInGame', (cb) => {
-        // state.game = game;
-        console.log("receive NowInGame");
         if (cb) {
 			    router.push('/play')
 		    } else {
@@ -102,7 +114,6 @@ export default createStore<State>({
         }
       })
 	    state.socketGame.on('resetRequester', () => {
-		    console.log("receive resetRequester");
 		    state.requester = null;
 	    })
       state.socket.on('Request',(data) => {
@@ -118,7 +129,6 @@ export default createStore<State>({
       state.user.isTwoFactorAuthenticationEnabled = enable;
     },
     setFriendsList(state, friendsList) {
-      // console.log(friendsList);
       state.friendsList = friendsList;
     },
     addFriend(state, user) {
@@ -128,18 +138,21 @@ export default createStore<State>({
       const index = state.friendsList?.findIndex(element => element.id == id)
       if (index != -1)
         state.friendsList?.splice(state.friendsList?.findIndex(element => element.id == id) , 1)
-    }
-
+    },
+    changeToast(state, toastObj: {show: boolean, mode: string, msg: string}) {
+      state.toastShow = toastObj.show;
+      state.toastMode = toastObj.mode;
+      state.toastMsg = toastObj.msg;
+    },
   },
   actions: {
     logOut({ commit }) {
+      if (router.currentRoute.value.path != '/login/tfa')
+        router.push("/login");
       commit('logOut');
       document.cookie = "Authentication=; expires=Thu, 01 Jan 1970 00:00:00 GMT;SameSite=Lax"
       localStorage.removeItem('user');
       this.state.user = null;
-      // console.log(router.currentRoute.value.path)
-      if (router.currentRoute.value.path != '/login/tfa')
-        router.push("/login");
     },
     validateUser({ commit, dispatch }){
       return VueAxios({
@@ -151,14 +164,12 @@ export default createStore<State>({
       .then(response => {
         commit('logIn', response.data)
         localStorage.setItem('user', JSON.stringify(user));
-
-
           return true
         }
       )
       .catch(error => {
-        // console.log(error);
-
+          // this.dispatch('triggerToast', {mode: 'error', show: true, msg: 'Could not validate user'})
+          console.log(error)
           dispatch('logOut')
         }
       )
@@ -171,17 +182,22 @@ export default createStore<State>({
         withCredentials: true,
       })
       .then(response => { commit('setFriendsList', response.data) } )
-      .catch()
+      .catch(error => console.log(error))
     },
     updateRooms({ commit }, room ) {
-      console.log("index.rooms", room);
       commit('addRoom', room);
     },
     logIn({ commit }, user) {
       commit("logIn", user)
+    },
+    triggerToast({commit}, toastObj:{show: boolean, mode: string, msg: string}) {
+      commit('changeToast', toastObj);
+      const toastReset = {
+        show: false,
+        mode: "",
+        msg: ""
+      }
+      setTimeout(() => this.commit('changeToast', toastReset), 2200)
     }
   },
-
-  modules: {
-  }
 })
