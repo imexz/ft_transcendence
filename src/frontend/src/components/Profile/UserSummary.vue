@@ -9,9 +9,6 @@
           </div>
           <div style="margin-top: -15px">
             <text class="status"> {{ UserStatus[user?.userStatus] }} </text>
-            <div v-if="user?.friendStatus == Status.pending">
-              <text class="friendStatus"> {{ Status[user?.friendStatus].toString() }} </text>
-            </div>
           </div>
         </div>
         <div v-if="user?.friendStatus == Status.requsted" >
@@ -21,6 +18,9 @@
           <button @click="response(3)" class="friendButton">
             <font-awesome-icon icon="fa-solid fa-x" />
           </button>
+        </div>
+        <div v-if="user?.friendStatus == Status.pending">
+          <text id="pendingTxt">pending</text>
         </div>
       </div>
       <div>
@@ -60,6 +60,10 @@ export default defineComponent({
       game: null as Game,
     }
   },
+  mounted() {
+    console.log(this.user)
+  }
+  ,
   props : {
     user: {
       type: Object,
@@ -132,8 +136,13 @@ export default defineComponent({
 
   #middleSection {
     display: flex;
-    justify-content: center;
+    justify-content: space-evenly;
+    align-items: center;
     gap: 10px;
+  }
+
+  #pendingTxt {
+    font-size: 15px;
   }
   .userSummary {
     position: relative;
@@ -182,7 +191,6 @@ export default defineComponent({
     font-family: Avenir, Helvetica, Arial, sans-serif;
     resize: none;
     color: var(--ft_cyan);
-    background-color: var(--ft_dark);
     font-size: 10px
   }
 
@@ -199,5 +207,11 @@ export default defineComponent({
     background-color: var(--ft_cyan);
     color: var(--ft_dark);
   }
+
+  .pending {
+    background-color: var(--ft_dark_purple);
+  }
+  
+
 
 </style>
