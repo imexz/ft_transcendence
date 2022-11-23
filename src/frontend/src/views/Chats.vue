@@ -26,7 +26,6 @@
         :load-first-room="false"
         :user-tags-enabled="false"
         @send-message="sendMessage($event.detail[0])"
-        @send-message-reaction="sendMessageReaction($event.detail[0])"
         @add-room="toggleCreateRoom"
         @room-action-handler="roomActionHandler($event.detail[0])"
         @room-info="roomInfo($event.detail[0])"
@@ -43,7 +42,7 @@
     </div>
     <div>
 
-      <div v-if="roomInfoPopUp" class="roomInfoPopUp" ref="roomInfo">
+      <div v-if="roomInfoPopUp" class="roomInfoPopUp">
         <roomInfoPopUp :room="roomInfoData" @action="roomInfoActions"/>
       </div>
     </div>
@@ -51,12 +50,11 @@
 </template>
 
   <script lang="ts">
-  import { defineComponent, ref } from 'vue';
+  import { defineComponent } from 'vue';
   import createRoomPopup from '@/components/Chat/createRoomPopup.vue';
   import joinRoomPopup from '@/components/Chat/joinRoomPopup.vue';
   import roomInfoPopUp from '@/components/Chat/RoomInfoPopUp.vue';
   import { customChatStyle } from "@/styles/chatStyle";
-  import Toast from "@/components/Footer/Toast.vue";
   import Message from '@/models/message';
   import Room from '@/models/room';
   import { Access } from '@/models/room';
@@ -84,7 +82,7 @@
           ],
           roomActionAdmin: { name: 'settings', title: 'Settings'},
           createRoomPopUp: false as boolean,
-          PoppupJoin: ref(false),
+          // PoppupJoin: ref(false),
           roomInfoPopUp: false,
           roomInfoData: null as Object | null,
           password: '',
@@ -98,7 +96,6 @@
         createRoomPopup,
         joinRoomPopup,
         roomInfoPopUp,
-        Toast,
       },
       computed: {
         compRooms () {

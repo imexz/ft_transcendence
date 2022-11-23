@@ -52,6 +52,10 @@ library.add(
 
 const app = createApp(App)
 
+// app.config.compilerOptions.isCustomElement = (tag) => {
+//   return tag.startsWith('vue-advanced-')
+// }
+
 // app.config.globalProperties.$socketio =
 // app.config.globalProperties.$socketgame = app.config.globalProperties.$socketchat = app.config.globalProperties.$socketio;
 
