@@ -4,54 +4,54 @@
       <div id="bannerName">Chat</div>
     </div>
     <div>
-    <vue-advanced-chat
-      :height="height"
-      :current-user-id="currentUserId"
-      :rooms.prop=rooms
-      :rooms = comprooms
-      :messages.prop= messages
-      :messages= compmessages
-      :room-actions="JSON.stringify(roomActions)"
-      :rooms-loaded="true"
-      :messages-loaded="messagesLoaded"
-      :message-actions="JSON.stringify(messageActions)"
-      :username-options="JSON.stringify(usernameOptions)"
-      :show-audio="false"
-      :show-files="false"
-      :show-reaction-emojis="false"
-      :room-info-enabled="true"
-      :show-new-messages-divider="false"
-      :styles="JSON.stringify(style)"
-      :spinner-icon-messages="{}"
-      :load-first-room="false"
-      :user-tags-enabled="false"
-      @send-message="sendMessage($event.detail[0])"
-      @send-message-reaction="sendMessageReaction($event.detail[0])"
-      @add-room="toggleCreateRoom"
-      @room-action-handler="roomActionHandler($event.detail[0])"
-      @room-info="roomInfo($event.detail[0])"
-      @toggle-rooms-list="toggleRoomsList($event.detail[0])"
-      @fetch-messages="putMessages($event.detail[0])"
-      @delete-message="deleteMessage($event.detail[0])"
-      @message-action-handler="messageActionHandler($event.detail[0])"
-    >
-    </vue-advanced-chat>
-  </div>
+      <vue-advanced-chat
+        :height="height"
+        :current-user-id="currentUserId"
+        :rooms.prop=rooms
+        :rooms = compRooms
+        :messages.prop= messages
+        :messages= compMessages
+        :room-actions="JSON.stringify(roomActions)"
+        :rooms-loaded="true"
+        :messages-loaded="messagesLoaded"
+        :message-actions="JSON.stringify(messageActions)"
+        :username-options="JSON.stringify(usernameOptions)"
+        :show-audio="false"
+        :show-files="false"
+        :show-reaction-emojis="false"
+        :room-info-enabled="true"
+        :show-new-messages-divider="false"
+        :styles="JSON.stringify(style)"
+        :spinner-icon-messages="{}"
+        :load-first-room="false"
+        :user-tags-enabled="false"
+        @send-message="sendMessage($event.detail[0])"
+        @send-message-reaction="sendMessageReaction($event.detail[0])"
+        @add-room="toggleCreateRoom"
+        @room-action-handler="roomActionHandler($event.detail[0])"
+        @room-info="roomInfo($event.detail[0])"
+        @toggle-rooms-list="toggleRoomsList($event.detail[0])"
+        @fetch-messages="putMessages($event.detail[0])"
+        @delete-message="deleteMessage($event.detail[0])"
+        @message-action-handler="messageActionHandler($event.detail[0])"
+      >
+      </vue-advanced-chat>
+    </div>
     <div class="chatFooter"></div>
     <div v-if="createRoomPopUp" class="createRoomPopUp">
       <createRoomPopup @actions="createRoomActions"/>
     </div>
-    <div v-if="roomInfoPopUp" class="roomInfoPopUp">
-      <roomInfoPopUp :room="roomInfoData" @action="roomInfoActions"/>
+    <div>
+
+      <div v-if="roomInfoPopUp" class="roomInfoPopUp" ref="roomInfo">
+        <roomInfoPopUp :room="roomInfoData" @action="roomInfoActions"/>
+      </div>
     </div>
   </div>
 </template>
 
   <script lang="ts">
-  // import { io, Socket } from 'socket.io-client';
   import { defineComponent, ref } from 'vue';
-  // import VueAxios from 'axios';
-  // import { API_URL } from '@/defines';
   import createRoomPopup from '@/components/Chat/createRoomPopup.vue';
   import joinRoomPopup from '@/components/Chat/joinRoomPopup.vue';
   import roomInfoPopUp from '@/components/Chat/RoomInfoPopUp.vue';
@@ -89,7 +89,6 @@
           roomInfoData: null as Object | null,
           password: '',
           timeout: 0,
-          // typing: false,
   		    socket: null,
           chatTheme: "dark",
           showEmojis: true,
@@ -102,69 +101,33 @@
         Toast,
       },
       computed: {
-        comprooms () {
-          console.log("rooms computed", this.$store.state.chat?.rooms)
-          // return this.$store.state.chat?.rooms
+        compRooms () {
           this.rooms = this.$store.state.chat?.rooms
           this.rooms.forEach(element => {
             let room = this.$store.state.chat.rooms.find(elem => elem.roomId == element.roomId)
             element.unreadCount = room.unreadCount
-            console.log("unreadCount updated", element.roomId, element.unreadCount);
-
             element.users = room.users
-            console.log("users changed", element.roomId, element.users);
-
             element.access = room.access
-            console.log("users changed", element.roomId, element.access);
-
           });
           this.rooms = [...this.rooms]
         },
-        compmessages () {
-          // console.log(new Date().getMilliseconds());
+        compMessages () {
           this.messagesLoaded = false
           if (this.currentRoomId)
           {
-            console.log("messages computed for ", this.currentRoomId);
-
             const currentRoom : Room = this.rooms.find(elem => elem.roomId == this.currentRoomId)
-            // console.log(currentRoom);
             currentRoom.unreadCount = 0
             if (currentRoom.messages.length < 1)
-            {
-              // return []
               this.messages = []
-            }
             else
-            {
-              // console.log("end compute", currentRoom.messages);
-
-              // return currentRoom.messages
               this.messages = currentRoom.messages
-            }
           }
           else
-          {
-            console.log("messages computed empty");
-
-            // return []
             this.messages = []
-          }
-
-            // return this.$store.state.chat?.getMessages(this.currentRoomId)
-            // this.messages = this.$store.state.chat?.getMessages(this.currentRoomId)
-
-            // console.log(new Date().getMilliseconds());
-
         },
       },
       updated() {
-
         this.messagesLoaded = true
-        // console.log(new Date().getMilliseconds());
-        // console.log("rooms = " , this.rooms)
-        // console.log("messages = ", this.messages);
-
       },
       methods: {
         async initChatInfoListener() {
@@ -179,140 +142,29 @@
           this.$store.dispatch('triggerToast', {msg: msg, mode: 'error', show: true})
         },
         putMessages({room}) {
-          // console.log(new Date().getMilliseconds());
           this.currentRoomId = undefined
-          // this.compmessages
           this.messages = []
-          console.log("putMessages");
           this.currentRoomId = room.roomId
-          // console.log(new Date().getMilliseconds());
-
-          // this.updateMessages(room.roomId)
-          // this.messagesLoaded = true;
         },
 
         sendMessage({ roomId, content}) {
-          console.log("createMessage");
-          console.log(roomId);
           this.$store.state.chat.socketChat.emit('createMessage', { roomId: roomId, content: content}, (response) =>
           {
-            // console.log("createMessage response");
-            // console.log(response);
-            // this.addMessage(response)
-            console.log("messages was sent", response);
-
-          })
-        },
-        sendMessageReaction({ roomId, messageId, reaction, remove }) {
-          console.log("createMessageReaction");
-          console.log(roomId);
-          this.$store.state.chat.socketChat.emit('createMessageReaction', { messageId: messageId, reaction: reaction, remove: remove}, (response) =>
-          {
-            console.log("createMessageReaction response");
-            console.log(response);
-            // this.addMessage(response)
+            // console.log("messages was sent", response);
           })
         },
         toggleCreateRoom() {
-          console.log("pupUp isOpen:", this.createRoomPopUp)
-          // if (this.createRoomPopUp)
-          //   window.removeEventListener('click', this.hideCreateRoom)
-          // else
-          //   window.addEventListener('click', this.hideCreateRoom)
           this.createRoomPopUp = !this.createRoomPopUp
         },
-        hideCreateRoom(e) {
-          console.log("hi")
-          if (!this.$el.contains(e.target)) {
-            this.toggleCreateRoom()
-          }
-        },
-        makePopupCreate() {
-          console.log("makePopupCreate");
-          this.PoppupCreate = !this.PoppupCreate
-          // if (this.PoppupCreate == false) {
-          //   // this.getRooms()
-          //   // this.initSocket()
-          // }
-          console.log(this.PoppupCreate);
-        },
-        // makePopupJoin(roomId) {
-        //   console.log("makePopupJoin");
-        //   console.log(roomId)
-        //   this.PoppupJoin = !this.PoppupJoin
-        //   if (this.PoppupJoin == false) {
-        //     console.log("clicked on join");
-
-        //     this.$store.state.socket.emit('join', {roomId: roomId, password: this.password})
-        //   }
-        //   console.log(this.PoppupJoin);
-        // },
-        // emitTyping({ roomId, message }) {
-        //   console.log("emitTyping");
-        //   console.log(roomId);
-        //   console.log(this.timeout);
-        //   if(this.typing == false)
-        //   {
-        //     this.$store.state.chat.socketChat.emit('typing', {isTyping: true, roomId: roomId});
-        //     this.typing = true
-
-        //     this.timeout = setTimeout(() => {
-        //       if(this.typing == true) {
-        //         this.$store.state.chat.socketChat.emit('typing', { isTyping: false, roomId: roomId});
-        //         this.typing = false
-        //       }
-        //     }, 2000);
-        //   }
-        //   console.log("emit typing ende");
-        // },
-        fillMessagesData(){
-          // this.rooms.forEach(
-          //   messages => messages.forEach(
-          //     username => username = "test"
-          //   )
-          // )
-        },
-        // getRooms(){
-        //     // VueAxios({
-        //     //     url: '/chatroom/all',
-        //     //     baseURL: API_URL,
-        //     //     method: 'GET',
-        //     //     withCredentials: true,
-        //     // })
-        //     //     .then(response => {
-        //     //     console.log(response.data);
-
-        //         // this.rooms = response.data
-        //         // })
-        //         // .catch()
-        //     this.rooms = this.$store.state.rooms;
-        //     this.fillMessagesData();
-        //     console.log("get rooms: ", this.rooms);
-
-        // },
-        // initSocket(){
-        //   this.$store.state.chat.socketChat = this.$store.state.chat.socketChat
-        //   if (this.$store.state.chat.socketChat){
-        //     this.$store.state.chat.socketChat.off('message')
-        //   }
-        //   console.log("initSocket")
-        // },
         async roomActionHandler({ roomId, action }) {
-          console.log("roomActionHandler");
-          console.log(action);
-          console.log(roomId);
           switch (action.name) {
             case 'join':
-              console.log("case join");
               for (let index = 0; index < this.rooms.length; index++) {
                 if(this.rooms[index].roomId == roomId)
                 {
-                  console.log("next")
                   var result: string = undefined
                   if (this.rooms[index].access == Access.protected)
                   {
-                    console.log(this.rooms[index]);
-
                     result = prompt("This room is protected\n password", "password") // @Tobi please rework this popup so it matches the style of our website, can be triggered by trying to join a protected room
                   }
 
@@ -327,56 +179,21 @@
 
                       // this.updateMessages(roomId)
                     })
-
-
-                    console.log(this.messages);
-
-                    console.log("after join");
-
-                    //  this.updateMessages(roomId))
                 }
               }
-
-              // this.updateMessages(roomId)
               break;
               case 'leave':
-                // this.updateMessages(roomId)
-                // this.$store.state.chat.socketChat.emit('leave', roomId)
-                // let room : Room = this.$store.state.rooms.find(elem => elem.roomId == roomId)
-                // if (room)
-                // {
-                //   room.users = []
-                //   room.admins = []
-                //   room.owner = undefined
-                //   room.messages = []
-                // }
                 this.$store.state.chat.leaveRoom(roomId)
-                // let viewRoom = this.rooms.find(elem => elem.roomId == roomId)
-                // if (viewRoom)
-                //   viewRoom = room
                 break;
               default:
-                console.log("Room action was not recognized");
-
                 this.$store.state.chat.socketChat.emit(action.name, roomId)
               break;
           }
         },
         roomInfo({ roomId }) {
-          // this.$store.state.chat.socketChat.emit(
-          //   'roomInfo',
-          //   {roomId: roomId},
-          //   data => {
-          //     this.roomInfoData = data
-          //     console.log("roomInfoData", data)
-          //     this.toggleRoomInfo()
-          //   }
-          // );
           this.roomInfoData = this.$store.state.chat?.getRoomInfo(roomId)
-          console.log("roomInfoData", this.roomInfoData);
-
           if(this.roomInfoData != undefined && this.roomInfoData.users.findIndex(elem => elem.id == this.currentUserId) != -1)
-              this.toggleRoomInfo()
+              this.activateRoomInfo()
         },
         roomInfoActions(emitMsg, userId, room){
           switch(emitMsg){
@@ -394,10 +211,8 @@
         createRoomActions(emitMsg) {
           switch(emitMsg){
             case "success":
-              // this.getRooms();
               this.toggleCreateRoom();
               this.changeSuccess("Room created")
-              // this.rooms = this.$store.state.chat?.rooms
               break;
             case "error":
               this.toggleCreateRoom();
@@ -406,27 +221,20 @@
             case "exit":
               this.toggleCreateRoom();
               break;
-            case "success":
-
             default:
               break;
           }
         },
         toggleRoomsList(data) {
-          console.log("clicked on toggle rooms list",data);
-          // let old = this.currentRoomId
           if (data.opened == true)
           {
             this.messages = []
             this.putMessages({room: {roomId: this.currentRoomId}})
-            //   // this.currentRoomId = undefined
           }
           else
           {
             this.messages = []
             this.putMessages({room: {roomId: this.currentRoomId}})
-            //   // this.currentRoomId = undefined
-          //   // this.currentRoomId = old
           }
 
         },
@@ -436,26 +244,21 @@
         banUser(userId, roomId){
           console.log("Requesting ban of:", userId, "in room:", roomId)
         },
+        activateRoomInfo(){
+          this.roomInfoPopUp = true;
+        },
+        deactivateRoomInfo(){
+          this.roomInfoPopUp = false;
+
+        },
         toggleRoomInfo() {
-          console.log("toggleRoomInfo");
           if (this.roomInfoPopUp)
-            window.removeEventListener('click', this.hideRoomInfo)
+            this.deactivateRoomInfo()
           else
-            window.addEventListener('click', this.hideRoomInfo)
-          this.roomInfoPopUp = !this.roomInfoPopUp
-          console.log("toggleRoomInfo ende");
+            this.activateRoomInfo();
         },
-        hideRoomInfo(e) {
-          console.log("hideRoomInfo");
-          if (this.$el.contains(e.target)) {
-            this.toggleRoomInfo()
-          }
-        },
+
         messageActionHandler({ roomId, action, message }) {
-          console.log("messageActionHandler")
-          console.log(roomId)
-          console.log(action)
-          console.log(message)
           switch (action.name) {
             case 'block':
               {
@@ -470,7 +273,6 @@
           }
         },
         deleteMessage({message}) {
-          console.log("delete requested")
           const messages = this.messages
           const index = messages.findIndex(element => element._id == message._id)
           if (index != -1)
@@ -480,119 +282,21 @@
             this.$store.state.chat.socketChat.emit('deleteMessage', {messageId: message._id}, () => { console.log("success delete");})
           }
         },
-        // addMessage(message) {
-        //   console.log("addMessage", message);
-        //   console.log(this.messages.length);
-        //   // let messages = [] as Message[]
-        //   // let i = 0
-        //   // for (; i < this.messages.length; i++) {
-        //   //   messages[i] = new Message(this.messages[i], this.Room.findUser(this.messages[i].senderId))
-        //   // }
-        //   // messages = this.messages;
-        //   this.messages[this.messages.length] = new Message(message)
-        //   // this.messages = messages
-        //   console.log(this.messages.length);
-        //   console.log(this.messages[this.messages.length - 1]);
-        //   console.log(this.messages[this.messages.length - 2]);
-
-        //   console.log("addMessage ende");
-        // }
-
       },
       created() {
-        console.log("created");
         this.$store.state.NrMessages = 0;
-        // this.messages
-        // this.rooms = this.$store.state.getRooms
-      },
-      beforeMount() {
-        // this.initSocket();
-        // console.log("beforeMount", this.$store.state.chat.socketChat);
       },
       async mounted() {
         await this.initChatInfoListener()
         this.$store.state.NrMessages = undefined
-        console.log("MOUNT", this.$store.state.chat.socketChat)
         if (this.$store.state.chat.socketChat === null){
           this.$router.push('/login')
           return ;
         }
-        // this.$store.state.NrMessages = 0;
-        // this.$store.state.chat.socketChat.off('message')
-        // this.$store.state.chat.socketChat.on('typing',({ userId, isTyping , roomId}) => {
-        //   console.log('typing');
-        //   const room = this.rooms.find((room) => {
-        //     return room.roomId === roomId
-        //   })
-        //   console.log("roomId", room.roomId)
-        //   console.log("bool", isTyping)
-        //   console.log("userId", userId)
-
-        //   console.log("array of typing users", room.typingUsers)
-        //   if(isTyping) {
-        //     console.log("before", room.typingUsers)
-        //     if(room.typingUsers == undefined || room.typingUsers.length == 0) {
-        //       room.typingUsers = [ userId ]
-        //     }
-        //     else if(room.typingUsers.indexOf(userId) == -1) {
-        //       room.typingUsers = [ ...room.typingUsers, userId ]
-        //     }
-
-        //     console.log("after", room.typingUsers)
-
-
-        //   } else {
-        //     const typingUsers = []
-        //     for (let i = 0; i < room.typingUsers.length; i++) {
-        //         if (room.typingUsers[i] != userId)
-        //           typingUsers.push(room.typingUsers[i])
-        //       }
-        //       room.typingUsers = typingUsers
-        //   }
-
-        //   console.log("before ende typing");
-        //   console.log(room.typingUsers);
-        //   console.log("ende typing");
-        // });
-
-        // this.$store.state.chat.socketChat.on('message',({message, roomId}) => {
-        //   console.log('message');
-        //   console.log(message);
-        //   console.log(roomId);
-        //   console.log(this.currentRoomId);
-        //   if(this.currentRoomId == roomId) {
-
-        //     console.log("this.currentRoomId == roomId");
-        //     this.addMessage(message)
-        //     console.log("this.currentRoomId == roomId behind");
-        //   } else {
-        //     console.log("message for an other room");
-        //   }
-        //   console.log("message ende");
-
-        // });
-
-        // this.getRooms();
         this.currentUserId = this.$store.state.user.id;
-
-        console.log("mounted CHAT");
-        // console.log(this.currentUserId)
       },
       unmounted() {
-        console.log("unmounted CHAT");
         this.$store.state.NrMessages = 0
-
-        // if (this.$store.state.chat.socketChat) {
-        // //   this.$store.state.chat.socketChat.off('typing')
-        //   // this.$store.state.chat.socketChat.off('message')
-        //   this.$store.state.chat.socketChat.on('message',() => {
-        //     this.$store.state.NrMessages++
-        //     console.log("mrmessages", this.$store.state.NrMessages)
-        //   })
-        // }
-        // else
-        //   console.warn("NO SOCKETCHAT FOUND!!");
-
       },
     })
 </script>
