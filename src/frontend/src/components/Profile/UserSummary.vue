@@ -9,6 +9,9 @@
           </div>
           <div style="margin-top: -15px">
             <text class="status"> {{ UserStatus[user?.userStatus] }} </text>
+            <div v-if="user?.friendStatus == Status.pending">
+              <text class="friendStatus"> {{ Status[user?.friendStatus].toString() }} </text>
+            </div>
           </div>
         </div>
         <div v-if="user?.friendStatus == Status.requsted" >
