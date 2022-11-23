@@ -216,6 +216,8 @@ export class ChatGateway {
 
     const room: {info: roomReturn, chatroom: chatroom} = await this.chatService.createRoom(client.handshake.auth as User, roomName, access, password);
     console.log(room);
+    if (room == undefined)
+      return {undefined}
 
     if(room.info == roomReturn.created) {
       if (access != Access.private)
