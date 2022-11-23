@@ -12,14 +12,6 @@ export enum Status {
 
 @Entity()
 export class Friend {
-	// constructor(id: number, unique_name: string, avatar_url_42intra: string, avatar: fileEntity, friends: User[]){
-	// 	this.id = id
-	// 	this.unique_name = unique_name
-	// 	this.avatar_url = avatar_url_42intra
-	// 	this.avatar_url_42intra = avatar_url_42intra
-	// 	this.avatar = avatar
-	// 	this.friends = friends
-	// }
 	constructor(partial: Partial<Friend>) {
 		Object.assign(this, partial);
 	  }
@@ -42,5 +34,5 @@ export class Friend {
 
 	@OneToMany(() => message, (message) => message.chatroom)
     messages: message[];
-	
+
 }
