@@ -3,6 +3,7 @@ import App from './App.vue'
 import router from './router'
 import store from './store'
 import { library } from "@fortawesome/fontawesome-svg-core";
+
 import {
   faMagnifyingGlass,
   faBars,
@@ -21,6 +22,7 @@ import {
   faX,
   faCheck,
   faTrophy,
+  faComment,
 
   } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
@@ -44,10 +46,15 @@ library.add(
   faX,
   faCheck,
   faTrophy,
+  faComment,
 )
 
 
 const app = createApp(App)
+
+// app.config.compilerOptions.isCustomElement = (tag) => {
+//   return tag.startsWith('vue-advanced-')
+// }
 
 // app.config.globalProperties.$socketio =
 // app.config.globalProperties.$socketgame = app.config.globalProperties.$socketchat = app.config.globalProperties.$socketio;

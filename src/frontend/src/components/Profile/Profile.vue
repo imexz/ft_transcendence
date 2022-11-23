@@ -10,7 +10,13 @@
       <p>
         {{ user.username }}
       </p>
+      <p style="font-size: 14px">
+        {{ UserStatus[user?.userStatus] }}
+      </p>
     </div>
+  </div>
+  <div v-if="id!=$store.state.user?.id && id !='0'" class="userActions">
+    <UserActionsPopup v-if="user != null" :user="user"/>
   </div>
 </template>
 
@@ -19,12 +25,18 @@ import User from '@/models/user';
 import { API_URL } from '@/defines';
 import VueAxios from 'axios';
 import { defineComponent } from 'vue';
+import { UserStatus } from '@/models/user';
+import UserActionsPopup from '@/components/Profile/UserActionsPopup.vue';
 
 export default defineComponent({
   data() {
     return {
       user: null as User | null,
+      UserStatus: UserStatus,
     }
+  },
+  components: {
+    UserActionsPopup,
   },
   props: {
     id: {
@@ -32,27 +44,23 @@ export default defineComponent({
       default: "0" },
   },
   methods: {
-    fetchUser(): void {
-      if (this.id == '0') {
-        this.user =this.$store.state.user;
-      }
-      else {
+    fetchUser(){
+      let uId = (this.id != "0")?this.id:this.$store.state?.user.id
       VueAxios({
-          url: '/users/find/' + this.id,
+          url: '/users/find/' + uId,
           baseURL: API_URL,
           method: 'GET',
           withCredentials: true,
         })
           .then(response => { this.user = response.data })
           .catch()
-      }
     }
   },
   mounted() {
     this.fetchUser();
   },
   updated() {
-    if (this.user && ( parseInt(this.id) != this.user.id) )
+    if (this.user && ( parseInt(this.id) != this.user.id) && this.id != 0 )
       this.fetchUser();
   }
 })
@@ -63,7 +71,6 @@ export default defineComponent({
 
   .profile {
     position: relative;
-    top: 10px;
     display: flex;
     justify-content: flex-start;
     align-items: center;
@@ -100,7 +107,15 @@ export default defineComponent({
     border: 2px solid var(--ft_cyan);
     border-radius: 10px 10px 0px 10px;
     border-bottom: none;
-    /* border-image-slice: 1;
-    border-image-source: linear-gradient(var(--ft_cyan), var(--ft_pink)); */
+  }
+
+  .userActions {
+    position: relative;
+    width: 776px;
+    border: 2px solid var(--ft_cyan);
+    border-radius: 10px;
+    margin-top: 20px;
+    padding: 10px;
+
   }
 </style>

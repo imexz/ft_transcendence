@@ -45,10 +45,10 @@ export class TwoFactorAuthenticationController {
 
         // request.res.cookie('token', [accessTokenCookie]);
 
-        request.res.setHeader('Set-Cookie', this.authService.getCookieWithJwtAccessToken(
-			request.user.id,
-			true,
-		))
+      request.res.setHeader('Set-Cookie', this.authService.getCookieWithJwtAccessToken(
+        request.user.id,
+        true,
+      ))
         return request.user;
     }
 
@@ -67,6 +67,10 @@ export class TwoFactorAuthenticationController {
 		throw new UnauthorizedException('Wrong authentication code');
 	  }
 	  this.twofaService.turnOnTwoFactorAuthentication(request.user.id);
+    request.res.setHeader('Set-Cookie', this.authService.getCookieWithJwtAccessToken(
+      request.user.id,
+      true,
+    ))
 	}
 
 	@Get('turn-off')

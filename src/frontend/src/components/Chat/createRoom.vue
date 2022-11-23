@@ -12,7 +12,6 @@
         </div>
         <div class="elem">
           <input v-if="access == Access.protected"  v-model="password" placeholder="Enter your password">
-          <!-- <input v-else v-model="password" placeholder="Not password protected" disabled> -->
         </div>
         <div v-if="roomName == ''" class="btn">
           <button class="elem2" type="submit" @click="createOrChangeRoom">Create Room</button>
@@ -55,13 +54,14 @@ export default defineComponent({
       default: ''
     },
     roomAccess: {
-      type: Number
+      type: Number,
+      default: 0
     },
   },
   methods: {
     createOrChangeRoom(): void{
       console.log("createRoom", this.roomName, this.name);
-      this.$store.state.chat.socketChat.emit('createOrChangeRoom', {roomName: this.name? this.name : this.roomName, access: this.access, password: this.password},  // !!!!!!!!!!!!!!!
+      this.$store.state.chat.socketChat.emit('createOrChangeRoom', {roomName: this.name? this.name : this.roomName, access: this.access, password: this.password},
         response => {
           console.log("RESPONSE: ", response.info);
 

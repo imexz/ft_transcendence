@@ -103,8 +103,8 @@ export class Gateway {
       if(id != client.handshake.auth.id) {
         if(await this.friendsService.findFriendShip(client.handshake.auth.id, id) == undefined){
           client.handshake.auth.friendStatus = Status.requsted;
-          (await this.usersService.getUserSocket(this.server, id))?.emit("Request", client.handshake.auth)
-          this.friendsService.request_friendship(client.handshake.auth.id, id)
+          (await this.usersService.getUserSocket(this.server, id))?.emit('Request', client.handshake.auth)
+          this.friendsService.requestFriendship(client.handshake.auth.id, id)
         } else {
         console.log("friendship alredy exist");
 
@@ -119,8 +119,11 @@ export class Gateway {
     @MessageBody('id') id?: number,
     @MessageBody('status') status?: Status    )
     {
-      // (await this.usersService.getUserSocket(this.server, id))?.emit("Request", {id, status})
-      this.friendsService.response_friendship(client.handshake.auth.id, id, status)
+      console.log("responseFriendship", status);
+
+      this.friendsService.responseFriendship(client.handshake.auth.id, id, status)
+      let friend = await this.findSocketOfUser(id)
+      this.server.to(friend.id.toString()).emit('updateFriend', {id: client.handshake.auth.id, status})
     }
 
     @SubscribeMessage('Remove')
@@ -128,6 +131,18 @@ export class Gateway {
     @ConnectedSocket() client: Socket,
     @MessageBody('id') id?: number)
     {
-  		this.friendsService.remove_friendship(client.handshake.auth.id, id)
+  		this.friendsService.removeFriendship(client.handshake.auth.id, id)
+      let friend = await this.findSocketOfUser(id)
+      this.server.to(friend.id.toString()).emit('updateFriend', {id: client.handshake.auth.id, status: Status.denied})
+    }
+
+    async findSocketOfUser(userId: number) {
+      const sockets = await this.server.fetchSockets();
+      for (const socket of sockets) {
+        if(socket.handshake.auth.id == userId)
+        {
+          return socket
+        }
+      }
     }
 }

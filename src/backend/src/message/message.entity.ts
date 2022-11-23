@@ -18,7 +18,7 @@ export class message {
     @Column()
     content: string;
 
-    @ManyToOne(() => User, (sender) => sender.messeges) //TB typo?
+    @ManyToOne(() => User, (sender) => sender.messeges) // TB typo?
     // @JoinColumn({name: "userId"})
     sender: User;
 

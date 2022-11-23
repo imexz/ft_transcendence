@@ -11,7 +11,7 @@ import chatroom, { Access } from 'src/chatroom/chatroom.entity';
 
 @Injectable()
 export class ChatService {
-  async adminAction(action: AdminAction, roomId: number, UserId: number, adminId: number): Promise<boolean> {
+  async adminAction(action: AdminAction, roomId: number, UserId: number, adminId: number): Promise<AdminAction> {
     const room = await this.chatroomService.getRoomWithAdmins(roomId)
     console.log("admins", room.admins, adminId);
 
@@ -19,46 +19,30 @@ export class ChatService {
     console.log(isAdmin);
 
     if(isAdmin) {
-      console.log("isAdmin");
       switch (action) {
-        case AdminAction.baned:
-          await this.chatroomService.removeUserFromChatroom(await this.usersService.getUser(UserId), roomId)
-          break;
+        case AdminAction.banned:
+          await this.chatroomService.removeUserFromChatroom(await this.usersService.getUser(UserId), roomId, true)
+          return AdminAction.banned
         case AdminAction.muted:
-
-          this.banMuteService.mut(await this.usersService.getUser(UserId), room)
-
-          break;
+          return this.banMuteService.mut(await this.usersService.getUser(UserId), room)
         case AdminAction.toAdmin:
           this.chatroomService.addRoomAdmin(room, UserId)
-          break;
-
+          return AdminAction.toAdmin
         default:
           break;
         }
-        return true
-      // if(action == AdminAction.baned)
     }
-    return false
   }
 
 
 
-  async creatRoomDM(user: User, id: number, content: string) {
-    console.log("undefind = ", user, id );
+  async creatRoomDM(user: User, id: number) {
 
     if(user != undefined && id != undefined)
     {
-      // console.log(content);
-
       const user1 = await this.usersService.getUser(id)
-      const chat: {info: roomReturn, chatroom: chatroom} = await this.chatroomService.findOrCreatDM(user, user1)
-      if(chat != undefined)
-        this.messageService.userAddMessageToRoom(user, content, chat.chatroom)
-      else
-        console.log("chat == undeinfd");
-
-      }
+      return this.chatroomService.findOrCreatDM(user, user1)
+    }
   }
 
   async createRoomInfo(roomId: number, id: any) {
@@ -94,12 +78,14 @@ export class ChatService {
         }
 
 
-        async createMessage(user: User, roomId:number, content: string) {
-            const object = await this.chatroomService.hasUserWriteAccess(user.id, roomId)
-            console.log("room=", object.chatroom);
-            if(object.allowed) {
-              return await this.messageService.userAddMessageToRoom(user, content, object.chatroom)
+        async createMessage(user: User, roomId:number, content: string, system: boolean) {
+            const object = await this.chatroomService.hasUserWriteAccess(user.id, roomId, system)
+            if(object.allowed || system == true) {
+              if (system == true)
+                user = undefined
+              return await this.messageService.userAddMessageToRoom(user, content, object.chatroom, system)
             }
+
         }
 
         async createRoom(user: User, room_name: string, access: Access, password?: string) {
@@ -108,26 +94,13 @@ export class ChatService {
 
 
         async manageJoin(user_id: number, roomId: number, password?: string) {
-            console.log("roomIdmanageJoin: ", roomId);
 
             const user = await this.usersService.getUser(user_id)
-            const room: chatroom = await this.chatroomService.userToRoom(user, roomId, password);
-            console.log("testbool2: ", room);
-
-            return room
+            return await this.chatroomService.userToRoom(user, roomId, password);
         }
 
 
 
-
-        // async findAllMessages(roomId: number, userId: number) {
-        //   const rooms = await this.chatroomService.getAllwithUser(userId)
-        //   for (let index = 0; index < rooms.length; index++) {
-        //     if(rooms[index].roomId == roomId) {
-        //       return await this.messageService.getAllMessagesOfRoom(roomId)
-        //     }
-        //   }
-        // }
 
         async getClientName(id: number) {
             const user = await this.usersService.getUser(id)

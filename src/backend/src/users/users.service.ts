@@ -19,7 +19,7 @@ export class UsersService {
 			.getMany()
 
 		console.log("getTopPlayer", test);
-		
+
 		return test
 	}
 
@@ -61,7 +61,7 @@ export class UsersService {
 	async getUser(id: number): Promise<User> {
 		// console.log("getUser -> ", id);
 
-		if(id != undefined) {
+		if(id !== undefined && id != NaN) {
 			const user = await this.usersRepository.findOne({where: {id: id}})
 			// console.log("getUsers: ", user);
 
@@ -115,14 +115,14 @@ export class UsersService {
 				tmp = await this.usersRepository.save(tmp);
 				faild = false
 				console.log("try block ende");
-				
-			} 
+
+			}
 			catch (error) {
 				console.log("fehler in init user");
 				tmp.username += "💩"
 				faild = true
 			}
-			
+
 		} while (faild);
 
 		return tmp
@@ -160,7 +160,7 @@ export class UsersService {
 			console.log(error);
 			throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
 		}
-		return 
+		return
 	}
 	// async addfriend(user_id: number, friend_id: number) {
 	// 	// console.log(user_id);

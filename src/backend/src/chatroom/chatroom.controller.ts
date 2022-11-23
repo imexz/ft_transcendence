@@ -24,9 +24,9 @@ export class ChatroomController {
         return await this.chatroomService.removeRoom(room_name, req.user)
     }
 
-    @Post('creat')//TB typo?
+    @Post('creat')// TB typo?
 	@UseGuards(JwtAuthGuard)
-    async CreatChatroon(@Request() req, //TB typo?
+    async CreatChatroon(@Request() req, // TB typo?
         @Body("room_name") room_name: string,
         @Body("access") access: Access,
         @Body("password") password: string)

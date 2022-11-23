@@ -1,9 +1,5 @@
 <template>
-  <Toast v-if="showToast" :msg=toastMsg :mode=toastMode />
   <div>
-    <div>
-        <!-- <button @click="enableTwoFA"> enable two Factor </button> -->
-    </div>
     <div class="btns">
       <div>
         <button @click="on">turn-on</button>
@@ -17,21 +13,14 @@
 
 import VueAxios from 'axios';
 import { API_URL } from '@/defines';
-import { defineComponent, ref } from 'vue';
-import Toast from '@/components/Toast.vue'
+import { defineComponent } from 'vue';
 
 export default defineComponent({
   data() {
     return{
       QR : API_URL + '/twofa/generate',
       twoFactorAuthenticationCode: '',
-      showToast: ref(false),
-      toastMsg: ref(''),
-      toastMode: ref('')
     } 
-  },
-  components: {
-    Toast
   },
   methods: {
     authenticate() {
@@ -67,10 +56,7 @@ export default defineComponent({
         .catch(e => this.triggerToast(e.response, "error"))
     },
     triggerToast(msg: string, mode: string) {
-        this.showToast = true;
-        this.toastMsg = msg;
-        this.toastMode = mode;
-        setTimeout(() => this.showToast = false, 2000);
+      this.$store.dispatch('triggerToast', {show: true, msg: msg, mode: mode})
     }
   }
 })
