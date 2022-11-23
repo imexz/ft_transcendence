@@ -1,3 +1,5 @@
+import { Status } from '@/enums/models/ResponseEnum';
+
 export enum UserStatus {
 	ONLINE,
 	OFFLINE,
@@ -36,6 +38,7 @@ export default class User {
   avatar_url_42intra: string
   clientId: any
   isTwoFactorAuthenticationEnabled: boolean
+  friendStatus: Status = 0
 }
 //   constructor(id: number, username: string, avatar_url: string,
 //     status: string, me: number
