@@ -56,20 +56,20 @@ export default defineComponent({
     created() {
     },
     async mounted() {
-      this.initPixi();
-      this.pixiApp.ticker.add(this.updatePixi)
       while (!this.socket) {
-		  	  await new Promise(r => 
-          {setTimeout(r, 100)
+        await new Promise(r => 
+        {setTimeout(r, 100)
           console.log("wait")}
           
           );
-      }
-      console.log("socket", this.socket)
-      
-      this.socket.on('updateBall', this.updateBall)
-      this.socket.on('updatePaddle', this.updatePaddle)
-      this.socket.on('updateScore', this.updateScore)
+        }
+        console.log("socket", this.socket)
+        
+        this.socket.on('updateBall', this.updateBall)
+        this.socket.on('updatePaddle', this.updatePaddle)
+        this.socket.on('updateScore', this.updateScore)
+        this.initPixi();
+        this.pixiApp.ticker.add(this.updatePixi)
       document.addEventListener('keydown', this.keyEvents, false);
     },
     unmounted() {

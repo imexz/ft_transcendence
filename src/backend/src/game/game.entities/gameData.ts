@@ -48,6 +48,8 @@ export class GameData {
             // this.settings.serving = settings.serving;
             if (settings) {
                 this.settings = settings
+                console.log("settings", this.settings);
+                
             }
 
             // this.finished = false;
@@ -62,7 +64,7 @@ export class GameData {
 	@Exclude()
 	score = new Score();
     @Exclude()
-    settings: Settings = new Settings;
+    settings: Settings;
 // @Exclude()
 	// finished: boolean = false;
 }

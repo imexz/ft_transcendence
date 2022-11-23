@@ -1,11 +1,9 @@
 <template>
   <div v-if="this.game && this.socketGame">
-    <PongGame :game = "this.game" :socket = "this.socketGame" />
+    <PongGame :game = "this.game" :socket = "this.socketGame" @reset="this.reset()" />
     <div v-show="this.$store.state.user.id!=this.game?.loser?.id && this.$store.state.user.id!=this.game?.winner?.id" class="leaveGame">
         <button @click="this.leaveGame"> Leave </button>
     </div>
-    <h1> test </h1> 
-
   </div>
   <div v-else-if="this.wait == true">
     <text> Waiting for opponent... </text>
@@ -13,7 +11,7 @@
     <button @click="this.leaveGame"> Leave </button>
   </div>
   <div v-else>
-    <GameSettings @action="this.setWait()"/>
+    <GameSettings @setWait="this.setWait()" @reset="this.reset()" :userId="this.userId" :socket = this.socketGame />
   </div>
 </template>
   
@@ -24,6 +22,7 @@
   import PongGame from '../components/Game/PongGame.vue';
   import { io, Socket } from 'socket.io-client'
   import { API_URL } from '@/defines';
+import User from '@/models/user';
 
 
   export default defineComponent({
@@ -33,6 +32,9 @@
         wait: false,
         socketGame: null as Socket | null,
       };
+    },
+    props: {
+      userId: String
     },
     async mounted() {
       console.log("in mounted gameMenu");
@@ -51,23 +53,21 @@
       this.initGameInfoListener()
       // await this.askBackendForGame()
     },
+    updated() {
+      // console.log("updated");
+      // console.log(this.userId);
+      
+
+      
+    },
     methods: {
       async setWait(){
-        await this.socketGame.emit('joinOrCreatGame', {isCustomized: this.$store.state.customized});
+        console.log("setWait");
         this.wait = true
       },
-      // async askBackendForGame() {
-      //   while (!this.socketGame) {
-      //     await new Promise(r => setTimeout(r, 100));
-      //   }
-      //   this.socketGame.emit('hasGame', (game) => {
-      //     if (game) {
-      //       this.game = game
-      //     } else {
-      //       this.game = null
-      //     }
-      //   })
-      // },
+      viewGame (game: Game) {
+        this.game = game
+      },
 	    async initGameInfoListener() {
 		    this.socketGame.on('GameInfo', (game: Game) => {
 
@@ -77,14 +77,20 @@
           this.game.loser = game.loser
 		    });
 		    this.socketGame.on('isFinished', () => {
-          this.game.isFinished = true
+          this.wait = false
+          if (this.game) {
+            this.game.isFinished = true
+          }
 		    });
 
 	    },
       leaveGame() {
         this.socketGame.emit('leaveGame');
+        this.reset()
+      },
+      
+      reset() {
         this.game = null
-        // this.$router.push("/");
       }
     },
     unmounted() {

@@ -3,7 +3,7 @@
     <h1> won against </h1>
     <user-summary :user=this.game.loser />
     <div>
-        <button @click="this.askForRematch"> ask for rematch </button>
+        <!-- <button @click="this.askForRematch"> ask for rematch </button> -->
         <button @click="this.newGame"> new game</button>
     </div>
 </template>
@@ -14,6 +14,7 @@ import { defineComponent } from 'vue'
 import UserSummary from '@/components/Profile/UserSummary.vue';
 import Game from '@/models/game';
 import { io, Socket } from 'socket.io-client'
+import router from '@/router';
 
 
 
@@ -30,26 +31,29 @@ export default defineComponent({
 	},
     methods: {
 		leaveRoom() {
-			this.$store.state.socketGame.emit('leaveRoom')
+			this.socket.emit('leaveRoom')
 		},
-		askForRematch() {
-			console.log("askForRematch");
-            let userId: number;
+        askForSpecialRematch() {
+            router.push('/game/' + this.getOpponentId())
+        },
 
-            if (this.$store.state.user.id === this.game.winner.id) {
-                userId = this.game.loser.id;
-            } else if (this.$store.state.user.id === this.game.loser.id) {
-                userId = this.game.winner.id;
-            } else { return }
-            console.log("userId= ", userId);
+		// askForRematch() {
+		// 	console.log("askForRematch");
             
 
-            // const tmp_user = this.$store.state.user.id === this.game.winner.id ? this.game.loser.id:  this.game.winner.id
-            this.$store.state.socketGame.emit('GameRequestBackend', {settings: undefined , id: userId}, (r) => {
-                // this.$store.state.winner = null;
-		    })
-            this.game = null
-        },
+        //     // this.game = null
+        //     // this.$emit()
+        // },
+        // getOpponentId(): number{
+        //     // let userId: number;
+        //     // if (this.$store.state.user.id === this.game.winner.id) {
+        //     //     userId = this.game.loser.id;
+        //     // } else if (this.$store.state.user.id === this.game.loser.id) {
+        //     //     userId = this.game.winner.id;
+        //     // } else { return }
+        //     // console.log("userId= ", userId);
+        //     return this.$store.state.user.id === this.game.winner.id ? this.game.loser.id:  this.game.winner.id
+        // },
         newGame() {
             console.log("newGame");
             this.$emit('newGame')

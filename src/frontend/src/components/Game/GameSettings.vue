@@ -35,8 +35,11 @@
 			<br>
 			<h1>Start Game</h1>
 			<br>
-			<button id="joinQueue" @click="this.joinQueue();">Join Queue</button>
-			<button id="invitePlayer" @click="this.invitePlayer();">Invite Player</button>
+            <div v-if="this.userId">
+                <UserSummary :user= this.user> </UserSummary>
+                <button id="invitePlayer" @click="this.startWait();">Invite Player</button>
+            </div>
+			<button v-else id="joinQueue" @click="this.startWait();">Join Queue</button>
 		</div>
 	</div>   
 </template>
@@ -46,6 +49,12 @@ import { defineComponent } from 'vue';
 import PongGame from './PongGame.vue';
 import GameSettings from './GameSettings.vue'
 import { Settings } from '@/models/gameSettings';
+import { io, Socket } from 'socket.io-client'
+import UserSummary from '@/components/Profile/UserSummary.vue';
+import User from '@/models/user';
+import VueAxios from 'axios';
+import { API_URL } from '@/defines';
+
 
 enum Serving {
 	LAST_SCORED,
@@ -56,11 +65,51 @@ enum Serving {
 export default defineComponent({
     data() {
         return {
-            settings: Settings
+            settings: Settings,
+            user: User
         }
     },
-
+    props: {
+        userId: String,
+        socket: Socket
+    },
+    components: {
+        UserSummary
+    },
+    created() {
+        console.log("created Game Settings");
+        
+        // this.user = undefined
+        this.settings = new Settings()
+        // if(this.userId != undefined) {
+        //     this.fetchUser()
+        // }
+        if(this.userId != this?.user.id) {
+            this.fetchUser()
+        }
+    },
+    updated() {
+        // console.log("updated GAmeSettings");
+        
+        // console.log("userId", this.userId);
+        
+        
+        if(this.userId != this?.user.id) {
+            this.fetchUser()
+        }
+    },
     methods: {
+        fetchUser() {
+            VueAxios({
+                url: '/users/find/' + this.userId,
+                baseURL: API_URL,
+                method: 'GET',
+                withCredentials: true,
+            })
+            .then(ret => this.user = ret.data)
+            .catch(error => console.log(error))
+            
+        },
         setScoreToWin(score: number) {
                 document.getElementById("score3").classList.remove("selected");
                 document.getElementById("score5").classList.remove("selected");
@@ -125,14 +174,31 @@ export default defineComponent({
                         break;
                 }
             },
-            joinQueue() {
-                this.$emit('action')
+            async startWait() {
+                if(this.userId != undefined) {
+
+                    console.log("settings", this.settings, this.user);
+                    this.socket.emit('GameRequestBackend', {settings: this.settings , id: this.userId}, (r) => {
+                        // if (r.game != undefined) {
+                        //     this.$emit('viewGame', r.game)
+                        // }
+                        if(r) {
+                            console.log("emit setWait");
+                            this.$emit('setWait')
+                        } else {
+                            this.$emit('reset')
+                        }
+                    })
+                } else {
+                    this.socket.emit('joinOrCreatGame', {settings: this.settings}, () => {
+                    });
+                    console.log("emit setWait");
+                    this.$emit('setWait')
+                }
+
                 // this.$store.state.isCustomized = this.isCustomized();
                 // this.$store.state.showGame = true;
-            },
-            invitePlayer() {
-                this.$emit('action')
-            },
+            }
             // isCustomized(): boolean {
             //     if (this.settings.scoreToWin != 10 ||
             //         this.settings.enablePowerUp == true ||

@@ -1,8 +1,8 @@
 <template>
   <div class="gameInvitePopUp">
-    <UserSummary :user = this.$store.state.requester />
+    <UserSummary :user = this.$store.state.gameRequest.user />
     <h4>wants to play a </h4>
-    <h4 v-show="this.isCustomRequest" v-once>customized </h4>
+    <h4 v-if="this.$store.state.gameRequest.settings" v-once>customized </h4>
     <h4>game</h4>
 	<br>
     <button @click="accept" class="gameButton">
@@ -18,37 +18,29 @@
 import { defineComponent } from 'vue'
 import UserSummary from '../Profile/UserSummary.vue'
 
+
+enum RESPONSE {
+  accept,
+  refuse
+}
+
 export default defineComponent({
 
-	data() {
-		return {
-			isCustom: false,
-		}
-	},
-	computed: {
-		isCustomRequest() {
-			this.$store.state.socketGame.emit('isCustom', {id: this.$store.state.requester.id}, (cb: boolean) => {
-				console.log(cb);
-			})
-			// this.isCustom = true
-			return this.isCustom
-		}
-	},
 	components: {
         UserSummary,
     },
 
     methods:{
         accept(){
-          this.$store.state.socketGame.emit("accept")
           // this.$store.state.winner = null
           // this.$store.state.game = null
-          this.$store.state.requester = null
+          this.$store.state.gameRequest.response(RESPONSE.accept)
+          this.$store.state.gameRequest = null
           this.$router.push('/play')
         },
         refuse(){
-          this.$store.state.socketGame.emit("denied")
-          this.$store.state.requester = null
+          this.$store.state.gameRequest.response(RESPONSE.refuse)
+          this.$store.state.gameRequest = null
         },
     }
 })

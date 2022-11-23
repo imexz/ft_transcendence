@@ -48,6 +48,12 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import('../views/PlayView.vue')
   },
   {
+    path: '/play/:userId',
+    name: 'playInvite',
+    props: true,
+    component: () => import('../views/PlayView.vue')
+  },
+  {
     path: '/scoreboard',
     name: 'scoreboard',
     component: () => import('../views/Scoreboard.vue')

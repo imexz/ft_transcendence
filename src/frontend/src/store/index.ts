@@ -12,6 +12,7 @@ import Room, { Access } from '@/models/room';
 import Message from '@/models/message';
 import Chat from '@/models/chat';
 import { Settings } from '@/models/gameSettings';
+import GameRequest from '@/models/GameRequest';
 
 
 
@@ -29,7 +30,7 @@ export interface State {
   socket: Socket | null
   friendsList: User[] | null
   NrFriendRequests: number
-  requester: User | null
+  gameRequest: GameRequest | null
   // game: Game | null
   chat: Chat
   // customized: boolean
@@ -40,8 +41,8 @@ export interface State {
 const storage = localStorage.getItem('user')
 const user = storage?JSON.parse(storage):null;
 const initialState = user?
-{ validated: true, user: user, socket: null,  socketChat: null,  socketGame: null, friendsList: null, NrMessages: 0, NrFriendRequests: 0, requester: null, game: null, winner: null, loser: null, customized: false, showGame: false , chat: null, settings: new Settings()}:
-{ validated: false, user: null,  socket: null,  socketChat: null,  socketGame: null, friendsList: null, NrMessages: 0, NrFriendRequests: 0, requester: null, game: null, winner: null, loser: null, customized: false, showGame: false , chat: null, settings: new Settings()};
+{ validated: true, user: user, socket: null,  socketChat: null,  socketGame: null, friendsList: null, NrMessages: 0, NrFriendRequests: 0, requester: null, game: null, winner: null, loser: null, customized: false, showGame: false , chat: null, gameRequest: null}:
+{ validated: false, user: null,  socket: null,  socketChat: null,  socketGame: null, friendsList: null, NrMessages: 0, NrFriendRequests: 0, requester: null, game: null, winner: null, loser: null, customized: false, showGame: false , chat: null, gameRequest: null};
 
 export default createStore<State>({
 
@@ -83,16 +84,21 @@ export default createStore<State>({
 		  //   console.log(state.socketGame);
 	    // })
 
-      state.socket.on('GameRequestFrontend',(user: User) => {
-        console.log("GameRequestFrontend");
+      state.socket.on('GameRequestFrontend',function (data, ack) {
+        console.log("GameRequestFrontend", data, ack);
+        state.gameRequest = new GameRequest()
         
-        state.requester = user;
-        // state.showGame = true;
+        state.gameRequest.user = data.user;
+        state.gameRequest.settings = data.settings;
+        state.gameRequest.response = ack
+
         console.log("receive askformatch");
+        // ack({data: "weil"})
+        // state.showGame = true;
       })
       state.socket.on('resetRequester', () => {
         console.log("receive resetRequester");
-        state.requester = null;
+        state.gameRequest = null;
       })
       state.socket.on('NowInGame', () => {
         console.log("receive NowInGame");

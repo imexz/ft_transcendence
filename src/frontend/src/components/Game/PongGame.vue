@@ -77,6 +77,7 @@
 
       prepareNewGame(){
         console.log("newGame");
+        this.$emit("reset")
         // this.$store.state.winner = null
         // this.$store.state.loser = null
         // this.$store.state.game = null

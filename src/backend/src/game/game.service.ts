@@ -24,25 +24,33 @@ export class GameService {
 
 	setup = new GameSetup;
 	gamesArr: Array<Game> = []
-	spectatorsMap = new Map<number, Game>;
+	spectatorsMap = new Map<number, number>;
 
 	@InjectRepository(Game)
 	private gameRepository: Repository<Game>
 
-	getGame(user_id: number | undefined, isCustomized: boolean = false): Game {
-		return this.gamesArr.find((value: Game) =>  {
-			const isPlayer: boolean = value.winner?.id == user_id || value.loser?.id == user_id
-			if (user_id)
-				return isPlayer
-			else {
-				return isPlayer && value.isCustomized === isCustomized
+	getGame(user_id: number | undefined, settings?: Settings): Game {
+		const test = this.gamesArr.find((value: Game) =>  {
+			return ((value.winner?.id == user_id || value.loser?.id == user_id)
+			&&
+		((settings == undefined)
+			||
+			(settings?.enablePowerUp == value.settings?.enablePowerUp
+			&&
+			settings?.enableSlowServe == value.settings?.enableSlowServe
+			&&
+			settings?.scoreToWin == value.settings?.scoreToWin
+			&&
+			settings?.serving == value.settings?.serving))
+		)})
+			console.log("test", test);
+			return test
 			}
-		})
-	}
+		
 
-	addUserToSpectators(userId: number, game: Game) {
-		this.spectatorsMap.set(userId, game);
-		game.spectators.push(userId);
+	addUserToSpectators(userId: number, gameId: number) {
+		this.spectatorsMap.set(userId, gameId);
+		// game.spectators.push(userId);
 	}
 
 	removeUserFromSpectators(userId: number, game: Game) {
@@ -56,7 +64,8 @@ export class GameService {
 	}
 
 	getSpectatedGame(userId: number): Game | undefined {
-		return this.spectatorsMap.get(userId)
+		const gameId = this.spectatorsMap.get(userId)
+		return this.gamesArr.find(elem => elem.id == gameId)
 	}
 
 	clearSpectatorArr(game: Game) {
@@ -64,7 +73,7 @@ export class GameService {
 	}
 
 	async joinGameOrCreateGame(user: User, settings: Settings, opponentUserId?: number): Promise<Game> {
-		let game = this.getGame(undefined) // checking for first game with missing (undefined) opponent
+		let game = this.getGame(undefined, settings) // checking for first game with missing (undefined) opponent
 		if (game == undefined || opponentUserId) {
 			game = await this.createGameInstance(user.id, settings)
 			// console.log("joinGameOrCreateGame", game.settings);
@@ -81,26 +90,9 @@ export class GameService {
 		}
 		return game
 	}
+
 	async createGameInstance(userId: number, settings: Settings): Promise<Game> {
 		console.log('inside createGameInstance()');
-		// let settings = new Settings();
-		// console.log("before", settings);
-		// const socket = await this.gameGateway.findSocketOfUser(userId);
-		// let receivedSettings: boolean = false;
-		// if (socket) {
-		// 	socket.emit('requestSettings', (cb) => {
-		// 		// console.log("callback", cb.data);
-		// 		settings = cb.data;
-		// 		receivedSettings = true;
-		// 	});
-		// } else {
-		// 	console.log("no socket for", userId);
-		// }
-		// const setup = new GameSetup();
-		// while (!receivedSettings) {
-		// 	await new Promise(r => setTimeout(r, 10));
-		// }
-		// console.log('leaving createGameInstance()', settings);
 		return new Game(userId, settings);
 	}
 
@@ -152,26 +144,14 @@ export class GameService {
 		return game
 	}
 	updateBall(game: Game) {
-		// game.ball.position.x += game.ball.direction.x;
-		// game.ball.position.y += game.ball.direction.y;
-		// if (game.ball.direction.y > 0) {
-		// 	if (game.ball.position.y + game.ball.radius >= 480) {
-		// 		game.ball.position.y = 480 - game.ball.radius;
-		// 		game.ball.direction.y *= -1;
-		// 	}
-		// }
-		// else {
-		// 	if (game.ball.position.y - game.ball.radius <= 0) {
-		// 		game.ball.position.y = 0 + game.ball.radius;
-		// 		game.ball.direction.y *= -1;
-		// 	}
-		// }
 		game.ball.BallPostionNext()
 	}
+
 	isBallWithinPaddleRange(game: Game, paddle: Paddle): boolean {
 		return (game.ball.position.y >= paddle.position.y &&
 			game.ball.position.y <= paddle.position.y + paddle.height)
 	}
+
 	isBallAtPaddle(game: Game, paddle: Paddle): boolean {
 		let ret: boolean = false;
 		if (paddle.side == Side.left) {
@@ -181,6 +161,7 @@ export class GameService {
 		}
 		return ret;
 	}
+
 	calcAngle(game: Game, paddle: Paddle) {
 		var section: number;
 
@@ -193,11 +174,13 @@ export class GameService {
 			game.ball.direction.angle = paddle.reboundAngles[i - 1];
 		}
 	}
+
 	updateBallDirection(game: Game, paddle: Paddle) {
 		this.calcAngle(game, paddle);
 		game.ball.direction.x = game.ball.direction.speed * Math.cos(game.ball.direction.angle * (Math.PI / 180));
 		game.ball.direction.y = game.ball.direction.speed * Math.sin(game.ball.direction.angle * (Math.PI / 180));
 	}
+
 	collisionControl(game: Game) {
 		if (game.ball.direction.x > 0) {
 			if (this.isBallAtPaddle(game, game.paddleRight) &&
@@ -215,6 +198,7 @@ export class GameService {
 			}
 		}
 	}
+
 	scored(game: Game): boolean {
 		var ret: boolean = false;
 		if (game.ball.position.x - game.ball.radius <= 0) {
@@ -230,8 +214,6 @@ export class GameService {
 		return ret;
 	}
 
-
-
 	reset(game: Game) {
 		game.ball.position = GameSetup.staticballPos
 		// console.log("GameSetup.staticballPos", GameSetup.staticballPos);
@@ -246,6 +228,7 @@ export class GameService {
 		game.score.increaseLeft = GameSetup.scoreIncrease;
 		game.score.increaseRight = GameSetup.scoreIncrease;
 	}
+
 	async isGameFinished(game: Game) {
 		if (game != undefined && (game.score.scoreLeft == game.settings.scoreToWin || game.score.scoreRight == game.settings.scoreToWin)) {
 			clearInterval(game.interval);
