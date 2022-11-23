@@ -50,33 +50,13 @@ export class UsersController {
 		return  this.usersService.addUser(user);
 	}
 
-	// @Post('addFriend')
-	// @UseGuards(JwtAuthGuard)
-	// requestFriend(@Request() req, @Body("id") id: number){
-	// 	return this.friendsService.request_friendship(req.user.id, id)
-	// 	// console.log(id);
-	// 	// return  this.usersService.addfriend(req.user.id, id);
-	// }
 
-	// @Post('removeFriend')
-	// @UseGuards(JwtAuthGuard)
-	// removeFriend(@Request() req, @Body("id") id: number){
-	// 	this.friendsService.remove_friendship(req.user.id, id)
-	// 	// console.log(id);
-	// 	// return  this.usersService.addfriend(req.user.id, id);
-	// }
 
 	@Get('validate')
 	@UseGuards(JwtAuthGuard)
 	@UseInterceptors(ClassSerializerInterceptor)
 	async validate(@Request() req): Promise<User> {
 
-		// console.log("inside validate");
-		// console.log(req.user);
-		// console.log("inside validate1");
-
-
-		// console.log(user);
 		return await this.usersService.getUser(req.user.id)
 	}
 
@@ -95,32 +75,5 @@ export class UsersController {
 		this.usersService.remove(req.user.id)
 	}
 
-
-
-	// @Post('turn-on')
-	// @HttpCode(200)
-	// @UseGuards(JwtAuthGuard)
-	// async turnOnTwoFactorAuthentication(
-	//   @Req() request,
-	//   @Body() { twoFactorAuthenticationCode } : TwoFactorAuthenticationCodeDto
-	// ) {
-	//   const isCodeValid = this.twofaService.isTwoFactorAuthenticationCodeValid(
-	// 	twoFactorAuthenticationCode,
-	// 	request.user
-	//   );
-	//   if (!isCodeValid) {
-	// 	throw new UnauthorizedException('Wrong authentication code');
-	//   }
-	//   this.usersService.turnOnTwoFactorAuthentication(request.user.id);
-	// }
-
-	// @Get('turn-off')
-	// @HttpCode(200)
-	// @UseGuards(JwtAuthGuard)
-	// async turnOffTwoFactorAuthentication(
-	//   @Req() request,
-	// ) {
-	//   await this.usersService.turnOffTwoFactorAuthentication(request.user.id);
-	// }
 
 }
