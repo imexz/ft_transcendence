@@ -77,6 +77,7 @@ export default defineComponent({
         this.socket.off('updatePaddle')
         this.socket.off('updateScore')
         document.removeEventListener('keydown', this.keyEvents, false);
+        this.pixiApp.ticker.stop()
     },
 
     methods: {

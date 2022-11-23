@@ -91,6 +91,7 @@ import User from '@/models/user';
       
       reset() {
         this.game = null
+        this.wait = false
       }
     },
     unmounted() {
