@@ -86,7 +86,10 @@ import { Status } from '@/enums/models/ResponseEnum';
 import ViewGamePopup from '../Game/ViewGamePopup.vue';
 import Game from '@/models/game';
 import Button from '@/models/button';
-import User from '@/models/user'
+import User from '@/models/user';
+import VueAxios from 'axios';
+import { API_URL } from '@/defines';
+
 
 export default defineComponent({
   data() {
@@ -158,32 +161,47 @@ export default defineComponent({
           this.showGame = false;
           break;
         case 'view':
-          this.$store.state.socketGame.emit('ViewGame', {id: this.user.id}, () => {
-            this.showGame = !this.showGame
+        VueAxios({
+          url: '/game/view/' + this.user.id,
+          baseURL: API_URL,
+          method: 'GET',
+          withCredentials: true,
+        })
+          .then(response => { 
             this.$router.push('/play')
-          });
-          console.log("viewGame");
+          })
+          .catch()
           break;
       }
     },
-    async askForMatchOrSpectate(){
+    async askForMatchOrSpectate() {
       const isSelfInvite: boolean = this.user.id === this.$store.state.user.id
-
       this.closeDmPopUp()
       if (isSelfInvite) return;
-      this.$store.state.winner = null;
-      this.$store.state.socketGame.emit('GameRequestBackend', {isCustomized: this.$store.state.customized, id: this.user.id}, (r) => {
-        if (r.winner != undefined && r.loser != undefined) {
-        	this.showGame = !this.showGame
-        	const isUserActivePlayer: boolean = r.winner.id == this.$store.state.user.id || r.loser.id == this.$store.state.user.id
-			if (!isUserActivePlayer)
-				this.$store.state.game = r
-        }
-        if (r.push) {
-        	this.$emit('actions')
-        	this.$router.push("/play");
-        }
-	    })
+
+
+      VueAxios({
+        url: '/game/live/' + this.user.id,
+        baseURL: API_URL,
+        method: 'Get',
+        withCredentials: true,
+      })
+        .then(res => {
+          console.log("api return live game", res);
+          if (res.data) {
+            console.log("res daat");
+            
+            this.opponentName = res.data.winner.id == this.user.id ? res.data.loser.username : res.data.winner.username
+            console.log("showGame = ", this.showGame);
+            this.showGame = !this.showGame
+            console.log("showGame = ", this.showGame);
+            
+          }
+          else {
+            this.$router.push('/play/' + this.user.id)
+          }
+        })
+        .catch(error => { this.$emit('actions', 'error') }) 
       console.log("askForMatchOrSpectate");
     },
   },

@@ -52,7 +52,15 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/play',
     name: 'play',
-    component: PlayView
+    // component: PlayView
+    component: () => import('../views/PlayView.vue')
+  },
+  {
+    path: '/play/:userId',
+    name: 'playInvite',
+    props: true,
+    component: () => import('../views/PlayView.vue')
+    // component: PlayView
   },
   {
     path: '/scoreboard',

@@ -8,4 +8,5 @@ export default class Game {
     loser: User
 	scoreWinner: number = 0;
     scoreLoser: number = 0;
+    isFinished: boolean = false
 }

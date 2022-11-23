@@ -3,9 +3,9 @@
 </template>
 
 <script lang="ts">
-import User from '@/models/user';
 import { defineComponent } from 'vue'
 import * as PIXI from 'pixi.js';
+import { Socket } from 'socket.io-client'
 
 export default defineComponent({
     data() {
@@ -43,7 +43,8 @@ export default defineComponent({
           },
           score: {
             scoreWinner: 0,
-	          scoreLoser: 0
+	          scoreLoser: 0,
+            scoreToWin: 10
           }
         },
         styleData: {
@@ -54,21 +55,41 @@ export default defineComponent({
     },
     created() {
     },
-    mounted() {
-      this.initPixi();
-      this.pixiApp.ticker.add(this.updatePixi)
-      this.$store.state.socketGame.on('updateBall', this.updateBall)
-      this.$store.state.socketGame.on('updatePaddle', this.updatePaddle)
-      this.$store.state.socketGame.on('updateScore', this.updateScore)
+    async mounted() {
+      while (!this.socket) {
+        await new Promise(r => 
+        {setTimeout(r, 100)
+          console.log("wait")}
+          
+          );
+        }
+        console.log("socket", this.socket)
+        
+        this.socket.on('updateBall', this.updateBall)
+        this.socket.on('updatePaddle', this.updatePaddle)
+        this.socket.on('updateScore', this.updateScore)
+        this.initPixi();
+        this.pixiApp.ticker.add(this.updatePixi)
+      document.addEventListener('keydown', this.keyEvents, false);
     },
     unmounted() {
-        this.$store.state.socketGame.off('updateBall')
-        this.$store.state.socketGame.off('updatePaddle')
-        this.$store.state.socketGame.off('updateScore')
+        this.socket.off('updateBall')
+        this.socket.off('updatePaddle')
+        this.socket.off('updateScore')
+        document.removeEventListener('keydown', this.keyEvents, false);
+        this.pixiApp.ticker.stop()
     },
 
     methods: {
-    initPixi(){
+    isValidKey(key) {
+      return  key == "w" || key == "s" || key == "ArrowUp" || key == "ArrowDown";
+    },
+    keyEvents(event) {
+        console.log(event.key);
+        if (this.isValidKey(event.key))
+          this.socket.emit('key', event.key)
+    },
+    initPixi() {
         let canvas: HTMLElement = document.getElementById('pixi')
 		    console.log("initPixi");
         this.pixiApp = new PIXI.Application({
@@ -90,6 +111,8 @@ export default defineComponent({
 
       },
       updatePixi(){
+        console.log("updatePixi");
+        
         this.pixiScene.clear();
 
         this.pixiScene.lineStyle(2, this.styleData.fgColor)
@@ -162,6 +185,8 @@ export default defineComponent({
         this.pixiScore.right.y = 5;
       },
       updateScore(data: any) {
+        console.log(data);
+        
         this.gameData.score = data;
         switch(Math.max(this.gameData.score.scoreWinner, this.gameData.score.scoreLoser)) {
           case 4:
@@ -171,17 +196,22 @@ export default defineComponent({
             this.styleData.fgColor = 0xe70038
             break;
         }
-        if (this.isGameFinished()) {
-          this.$emit('assignWinner', this.assignWinnerAndLoser())
-          console.log("winner");
-          this.$store.state.game = null
-        }
+        // if (this.isGameFinished()) {
+
+        //   // this.$emit('assignWinner', this.assignWinnerAndLoser())
+        //   console.log("winner");
+        //   this.$store.state.game.isFinished = true
+        // }
       },
       updatePaddle(data: any) {
+        console.log(data);
+        
         this.gameData.paddleLeft = data.paddleLeft;
         this.gameData.paddleRight = data.paddleRight;
       },
       updateBall(data: any) {
+        // console.log(data);
+        
 		    if (data === undefined) {
           console.log("data undefined");
           // this.gameExists = false;
@@ -191,16 +221,20 @@ export default defineComponent({
         }
         this.gameData.ball = data;
       },
-	    isGameFinished(): boolean {
-		    return this.gameData.score.scoreWinner == 3 || this.gameData.score.scoreLoser == 3
-	    },
-      assignWinnerAndLoser() {
-        if (this.gameData.score.scoreWinner > this.gameData.score.scoreLoser) {
-          return { winner: this.$store.state.game.winner, loser: this.$store.state.game.loser }
-        } else {
-          return { winner: this.$store.state.game.loser, loser: this.$store.state.game.winner }
-        }
-      }
+	    // isGameFinished(): boolean {
+		  //   return (this.gameData.score.scoreWinner == this.gameData.score.scoreToWin ||
+      //           this.gameData.score.scoreLoser == this.gameData.score.scoreToWin);
+	    // },
+      // assignWinnerAndLoser() {
+      //   if (this.gameData.score.scoreWinner > this.gameData.score.scoreLoser) {
+      //     return { winner: this.$store.state.game.winner, loser: this.$store.state.game.loser }
+      //   } else {
+      //     return { winner: this.$store.state.game.loser, loser: this.$store.state.game.winner }
+      //   }
+      // }
+    },
+    props: {
+      socket: Socket
     }
 })
 </script>

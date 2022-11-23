@@ -75,8 +75,9 @@ export default defineComponent({
         this.winCount = 0;
         this.lossCount = 0;   
         this.matchData.forEach(match => {
-          if (match?.scoreWinner > match?.scoreLoser && match?.winner == null ||
-              match?.scoreWinner < match?.scoreLoser && match?.loser == null)
+          console.log("match", match);
+          
+          if (match?.winner == null)
             this.winCount++;
           else
             this.lossCount++;

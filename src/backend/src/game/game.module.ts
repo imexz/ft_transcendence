@@ -7,9 +7,10 @@ import { Game } from './game.entities/game.entity';
 import { AuthModule } from 'src/auth/auth.module';
 import { JwtModule } from '@nestjs/jwt';
 import { UsersModule } from 'src/users/users.module';
+import { FriendsModule } from 'src/users/friends/friends.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Game]), forwardRef(() => AuthModule), UsersModule, JwtModule.register({
+  imports: [TypeOrmModule.forFeature([Game]), forwardRef(() => AuthModule), forwardRef(() => UsersModule), forwardRef(() => FriendsModule), JwtModule.register({
     // imports: [HttpModule, UsersModule, PassportModule, JwtModule.register({
       secret: process.env.JWT_PASSWORD,
       signOptions: { expiresIn: '600s'}

@@ -1,5 +1,21 @@
 <template>
   <div class="userSummary">
+    <div v-if="showDm" class="dmPopUp">
+      <div class="headLineWrapper">
+        <div class="headLine">Direct Message</div>
+        <button class="exitButton" @click="closeDmPopUp">
+          <font-awesome-icon icon="fa-solid fa-x" />
+        </button>
+      </div>
+      <form @submit.prevent="sendDm">
+        <textarea class="dmText" v-model="msgText" placeholder="your message" rows="4">
+        </textarea>
+        <button class="dmButton">Send</button>
+      </form>
+    </div>
+    <div v-if="showGame" class="dmPopUp">
+      <ViewGamePopup @actions="viewGame" :userName="this.opponentName" />
+    </div>
     <div class="userInfoBar">
       <img id="userAvatar" :src="user?.avatar_url" alt="Avatar">
       <div id="middleSection">
@@ -41,10 +57,21 @@ import { defineComponent } from 'vue';
 import { Status } from '@/enums/models/ResponseEnum';
 import ViewGamePopup from '../Game/ViewGamePopup.vue';
 import{ UserStatus }from '@/models/user';
+import { Socket } from 'socket.io'
+import VueAxios from 'axios';
+import { API_URL } from '@/defines';
+
+
+
 import UserActionsPopup from '@/components/Profile/UserActionsPopup.vue';
 import Game from '@/models/game';
+import router from '@/router';
 
 export default defineComponent({
+  created() {
+    console.log("creted user summary");
+    
+  },
   components: {
     ViewGamePopup,
     UserActionsPopup,
@@ -58,6 +85,7 @@ export default defineComponent({
       UserStatus: UserStatus,
       showGame: false as boolean,
       game: null as Game,
+      opponentName: null as String
     }
   },
   mounted() {
@@ -116,6 +144,7 @@ export default defineComponent({
         window.addEventListener('click', this.hideDropDown)
       this.show = !this.show
     },
+    // for match and spectat
   },
 })
 
