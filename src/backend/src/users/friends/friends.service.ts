@@ -21,21 +21,6 @@ export class FriendsService {
 	private friendRepository: Repository<Friend>,
 	private readonly usersService: UsersService){}
 
-	// async getRequestedFriends(user_id): Promise<friend[]> {
-	// 	return await this.friendRepository.createQueryBuilder("friend")
-	// 		.innerJoin('friend.requester', 'requester', 'requester.id = :id1', { id1: user_id })
-	// 		.leftJoinAndSelect('friend.accepter', 'accepter')
-	// 		.select('status, accepter.id  AS "id", accepter.avatar_url AS avatar_url, accepter.username AS username, 1 AS me')
-	// 		.getRawMany()
-	// }
-
-	// async getAskedFriends(user_id): Promise<friend[]>{
-	// 	return await this.friendRepository.createQueryBuilder("friend")
-	// 		.innerJoin('friend.accepter', 'accepter', 'accepter.id = :id', { id: user_id })
-	// 		.leftJoinAndSelect('friend.requester', 'requester')
-	// 		.select('status, requester.id  AS "id", requester.avatar_url AS avatar_url, requester.username AS username, 0 AS me')
-	// 		.getRawMany()
-	// }
 
 	async getFriendst(user_id: number) {
 		const test = await this.friendRepository.find({
@@ -52,18 +37,15 @@ export class FriendsService {
 		var tmp: User[] = [];
 		test.forEach(element => {
 			if(element.requester.id == user_id) {
+				if (element.status == Status.requsted)
+					element.accepter.friendStatus = Status.pending
 				// if(element.status != Status.accepted)
-				// element.accepter.friendStatus = element.status
 				tmp.push(element.accepter)
 			} else {
-				// if(element.status != Status.accepted)
 				element.requester.friendStatus = element.status
 				tmp.push(element.requester)
 			}
 		});
-		// console.log("getFriendst");
-		// console.log(tmp);
-		
 		return tmp
 	}
 
@@ -77,17 +59,16 @@ export class FriendsService {
 	// 	return(requested.concat(accepted))
 	// }
 
-	async remove_friendship(user_id: any, friend_id: number) {
-		console.log("remove_friendship");
+	async removeFriendship(user_id: any, friend_id: number) {
+		console.log("removeFriendship");
 		console.log(user_id, friend_id);
 
-		const friends = await this.findFriendShip(user_id, friend_id)
+		const friendship = await this.findFriendShip(user_id, friend_id)
 
-		console.log(friends);
+		console.log(friendship);
 
-		// const test: FindOptionsWhere<Friend> =
-		if(friends != null)
-			return await this.friendRepository.remove(friends)
+		if(friendship != null && friendship != undefined)
+			return await this.friendRepository.remove(friendship)
 	}
 
 	async findFriendShip(user_id: number, friend_id: number) {
@@ -104,10 +85,8 @@ export class FriendsService {
 	}
 
 
-    async request_friendship(user_id: number, friend_id: number) {
+	async requestFriendship(user_id: number, friend_id: number) {
 		if(user_id && friend_id) {
-			// console.log("request_friendship");
-			
 			const user1 = this.usersService.getUser(user_id)
 			const user2 = this.usersService.getUser(friend_id)
 
@@ -117,30 +96,18 @@ export class FriendsService {
 		}
 	}
 
-    async response_friendship(user_id: number, friend_id: number, status: Status ) {
+	async responseFriendship(user_id: number, friend_id: number, status: Status ) {
 		if(user_id && friend_id) {
 			var friendship = await this.findFriendShip(user_id, friend_id)
-			// console.log("response_friendship", friendship, status);
-			// console.log(user_id, friend_id);
-			
-			
-			if (friendship != undefined) {
-				this.friendRepository.update(friendship.id, {status: status})
+
+			if (friendship != null && friendship != undefined) {
+				if (status != Status.denied)
+					this.friendRepository.update(friendship.id, {status: status})
+				else
+					this.friendRepository.remove(friendship)
 			}
 		}
 	}
 
-
-    // async getFriends(id: number) {
-	// 	const user = await this.friendRepository.findOne({
-	// 		where: {
-	// 			id: id
-	// 		},
-	// 		relations: {
-	// 			friends: true,
-	// 		}
-	// 	})
-	// 	return user.friends
-	// }
 
 }

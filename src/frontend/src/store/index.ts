@@ -11,6 +11,7 @@ import Game from '@/models/game';
 import Room, { Access } from '@/models/room';
 import Message from '@/models/message';
 import Chat from '@/models/chat';
+import { Status } from '@/enums/models/ResponseEnum';
 
 
 export enum changedRoom {
@@ -121,6 +122,21 @@ export default createStore<State>({
         state.NrFriendRequests++
         console.log("receive  request");
       })
+      state.socket.on('updateFriend', (data) => {
+        console.log("updateFriend", data);
+        console.log(state.friendsList);
+        let user = state.friendsList.find(elem => elem.id == data.id)
+
+        if (user != undefined && user != null)
+        {
+          console.log(user);
+          if (data.status != Status.denied)
+            user.friendStatus = data.status
+          else
+            state.friendsList.splice(state.friendsList.findIndex(elem => elem.id == user.id), 1)
+        }
+
+      })
     },
     changeUserName(state, username) {
       state.user.username = username;
@@ -132,6 +148,7 @@ export default createStore<State>({
       state.friendsList = friendsList;
     },
     addFriend(state, user) {
+      user.friendStatus = Status.pending
       state.friendsList?.push(user)
     },
     removeFriend(state, id) { //todo make better
