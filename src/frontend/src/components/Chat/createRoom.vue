@@ -12,7 +12,6 @@
         </div>
         <div class="elem">
           <input v-if="access == Access.protected"  v-model="password" placeholder="Enter your password">
-          <!-- <input v-else v-model="password" placeholder="Not password protected" disabled> -->
         </div>
         <div v-if="roomName == ''" class="btn">
           <button class="elem2" type="submit" @click="createOrChangeRoom">Create Room</button>

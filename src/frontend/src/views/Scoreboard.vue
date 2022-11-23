@@ -79,7 +79,7 @@ export default defineComponent({
   border: 2px solid var(--ft_cyan);
   border-radius: 10px;
 
-  background-image: linear-gradient(0deg, var(--ft_dark), var(--ft_cyan));
+  /* background-image: linear-gradient(0deg, var(--ft_dark), var(--ft_cyan)); */
 }
 
 #banner {

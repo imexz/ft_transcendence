@@ -147,6 +147,7 @@ export default defineComponent({
     font-weight: bold;
     display: grid;
     grid-template-columns: 50px auto 50px;
+    align-items: center;
   }
   .dropdownMenu {
     display: flex;
