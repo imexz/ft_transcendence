@@ -1,7 +1,7 @@
 <template>
   <div class="profile" v-if="user">
     <div class="Avatar">
-      <img :src='user.avatar_url' alt='Profile Pic'>
+      <img :src="user.avatar_url" alt='Profile Pic'>
     </div>
     <div class="nameLine">
       <p>

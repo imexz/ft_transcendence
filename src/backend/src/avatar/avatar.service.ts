@@ -29,7 +29,7 @@ export class AvatarService {
         }
 
         await this.usersService.updateAvatar(id, await this.fileRepository.save(avatar))
-        return "/avatar"
+        return "/avatar/" + id.toString()
     }
 
     async delete(id: number) {
@@ -41,7 +41,7 @@ export class AvatarService {
             }
         }
         )
-        this.fileRepository.delete({id: avatar.id})
+        this.fileRepository.delete({id: avatar?.id})
         await this.usersService.updateAvatar(id, null)
         return (await this.usersService.getUser(id)).avatar_url_42intra
     }
