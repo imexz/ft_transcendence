@@ -11,9 +11,9 @@
   </div>
   <input ref="file" type="file" class="d-none" @change="uploadFile"/>
 </template>
-  
+
 <script lang="ts">
-  
+
 import VueAxios from 'axios';
 import { API_URL } from '@/defines';
 import { defineComponent } from 'vue';
@@ -49,10 +49,23 @@ export default defineComponent({
           withCredentials: true,
           data: fd
         })
-        .then(response => { 
+        .then(response => {
           this.$emit('success', 'avatar changed'),
-          this.$store.state.user.avatar_url = API_URL + response.data})
-        .catch(error => { this.$emit('error', 'Could not change Avatar') })
+          console.log("AAABBB", response.data);
+          if (response.data.includes('cdn.intra.42.fr'))
+            this.$store.state.user.avatar_url = API_URL + response.data
+          else
+          {
+            let date : Date = new Date()
+            this.$store.state.user.avatar_url = API_URL + response.data + "?nocache=" + date.getHours() + date.getMinutes() + date.getSeconds() + date.getMilliseconds()
+          }
+          console.log("done");
+        })
+
+        .catch(error => {
+          this.$emit('error', 'Could not change Avatar')
+          console.log(error);
+        })
       }
     },
     uploadFile(event: any) {
@@ -77,7 +90,7 @@ export default defineComponent({
 
 
 <style scoped>
-  
+
   .d-none {
     display: none;
   }

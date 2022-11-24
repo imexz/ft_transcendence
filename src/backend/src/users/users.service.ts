@@ -138,7 +138,7 @@ export class UsersService {
 		}
 		else {
 			user.avatar = file
-			user.avatar_url = hostURL + ":3000/avatar"
+			user.avatar_url = hostURL + ":3000/avatar/" + id.toString()
 		}
 		this.usersRepository.update(id, user)
 	}
