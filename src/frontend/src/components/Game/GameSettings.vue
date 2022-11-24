@@ -1,5 +1,5 @@
 <template>
-    <div class="wrapper">
+  <div class="wrapper">
 		<h1>Game Settings</h1>
 		<div class="singleOption">
 			Score to Win
@@ -11,37 +11,30 @@
 			<button id="score20" @click="this.setScoreToWin(20);" class>20</button>
 		</div>
 		<div class="singleOption">
-			Enable PowerUps
-			<br>
+			<div class="singleOptionText">Enable PowerUps</div>
 			<button id="powerupYes" @click="this.setPowerUp(true);" class>Yes</button>
 			<button id="powerupNo" @click="this.setPowerUp(false);" class="selected">No</button>
 		</div>
-		<div class="singleOption">
-			Enable slower serve
-			<br>
+		<div class="singleOption">	
+      <div class="singleOptionText">Enable slower serve</div>
 			<button id="slowServeYes" @click="this.setSlowServe(true);" class>Yes</button>
 			<button id="slowServeNo" @click="this.setSlowServe(false);" class="selected">No</button>
 		</div>
 		<div class="singleOption">
-			Who serves after score
-			<br>
+      <div class="singleOptionText">Who serves after score</div>
 			<button id="lastScored" @click="this.setServing(1);" class>Last Scored</button>
 			<button id="alternate" @click="this.setServing(0);" class>Alternate</button>
 			<button id="random" @click="this.setServing(2);" class="selected">Random</button>
 		</div>
 		<div class="singleOption">
-			<br>
-			<br>
-			<br>
 			<h1>Start Game</h1>
-			<br>
-            <div v-if="this.userId">
-                <UserSummary :user= this.user> </UserSummary>
-                <button id="invitePlayer" @click="this.startWait();">Invite Player</button>
-            </div>
+      <div v-if="this.userId">
+        <UserSummary :user= this.user> </UserSummary>
+        <button id="invitePlayer" @click="this.startWait();">Invite Player</button>
+      </div>
 			<button v-else id="joinQueue" @click="this.startWait();">Join Queue</button>
 		</div>
-	</div>   
+	</div>
 </template>
 
 <script lang="ts">
@@ -212,3 +205,49 @@ export default defineComponent({
 
 </script>
 
+<style scoped>
+
+.singleOption {
+    margin-top: 14px
+  }
+
+  .singleOptionText {
+    font-size: 25px;
+    font-weight: bold;
+  }
+  
+  .singleOption>button {
+    width: 130px;
+
+    color: var(--ft_cyan);
+    background-color: var(--ft_dark);
+    
+    border: 1px solid var(--ft_cyan);
+    border-radius: 5px;
+    
+    padding: 5px 8px;
+    margin-left: 2px;
+    margin-right: 2px;
+    font-size: 20px;
+
+  }
+
+  .singleOption>button:hover {
+    color: var(--ft_dark);
+    background-color: var(--ft_cyan);
+    border-color: var(--ft_cyan);
+  }
+  
+  .singleOption>button.selected {
+    color: var(--ft_pink);
+    background-color: var(--ft_dark);
+    border-color: var(--ft_pink);
+  }
+  .singleOption>button.selected:hover {
+    color: var(--ft_dark);
+    background-color: var(--ft_pink);
+    border-color: var(--ft_pink);
+  }
+  
+
+</style>
