@@ -1,9 +1,9 @@
-import {  Delete, Controller, Request, Post, Param, UseInterceptors, UploadedFile, MaxFileSizeValidator, FileTypeValidator, ParseFilePipe, Get, UseGuards, Res, StreamableFile, Header } from '@nestjs/common';
+import {  HttpException, Delete, Controller, Request, Post, Param, UseInterceptors, UploadedFile, MaxFileSizeValidator, FileTypeValidator, ParseFilePipe, Get, UseGuards, Res, StreamableFile, Header } from '@nestjs/common';
 import { Express } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { AvatarService } from './avatar.service';
 import { JwtAuthGuard } from '../auth/jwt-two/jwt-auth.guard';
-
+import { HttpStatus } from '@nestjs/common'
 
 @Controller('avatar')
 export class AvatarController {
@@ -27,6 +27,11 @@ export class AvatarController {
       return await this.avatarService.add(req.user.id, file)
   }
 
+  @Get()
+  emptyUserId() {
+    throw new HttpException('Please provide user id', HttpStatus.BAD_REQUEST)
+  }
+
   @Get(':id')
   @Header('Content-Type', 'image/jpeg')
 	@UseGuards(JwtAuthGuard)
@@ -37,8 +42,7 @@ export class AvatarController {
         return new StreamableFile(file.data)
       else
       {
-        // CHANGE HERE TO 404 !!!!!!
-        return {undefined}
+        throw new HttpException('Not Found', HttpStatus.NOT_FOUND)
       }
   }
 
