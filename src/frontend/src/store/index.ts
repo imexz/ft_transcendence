@@ -73,8 +73,10 @@ export default createStore<State>({
       state.validated = false;
       console.log("store logOut()");
       // state.socketGame.emit('leaveGame')
-      state.socket.disconnect();
-      router.push('/')
+      if (state.socket != null && state.socket != undefined) {
+        state?.socket.disconnect();
+        router.push('/')
+      }
     },
     logIn(state, user) {
       state.validated = true;
@@ -86,7 +88,7 @@ export default createStore<State>({
       })
 
       console.log("socketGame established");
-      
+
       state.chat = new Chat()
 
       // console.log("game socket init");
@@ -100,7 +102,7 @@ export default createStore<State>({
       state.socket.on('GameRequestFrontend',function (data, ack) {
         console.log("GameRequestFrontend", data, ack);
         state.gameRequest = new GameRequest()
-        
+
         state.gameRequest.user = data.user;
         state.gameRequest.settings = data.settings;
         state.gameRequest.response = ack

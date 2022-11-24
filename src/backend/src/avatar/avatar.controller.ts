@@ -1,4 +1,4 @@
-import {  Delete, Controller, Request, Post, UseInterceptors, UploadedFile, MaxFileSizeValidator, FileTypeValidator, ParseFilePipe, Get, UseGuards, Res, StreamableFile, Header } from '@nestjs/common';
+import {  Delete, Controller, Request, Post, Param, UseInterceptors, UploadedFile, MaxFileSizeValidator, FileTypeValidator, ParseFilePipe, Get, UseGuards, Res, StreamableFile, Header } from '@nestjs/common';
 import { Express } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { AvatarService } from './avatar.service';
@@ -27,11 +27,19 @@ export class AvatarController {
       return await this.avatarService.add(req.user.id, file)
   }
 
-  @Get()
+  @Get(':id')
   @Header('Content-Type', 'image/jpeg')
 	@UseGuards(JwtAuthGuard)
-  async getAvatar(@Request() req) {
-      return new StreamableFile((await this.avatarService.getFile(req.user.id)).data)
+  async getAvatar(@Param('id') id: number) {
+
+    let file = await this.avatarService.getFile(id)
+      if (file)
+        return new StreamableFile(file.data)
+      else
+      {
+        // CHANGE HERE TO 404 !!!!!!
+        return {undefined}
+      }
   }
 
   @Delete()
