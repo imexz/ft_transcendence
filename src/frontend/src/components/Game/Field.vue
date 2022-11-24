@@ -6,6 +6,7 @@
 import { defineComponent } from 'vue'
 import * as PIXI from 'pixi.js';
 import { Socket } from 'socket.io-client'
+import Game from '@/models/game';
 
 export default defineComponent({
     data() {
@@ -71,6 +72,7 @@ export default defineComponent({
         this.initPixi();
         this.pixiApp.ticker.add(this.updatePixi)
       document.addEventListener('keydown', this.keyEvents, false);
+      this.updateScore({scoreWinner: this.gameInit?.scoreWinner, scoreLoser: this.gameInit?.scoreLoser})
     },
     unmounted() {
         this.socket.off('updateBall')
@@ -79,7 +81,6 @@ export default defineComponent({
         document.removeEventListener('keydown', this.keyEvents, false);
         this.pixiApp.ticker.stop()
     },
-
     methods: {
     isValidKey(key) {
       return  key == "w" || key == "s" || key == "ArrowUp" || key == "ArrowDown";
@@ -234,7 +235,8 @@ export default defineComponent({
       // }
     },
     props: {
-      socket: Socket
+      socket: Socket,
+      gameInit: Game
     }
 })
 </script>

@@ -13,7 +13,7 @@
     </form>
   </div>
   <div v-if="showGame" class="dmPopUp">
-      <ViewGamePopup @actions="viewGame" :game="game" :userId="user.id" />
+      <ViewGamePopup @actions="viewGame" :userName=this.opponentName :userId="user.id" />
   </div>
   <div class="dropdownMenu">
     <div class="box" v-if="$store.state.friendsList != '' && $store.state.friendsList.some((us: User) => us.id == user.id)">

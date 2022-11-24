@@ -75,6 +75,8 @@ import User from '@/models/user';
           this.game = new Game()
           this.game.winner = game.winner
           this.game.loser = game.loser
+          this.game.scoreWinner = game.scoreWinner
+          this.game.scoreLoser = game.scoreLoser
 		    });
 		    this.socketGame.on('isFinished', () => {
           this.wait = false

@@ -43,7 +43,7 @@ export class GameService {
 			&&
 			settings?.serving == value.settings?.serving))
 		)})
-			console.log("test", test);
+			// console.log("test", test);
 			return test
 			}
 		
@@ -73,13 +73,20 @@ export class GameService {
 	}
 
 	async joinGameOrCreateGame(user: User, settings: Settings, opponentUserId?: number): Promise<Game> {
-		let game = this.getGame(undefined, settings) // checking for first game with missing (undefined) opponent
+		let game = this.getGame(user.id)
+		if(game != undefined) return game
+		this.getGame(undefined, settings) // checking for first game with missing (undefined) opponent
 		if (game == undefined || opponentUserId) {
 			game = await this.createGameInstance(user.id, settings)
 			// console.log("joinGameOrCreateGame", game.settings);
 			game.winner = user
 			// opponentUserId is set when called via Frontend::askForMatch
 			if(opponentUserId != undefined) {
+				const tmpGame = this.getGame(opponentUserId)
+				if(tmpGame) {
+					this.removeGame(game);
+					return
+				}
 				const opponent = await this.userService.getUser(opponentUserId)
 				game.loser = opponent
 			}
