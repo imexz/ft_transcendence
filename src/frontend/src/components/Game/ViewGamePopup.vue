@@ -6,13 +6,8 @@
         <font-awesome-icon icon="fa-solid fa-x" />
       </button>
     </div>
-    <div v-if="$store.state.game != null" class="txt">
-      <div v-if="userId != $store.state.game.loser.id">
-        Playing against {{$store.state.game.loser.username}}
-      </div>
-      <div v-if="userId != $store.state.game.winner.id">
-        Playing against {{$store.state.game.winner.username}}
-      </div>
+    <div class="txt">
+        Playing against {{this.userName}}
     </div>
     <div>
       <button class="btn" @click="reEmit" >
@@ -29,9 +24,9 @@ import { defineComponent } from 'vue';
 
 export default defineComponent({
   props: {
-        userId: {
-          type: Number,
-          default: 0
+    userName: {
+          type: String,
+          default: ""
         }
 
   },

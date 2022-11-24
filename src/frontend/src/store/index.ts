@@ -11,6 +11,9 @@ import Game from '@/models/game';
 import Room, { Access } from '@/models/room';
 import Message from '@/models/message';
 import Chat from '@/models/chat';
+import { Settings } from '@/models/gameSettings';
+import GameRequest from '@/models/GameRequest';
+
 import { Status } from '@/enums/models/ResponseEnum';
 
 
@@ -26,18 +29,11 @@ export interface State {
   validated: boolean
   user: User
   socket: Socket | null
-  socketGame: Socket | null
-  // socketChat: Socket | null
   friendsList: User[] | null
   NrMessages: number
   NrFriendRequests: number
-  requester: User | null
-  // rooms: Room[]
-  game: Game | null
-  winner: User | null
+  gameRequest: GameRequest | null
   chat: Chat
-  loser: User | null
-  customized: boolean
 
   toastShow: boolean
   toastMode: string
@@ -55,11 +51,7 @@ const initialState = {
   friendsList: null,
   NrMessages: 0,
   NrFriendRequests: 0,
-  requester: null,
-  game: null,
-  winner: null,
-  loser: null,
-  customized: false,
+  gameRequest: null,
   chat: null,
   toastShow: false,
   toastMode: "",
@@ -79,9 +71,10 @@ export default createStore<State>({
   mutations: {
     logOut(state) {
       state.validated = false;
-      state.socketGame?.emit('leaveGame')
-      state.socket?.disconnect();
-	    state.socketGame?.disconnect();
+      console.log("store logOut()");
+      // state.socketGame.emit('leaveGame')
+      state.socket.disconnect();
+      router.push('/')
     },
     logIn(state, user) {
       state.validated = true;
@@ -91,32 +84,39 @@ export default createStore<State>({
               id: document.cookie
           }
       })
-      state.socketGame = io(API_URL + "/game", {
-        auth: {
-          id: document.cookie
-        }
-      })
+
+      console.log("socketGame established");
+      
       state.chat = new Chat()
 
-	    state.socketGame.on('disconnecting', () => {
-		    console.log("game socket disconnecting");
-		    console.log(state.socketGame);
-	    })
+      // console.log("game socket init");
+      console.log(document.cookie);
 
-      state.socketGame.on('GameRequestFrontend',(user: User) => {
-        state.requester = user;
+	    // state.socketGame.on('disconnecting', () => {
+		  //   console.log("game socket disconnecting");
+		  //   console.log(state.socketGame);
+	    // })
+
+      state.socket.on('GameRequestFrontend',function (data, ack) {
+        console.log("GameRequestFrontend", data, ack);
+        state.gameRequest = new GameRequest()
+        
+        state.gameRequest.user = data.user;
+        state.gameRequest.settings = data.settings;
+        state.gameRequest.response = ack
+
+        console.log("receive askformatch");
+        // ack({data: "weil"})
+        // state.showGame = true;
       })
-      state.socketGame.on('NowInGame', (cb) => {
-        if (cb) {
-			    router.push('/play')
-		    } else {
-          state.game = null;
+      state.socket.on('resetRequester', () => {
+        console.log("receive resetRequester");
+        state.gameRequest = null;
+      })
+      state.socket.on('NowInGame', () => {
+        console.log("receive NowInGame");
           router.push('/')
-        }
       })
-	    state.socketGame.on('resetRequester', () => {
-		    state.requester = null;
-	    })
       state.socket.on('Request',(data) => {
         state.friendsList.push(data)
         state.NrFriendRequests++

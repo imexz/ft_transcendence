@@ -10,7 +10,7 @@
     <div v-if="getRole == 'owner'">
       <CreateRoom :roomName=room.roomName :roomAccess=room.access> </CreateRoom>
     </div>
-    <div class="userGroup">Admins</div>
+    <div v-if="room.admins != undefined" class="userGroup">Admins</div>
     <div class="user" v-for="user in room?.admins">
       <UserSummary v-if="room?.access == Access.dm && user.id != this.$store.state.user.id" :user=user :extraButtons=extraButtonsDm @action="reEmit"></UserSummary>
       <UserSummary v-else :user=user></UserSummary>
@@ -29,8 +29,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import UserSummary from '@/components/Profile/UserSummary.vue'
-import Room, { Access } from '@/models/room';
-import Button from '@/models/button';
+import { Access } from '@/models/room';
 import User from '@/models/user';
 import CreateRoom from './createRoom.vue';
 
@@ -43,7 +42,6 @@ enum AdminAction {
 export default defineComponent({
   data() {
     return {
-      // room: null,
       admin: false as boolean,
       extraButtons: [
         {
@@ -79,8 +77,6 @@ export default defineComponent({
   },
   updated() {
     console.log("updated in room info");
-
-    // this.room = this.roomInfo?.room;
   },
   computed: {
     getRole(): string{
@@ -120,8 +116,6 @@ export default defineComponent({
           case AdminAction.unMuted:
             this.extraButtonsDm[0].icon = "fa-solid fa-comment-slash"
             this.extraButtonsDm[0].tooltip = "Mute User"
-            // <font-awesome-icon icon="fa-solid fa-comment" />
-
           default:
             break;
         }
@@ -142,7 +136,10 @@ export default defineComponent({
     CreateRoom
   },
   props: {
-    room: Object //Room
+    room: {
+      type: Object,
+      default: null
+    }
   }
 })
 

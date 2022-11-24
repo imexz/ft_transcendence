@@ -14,7 +14,7 @@
       <div v-else></div>
     </div>
     <div class="child topElement">
-      <router-link :to="'/play'" @click.native="this.$store.state.winner=null" class="playButton">PLAY</router-link>
+      <router-link :to="'/play'" class="playButton">PLAY</router-link>
     </div>
     <div class="rightSide child">
       <div class="sb rightSideElement">

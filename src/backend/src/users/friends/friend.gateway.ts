@@ -11,8 +11,17 @@ import { AuthService } from 'src/auth/auth.service';
 import { FriendsService } from './friends.service';
 import { Status } from './friend.entity';
 import User from '../entitys/user.entity';
+import { Settings } from 'src/game/game.entities/settings';
+import { forwardRef, Injectable, Inject } from '@nestjs/common';
+import { GameService } from 'src/game/game.service';
+import { GameGateway } from 'src/game/game.gateway';
 
 
+
+enum RESPONSE {
+  accept,
+  refuse
+}
 
 @WebSocketGateway({
   cors: {
@@ -21,16 +30,57 @@ import User from '../entitys/user.entity';
     credentials: true
   }
 })
-export class FriendGateway {
+export class Gateway {
 
+  @WebSocketServer()
+  server: Server;
+  
+  
   constructor(
-    private authService: AuthService,
-    private usersService: UsersService,
-    private readonly friendsService: FriendsService
-  ) {}
+    @Inject(forwardRef(() => AuthService))
+    private readonly authService: AuthService,
+    private readonly usersService: UsersService,
+    private readonly friendsService: FriendsService,
+    @Inject(forwardRef(() => GameService))
+    private readonly gameService: GameService,
+    @Inject(forwardRef(() => GameGateway))
+    private readonly gameGateway: GameGateway
+    ) {}
+    
+    async askUserToPlay(user: User, id: number, settings: Settings) {
+      const socket = await this.usersService.getUserSocket(this.server, id)
+      if (socket == undefined) {
+        console.log("gameRequest: opponent is offline");
+      } else {
+        var receivedSettings = false
+        var response = {data: null as RESPONSE};
 
-    @WebSocketServer()
-    server: Server;
+        await socket.emit('GameRequestFrontend',{ user, settings},  function ( data: RESPONSE)  {
+          console.log("GameRequestFrontend beginn");
+          response.data = data
+          console.log("in call back ", data)
+        } 
+        )
+        
+        this.responseGameRequest(response, user, settings, id)
+        }
+      }
+      
+      async responseGameRequest(data: { data: RESPONSE}, user, settings, id) {
+        console.log("start async");
+        while (data.data == undefined) {
+          await new Promise(r => setTimeout(r, 10));
+        }
+        console.log(data.data);
+        if (data.data == RESPONSE.accept) {
+          const game = this.gameService.joinGameOrCreateGame( user, settings, id)
+          this.gameGateway.joinGameRoom(await this.gameGateway.findSocketOfUser(user.id), await  game)
+        } else if(data.data == RESPONSE.refuse) {
+          (await this.gameGateway.findSocketOfUser(user.id)).emit('isFinished')
+        }
+        console.log("ende async")
+    }
+
 
   async handleConnection(socket) {
     await this.authService.validateSocket(socket)

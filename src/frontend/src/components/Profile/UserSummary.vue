@@ -1,5 +1,21 @@
 <template>
   <div class="userSummary">
+    <div v-if="showDm" class="dmPopUp">
+      <div class="headLineWrapper">
+        <div class="headLine">Direct Message</div>
+        <button class="exitButton" @click="closeDmPopUp">
+          <font-awesome-icon icon="fa-solid fa-x" />
+        </button>
+      </div>
+      <form @submit.prevent="sendDm">
+        <textarea class="dmText" v-model="msgText" placeholder="your message" rows="4">
+        </textarea>
+        <button class="dmButton">Send</button>
+      </form>
+    </div>
+    <div v-if="showGame" class="dmPopUp">
+      <ViewGamePopup @actions="viewGame" :userName="this.opponentName" />
+    </div>
     <div class="userInfoBar">
       <img id="userAvatar" :src="user?.avatar_url" alt="Avatar">
       <div id="middleSection">
@@ -9,9 +25,6 @@
           </div>
           <div style="margin-top: -15px">
             <text class="status"> {{ UserStatus[user?.userStatus] }} </text>
-            <div v-if="user?.friendStatus == Status.pending">
-              <text class="friendStatus"> {{ Status[user?.friendStatus].toString() }} </text>
-            </div>
           </div>
         </div>
         <div v-if="user?.friendStatus == Status.requsted" >
@@ -21,6 +34,9 @@
           <button @click="response(3)" class="friendButton">
             <font-awesome-icon icon="fa-solid fa-x" />
           </button>
+        </div>
+        <div v-if="user?.friendStatus == Status.pending">
+          <text id="pendingTxt">pending</text>
         </div>
       </div>
       <div>
@@ -41,10 +57,21 @@ import { defineComponent } from 'vue';
 import { Status } from '@/enums/models/ResponseEnum';
 import ViewGamePopup from '../Game/ViewGamePopup.vue';
 import{ UserStatus }from '@/models/user';
+import { Socket } from 'socket.io'
+import VueAxios from 'axios';
+import { API_URL } from '@/defines';
+
+
+
 import UserActionsPopup from '@/components/Profile/UserActionsPopup.vue';
 import Game from '@/models/game';
+import router from '@/router';
 
 export default defineComponent({
+  created() {
+    console.log("creted user summary");
+    
+  },
   components: {
     ViewGamePopup,
     UserActionsPopup,
@@ -58,8 +85,13 @@ export default defineComponent({
       UserStatus: UserStatus,
       showGame: false as boolean,
       game: null as Game,
+      opponentName: null as String
     }
   },
+  mounted() {
+    console.log(this.user)
+  }
+  ,
   props : {
     user: {
       type: Object,
@@ -112,6 +144,7 @@ export default defineComponent({
         window.addEventListener('click', this.hideDropDown)
       this.show = !this.show
     },
+    // for match and spectat
   },
 })
 
@@ -132,8 +165,13 @@ export default defineComponent({
 
   #middleSection {
     display: flex;
-    justify-content: center;
+    justify-content: space-evenly;
+    align-items: center;
     gap: 10px;
+  }
+
+  #pendingTxt {
+    font-size: 15px;
   }
   .userSummary {
     position: relative;
@@ -147,6 +185,7 @@ export default defineComponent({
     font-weight: bold;
     display: grid;
     grid-template-columns: 50px auto 50px;
+    align-items: center;
   }
   .dropdownMenu {
     display: flex;
@@ -181,7 +220,6 @@ export default defineComponent({
     font-family: Avenir, Helvetica, Arial, sans-serif;
     resize: none;
     color: var(--ft_cyan);
-    background-color: var(--ft_dark);
     font-size: 10px
   }
 
@@ -198,5 +236,11 @@ export default defineComponent({
     background-color: var(--ft_cyan);
     color: var(--ft_dark);
   }
+
+  .pending {
+    background-color: var(--ft_dark_purple);
+  }
+  
+
 
 </style>

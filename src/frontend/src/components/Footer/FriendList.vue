@@ -36,9 +36,22 @@
         </div>
       </button>
       <div class="friends">
-        <UserSummary
-        v-for="user in $store.state.friendsList"
-        :user = user as User ></UserSummary>
+        <div 
+          v-if="$store.state.friendsList?.some((user)=>{
+            return user.friendStatus == Status.pending || user.friendStatus == Status.requsted})">
+          <div class="pending">Pending FriendRequests</div>
+          <div v-for="user in $store.state.friendsList">
+            <UserSummary
+              v-if="user.friendStatus == Status.pending || user.friendStatus == Status.requsted"
+              :user = user as User ></UserSummary>
+          </div>
+          <div class="pending">Friends</div>
+        </div>
+        <div v-for="user in $store.state.friendsList">
+          <UserSummary
+          v-if="user?.friendStatus != Status.pending && user.friendStatus != Status.requsted"
+          :user = user as User ></UserSummary>
+        </div>
       </div>
     </div>
   </div>
@@ -46,12 +59,15 @@
 
 <script lang="ts">
 import UserSummary from '@/components/Profile/UserSummary.vue';
+import User from '@/models/user';
 import { defineComponent } from 'vue';
+import { Status } from '@/enums/models/ResponseEnum';
 
 export default defineComponent({
   data() {
     return {
       isCollapsed: true as boolean,
+      Status: Status,
     }
   },
   methods: {
@@ -157,6 +173,11 @@ export default defineComponent({
     100% {
       transform: scaleY(1);
     }
+  }
+
+  .pending {
+    font-size: 20px;
+    font-weight: bold;
   }
   .text {
     display: flex;
