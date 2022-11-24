@@ -63,12 +63,16 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 					await this.gameService.startGame(this.server, game);
 				}
 			} else {
-				client.emit('GameInfo', {winner: game.winner, loser: game.loser})
-				client.emit('updateScore', {scoreWinner: game.score.scoreLeft, scoreLoser: game.score.scoreRight, scoreToWin: game.settings.scoreToWin})
-				client.emit('updatePaddle', {paddleLeft: game.paddleLeft, paddleRight: game.paddleRight})
+				client.emit('GameInfo', {winner: game.winner, loser: game.loser, scoreLoser: game.scoreLoser, scoreWinner: game.scoreWinner})
+				this.sendPaddel(client, game)
 			}
 		}
   }
+	
+	async sendPaddel(client: Socket, game: Game){
+		await new Promise( resolve => setTimeout(resolve, 100) )
+		client.emit('updatePaddle', {paddleLeft: game?.paddleLeft, paddleRight: game?.paddleRight})
+	}
 
 	getGame(userId: number): Game {
 		const game = this.gameService.getGame(userId);
