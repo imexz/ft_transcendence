@@ -22,9 +22,9 @@
       </div>
       <div class="singleOption">
         <div class="singleOptionText">Who serves after score</div>
-        <button id="lastScored" @click="this.setServing(1);" class>Last Scored</button>
-        <button id="alternate" @click="this.setServing(0);" class>Alternate</button>
-        <button id="random" @click="this.setServing(2);" class="selected">Random</button>
+        <button id="lastScored" @click="this.setServing(this.Serving.LAST_SCORED);" class>Last Scored</button>
+        <button id="alternate" @click="this.setServing(this.Serving.ALTERNATE);" class>Alternate</button>
+        <button id="random" @click="this.setServing(this.Serving.RANDOM);" class="selected">Random</button>
       </div>
     </div>
 		<div id="startGame">
@@ -275,25 +275,19 @@ export default defineComponent({
     
     border: 1px solid var(--ft_red);
     border-radius: 10px;
-    /* border-radius: 50%; */
+
     color: var(--ft_white);
     background-color: var(--ft_red);
     padding: 14px 24px;
-    
-    /* width: 150px;
-    height: 150px; */
+  
     
     margin-top: 20px;
     
     font-size: 30px;
     font-weight: bold;
-    filter: drop-shadow(0 0 7.5rem crimson);
   }
   
   .epicButton:hover {
-    filter: drop-shadow(0 0 2rem crimson);
-    filter: drop-shadow(0 0 10rem crimson);
-    
     animation: vibe 75ms forwards infinite;
   }
   
