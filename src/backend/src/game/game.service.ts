@@ -147,7 +147,7 @@ export class GameService {
 		this.collisionControl(game);
 		if (this.scored(game)){
 			this.reset(game);
-			this.gameGateway.server.to(game.id.toString()).emit('updateScore', {scoreWinner: game.score.scoreLeft, scoreLoser: game.score.scoreRight, scoreToWin: game.settings.scoreToWin})
+			this.gameGateway.server.to(game.id.toString()).emit('updateScore', {scoreWinner: game.score.scoreLeft, scoreLoser: game.score.scoreRight})
 		}
 		await this.isGameFinished(game);
 		return game

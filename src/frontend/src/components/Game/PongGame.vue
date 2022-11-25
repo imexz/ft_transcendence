@@ -5,7 +5,7 @@
     <br>
     <button @click="this.leaveGame"> Leave </button>
   </div> -->
-  <div v-show="this.game.isFinished == false">
+  <div v-if="this.game.isFinished == false">
 		<GamePlayers :game = this.game />
 		<div class="gameCanvas">
       <div>

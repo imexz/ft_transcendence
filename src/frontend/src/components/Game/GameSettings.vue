@@ -25,9 +25,9 @@
 		<div class="singleOption">
 			Who serves after score
 			<br>
-			<button id="lastScored" @click="this.setServing(1);" class>Last Scored</button>
-			<button id="alternate" @click="this.setServing(0);" class>Alternate</button>
-			<button id="random" @click="this.setServing(2);" class="selected">Random</button>
+			<button id="lastScored" @click="this.setServing(this.Serving.LAST_SCORED);" class>Last Scored</button>
+			<button id="alternate" @click="this.setServing(this.Serving.ALTERNATE);" class>Alternate</button>
+			<button id="random" @click="this.setServing(this.Serving.RANDOM);" class="selected">Random</button>
 		</div>
 		<div class="singleOption">
 			<br>
@@ -66,7 +66,8 @@ export default defineComponent({
     data() {
         return {
             settings: Settings,
-            user: User
+            user: User,
+            Serving
         }
     },
     props: {
@@ -160,15 +161,15 @@ export default defineComponent({
                 document.getElementById("alternate").classList.remove("selected");
                 document.getElementById("random").classList.remove("selected");
                 switch (option) {
-                    case 0:
+                    case Serving.ALTERNATE:
                         document.getElementById("alternate").classList.add("selected");
                         this.settings.serving = Serving.ALTERNATE;
                         break;
-                    case 1:
+                    case Serving.LAST_SCORED:
                         document.getElementById("lastScored").classList.add("selected");
                         this.settings.serving = Serving.LAST_SCORED;
                         break;
-                    case 2:
+                    case Serving.RANDOM:
                         document.getElementById("random").classList.add("selected");
                         this.settings.serving = Serving.RANDOM;
                         break;

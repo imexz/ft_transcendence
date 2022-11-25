@@ -1,11 +1,12 @@
 import { PosXY } from "../game.interfaces/pos.interface";
 import { BallDirObj } from "../game.interfaces/balldirobj.interface";
 import { GameSetup } from "./setup.entity";
+import { Serving } from "./settings";
 
 export class Ball {
-	constructor(slow: boolean) {
+	constructor(slow: boolean, serving?: Serving) {
 
-		this.direction = new BallDirObj(slow)
+		this.direction = new BallDirObj(slow, serving)
 	}
 
 	

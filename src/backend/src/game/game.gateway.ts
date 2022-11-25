@@ -54,7 +54,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   }
 
   async joinGameRoom(client: Socket | any, game: Game) {
-		if(game != undefined) {
+		if(game != undefined && client != undefined) {
 			client.join(game.id.toString());
 			if (game.interval == null) {
 				if (client.handshake.auth.id === game.loser?.id) {
@@ -62,7 +62,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 					await this.gameService.startGame(this.server, game);
 				}
 			} else {
-				client.emit('GameInfo', {winner: game.winner, loser: game.loser, scoreLoser: game.scoreLoser, scoreWinner: game.scoreWinner})
+				client.emit('GameInfo', {winner: game.winner, loser: game.loser})
 				this.sendPaddel(client, game)
 			}
 		}
@@ -71,6 +71,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	async sendPaddel(client: Socket, game: Game){
 		await new Promise( resolve => setTimeout(resolve, 100) )
 		client.emit('updatePaddle', {paddleLeft: game?.paddleLeft, paddleRight: game?.paddleRight})
+		client.emit('updateScore', {scoreWinner: game.score.scoreLeft, scoreLoser: game.score.scoreRight})
 	}
 
 	getGame(userId: number): Game {
