@@ -145,8 +145,9 @@ export class GameService {
 		}
 		this.updateBall(game)
 		this.collisionControl(game);
-		if (this.scored(game)){
-			this.reset(game);
+		const getPoint = this.scored(game)
+		if (getPoint != undefined){
+			this.reset(game, getPoint);
 			this.gameGateway.server.to(game.id.toString()).emit('updateScore', {scoreWinner: game.score.scoreLeft, scoreLoser: game.score.scoreRight})
 		}
 		await this.isGameFinished(game);
@@ -208,31 +209,36 @@ export class GameService {
 		}
 	}
 
-	scored(game: Game): boolean {
-		var ret: boolean = false;
+	scored(game: Game): Side {
+		var ret: Side = undefined;
 		if (game.ball.position.x - game.ball.radius <= 0) {
 			game.score.scoreRight += game.score.increaseRight;
 			game.scoreLoser += game.score.increaseRight;
-			ret = true;
+			ret = Side.left;
 		}
 		else if (game.ball.position.x + game.ball.radius >= 640 ) {
 			game.score.scoreLeft += game.score.increaseLeft;
 			game.scoreWinner += game.score.increaseLeft;
-			ret = true;
+			ret = Side.right;
 		}
 		return ret;
 	}
 
-	reset(game: Game) {
+	reset(game: Game, getPoint: Side) {
 		game.ball.position = GameSetup.staticballPos
 		// console.log("GameSetup.staticballPos", GameSetup.staticballPos);
 		game.ball.reset()
-		game.ball.direction.newBallDir()
-		game.ball.radius = GameSetup.ballRadius;
+		game.ball.direction.newBallDir(getPoint)
+		if (game.settings.enablePowerUp) {
+			game.ball.radius++
+			game.paddleLeft.speed *= -1
+			game.paddleRight.speed *= -1
+		} else {
+			game.ball.radius = GameSetup.ballRadius;
+		}
 
-		game.paddleLeft.reset()
-		game.paddleRight.reset()
-
+		// game.paddleLeft.reset()
+		// game.paddleRight.reset()
 		game.score.increaseLeft = GameSetup.scoreIncrease;
 		game.score.increaseRight = GameSetup.scoreIncrease;
 	}

@@ -1,3 +1,4 @@
+import { Side } from "../game.entities/game.entity";
 import { Serving } from "../game.entities/settings";
 import { GameSetup } from "../game.entities/setup.entity";
 
@@ -6,7 +7,7 @@ export class BallDirObj {
 	constructor(slow: boolean, serving?: Serving) {
 		this.slowServe = slow
 		this.serving = serving
-		this.newBallDir()
+		this.newBallDir(Side.left)
 	}
 
 	serving: Serving;
@@ -18,7 +19,7 @@ export class BallDirObj {
 	speed = GameSetup.ballSpeed;
 
 
-	isDirectionValid(angle: number): boolean {
+	isDirectionValid(angle: number, side: Side): boolean {
 		const toLeft: boolean = (angle >= 3 * Math.PI / 4 && angle <= 5 * Math.PI / 4)
 		const toRight:boolean =  (angle <= Math.PI / 4 || angle >= 7 * Math.PI / 4);
 
@@ -35,7 +36,8 @@ export class BallDirObj {
 			ret = this.side ? toLeft : toRight
 			break
 		case Serving.LAST_SCORED:
-					
+			ret = side == Side.left ? toLeft : toRight
+					break
 		default:
 			ret = toLeft || toRight		
 			break;
@@ -43,13 +45,13 @@ export class BallDirObj {
 		return ret
 }
 
-	newBallDir(){
+	newBallDir(side: Side){
 		console.log(this.serving);
 		
 				do {
 					this.angle = Math.random() * 2 * Math.PI;
 				}
-				while (!this.isDirectionValid(this.angle));
+				while (!this.isDirectionValid(this.angle, side));
 				this.x = GameSetup.ballSpeed * Math.cos(this.angle);
 				this.y = GameSetup.ballSpeed * Math.sin(this.angle);
 		
