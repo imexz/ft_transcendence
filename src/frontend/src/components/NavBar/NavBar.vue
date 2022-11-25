@@ -188,9 +188,7 @@ export default defineComponent({
   font-size: 25px;
   font-weight: bold;
   color: var(--ft_white);
-  /* background:  linear-gradient(var(--ft_red), var(--ft_yellow)); */
   background-color: var(--ft_red);
-  /* color: var(--ft_cyan); */
   padding: 14px 24px;
   border-radius: 10px;
 }

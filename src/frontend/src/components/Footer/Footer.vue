@@ -2,6 +2,7 @@
   <div class="footer">
       <AskForGame v-if="this.$store.state.gameRequest != null"/>
       <FriendList v-if="this.$store.state.validated"></FriendList>
+      <Toast/>
   </div>
 </template>
 

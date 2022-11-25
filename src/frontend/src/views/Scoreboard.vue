@@ -128,7 +128,7 @@ export default defineComponent({
 #scoreBoard {
   height: 740px;
   margin: 40px;
-  border: 1px solid var(--ft_pink);
+  border: 2px solid var(--ft_pink);
   background-color: var(--ft_dark);
 }
 .scoreList {
