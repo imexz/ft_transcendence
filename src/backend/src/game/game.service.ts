@@ -43,14 +43,12 @@ export class GameService {
 			&&
 			settings?.serving == value.settings?.serving))
 		)})
-			console.log("test", test);
 			return test
 			}
 		
 
 	addUserToSpectators(userId: number, gameId: number) {
 		this.spectatorsMap.set(userId, gameId);
-		// game.spectators.push(userId);
 	}
 
 	removeUserFromSpectators(userId: number, game: Game) {
@@ -73,13 +71,24 @@ export class GameService {
 	}
 
 	async joinGameOrCreateGame(user: User, settings: Settings, opponentUserId?: number): Promise<Game> {
-		let game = this.getGame(undefined, settings) // checking for first game with missing (undefined) opponent
+		let game = this.getGame(user.id)
+		if(game != undefined) {
+			console.log("already in game");
+			return game
+		}
+
+		game = this.getGame(undefined, settings) // checking for first game with missing (undefined) opponent
 		if (game == undefined || opponentUserId) {
 			game = await this.createGameInstance(user.id, settings)
 			// console.log("joinGameOrCreateGame", game.settings);
 			game.winner = user
 			// opponentUserId is set when called via Frontend::askForMatch
 			if(opponentUserId != undefined) {
+				const tmpGame = this.getGame(opponentUserId)
+				if(tmpGame) {
+					this.removeGame(game);
+					return
+				}
 				const opponent = await this.userService.getUser(opponentUserId)
 				game.loser = opponent
 			}
@@ -138,7 +147,7 @@ export class GameService {
 		this.collisionControl(game);
 		if (this.scored(game)){
 			this.reset(game);
-			this.gameGateway.server.to(game.id.toString()).emit('updateScore', {scoreWinner: game.score.scoreLeft, scoreLoser: game.score.scoreRight, scoreToWin: game.settings.scoreToWin})
+			this.gameGateway.server.to(game.id.toString()).emit('updateScore', {scoreWinner: game.score.scoreLeft, scoreLoser: game.score.scoreRight})
 		}
 		await this.isGameFinished(game);
 		return game
@@ -219,7 +228,6 @@ export class GameService {
 		// console.log("GameSetup.staticballPos", GameSetup.staticballPos);
 		game.ball.reset()
 		game.ball.direction.newBallDir()
-
 		game.ball.radius = GameSetup.ballRadius;
 
 		game.paddleLeft.reset()

@@ -6,6 +6,7 @@
 import { defineComponent } from 'vue'
 import * as PIXI from 'pixi.js';
 import { Socket } from 'socket.io-client'
+import Game from '@/models/game';
 
 export default defineComponent({
     data() {
@@ -71,6 +72,16 @@ export default defineComponent({
         this.initPixi();
         this.pixiApp.ticker.add(this.updatePixi)
       document.addEventListener('keydown', this.keyEvents, false);
+      console.log("Field mounted gameInit", this.gameInit);
+    },
+    updated() {
+      // console.log("Field updated gameInit", this.gameInit);
+      // console.log("GameInfo", game)
+
+      
+      // this.updateScore({scoreWinner: this.gameInit?.scoreWinner, scoreLoser: this.gameInit?.scoreLoser})
+      console.log("FieldView Updated");
+      
     },
     unmounted() {
         this.socket.off('updateBall')
@@ -79,7 +90,6 @@ export default defineComponent({
         document.removeEventListener('keydown', this.keyEvents, false);
         this.pixiApp.ticker.stop()
     },
-
     methods: {
     isValidKey(key) {
       return  key == "w" || key == "s" || key == "ArrowUp" || key == "ArrowDown";
@@ -196,12 +206,12 @@ export default defineComponent({
             this.styleData.fgColor = 0xe70038
             break;
         }
-        // if (this.isGameFinished()) {
-
+        if (this.isGameFinished()) {
+          this.pixiApp.ticker.stop()
         //   // this.$emit('assignWinner', this.assignWinnerAndLoser())
         //   console.log("winner");
         //   this.$store.state.game.isFinished = true
-        // }
+        }
       },
       updatePaddle(data: any) {
         console.log(data);
@@ -221,10 +231,10 @@ export default defineComponent({
         }
         this.gameData.ball = data;
       },
-	    // isGameFinished(): boolean {
-		  //   return (this.gameData.score.scoreWinner == this.gameData.score.scoreToWin ||
-      //           this.gameData.score.scoreLoser == this.gameData.score.scoreToWin);
-	    // },
+	    isGameFinished(): boolean {
+		    return (this.gameData.score.scoreWinner == this.gameData.score.scoreToWin ||
+                this.gameData.score.scoreLoser == this.gameData.score.scoreToWin);
+	    },
       // assignWinnerAndLoser() {
       //   if (this.gameData.score.scoreWinner > this.gameData.score.scoreLoser) {
       //     return { winner: this.$store.state.game.winner, loser: this.$store.state.game.loser }
@@ -234,7 +244,8 @@ export default defineComponent({
       // }
     },
     props: {
-      socket: Socket
+      socket: Socket,
+      gameInit: Game
     }
 })
 </script>

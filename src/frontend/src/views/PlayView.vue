@@ -28,7 +28,7 @@
   import PongGame from '../components/Game/PongGame.vue';
   import { io, Socket } from 'socket.io-client'
   import { API_URL } from '@/defines';
-import User from '@/models/user';
+  import User from '@/models/user';
 
 
   export default defineComponent({
@@ -56,10 +56,18 @@ import User from '@/models/user';
             
           });
       }
+      this.wait = false
+      this.game = null
       this.initGameInfoListener()
+      console.log("view mounted");
+      
       // await this.askBackendForGame()
     },
     updated() {
+      console.log("view updated");
+      if (this.game?.isFinished) {
+        this.game = null
+      }
       // console.log("updated");
       // console.log(this.userId);
       
@@ -76,11 +84,14 @@ import User from '@/models/user';
       },
 	    async initGameInfoListener() {
 		    this.socketGame.on('GameInfo', (game: Game) => {
-
-          console.log("GameInfo", game)
+          this.reset()
           this.game = new Game()
           this.game.winner = game.winner
           this.game.loser = game.loser
+          this.game.scoreWinner = game.scoreWinner
+          this.game.scoreLoser = game.scoreLoser
+          console.log("GameInfo PlayView", game)
+          
 		    });
 		    this.socketGame.on('isFinished', () => {
           this.wait = false
@@ -96,8 +107,9 @@ import User from '@/models/user';
       },
       
       reset() {
-        this.game = null
         this.wait = false
+        this.game = null
+        this.$router.push('/play')
       }
     },
     unmounted() {

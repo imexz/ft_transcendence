@@ -67,7 +67,8 @@ export default defineComponent({
     data() {
         return {
             settings: Settings,
-            user: User
+            user: User,
+            Serving
         }
     },
     props: {
@@ -161,15 +162,15 @@ export default defineComponent({
                 document.getElementById("alternate").classList.remove("selected");
                 document.getElementById("random").classList.remove("selected");
                 switch (option) {
-                    case 0:
+                    case Serving.ALTERNATE:
                         document.getElementById("alternate").classList.add("selected");
                         this.settings.serving = Serving.ALTERNATE;
                         break;
-                    case 1:
+                    case Serving.LAST_SCORED:
                         document.getElementById("lastScored").classList.add("selected");
                         this.settings.serving = Serving.LAST_SCORED;
                         break;
-                    case 2:
+                    case Serving.RANDOM:
                         document.getElementById("random").classList.add("selected");
                         this.settings.serving = Serving.RANDOM;
                         break;
@@ -177,7 +178,6 @@ export default defineComponent({
             },
             async startWait() {
                 if(this.userId != undefined) {
-
                     console.log("settings", this.settings, this.user);
                     this.socket.emit('GameRequestBackend', {settings: this.settings , id: this.userId}, (r) => {
                         // if (r.game != undefined) {

@@ -5,7 +5,7 @@ import { Score } from "./score.entity";
 import { Column } from "typeorm";
 import { GameSetup } from "./setup.entity";
 import { Exclude } from 'class-transformer';
-import { Settings } from "./settings";
+import { Serving, Settings } from "./settings";
 import { Side } from "./game.entity";
 
 export class GameData {
@@ -50,13 +50,16 @@ export class GameData {
                 this.settings = settings
                 console.log("settings", this.settings);
                 
+                this.ball = new Ball(settings.enableSlowServe, settings.serving)
+            } else {
+                this.ball = new Ball(false, Serving.RANDOM)
             }
 
             // this.finished = false;
         // }
     }
 	@Exclude()
-	ball = new Ball;
+	ball: Ball;
 	@Exclude()
 	paddleLeft = new Paddle(Side.left);
 	@Exclude()
