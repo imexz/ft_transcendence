@@ -43,14 +43,12 @@ export class GameService {
 			&&
 			settings?.serving == value.settings?.serving))
 		)})
-			// console.log("test", test);
 			return test
 			}
 		
 
 	addUserToSpectators(userId: number, gameId: number) {
 		this.spectatorsMap.set(userId, gameId);
-		// game.spectators.push(userId);
 	}
 
 	removeUserFromSpectators(userId: number, game: Game) {
@@ -230,7 +228,6 @@ export class GameService {
 		// console.log("GameSetup.staticballPos", GameSetup.staticballPos);
 		game.ball.reset()
 		game.ball.direction.newBallDir()
-
 		game.ball.radius = GameSetup.ballRadius;
 
 		game.paddleLeft.reset()

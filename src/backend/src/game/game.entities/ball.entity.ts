@@ -3,14 +3,18 @@ import { BallDirObj } from "../game.interfaces/balldirobj.interface";
 import { GameSetup } from "./setup.entity";
 
 export class Ball {
+	constructor(slow: boolean) {
 
+		this.direction = new BallDirObj(slow)
+	}
+
+	
+	radius: number = 10;
+	position: PosXY = {x: 340, y: 240};
+	direction: BallDirObj
 	reset() {
 		this.position = {x: 340, y: 240}
 	}
-
-	radius: number = 10;
-	position: PosXY = {x: 340, y: 240};
-	direction: BallDirObj = new BallDirObj()
 
 	BallPostionNext() {
 		// console.log("BallPostionNext", this.position);

@@ -16,10 +16,6 @@
 <script lang="ts">
 
 import { defineComponent } from 'vue';
-import User from '@/models/user';
-import MatchData from '@/models/matchData';
-import VueAxios from 'axios';
-import { API_URL } from '@/defines';
 import UserSummary from '@/components/Profile/UserSummary.vue';
 
 export default defineComponent({
@@ -35,8 +31,7 @@ export default defineComponent({
   computed: {
       get() {
         return this.match.winner != null ? this.match.winner : this.match.loser;
-      },
-
+      }
   }
 })
 

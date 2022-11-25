@@ -1,9 +1,13 @@
 import { GameSetup } from "../game.entities/setup.entity";
 
 export class BallDirObj {
-	constructor() {
+	
+	constructor(slow: boolean) {
+		this.slowServe = slow
 		this.newBallDir()
 	}
+
+	slowServe: boolean;
 	x: number;
 	y: number;
 	angle: number;
@@ -21,6 +25,10 @@ export class BallDirObj {
 		while (!this.isDirectionValid(this.angle));
 		this.x = GameSetup.ballSpeed * Math.cos(this.angle);
 		this.y = GameSetup.ballSpeed * Math.sin(this.angle);
+		if (this.slowServe) {
+			this.x *= 0.5	
+			this.y *= 0.5	
+		}
 	}
 
 }

@@ -50,13 +50,16 @@ export class GameData {
                 this.settings = settings
                 console.log("settings", this.settings);
                 
+                this.ball = new Ball(settings.enableSlowServe)
+            } else {
+                this.ball = new Ball(false)
             }
 
             // this.finished = false;
         // }
     }
 	@Exclude()
-	ball = new Ball;
+	ball: Ball;
 	@Exclude()
 	paddleLeft = new Paddle(Side.left);
 	@Exclude()
