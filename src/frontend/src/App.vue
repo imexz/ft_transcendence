@@ -25,7 +25,7 @@ export default defineComponent({
 
 :root {
     --ft_black: #000000;
-    --ft_white: #FFFFFF;
+    --ft_white: #FEFEFE;
     --ft_pink: #FF0088;
     --ft_blue: #0877E6;
 

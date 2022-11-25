@@ -1,38 +1,46 @@
 <template>
   <div class="wrapper">
 		<h1>Game Settings</h1>
-		<div class="singleOption">
-			Score to Win
-			<br>
-			<button id="score3" @click="this.setScoreToWin(3);" class>3</button>
-			<button id="score5" @click="this.setScoreToWin(5);" class>5</button>
-			<button id="score10" @click="this.setScoreToWin(10);" class="selected">10</button>
-			<button id="score15" @click="this.setScoreToWin(15);" class>15</button>
-			<button id="score20" @click="this.setScoreToWin(20);" class>20</button>
-		</div>
-		<div class="singleOption">
-			<div class="singleOptionText">Enable PowerUps</div>
-			<button id="powerupYes" @click="this.setPowerUp(true);" class>Yes</button>
-			<button id="powerupNo" @click="this.setPowerUp(false);" class="selected">No</button>
-		</div>
-		<div class="singleOption">	
-      <div class="singleOptionText">Enable slower serve</div>
-			<button id="slowServeYes" @click="this.setSlowServe(true);" class>Yes</button>
-			<button id="slowServeNo" @click="this.setSlowServe(false);" class="selected">No</button>
-		</div>
-		<div class="singleOption">
-      <div class="singleOptionText">Who serves after score</div>
-			<button id="lastScored" @click="this.setServing(1);" class>Last Scored</button>
-			<button id="alternate" @click="this.setServing(0);" class>Alternate</button>
-			<button id="random" @click="this.setServing(2);" class="selected">Random</button>
-		</div>
-		<div class="singleOption">
-			<h1>Start Game</h1>
-      <div v-if="this.userId">
-        <UserSummary :user= this.user> </UserSummary>
-        <button id="invitePlayer" @click="this.startWait();">Invite Player</button>
+    <div id="gameSettings">
+      <div class="singleOption">
+        <div class="singleOptionText">Score to Win</div>
+        <button id="score3" @click="this.setScoreToWin(3);" class>3</button>
+        <button id="score5" @click="this.setScoreToWin(5);" class>5</button>
+        <button id="score10" @click="this.setScoreToWin(10);" class="selected">10</button>
+        <button id="score15" @click="this.setScoreToWin(15);" class>15</button>
+        <button id="score20" @click="this.setScoreToWin(20);" class>20</button>
       </div>
-			<button v-else id="joinQueue" @click="this.startWait();">Join Queue</button>
+      <div class="singleOption">
+        <div class="singleOptionText">Enable PowerUps</div>
+        <button id="powerupYes" @click="this.setPowerUp(true);" class>Yes</button>
+        <button id="powerupNo" @click="this.setPowerUp(false);" class="selected">No</button>
+      </div>
+      <div class="singleOption">	
+        <div class="singleOptionText">Enable slower serve</div>
+        <button id="slowServeYes" @click="this.setSlowServe(true);" class>Yes</button>
+        <button id="slowServeNo" @click="this.setSlowServe(false);" class="selected">No</button>
+      </div>
+      <div class="singleOption">
+        <div class="singleOptionText">Who serves after score</div>
+        <button id="lastScored" @click="this.setServing(1);" class>Last Scored</button>
+        <button id="alternate" @click="this.setServing(0);" class>Alternate</button>
+        <button id="random" @click="this.setServing(2);" class="selected">Random</button>
+      </div>
+    </div>
+		<div id="startGame">
+      <h1>Start Game</h1>
+      <div>
+        <div v-if="this.userId" class="startGameElem">
+          <h2>VS</h2>
+          <UserSummary :user= this.user> </UserSummary>
+        </div>
+      </div>
+      <div>
+        <button id="invitePlayer" class="epicButton" @click="this.startWait();">
+          <span v-if="this.userId">Invite Player</span>
+          <span v-else>Join Queue</span>
+        </button>
+      </div>
 		</div>
 	</div>
 </template>
@@ -207,13 +215,19 @@ export default defineComponent({
 
 <style scoped>
 
+#gameSettings {
+  border-top: 2px solid var(--ft_cyan);
+  border-bottom: 2px solid var(--ft_cyan);
+  padding-bottom: 40px;
+}
 .singleOption {
-    margin-top: 14px
+    margin-top: 20px
   }
 
   .singleOptionText {
     font-size: 25px;
     font-weight: bold;
+    margin-bottom: 10px;
   }
   
   .singleOption>button {
@@ -250,4 +264,58 @@ export default defineComponent({
   }
   
 
-</style>
+  .startGameElem {
+    width: 400px;
+    margin: auto;
+    margin-top: 50px;
+
+  }
+  
+  .epicButton {
+    
+    border: 1px solid var(--ft_red);
+    border-radius: 10px;
+    /* border-radius: 50%; */
+    color: var(--ft_white);
+    background-color: var(--ft_red);
+    padding: 14px 24px;
+    
+    /* width: 150px;
+    height: 150px; */
+    
+    margin-top: 20px;
+    
+    font-size: 30px;
+    font-weight: bold;
+    filter: drop-shadow(0 0 7.5rem crimson);
+  }
+  
+  .epicButton:hover {
+    filter: drop-shadow(0 0 2rem crimson);
+    filter: drop-shadow(0 0 10rem crimson);
+    
+    animation: vibe 75ms forwards infinite;
+  }
+  
+  @keyframes vibe {
+    0% {
+      transform: translateX(0px);
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateX(0px);
+      transform: translateY(2px);
+    }
+    100% {
+      transform: translateX(0px);
+      transform: translateY(0px);
+    }
+  }
+
+  #startGame {
+
+    display: grid;
+    grid-template-rows: 100px 230px auto;
+  }
+  
+  </style>

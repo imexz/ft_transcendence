@@ -7,9 +7,13 @@
       </div>
     </div>
     <div v-else-if="this.wait == true">
-      <text> Waiting for opponent... </text>
-      <br>
-      <button @click="this.leaveGame"> Leave </button>
+      <div class="waitScreen">
+        <div class="waitIcon"></div>
+        <div class="waitText"> Waiting for opponent... </div>
+        <div>
+          <button class="waitButton" @click="this.leaveGame"> Leave </button>
+        </div>
+      </div>
     </div>
     <div v-else>
       <GameSettings @setWait="this.setWait()" @reset="this.reset()" :userId="this.userId" :socket = this.socketGame />
@@ -111,6 +115,9 @@ import User from '@/models/user';
   #gameWrapper {
     margin: auto;
     width: 800px;
+
+    height: 1073px;
+
     margin-top: 70px;
     margin-bottom: 80px;
 
@@ -118,5 +125,62 @@ import User from '@/models/user';
     border-radius: 10px;
   }
 
+  .waitScreen {
+    width: 400px;
+    margin: auto;
+    margin-top: 100px;
+  }
+
+  .waitIcon {
+    width: 2em;
+    height: 2em;
+    border-radius: 50%;
+    background-color: var(--ft_cyan);
+    margin: auto;
+    margin-top: 200px;
+    margin-bottom: 300px;
+    animation: waiting 2s ease-in-out infinite alternate;
+  }
+
+  @keyframes waiting {
+    0% {
+      transform: translateX(-150px);
+      background-color: var(--ft_cyan);
+    }
+    100% {
+      transform: translateX(150px);
+      background-color: var(--ft_pink);
+    }
+  }
+
+  .waitButton {
+    width: 130px;
+
+    color: var(--ft_cyan);
+    background-color: var(--ft_dark);
+
+    border: 1px solid var(--ft_cyan);
+    border-radius: 5px;
+
+    padding: 10px 16px;
+
+    margin-top: 20px;
+    font-size: 25px;
+    font-weight: bold;
+  }
+
+  .waitButton:hover {
+    color: var(--ft_dark);
+    background-color: var(--ft_cyan);
+    border-color: var(--ft_cyan);
+  }
+
+  .waitButton:active {
+    transform: translateY(1px);
+  }
+
+  .waitText {
+    font-size: 20px;
+  }
 
 </style>

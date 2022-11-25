@@ -97,35 +97,3 @@
   	}
   })
 </script>
-
-<style scoped>
-
-.queue {
-	padding-top: 100px;
-	font-size: 20px;
-	text-align: center;
-}
-
-.matchInfo {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 60px;
-  width: 640px;
-  margin: auto;
-  margin-bottom: 20px;
-  padding: 10px 20px 10px 20px;
-  border: 2px solid var(--ft_cyan);
-  border-radius: 10px;
-
-}
-
-/* .gameCanvas {
-  display: inline-block;
-  padding: 20px;
-  border: 2px solid var(--ft_cyan);
-  border-radius: 10px;
-
-} */
-
-</style>
