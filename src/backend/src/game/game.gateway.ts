@@ -55,7 +55,6 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
   async joinGameRoom(client: Socket | any, game: Game) {
 		if(game != undefined) {
-			// console.log("joining existing gameRoom", game);
 			client.join(game.id.toString());
 			if (game.interval == null) {
 				if (client.handshake.auth.id === game.loser?.id) {

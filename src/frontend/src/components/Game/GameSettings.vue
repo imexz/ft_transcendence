@@ -176,7 +176,6 @@ export default defineComponent({
             },
             async startWait() {
                 if(this.userId != undefined) {
-
                     console.log("settings", this.settings, this.user);
                     this.socket.emit('GameRequestBackend', {settings: this.settings , id: this.userId}, (r) => {
                         // if (r.game != undefined) {
