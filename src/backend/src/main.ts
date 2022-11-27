@@ -5,6 +5,7 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import 'reflect-metadata';
 import { hostURL } from './hostURL';
 import { ValidationPipe } from '@nestjs/common';
+import { TimeoutInterceptor } from './timeout.interceptor';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -13,6 +14,7 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe({
     transform: true,
   }));
+  app.useGlobalInterceptors(new TimeoutInterceptor)
   app.use(cookieParser());
 
   const config = new DocumentBuilder()

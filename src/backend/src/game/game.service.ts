@@ -187,6 +187,8 @@ export class GameService {
 
 	updateBallDirection(game: Game, paddle: Paddle) {
 		this.calcAngle(game, paddle);
+		if (game.settings.enablePowerUp)
+			game.ball.direction.speed *= 1.1
 		game.ball.direction.x = game.ball.direction.speed * Math.cos(game.ball.direction.angle * (Math.PI / 180));
 		game.ball.direction.y = game.ball.direction.speed * Math.sin(game.ball.direction.angle * (Math.PI / 180));
 	}
