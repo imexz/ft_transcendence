@@ -27,10 +27,10 @@ export class AvatarController {
       return await this.avatarService.add(req.user.id, file)
   }
 
-  @Get()
-  emptyUserId() {
-    throw new HttpException('Please provide user id', HttpStatus.BAD_REQUEST)
-  }
+  // @Get()
+  // emptyUserId() {
+  //   throw new HttpException('Please provide user id', HttpStatus.BAD_REQUEST)
+  // }
 
   @Get(':id')
   @Header('Content-Type', 'image/jpeg')
