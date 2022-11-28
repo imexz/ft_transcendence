@@ -20,7 +20,7 @@ import {Gateway} from '../users/friends/friend.gateway'
 @WebSocketGateway({
 	namespace: 'game',
 	cors: {
-		origin: [hostURL + ':8080', hostURL +':3000'],
+		origin: [hostURL + ':8080'/* , hostURL +':3000' */],
 		credentials: true
 	},
 })
@@ -67,7 +67,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			}
 		}
   }
-	
+
 	async sendPaddel(client: Socket, game: Game){
 		await new Promise( resolve => setTimeout(resolve, 100) )
 		client.emit('updatePaddle', {paddleLeft: game?.paddleLeft, paddleRight: game?.paddleRight})
@@ -86,7 +86,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	) {
 			var game = this.getGame(client.handshake.auth.id)
 			if (game == undefined) {
-						game = await this.gameService.joinGameOrCreateGame(client.handshake.auth as User, settings)		
+						game = await this.gameService.joinGameOrCreateGame(client.handshake.auth as User, settings)
 			}
 		await this.joinGameRoom(client, game);
 		console.log("isInGame end", client.rooms);
@@ -99,7 +99,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	@MessageBody('id') id?: number,
   ) {
 		console.log("settings", settings);
-		
+
 	const clientId: number = client.handshake.auth.id;
 
 	// if (clientId === id) return ret; // Selfinvite -> no push
@@ -161,7 +161,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   async viewRequest(userId: number, gameId: number )
   {
 		if(gameId != undefined) {
-			
+
 			this.gameService.addUserToSpectators(userId, gameId);
 			const socket = await this.findSocketOfUser(userId)
 			if(socket) {

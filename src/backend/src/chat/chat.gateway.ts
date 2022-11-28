@@ -24,7 +24,7 @@ export enum changedRoom {
 @WebSocketGateway({
   cors: {
     // origin: "*",
-    origin: [hostURL + ':8080', hostURL + ':3000'],
+    origin: [hostURL + ':8080'/* , hostURL + ':3000' */],
     credentials: true
   },
   namespace: 'chat'
