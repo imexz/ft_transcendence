@@ -1,12 +1,11 @@
 <template>
   <div class="matchSummary">
     <div>
-      <span class="win" v-if="win">Win</span>
-      <span class="loss" v-else>Loss</span>
+      <span class="loss" v-if="this.match.winner">Loss</span>
+      <span class="win" v-else>Win</span>
     </div>
     <div>
-      <span v-if="win">{{ match.scoreWinner }} : {{ match.scoreLoser }}</span>
-      <span v-else>{{ match.scoreLoser }} : {{ match.scoreWinner }}</span>
+      <span>{{ this.match.scoreWinner }} : {{ this.match.scoreLoser }}</span>
     </div>
     <div>
       <UserSummary :user=get ></UserSummary>
@@ -17,10 +16,6 @@
 <script lang="ts">
 
 import { defineComponent } from 'vue';
-import User from '@/models/user';
-import MatchData from '@/models/matchData';
-import VueAxios from 'axios';
-import { API_URL } from '@/defines';
 import UserSummary from '@/components/Profile/UserSummary.vue';
 
 export default defineComponent({
@@ -36,15 +31,7 @@ export default defineComponent({
   computed: {
       get() {
         return this.match.winner != null ? this.match.winner : this.match.loser;
-      },
-      win() {
-        if (this.match?.scoreWinner > this.match?.scoreLoser && this.match?.winner == null ||
-        this.match?.scoreWinner < this.match?.scoreLoser && this.match?.loser == null) {
-          return true
       }
-      return false
-      }
-
   }
 })
 

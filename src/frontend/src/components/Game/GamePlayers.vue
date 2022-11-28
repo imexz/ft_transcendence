@@ -1,15 +1,15 @@
 <template>
-    <div class="matchInfo">
-        <div>
-        <UserSummary class="test"  :user=this.game?.winner></UserSummary>
-        </div>
-        <div>
-        vs
-        </div>
-        <div>
-        <UserSummary class="test" ref="summ" :user=this.game?.loser></UserSummary> 
-        </div>   
+  <div class="matchInfoBox">
+    <div>
+      <UserSummary :user=this.game?.winner></UserSummary>
     </div>
+    <div class="txtVs">
+      vs
+    </div>
+    <div>
+      <UserSummary :user=this.game?.loser></UserSummary> 
+    </div>   
+  </div>
 </template>
 
 <script lang="ts">
@@ -33,21 +33,24 @@ export default defineComponent({
 </script>
 
 <style scoped>
-.matchInfo {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 60px;
+.matchInfoBox {
   width: 640px;
   margin: auto;
-  margin-bottom: 20px;
+  margin-top: 40px;
+  margin-bottom: 40px;
+
   padding: 10px 20px 10px 20px;
   border: 2px solid var(--ft_cyan);
   border-radius: 10px;
 
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
 }
 
-.test {
-  width: 40px;
+.txtVs{
+  font-size: 60px;
 }
+
 </style>

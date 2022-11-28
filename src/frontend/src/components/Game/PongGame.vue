@@ -5,12 +5,12 @@
     <br>
     <button @click="this.leaveGame"> Leave </button>
   </div> -->
-  <div v-show="this.game.isFinished == false">
+  <div v-if="this.game.isFinished == false">
 		<GamePlayers :game = this.game />
 		<div class="gameCanvas">
       <div>
         <!-- <Field @assignWinner="this.assignWinner"/> -->
-        <Field :socket = "this.socket" />
+        <Field :socket = "this.socket" :gameInit="this.game" />
       </div>
     </div>
   </div>
@@ -27,8 +27,6 @@
   import Result from './Result.vue'
   import Field from './Field.vue'
   import { Socket } from 'socket.io-client'
-
-
 
   export default defineComponent({
   	data() {
@@ -97,35 +95,3 @@
   	}
   })
 </script>
-
-<style scoped>
-
-.queue {
-	padding-top: 100px;
-	font-size: 20px;
-	text-align: center;
-}
-
-.matchInfo {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 60px;
-  width: 640px;
-  margin: auto;
-  margin-bottom: 20px;
-  padding: 10px 20px 10px 20px;
-  border: 2px solid var(--ft_cyan);
-  border-radius: 10px;
-
-}
-
-/* .gameCanvas {
-  display: inline-block;
-  padding: 20px;
-  border: 2px solid var(--ft_cyan);
-  border-radius: 10px;
-
-} */
-
-</style>

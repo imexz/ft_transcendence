@@ -38,7 +38,7 @@
         <twoFaSettings/>
       </div>
     </div>
-    <div class="section">
+    <!-- <div class="section">
       <div class="sectionHeadline"> 
         <h2>API-Test (DEBUG ONLY!!)</h2>
       </div>
@@ -57,7 +57,7 @@
         <p>prints the store content to console</p>
         <button @click="show">show Store</button>       
       </div>
-    </div>
+    </div> -->
   </div>
 </template>
 
@@ -102,12 +102,12 @@ export default defineComponent({
     width: 800px;
     margin: auto;
     margin-bottom: 80px;
+    margin-top: 80px;
     display: flex;
     flex-direction: column;
     background-color: var(--ft_dark);
   }
   .wrapper h1 {
-    /* text-align: left; */
     margin-bottom: 40px;
   
   }

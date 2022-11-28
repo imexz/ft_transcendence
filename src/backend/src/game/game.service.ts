@@ -43,14 +43,12 @@ export class GameService {
 			&&
 			settings?.serving == value.settings?.serving))
 		)})
-			console.log("test", test);
 			return test
 			}
 		
 
 	addUserToSpectators(userId: number, gameId: number) {
 		this.spectatorsMap.set(userId, gameId);
-		// game.spectators.push(userId);
 	}
 
 	removeUserFromSpectators(userId: number, game: Game) {
@@ -73,13 +71,24 @@ export class GameService {
 	}
 
 	async joinGameOrCreateGame(user: User, settings: Settings, opponentUserId?: number): Promise<Game> {
-		let game = this.getGame(undefined, settings) // checking for first game with missing (undefined) opponent
+		let game = this.getGame(user.id)
+		if(game != undefined) {
+			console.log("already in game");
+			return game
+		}
+
+		game = this.getGame(undefined, settings) // checking for first game with missing (undefined) opponent
 		if (game == undefined || opponentUserId) {
 			game = await this.createGameInstance(user.id, settings)
 			// console.log("joinGameOrCreateGame", game.settings);
 			game.winner = user
 			// opponentUserId is set when called via Frontend::askForMatch
 			if(opponentUserId != undefined) {
+				const tmpGame = this.getGame(opponentUserId)
+				if(tmpGame) {
+					this.removeGame(game);
+					return
+				}
 				const opponent = await this.userService.getUser(opponentUserId)
 				game.loser = opponent
 			}
@@ -136,9 +145,10 @@ export class GameService {
 		}
 		this.updateBall(game)
 		this.collisionControl(game);
-		if (this.scored(game)){
-			this.reset(game);
-			this.gameGateway.server.to(game.id.toString()).emit('updateScore', {scoreWinner: game.score.scoreLeft, scoreLoser: game.score.scoreRight, scoreToWin: game.settings.scoreToWin})
+		const getPoint = this.scored(game)
+		if (getPoint != undefined){
+			this.reset(game, getPoint);
+			this.gameGateway.server.to(game.id.toString()).emit('updateScore', {scoreWinner: game.score.scoreLeft, scoreLoser: game.score.scoreRight})
 		}
 		await this.isGameFinished(game);
 		return game
@@ -177,6 +187,8 @@ export class GameService {
 
 	updateBallDirection(game: Game, paddle: Paddle) {
 		this.calcAngle(game, paddle);
+		if (game.settings.enablePowerUp)
+			game.ball.direction.speed *= 1.1
 		game.ball.direction.x = game.ball.direction.speed * Math.cos(game.ball.direction.angle * (Math.PI / 180));
 		game.ball.direction.y = game.ball.direction.speed * Math.sin(game.ball.direction.angle * (Math.PI / 180));
 	}
@@ -199,32 +211,36 @@ export class GameService {
 		}
 	}
 
-	scored(game: Game): boolean {
-		var ret: boolean = false;
+	scored(game: Game): Side {
+		var ret: Side = undefined;
 		if (game.ball.position.x - game.ball.radius <= 0) {
 			game.score.scoreRight += game.score.increaseRight;
 			game.scoreLoser += game.score.increaseRight;
-			ret = true;
+			ret = Side.left;
 		}
 		else if (game.ball.position.x + game.ball.radius >= 640 ) {
 			game.score.scoreLeft += game.score.increaseLeft;
 			game.scoreWinner += game.score.increaseLeft;
-			ret = true;
+			ret = Side.right;
 		}
 		return ret;
 	}
 
-	reset(game: Game) {
+	reset(game: Game, getPoint: Side) {
 		game.ball.position = GameSetup.staticballPos
 		// console.log("GameSetup.staticballPos", GameSetup.staticballPos);
 		game.ball.reset()
-		game.ball.direction.newBallDir()
+		game.ball.direction.newBallDir(getPoint)
+		if (game.settings.enablePowerUp) {
+			game.ball.radius++
+			game.paddleLeft.speed *= -1
+			game.paddleRight.speed *= -1
+		} else {
+			game.ball.radius = GameSetup.ballRadius;
+		}
 
-		game.ball.radius = GameSetup.ballRadius;
-
-		game.paddleLeft.reset()
-		game.paddleRight.reset()
-
+		// game.paddleLeft.reset()
+		// game.paddleRight.reset()
 		game.score.increaseLeft = GameSetup.scoreIncrease;
 		game.score.increaseRight = GameSetup.scoreIncrease;
 	}

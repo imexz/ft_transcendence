@@ -1,17 +1,23 @@
 <template>
-  <div v-if="this.game && this.socketGame">
-    <PongGame :game = "this.game" :socket = "this.socketGame" @reset="this.reset()" />
-    <div v-show="this.$store.state.user.id!=this.game?.loser?.id && this.$store.state.user.id!=this.game?.winner?.id" class="leaveGame">
+  <div id="gameWrapper">
+    <div v-if="this.game && this.socketGame">
+      <PongGame :game = "this.game" :socket = "this.socketGame" @reset="this.reset()" />
+      <div v-show="this.$store.state.user.id!=this.game?.loser?.id && this.$store.state.user.id!=this.game?.winner?.id" class="leaveGame">
         <button @click="this.leaveGame"> Leave </button>
+      </div>
     </div>
-  </div>
-  <div v-else-if="this.wait == true">
-    <text> Waiting for opponent... </text>
-    <br>
-    <button @click="this.leaveGame"> Leave </button>
-  </div>
-  <div v-else>
-    <GameSettings @setWait="this.setWait()" @reset="this.reset()" :userId="this.userId" :socket = this.socketGame />
+    <div v-else-if="this.wait == true">
+      <div class="waitScreen">
+        <div class="waitIcon"></div>
+        <div class="waitText"> Waiting for opponent... </div>
+        <div>
+          <button class="waitButton" @click="this.leaveGame"> Leave </button>
+        </div>
+      </div>
+    </div>
+    <div v-else>
+      <GameSettings @setWait="this.setWait()" @reset="this.reset()" :userId="this.userId" :socket = this.socketGame />
+    </div>
   </div>
 </template>
   
@@ -22,7 +28,7 @@
   import PongGame from '../components/Game/PongGame.vue';
   import { io, Socket } from 'socket.io-client'
   import { API_URL } from '@/defines';
-import User from '@/models/user';
+  import User from '@/models/user';
 
 
   export default defineComponent({
@@ -50,10 +56,18 @@ import User from '@/models/user';
             
           });
       }
+      this.wait = false
+      this.game = null
       this.initGameInfoListener()
+      console.log("view mounted");
+      
       // await this.askBackendForGame()
     },
     updated() {
+      console.log("view updated");
+      if (this.game?.isFinished) {
+        this.game = null
+      }
       // console.log("updated");
       // console.log(this.userId);
       
@@ -70,11 +84,14 @@ import User from '@/models/user';
       },
 	    async initGameInfoListener() {
 		    this.socketGame.on('GameInfo', (game: Game) => {
-
-          console.log("GameInfo", game)
+          this.reset()
           this.game = new Game()
           this.game.winner = game.winner
           this.game.loser = game.loser
+          this.game.scoreWinner = game.scoreWinner
+          this.game.scoreLoser = game.scoreLoser
+          console.log("GameInfo PlayView", game)
+          
 		    });
 		    this.socketGame.on('isFinished', () => {
           this.wait = false
@@ -90,8 +107,9 @@ import User from '@/models/user';
       },
       
       reset() {
-        this.game = null
         this.wait = false
+        this.game = null
+        this.$router.push('/play')
       }
     },
     unmounted() {
@@ -103,38 +121,78 @@ import User from '@/models/user';
     }
   })
   </script>
-  
-  <style>
-  .singleOption {
-    margin-top: 14px
-  }
-  
-  .singleOption>button {
-    font-size: 20px;
-    width: 102px;
-    margin-left: 0;
-    margin-right: 0;
-    margin-top: 4px;
-    padding-top: 5px
-  }
-  
-  .singleOption>button.selected {
-    font-size: 20px;
-    width: 102px;
-    background-color: lightgray;
-    color: black;
-    margin-left: 0;
-    margin-right: 0
-  }
-  </style>
-  
+    
 <style scoped>
 
-.gameWrapper {
-  margin: auto;
-  margin-top: 80px;
-  margin-bottom: 80px;
-  width: 800px;
-}
+  #gameWrapper {
+    margin: auto;
+    width: 800px;
+
+    height: 1073px;
+
+    margin-top: 70px;
+    margin-bottom: 80px;
+
+    border: 2px solid var(--ft_cyan);
+    border-radius: 10px;
+  }
+
+  .waitScreen {
+    width: 400px;
+    margin: auto;
+    margin-top: 100px;
+  }
+
+  .waitIcon {
+    width: 2em;
+    height: 2em;
+    border-radius: 50%;
+    background-color: var(--ft_cyan);
+    margin: auto;
+    margin-top: 200px;
+    margin-bottom: 300px;
+    animation: waiting 2s ease-in-out infinite alternate;
+  }
+
+  @keyframes waiting {
+    0% {
+      transform: translateX(-150px);
+      background-color: var(--ft_cyan);
+    }
+    100% {
+      transform: translateX(150px);
+      background-color: var(--ft_pink);
+    }
+  }
+
+  .waitButton {
+    width: 130px;
+
+    color: var(--ft_cyan);
+    background-color: var(--ft_dark);
+
+    border: 1px solid var(--ft_cyan);
+    border-radius: 5px;
+
+    padding: 10px 16px;
+
+    margin-top: 20px;
+    font-size: 25px;
+    font-weight: bold;
+  }
+
+  .waitButton:hover {
+    color: var(--ft_dark);
+    background-color: var(--ft_cyan);
+    border-color: var(--ft_cyan);
+  }
+
+  .waitButton:active {
+    transform: translateY(1px);
+  }
+
+  .waitText {
+    font-size: 20px;
+  }
 
 </style>

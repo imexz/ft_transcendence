@@ -15,9 +15,16 @@ export class Paddle {
 	side: Side;
 	// socketid: string;
 
-	reset(){
-		this.width = GameSetup.paddleWidth
-		this.height = GameSetup.paddleHeight
-		this.speed = GameSetup.paddleSpeed
+	reset(wight?: number, height?: number, speed?: number){
+		if (wight && height && speed) {
+			this.width = wight
+			this.height = height
+			this.speed = speed
+			
+		} else {
+			this.width = GameSetup.paddleWidth
+			this.height = GameSetup.paddleHeight
+			this.speed = GameSetup.paddleSpeed
+		}
 	}
 }

@@ -13,9 +13,6 @@
         <button class="dmButton">Send</button>
       </form>
     </div>
-    <div v-if="showGame" class="dmPopUp">
-      <ViewGamePopup @actions="viewGame" :userName="this.opponentName" />
-    </div>
     <div class="userInfoBar">
       <img id="userAvatar" :src="user?.avatar_url" alt="Avatar">
       <div id="middleSection">

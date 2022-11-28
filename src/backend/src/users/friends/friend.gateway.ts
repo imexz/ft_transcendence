@@ -17,7 +17,6 @@ import { GameService } from 'src/game/game.service';
 import { GameGateway } from 'src/game/game.gateway';
 
 
-
 enum RESPONSE {
   accept,
   refuse
@@ -52,7 +51,6 @@ export class Gateway {
       if (socket == undefined) {
         console.log("gameRequest: opponent is offline");
       } else {
-        var receivedSettings = false
         var response = {data: null as RESPONSE};
 
         await socket.emit('GameRequestFrontend',{ user, settings},  function ( data: RESPONSE)  {
@@ -61,22 +59,29 @@ export class Gateway {
           console.log("in call back ", data)
         } 
         )
-        
-        this.responseGameRequest(response, user, settings, id)
-        }
+        this.responseGameRequest(socket, response, user, settings, id)
       }
+    }
       
-      async responseGameRequest(data: { data: RESPONSE}, user, settings, id) {
+    async responseGameRequest(socket ,data: { data: RESPONSE}, user, settings, id) {
         console.log("start async");
-        while (data.data == undefined) {
-          await new Promise(r => setTimeout(r, 10));
+        var i = 0
+        while (data.data == undefined && i < 100) {
+          await new Promise(r => setTimeout(r, 100));
+          i++
         }
         console.log(data.data);
         if (data.data == RESPONSE.accept) {
+          console.log("accepted response");
+          
           const game = this.gameService.joinGameOrCreateGame( user, settings, id)
+          
+          this.gameGateway.joinGameRoom(await this.gameGateway.findSocketOfUser(id), await  game)
           this.gameGateway.joinGameRoom(await this.gameGateway.findSocketOfUser(user.id), await  game)
-        } else if(data.data == RESPONSE.refuse) {
+          console.log("game = ", await game);
+        } else {
           (await this.gameGateway.findSocketOfUser(user.id)).emit('isFinished')
+					socket.emit('resetRequester')
         }
         console.log("ende async")
     }

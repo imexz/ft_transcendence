@@ -54,8 +54,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   }
 
   async joinGameRoom(client: Socket | any, game: Game) {
-		if(game != undefined) {
-			// console.log("joining existing gameRoom", game);
+		if(game != undefined && client != undefined) {
 			client.join(game.id.toString());
 			if (game.interval == null) {
 				if (client.handshake.auth.id === game.loser?.id) {
@@ -64,11 +63,16 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 				}
 			} else {
 				client.emit('GameInfo', {winner: game.winner, loser: game.loser})
-				client.emit('updateScore', {scoreWinner: game.score.scoreLeft, scoreLoser: game.score.scoreRight, scoreToWin: game.settings.scoreToWin})
-				client.emit('updatePaddle', {paddleLeft: game.paddleLeft, paddleRight: game.paddleRight})
+				this.sendPaddel(client, game)
 			}
 		}
   }
+	
+	async sendPaddel(client: Socket, game: Game){
+		await new Promise( resolve => setTimeout(resolve, 100) )
+		client.emit('updatePaddle', {paddleLeft: game?.paddleLeft, paddleRight: game?.paddleRight})
+		client.emit('updateScore', {scoreWinner: game.score.scoreLeft, scoreLoser: game.score.scoreRight})
+	}
 
 	getGame(userId: number): Game {
 		const game = this.gameService.getGame(userId);
@@ -96,28 +100,27 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   ) {
 		console.log("settings", settings);
 		
-	let ret = false;
 	const clientId: number = client.handshake.auth.id;
 
-	if (clientId === id) return ret; // Selfinvite -> no push
+	// if (clientId === id) return ret; // Selfinvite -> no push
 	let game: Game | undefined = this.gameService.getGame(clientId)
 	if (game != undefined) {
 		console.log("gameRequest: client has a game. Reject request");
-		return ret; // client in game -> no push
+		return false; // client in game -> no push
 	} else {
 		console.log("gameRequest: client has no game");
 		game = this.gameService.getGame(id);
 		if(game == undefined) {
 			console.log("gameRequest: opponent has no game");
 			const socket = await this.gateway.askUserToPlay(client.handshake.auth as User, id, settings)
-			ret = true
+			return true
 		} else {
 			console.log("gameRequest: invited player has game. Specatating.");
 			client.rooms.forEach(roomId => { if (client.id != roomId) client.leave(roomId) });
 		}
 	}
 	console.log("gameRequest end");
-	return ret
+	return true
   }
 
   closeRoom(roomId: string) {
@@ -157,16 +160,15 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
   async viewRequest(userId: number, gameId: number )
   {
-	if(gameId != undefined) {
-		
-		this.gameService.addUserToSpectators(userId, gameId);
-		const socket = await this.findSocketOfUser(userId)
-		if(socket) {
-			const game = this.getGame(userId)
-			this.joinGameRoom(socket, game)
+		if(gameId != undefined) {
+			
+			this.gameService.addUserToSpectators(userId, gameId);
+			const socket = await this.findSocketOfUser(userId)
+			if(socket) {
+				const game = this.getGame(userId)
+				this.joinGameRoom(socket, game)
+			}
 		}
-	}
-	// return {winner: game.winner, loser: game.loser}
   }
 
   @SubscribeMessage('key')
