@@ -162,7 +162,7 @@ export class UsersService {
 		// user.username = username
 		username = username.trim()
 		if (username.length < 1 || username.length > 30)
-			throw new HttpException('Bad Request', HttpStatus.BAD_REQUEST)
+			throw new HttpException('provide username 1-30 characters', HttpStatus.BAD_REQUEST)
 		user.username = username
 		try {
 			await this.usersRepository.save(user)

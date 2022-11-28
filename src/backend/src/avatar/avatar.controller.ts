@@ -37,12 +37,14 @@ export class AvatarController {
 	@UseGuards(JwtAuthGuard)
   async getAvatar(@Param('id') id: number) {
 
+    if (Number.isNaN(id) || !Number.isFinite(id) || !Number.isSafeInteger(id))
+			throw new HttpException('Not Found', HttpStatus.NOT_FOUND)
     let file = await this.avatarService.getFile(id)
       if (file)
         return new StreamableFile(file.data)
       else
       {
-        throw new HttpException('Not Found', HttpStatus.NOT_FOUND)
+        throw new HttpException('id ' + id.toString() + ' was not found', HttpStatus.NOT_FOUND)
       }
   }
 
