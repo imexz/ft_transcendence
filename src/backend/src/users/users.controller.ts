@@ -71,7 +71,8 @@ export class UsersController {
 	@UseInterceptors(ClassSerializerInterceptor)
 	async validate(@Request() req): Promise<User> {
 
-		return await this.usersService.getUser(req.user.id)
+		// return await this.usersService.getUser(req.user.id)
+		return req.user // test more !!!!!!
 	}
 
 	@Post('update_name')
@@ -84,11 +85,11 @@ export class UsersController {
 		return this.usersService.updateName(req.user, name);
 	}
 
-	@Delete()
-	async delete(@Request() req) {
-		let test = await this.usersService.remove(req.user?.id)
-		console.log(test);
-	}
+	// @Delete() // needed???????
+	// async delete(@Request() req) {
+	// 	let test = await this.usersService.remove(req.user?.id)
+	// 	console.log(test);
+	// }
 
 
 }
