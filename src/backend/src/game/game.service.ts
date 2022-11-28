@@ -1,4 +1,4 @@
-import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { Game, Side } from './game.entities/game.entity';
 import { Paddle } from './game.entities/paddle.entity';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -14,8 +14,8 @@ import { BallDirObj } from './game.interfaces/balldirobj.interface';
 
 @Injectable()
 export class GameService {
-	
-	
+
+
 	constructor(
 		private userService: UsersService,
 		@Inject(forwardRef(() => GameGateway))
@@ -45,7 +45,7 @@ export class GameService {
 		)})
 			return test
 			}
-		
+
 
 	addUserToSpectators(userId: number, gameId: number) {
 		this.spectatorsMap.set(userId, gameId);
@@ -126,12 +126,12 @@ export class GameService {
 
 	async emitGameData(game: Game, server: Server) {
 		const tmpGame: Game = await this.getData(game)
-		
+
 		const updatedBall = {
 			position: tmpGame.ball.position,
 			radius: tmpGame.ball.radius,
 		}
-		
+
 		server.to(game.id.toString()).emit('updateBall', updatedBall);
 		if (tmpGame.score.scoreLeft === tmpGame.settings.scoreToWin || tmpGame.score.scoreRight === tmpGame.settings.scoreToWin) {
 			console.log("emitGameData: closeRoom");
@@ -198,7 +198,7 @@ export class GameService {
 			if (this.isBallAtPaddle(game, game.paddleRight) &&
 				this.isBallWithinPaddleRange(game, game.paddleRight)) {
 					console.log("updateBallDirection right");
-					
+
 					this.updateBallDirection(game, game.paddleRight);
 				}
 			}
@@ -327,6 +327,7 @@ export class GameService {
 	async getMatchHistory(userId: number){
 		if (userId == undefined) {
 			console.log("userId == undefind");
+			throw new HttpException('please provide userId', HttpStatus.BAD_REQUEST)
 		}
 		console.log("userId", userId, typeof(userId));
 		return await this.gameRepository.createQueryBuilder("game")

@@ -11,7 +11,7 @@ import { JwtStrategy } from './jwt-two/jwt.strategy';
 @Injectable()
 export class AuthService {
 	constructor(private usersService: UsersService, private jwtService: JwtService, private jwtStrategy: JwtStrategy, private gameService: GameService) {}
-	
+
 	async validateUser(id: number) {
 
 			const user = await this.usersService.getUser(id);
@@ -19,8 +19,8 @@ export class AuthService {
 			return user;
 	}
 
-	addUser(user: User) {
-		return  this.usersService.addUser(user);
+	async addUser(user: User) {
+		return await this.usersService.addUser(user);
 	}
 
 	login(user: any) {
@@ -51,7 +51,7 @@ export class AuthService {
 			socket.handshake.auth =  await this.jwtService.verify(socket.handshake.auth.id.replace('Authentication=',''));
 			// console.log("socket handshake");
 			// console.log(socket.handshake.auth);
-			
+
 			socket.handshake.auth = await this.jwtStrategy.validate(socket.handshake.auth as TokenPayload)
 			// console.log("socket handshake1");
 			// console.log(socket.handshake.auth);
@@ -64,7 +64,7 @@ export class AuthService {
 					await this.usersService.setStatus(socket.handshake.auth.id, UserStatus.ONLINE)
 				else
 					await this.usersService.setStatus(socket.handshake.auth.id, UserStatus.PLAYING)
-					
+
 				// console.log(socket.handshake.auth);
 				return true
 			}

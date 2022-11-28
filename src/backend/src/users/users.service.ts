@@ -10,8 +10,8 @@ import { UserStatus } from "./entitys/status.enum";
 
 @Injectable()
 export class UsersService {
-	getTopPlayer() {
-		const test = this.usersRepository.createQueryBuilder("user")
+	async getTopPlayer() {
+		const test = await this.usersRepository.createQueryBuilder("user")
 			.loadRelationCountAndMap('user.winns','user.winns')
 			.loadRelationCountAndMap('user.loses','user.loses')
 			// .orderBy("winns", "DESC")
@@ -75,9 +75,9 @@ export class UsersService {
 
 	async getUserSocket(server, id: number){
 		console.log("id = ", id);
-		
+
 		const sockets = await server.fetchSockets();
-		
+
 		for (const socket of sockets) {
 			console.log("socket ", socket.handshake.auth);
             if(socket.handshake.auth.id == id)
@@ -107,8 +107,9 @@ export class UsersService {
 			user.avatar_url_42intra = "https://cdn.intra.42.fr/users/0f2f1b9f30116d06e1e55bed9cf2cb46/casian.png"
 		}
 		tmp = this.usersRepository.create(user);
-		var tmp: User
-		var faild: boolean
+		var tmp: User = undefined
+		var faild: boolean = false
+		var counter: number = 0
 
 		do {
 			try {
@@ -119,11 +120,17 @@ export class UsersService {
 			}
 			catch (error) {
 				console.log("fehler in init user");
-				tmp.username += "💩"
-				faild = true
+				if (tmp.username != undefined)
+				{
+					tmp.username += "💩"
+					faild = true
+					++counter
+				}
 			}
 
-		} while (faild);
+		} while (faild && counter < 40);
+
+		console.log(tmp.username);
 
 		return tmp
 	}
@@ -153,6 +160,9 @@ export class UsersService {
 		// 	return
 		// }
 		// user.username = username
+		username = username.trim()
+		if (username.length < 1 || username.length > 30)
+			throw new HttpException('provide username 1-30 characters', HttpStatus.BAD_REQUEST)
 		user.username = username
 		try {
 			await this.usersRepository.save(user)

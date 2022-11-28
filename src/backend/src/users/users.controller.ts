@@ -1,9 +1,10 @@
-import { Body, Controller, Delete, Get, Param, Post, UseGuards, Request, UseInterceptors, ClassSerializerInterceptor } from '@nestjs/common';
+import { HttpException, Body, Controller, Delete, Get, Param, Post, UseGuards, Request, UseInterceptors, ClassSerializerInterceptor } from '@nestjs/common';
 import { UsersService } from './users.service';
 import User from './entitys/user.entity';
 import { JwtAuthGuard } from '../auth/jwt-two/jwt-auth.guard';
 import { TwofaService } from 'src/twofa/twofa.service';
 import { FriendsService } from './friends/friends.service';
+import { HttpStatus } from '@nestjs/common'
 
 
 @Controller('users')
@@ -12,13 +13,22 @@ export class UsersController {
 		private readonly twofaService: TwofaService,
 		private readonly friendsService: FriendsService ){}
 
+	@Get('teapot')
+	iAmATeapot() {
+		throw new HttpException("I'm a teapot", HttpStatus.I_AM_A_TEAPOT)
+	}
+
 	@Get('find/:id')
 	@UseGuards(JwtAuthGuard)
 	@UseInterceptors(ClassSerializerInterceptor)
-	findOne(@Param('id') params: number){
-		// console.log("findOne");
-		const user = this.usersService.getUser(params);
-		// console.log("findOne", user);
+	async findOne(@Param('id') params: number){
+		console.log("findOne", params);
+		if (Number.isNaN(params) || !Number.isFinite(params) || !Number.isSafeInteger(params))
+			throw new HttpException('Not Found', HttpStatus.NOT_FOUND)
+		const user = await this.usersService.getUser(params);
+		console.log("findOne", user);
+		if (user == null || user == undefined)
+			throw new HttpException('Not Found', HttpStatus.NOT_FOUND)
 
 		return user;
 	}
@@ -35,20 +45,24 @@ export class UsersController {
 	@Get('allUserWinnes')
 	@UseGuards(JwtAuthGuard)
 	@UseInterceptors(ClassSerializerInterceptor)
-	getTopPlayer(@Request() req){
+	async getTopPlayer(@Request() req){
 		// console.log(req);
 
-		return this.usersService.getTopPlayer()
+		return await this.usersService.getTopPlayer()
 	}
 
 
-	@Post('addUser')
-	@UseGuards(JwtAuthGuard)
-	@UseInterceptors(ClassSerializerInterceptor)
-	addUser(@Body() user: User){
-		// console.log(user);
-		return  this.usersService.addUser(user);
-	}
+	// @Post('addUser') // can be messed up very bad with bad data input !!!!!!!!
+	// @UseGuards(JwtAuthGuard)
+	// @UseInterceptors(ClassSerializerInterceptor)
+	// async addUser(@Body() user: User){
+	// 	console.log(user);
+	// 	let ret = await this.usersService.addUser(user);
+	// 	if (ret.username == undefined)
+	// 		throw new HttpException('Bad Request', HttpStatus.BAD_REQUEST)
+	// 	else
+	// 		return ret
+	// }
 
 
 
@@ -57,7 +71,8 @@ export class UsersController {
 	@UseInterceptors(ClassSerializerInterceptor)
 	async validate(@Request() req): Promise<User> {
 
-		return await this.usersService.getUser(req.user.id)
+		// return await this.usersService.getUser(req.user.id)
+		return req.user // test more !!!!!!
 	}
 
 	@Post('update_name')
@@ -70,10 +85,11 @@ export class UsersController {
 		return this.usersService.updateName(req.user, name);
 	}
 
-	@Delete()
-	delete(@Request() req) {
-		this.usersService.remove(req.user.id)
-	}
+	// @Delete() // needed???????
+	// async delete(@Request() req) {
+	// 	let test = await this.usersService.remove(req.user?.id)
+	// 	console.log(test);
+	// }
 
 
 }

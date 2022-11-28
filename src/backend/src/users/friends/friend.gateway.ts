@@ -25,7 +25,7 @@ enum RESPONSE {
 @WebSocketGateway({
   cors: {
     // origin: "*",
-    origin: [hostURL + ':8080', hostURL + ':3000'],
+    origin: [hostURL + ':8080'/* , hostURL + ':3000' */],
     credentials: true
   }
 })
@@ -33,8 +33,8 @@ export class Gateway {
 
   @WebSocketServer()
   server: Server;
-  
-  
+
+
   constructor(
     @Inject(forwardRef(() => AuthService))
     private readonly authService: AuthService,
@@ -45,7 +45,7 @@ export class Gateway {
     @Inject(forwardRef(() => GameGateway))
     private readonly gameGateway: GameGateway
     ) {}
-    
+
     async askUserToPlay(user: User, id: number, settings: Settings) {
       const socket = await this.usersService.getUserSocket(this.server, id)
       if (socket == undefined) {
@@ -57,12 +57,12 @@ export class Gateway {
           console.log("GameRequestFrontend beginn");
           response.data = data
           console.log("in call back ", data)
-        } 
+        }
         )
         this.responseGameRequest(socket, response, user, settings, id)
       }
     }
-      
+
     async responseGameRequest(socket ,data: { data: RESPONSE}, user, settings, id) {
         console.log("start async");
         var i = 0
@@ -73,9 +73,9 @@ export class Gateway {
         console.log(data.data);
         if (data.data == RESPONSE.accept) {
           console.log("accepted response");
-          
+
           const game = this.gameService.joinGameOrCreateGame( user, settings, id)
-          
+
           this.gameGateway.joinGameRoom(await this.gameGateway.findSocketOfUser(id), await  game)
           this.gameGateway.joinGameRoom(await this.gameGateway.findSocketOfUser(user.id), await  game)
           console.log("game = ", await game);
