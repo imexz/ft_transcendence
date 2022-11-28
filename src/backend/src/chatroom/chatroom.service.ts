@@ -410,21 +410,25 @@ export class ChatroomService {
         }
     }
 
-    async removeRoom(room_name: string, user: User){
+    // async removeRoom(room_name: string, user: User){
 
-        const room = await this.chatroomRepository.findOne({
-            where: {
-                roomName: room_name
-            },
-            relations: {
-                owner: true,
-            }
-        })
-        if (room.owner == user)
-        {
-            this.chatroomRepository.delete({roomName: room_name})
-        }
-    }
+    //     const room = await this.chatroomRepository.findOne({
+    //         where: {
+    //             roomName: room_name
+    //         },
+    //         relations: {
+    //             owner: true,
+    //         }
+    //     })
+    //     if (room.owner == user)
+    //     {
+    //         this.chatroomRepository.delete({roomName: room_name})
+    //     }
+    //     else
+    //     {
+    //         throw new HttpException('you are not the owner of the room', )
+    //     }
+    // }
 
 
 }
