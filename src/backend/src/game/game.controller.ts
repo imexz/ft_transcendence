@@ -48,20 +48,18 @@ export class GameController {
 
 	@Get('view/:id')
 	@UseGuards(JwtAuthGuard)
-	// @UseInterceptors(ClassSerializerInterceptor) // why commented ??????
-	async viewGame(@Param('id') id: number, @Request() req) { // do we need to protect req in any way?????
+	// @UseInterceptors(ClassSerializerInterceptor) // @shackbei why is this guard disabled?
+	async viewGame(@Param('id') id: number, @Request() req) {
 		console.log("viewGame api");
 		if (Number.isNaN(id) || !Number.isFinite(id) || !Number.isSafeInteger(id))
 			throw new HttpException('Not Found', HttpStatus.NOT_FOUND)
-		// const user = await this.usersService.getUser(id);
-		// if (user == null || user == undefined)
 		const game = await this.getGame(id)
 		if (game) {
 			console.log("usser = ", req.user);
 
 			this.gameGateway.viewRequest(req?.user?.id , game.id)
 		}
-		else // better than commented code above?????
+		else
 		{
 			throw new HttpException('Not Found', HttpStatus.NOT_FOUND)
 		}

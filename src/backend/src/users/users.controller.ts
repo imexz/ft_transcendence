@@ -45,10 +45,10 @@ export class UsersController {
 	@Get('allUserWinnes')
 	@UseGuards(JwtAuthGuard)
 	@UseInterceptors(ClassSerializerInterceptor)
-	getTopPlayer(@Request() req){
+	async getTopPlayer(@Request() req){
 		// console.log(req);
 
-		return this.usersService.getTopPlayer()
+		return await this.usersService.getTopPlayer()
 	}
 
 

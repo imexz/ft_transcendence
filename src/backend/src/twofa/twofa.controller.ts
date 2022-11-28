@@ -21,7 +21,7 @@ export class TwoFactorAuthenticationController {
         const { otpauthUrl } = await this.twoFactorAuthenticationService.genaretwofaSecret(request.user);
         // this.twoFactorAuthenticationService.turnOnTwoFactorAuthentication(request.user.id)
         this.twoFactorAuthenticationService.turnOffTwoFactorAuthentication(request.user.id)
-        return this.twoFactorAuthenticationService.pipeQrCodeStream(response, otpauthUrl);
+        return await this.twoFactorAuthenticationService.pipeQrCodeStream(response, otpauthUrl);
     }
 
     @Post('authenticate')
@@ -36,7 +36,7 @@ export class TwoFactorAuthenticationController {
             request.user
         );
         // console.log(isCodeValid);
-        
+
             if (isCodeValid == false) {
                 throw new UnauthorizedException('Wrong authentication code');
             }
