@@ -106,8 +106,8 @@ export class UsersService {
 		{
 			user.avatar_url_42intra = "https://cdn.intra.42.fr/users/0f2f1b9f30116d06e1e55bed9cf2cb46/casian.png"
 		}
-		tmp = this.usersRepository.create(user);
 		var tmp: User = undefined
+		tmp = this.usersRepository.create(user);
 		var faild: boolean = false
 		var counter: number = 0
 

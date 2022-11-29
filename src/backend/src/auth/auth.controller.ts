@@ -18,7 +18,7 @@ export class AuthController{
 	@UseGuards(LocalAuthGuard)
 	@Get('login/callback')
 	@Redirect("", 302)
-	callback(@Request() req, @Res({ passthrough: true }) res ) { 
+	callback(@Request() req, @Res({ passthrough: true }) res ) {
 		// console.log('login/callback');
 
 		// res.cookie("token", this.authService.login(req.user));
@@ -53,7 +53,7 @@ export class AuthController{
 	@UseGuards(JwtAuthGuard)
 	logout(@Request() req, @Res({ passthrough: true }) res) {
 		// console.log("logout");
-		
+
 		res.setHeader('Set-Cookie', this.authService.getCookieWithJwtAccessToken(
 			req.user.id,
 			false,
