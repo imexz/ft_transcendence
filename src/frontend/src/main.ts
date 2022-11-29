@@ -65,3 +65,4 @@ app
   .use(store)
   .component("fontAwesomeIcon", FontAwesomeIcon)
   .mount('#app')
+

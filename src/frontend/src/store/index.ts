@@ -1,19 +1,12 @@
 
-import { Vue } from 'vue-class-component'
-import { createStore, storeKey } from 'vuex'
-import User, { UserStatus } from '@/models/user';
+import { createStore } from 'vuex'
+import User from '@/models/user';
 import router from '@/router';
 import VueAxios from 'axios';
 import { API_URL } from '@/defines';
 import { io, Socket } from 'socket.io-client'
-import { RequestEnum } from '@/enums/models/RequestEnum';
-import Game from '@/models/game';
-import Room, { Access } from '@/models/room';
-import Message from '@/models/message';
 import Chat from '@/models/chat';
-import { Settings } from '@/models/gameSettings';
 import GameRequest from '@/models/GameRequest';
-
 import { Status } from '@/enums/models/ResponseEnum';
 
 
@@ -33,7 +26,7 @@ export interface State {
   NrMessages: number
   NrFriendRequests: number
   gameRequest: GameRequest | null
-  chat: Chat
+  chat: Chat | null
 
   toastShow: boolean
   toastMode: string
@@ -75,7 +68,7 @@ export default createStore<State>({
       // state.socketGame.emit('leaveGame')
       if (state.socket != null && state.socket != undefined) {
         state?.socket.disconnect();
-        router.push('/')
+        router.push('/login')
       }
     },
     logIn(state, user) {
@@ -135,16 +128,18 @@ export default createStore<State>({
           if (data.status != Status.denied)
             user.friendStatus = data.status
           else
-            state.friendsList?.splice(state.friendsList?.findIndex(elem => elem.id == user.id), 1)
+            state.friendsList?.splice(state.friendsList?.findIndex(elem => elem.id == user?.id), 1)
         }
 
       })
     },
     changeUserName(state, username) {
-      state.user.username = username;
+      if (state.user?.username)
+        state.user.username = username;
     },
     setTwoFa(state, enable) {
-      state.user.isTwoFactorAuthenticationEnabled = enable;
+      if (state.user?.isTwoFactorAuthenticationEnabled)
+        state.user.isTwoFactorAuthenticationEnabled = enable;
     },
     setFriendsList(state, friendsList) {
       state.friendsList = friendsList;
