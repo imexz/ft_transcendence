@@ -59,9 +59,8 @@
   import Room from '@/models/room';
   import { Access } from '@/models/room';
 
-  import { register } from 'vue-advanced-chat'
+  const { register } = require('vue-advanced-chat')
   register()
-
   export default defineComponent({
     data() {
       return {
