@@ -285,7 +285,7 @@ export class ChatGateway {
     if(room.info == roomReturn.created) {
       const socket = await this.findSocketOfUser(id)
       const toWait = Promise.all([this.addUserRooms(client), this.addUserRooms(socket)]);
-      room.chatroom.roomName = socket.handshake.auth.username
+      room.chatroom.roomName = socket?.handshake?.auth?.username
       client.emit('newRoom', room.chatroom)
       room.chatroom.roomName = client.handshake.auth.username
       socket.emit('newRoom', room.chatroom)
