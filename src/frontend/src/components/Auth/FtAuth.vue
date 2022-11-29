@@ -30,9 +30,8 @@ export default defineComponent({
           baseURL: API_URL,
           method: 'GET',
           withCredentials: true,
-      })
+      }).catch(e => this.triggerToast('please log in', 'error'))
       this.$store.dispatch('logOut');
-      this.$router.push('/login');
     },
     authenticate() {
       location.href= API_URL + '/auth/login'
