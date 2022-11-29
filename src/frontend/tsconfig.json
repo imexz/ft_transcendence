@@ -4,6 +4,8 @@
     "module": "esnext",
     // compile error msg
     "strict": false,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
     "jsx": "preserve",
     "moduleResolution": "node",
     "experimentalDecorators": true,
