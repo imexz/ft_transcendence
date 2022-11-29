@@ -83,6 +83,7 @@ router.beforeEach(async (to) => {
   const authRequired = !publicPages.includes(to.path);
   if (authRequired && store.state.user == null) {
     await store.dispatch('validateUser')
+    console.log("user", store.state.user)
     if (store.state.user == null)
       return '/login';
   }

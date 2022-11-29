@@ -27,7 +27,7 @@ export enum changedRoom {
 
 export interface State {
   validated: boolean
-  user: User
+  user: User | null
   socket: Socket | null
   friendsList: User[] | null
   NrMessages: number
@@ -120,14 +120,14 @@ export default createStore<State>({
           router.push('/')
       })
       state.socket.on('Request',(data) => {
-        state.friendsList.push(data)
+        state.friendsList?.push(data)
         state.NrFriendRequests++
         console.log("receive  request");
       })
       state.socket.on('updateFriend', (data) => {
         console.log("updateFriend", data);
         console.log(state.friendsList);
-        let user = state.friendsList.find(elem => elem.id == data.id)
+        let user = state.friendsList?.find(elem => elem.id == data.id)
 
         if (user != undefined && user != null)
         {
@@ -135,7 +135,7 @@ export default createStore<State>({
           if (data.status != Status.denied)
             user.friendStatus = data.status
           else
-            state.friendsList.splice(state.friendsList.findIndex(elem => elem.id == user.id), 1)
+            state.friendsList?.splice(state.friendsList?.findIndex(elem => elem.id == user.id), 1)
         }
 
       })
@@ -166,12 +166,12 @@ export default createStore<State>({
   },
   actions: {
     logOut({ commit }) {
-      if (router.currentRoute.value.path != '/login/tfa')
-        router.push("/login");
       commit('logOut');
       document.cookie = "Authentication=; expires=Thu, 01 Jan 1970 00:00:00 GMT;SameSite=Lax"
       localStorage.removeItem('user');
       this.state.user = null;
+      if (router.currentRoute.value.path != '/login/tfa')
+        router.push("/login");
     },
     validateUser({ commit, dispatch }){
       return VueAxios({
@@ -187,8 +187,7 @@ export default createStore<State>({
         }
       )
       .catch(error => {
-          // this.dispatch('triggerToast', {mode: 'error', show: true, msg: 'Could not validate user'})
-          console.log(error)
+          this.dispatch('triggerToast', {mode: 'error', show: true, msg: 'Could not validate user'})
           dispatch('logOut')
         }
       )
@@ -201,7 +200,7 @@ export default createStore<State>({
         withCredentials: true,
       })
       .then(response => { commit('setFriendsList', response.data) } )
-      .catch(error => console.log(error))
+      .catch(error =>  this.dispatch('triggerToast', {mode: 'error', show: true, msg: 'Could not load Friendlist'}))
     },
     updateRooms({ commit }, room ) {
       commit('addRoom', room);

@@ -20,13 +20,9 @@
 
 import VueAxios from 'axios';
 import { API_URL } from '@/defines';
-import EnableTwoFA from '@/components/Auth/2FA/enable2fc.vue';
 import { defineComponent } from 'vue';
 
 export default defineComponent({
-  components: {
-    EnableTwoFA,
-  },
   methods: {
     async logout() {
       await VueAxios({

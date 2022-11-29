@@ -1,18 +1,5 @@
 <template>
   <div class="userSummary">
-    <div v-if="showDm" class="dmPopUp">
-      <div class="headLineWrapper">
-        <div class="headLine">Direct Message</div>
-        <button class="exitButton" @click="closeDmPopUp">
-          <font-awesome-icon icon="fa-solid fa-x" />
-        </button>
-      </div>
-      <form @submit.prevent="sendDm">
-        <textarea class="dmText" v-model="msgText" placeholder="your message" rows="4">
-        </textarea>
-        <button class="dmButton">Send</button>
-      </form>
-    </div>
     <div class="userInfoBar">
       <img id="userAvatar" :src="user?.avatar_url" alt="Avatar">
       <div id="middleSection">
@@ -37,7 +24,7 @@
         </div>
       </div>
       <div>
-        <div v-if="user?.id != this.$store.state.user.id" class="toggleDropdown" @click="toggleDropdown">
+        <div v-if="user?.id != this.$store.state.user?.id" class="toggleDropdown" @click="toggleDropdown">
           <font-awesome-icon icon="fa-solid fa-bars" />
         </div>
       </div>
@@ -141,7 +128,6 @@ export default defineComponent({
         window.addEventListener('click', this.hideDropDown)
       this.show = !this.show
     },
-    // for match and spectat
   },
 })
 

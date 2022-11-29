@@ -53,7 +53,7 @@ export default defineComponent({
           withCredentials: true,
         })
           .then(response => { this.user = response.data })
-          .catch()
+          .catch(e =>  this.dispatch('triggerToast', {mode: 'error', show: true, msg: 'Could not load Data'}))
     }
   },
   mounted() {
