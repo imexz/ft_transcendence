@@ -87,11 +87,6 @@ export default createStore<State>({
       // console.log("game socket init");
       console.log(document.cookie);
 
-	    // state.socketGame.on('disconnecting', () => {
-		  //   console.log("game socket disconnecting");
-		  //   console.log(state.socketGame);
-	    // })
-
       state.socket.on('GameRequestFrontend',function (data, ack) {
         console.log("GameRequestFrontend", data, ack);
         state.gameRequest = new GameRequest()
