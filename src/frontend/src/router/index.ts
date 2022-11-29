@@ -7,6 +7,7 @@ import SettingsView from '@/views/SettingsView.vue';
 import PlayView from '@/views/ProfileView.vue';
 import ScoreboardView from '@/views/Scoreboard.vue';
 import ChatView from '@/views/Chats.vue';
+import PageNotFound from '@/views/PageNotFound.vue';
 
 
 import store from '../store/index'
@@ -71,6 +72,11 @@ const routes: Array<RouteRecordRaw> = [
     path: '/chat',
     name: 'Chats',
     component: ChatView
+  },
+  {
+    name: 'NotFound',
+    path: '/:pathMatch(.*)*',
+    component: PageNotFound
   }    
 ]
 const router = createRouter({
@@ -81,11 +87,12 @@ const router = createRouter({
 router.beforeEach(async (to) => {
   const publicPages = ['/login', '/login/tfa'];
   const authRequired = !publicPages.includes(to.path);
+
   if (authRequired && store.state.user == null) {
     await store.dispatch('validateUser')
     console.log("user", store.state.user)
     if (store.state.user == null)
-      return '/login';
+      return false;
   }
 })
 
