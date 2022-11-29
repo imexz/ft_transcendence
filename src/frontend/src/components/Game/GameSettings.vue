@@ -109,7 +109,7 @@ export default defineComponent({
                 withCredentials: true,
             })
             .then(ret => this.user = ret.data)
-            .catch(error => console.log(error))
+            .catch(error =>  {this.dispatch('triggerToast', {mode: 'error', show: true, msg: 'Could not load User Data'})})
             
         },
         setScoreToWin(score: number) {

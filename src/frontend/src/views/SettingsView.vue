@@ -38,26 +38,6 @@
         <twoFaSettings/>
       </div>
     </div>
-    <!-- <div class="section">
-      <div class="sectionHeadline"> 
-        <h2>API-Test (DEBUG ONLY!!)</h2>
-      </div>
-      <hr class="break"/>
-      <div class="sectionContent">
-        <p>lets you test api-calls and their returns</p>
-        <button @click="$router.push('/api_test')">goto</button>
-      </div>
-    </div>
-    <div class="section">
-      <div class="sectionHeadline"> 
-        <h2>Inspect Store Content (DEBUG ONLY!!)</h2>
-      </div>
-      <hr class="break"/>
-      <div class="sectionContent">
-        <p>prints the store content to console</p>
-        <button @click="show">show Store</button>       
-      </div>
-    </div> -->
   </div>
 </template>
 
@@ -66,7 +46,6 @@
 import ChangeUserName from '@/components/Settings/ChangeUserName.vue';
 import twoFaSettings from '@/components/Auth/2FA/twoFaSettings.vue';
 import ChangeUserAvatar from '@/components/Settings/ChangeUserAvatar.vue';
-import EnableTwoFA from '@/components/Auth/2FA/enable2fc.vue';
 import { defineComponent } from 'vue';
 import { maxLenUserName } from '@/defines';
 
@@ -74,7 +53,6 @@ export default defineComponent({
   components: {
     ChangeUserName,
     ChangeUserAvatar,
-    EnableTwoFA,
     twoFaSettings,
   },
   data() {

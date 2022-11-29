@@ -57,7 +57,7 @@ export default defineComponent({
             withCredentials: true,
         })
         .then(response => { this.users = response.data})
-        .catch()
+        .catch(e => this.$store.dispatch('triggerToast', {msg: "Could not load", mode: "error", show: true}))
         }
     },
     mounted() {
