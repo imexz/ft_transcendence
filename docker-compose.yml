@@ -5,9 +5,9 @@ services:
     build:
       context: ./src/frontend/
     # image: vuejs/ci:latest
-    # depends_on:
-    #   - backend
-    #   - database
+    depends_on:
+      - backend
+      - database
     restart: always
     ports:
       - "8080:8080"
