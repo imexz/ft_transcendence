@@ -1,6 +1,6 @@
 <template>
   <div class="wrapper">
-    <user-summary :user= this.game.winner />
+    <user-summary :user=this.game.winner />
     <h1> won against </h1>
     <user-summary :user=this.game.loser />
     <div>
@@ -20,13 +20,18 @@ import router from '@/router';
 
 
 export default defineComponent({
-    components: {
+  components: {
         UserSummary
-    },
-    props: {
+  },
+  props: {
         game: Game,
         socket: Socket
-    },
+  },
+  mounted() {
+    console.log("result: winner", this.game.winner);
+    console.log("result: loser", this.game.loser);
+    console.log("result mounted:", this.game.scoreWinner, this.game.scoreLoser);
+  },
 	unmounted() {
 		console.log("result.vue unmounted");
 	},
@@ -34,27 +39,6 @@ export default defineComponent({
 		leaveRoom() {
 			this.socket.emit('leaveRoom')
 		},
-        askForSpecialRematch() {
-            router.push('/game/' + this.getOpponentId())
-        },
-
-		// askForRematch() {
-		// 	console.log("askForRematch");
-            
-
-        //     // this.game = null
-        //     // this.$emit()
-        // },
-        // getOpponentId(): number{
-        //     // let userId: number;
-        //     // if (this.$store.state.user.id === this.game.winner.id) {
-        //     //     userId = this.game.loser.id;
-        //     // } else if (this.$store.state.user.id === this.game.loser.id) {
-        //     //     userId = this.game.winner.id;
-        //     // } else { return }
-        //     // console.log("userId= ", userId);
-        //     return this.$store.state.user.id === this.game.winner.id ? this.game.loser.id:  this.game.winner.id
-        // },
         newGame() {
             console.log("newGame");
             this.$emit('newGame')

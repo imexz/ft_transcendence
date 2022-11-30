@@ -75,11 +75,6 @@ export default defineComponent({
       console.log("Field mounted gameInit", this.gameInit);
     },
     updated() {
-      // console.log("Field updated gameInit", this.gameInit);
-      // console.log("GameInfo", game)
-
-      
-      // this.updateScore({scoreWinner: this.gameInit?.scoreWinner, scoreLoser: this.gameInit?.scoreLoser})
       console.log("FieldView Updated");
       
     },
@@ -208,9 +203,6 @@ export default defineComponent({
         }
         if (this.isGameFinished()) {
           this.pixiApp.ticker.stop()
-        //   // this.$emit('assignWinner', this.assignWinnerAndLoser())
-        //   console.log("winner");
-        //   this.$store.state.game.isFinished = true
         }
       },
       updatePaddle(data: any) {
@@ -220,11 +212,8 @@ export default defineComponent({
         this.gameData.paddleRight = data.paddleRight;
       },
       updateBall(data: any) {
-        // console.log(data);
-        
 		    if (data === undefined) {
           console.log("data undefined");
-          // this.gameExists = false;
 			    this.left = 0;
 			    this.right = 0;
         	return;
@@ -235,13 +224,6 @@ export default defineComponent({
 		    return (this.gameData.score.scoreWinner == this.gameData.score.scoreToWin ||
                 this.gameData.score.scoreLoser == this.gameData.score.scoreToWin);
 	    },
-      // assignWinnerAndLoser() {
-      //   if (this.gameData.score.scoreWinner > this.gameData.score.scoreLoser) {
-      //     return { winner: this.$store.state.game.winner, loser: this.$store.state.game.loser }
-      //   } else {
-      //     return { winner: this.$store.state.game.loser, loser: this.$store.state.game.winner }
-      //   }
-      // }
     },
     props: {
       socket: Socket,

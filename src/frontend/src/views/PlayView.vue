@@ -28,7 +28,6 @@
   import PongGame from '../components/Game/PongGame.vue';
   import { io, Socket } from 'socket.io-client'
   import { API_URL } from '@/defines';
-  import User from '@/models/user';
 
 
   export default defineComponent({
@@ -60,19 +59,13 @@
       this.game = null
       this.initGameInfoListener()
       console.log("view mounted");
-      
-      // await this.askBackendForGame()
     },
     updated() {
       console.log("view updated");
-      if (this.game?.isFinished) {
+      console.log(this.userId);
+      if (this.game?.isFinished && this.userId) { //   this.game?.winner == undefined && this.game?.loser == undefined
         this.game = null
       }
-      // console.log("updated");
-      // console.log(this.userId);
-      
-
-      
     },
     methods: {
       async setWait(){
@@ -93,19 +86,23 @@
           console.log("GameInfo PlayView", game)
           
 		    });
-		    this.socketGame.on('isFinished', () => {
+		    this.socketGame.on('isFinished', (data) => {
           this.wait = false
           if (this.game) {
+            console.log("PlayView: Winner", this.game.winner)
+            console.log("PlayView: Winner data", data.winner)
+            console.log("PlayView: Loser", this.game.loser)
+            console.log("PlayView: Loser data", data.loser)
+            this.game.winner = data.winner
+            this.game.loser = data.loser
             this.game.isFinished = true
           }
 		    });
-
 	    },
       leaveGame() {
         this.socketGame.emit('leaveGame');
         this.reset()
       },
-      
       reset() {
         this.wait = false
         this.game = null

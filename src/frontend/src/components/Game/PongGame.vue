@@ -1,15 +1,8 @@
 <template>
-<!-- <div v-if="this.dataRdy"> -->
-  <!-- <div class="queue" v-show="this.game == null">
-    <text> Waiting for opponent... </text>
-    <br>
-    <button @click="this.leaveGame"> Leave </button>
-  </div> -->
   <div v-if="this.game.isFinished == false">
 		<GamePlayers :game = this.game />
 		<div class="gameCanvas">
       <div>
-        <!-- <Field @assignWinner="this.assignWinner"/> -->
         <Field :socket = "this.socket" :gameInit="this.game" />
       </div>
     </div>
@@ -17,7 +10,6 @@
   <div v-if="this.game?.isFinished">
 	  <Result :game = this.game :socket = this.socket @newGame="this.prepareNewGame" />
   </div>
-<!-- </div> -->
 </template>
 
 <script lang="ts">
@@ -49,7 +41,6 @@
   	},
   	async mounted() {
   		console.log("mounted");
-		  // await this.initGameInfoListener();
 		  this.dataRdy = true;
       while (!this.socket) {
 		  	  await new Promise(r => 
@@ -60,38 +51,20 @@
       }
   	},
 		async beforeUpdate() {
-  		console.log("beforeUpdate");
-      // if (this.$store.state.game == null) {
-      //   await this.$store.state.socketGame.emit('joinOrCreatGame', {isCustomized: this.$store.state.customized});
-      // }
+  		console.log("beforeUpdate PongGame");
+      console.log("winner", this.game.winner);
+      console.log("loser", this.game.loser);
 		  console.log("leaving beforeUpdate");
 	  },
   	unmounted() {
   	  console.log("in unmount");
-      // this.$store.state.socketGame?.off('GameInfo')
-      // document.removeEventListener('keydown', this.keyEvents, false);
   	},
   	methods: {
 
       prepareNewGame(){
         console.log("newGame");
         this.$emit("reset")
-        // this.$store.state.winner = null
-        // this.$store.state.loser = null
-        // this.$store.state.game = null
       },
-      // assignWinner(data: {winner: User, loser: User}) {
-      //   console.log("assignWinner");
-      //   this.$store.state.winner = data.winner
-      //   this.$store.state.loser = data.loser
-      // },
-      // assignGame(game: Game) {
-        // this.$store.state.game = game
-        // this.$store.state.game.isFinished = false
-        // if (this.$store.state.game.loser != undefined) {
-  	  	//   document.addEventListener('keydown', this.keyEvents, false);
-        // }
-      // },
   	}
   })
 </script>

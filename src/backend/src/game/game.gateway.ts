@@ -20,7 +20,7 @@ import {Gateway} from '../users/friends/friend.gateway'
 @WebSocketGateway({
 	namespace: 'game',
 	cors: {
-		origin: [hostURL + ':8080'/* , hostURL +':3000' */],
+		origin: [hostURL + ':8080'],
 		credentials: true
 	},
 })
@@ -34,10 +34,10 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		private authService: AuthService,
 		@Inject(forwardRef(() => Gateway))
 		private gateway: Gateway,
-	) {};
+	) {}
 
   @WebSocketServer()
-	server: Server;
+	server: Server
 
   afterInit() { console.log("GameGateway: After init") }
 
@@ -63,8 +63,8 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			}
 		} else {
 			client.emit('GameInfo', {winner: game.winner, loser: game.loser})
-			this.sendPaddle(client, game)
 		}
+		this.sendPaddle(client, game)
 	}
   }
 
@@ -100,20 +100,19 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   ) {
 		console.log("settings", settings)
 		const clientId: number = client.handshake.auth.id
-		// if (clientId === id) return ret; // Selfinvite -> no push
 		let game: Game | undefined = this.gameService.getGame(clientId)
 		if (game != undefined) {
 			console.log("gameRequest: client has a game. Reject request")
-			return false; // client in game -> no push
+			return false // client in game -> no push
 		} else {
 			console.log("gameRequest: client has no game")
-			game = this.gameService.getGame(id);
+			game = this.gameService.getGame(id)
 			if(game == undefined) {
-				console.log("gameRequest: opponent has no game");
+				console.log("gameRequest: opponent has no game")
 				const socket = await this.gateway.askUserToPlay(client.handshake.auth as User, id, settings)
 				return true
 			} else {
-				console.log("gameRequest: invited player has game. Specatating.");
+				console.log("gameRequest: invited player has game. Specatating.")
 				client.rooms.forEach(roomId => { if (client.id != roomId) client.leave(roomId) })
 			}
 		}

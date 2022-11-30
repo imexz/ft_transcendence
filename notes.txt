@@ -2,10 +2,6 @@ Topics:
 
 invite spectating user. starts game if accepted, but spectator needs to reload..
 
-implement game settings
-
-implement game customization
-
 Change hitbox of paddles / collision control (?)
 
 

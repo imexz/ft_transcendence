@@ -246,7 +246,9 @@ export class GameService {
 			this.userService.setStatus(game.winner.id, UserStatus.ONLINE)
 			this.userService.setStatus(game.loser.id, UserStatus.ONLINE)
 			this.removeGame(game)
-			this.gameGateway.server.to(game.id.toString()).emit('isFinished')
+			this.gameGateway.server.to(game.id.toString()).emit('isFinished', game);
+			console.log("winner is ", game.winner);
+			console.log("loser is ", game.loser);
 			console.log("game is finished")
 		}
 	}

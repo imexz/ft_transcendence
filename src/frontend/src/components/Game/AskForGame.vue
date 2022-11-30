@@ -32,8 +32,6 @@ export default defineComponent({
 
     methods:{
         accept(){
-          // this.$store.state.winner = null
-          // this.$store.state.game = null
           this.$store.state.gameRequest.response(RESPONSE.accept)
           this.$store.state.gameRequest = null
           this.$router.push('/play')

@@ -63,7 +63,7 @@
         <font-awesome-icon icon="fa-solid fa-table-tennis-paddle-ball" />
       </button>
       <div class="tooltip right">
-        Spectate Match
+        Invite / Spectate
       </div>
     </div>
     <div class="box" v-for="button in extraButtons as Button[]">

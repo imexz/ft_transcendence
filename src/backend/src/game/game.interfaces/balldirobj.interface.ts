@@ -24,14 +24,10 @@ export class BallDirObj {
 
 		var ret: boolean
 		switch (this.serving) {
-			case Serving.RANDOM:	
-				ret = toLeft || toRight	
-				break
 			case Serving.ALTERNATE:
-				console.log("side = ", this.side)
-				this.side = !this.side
-				console.log("side1 = ", this.side)
 				ret = this.side ? toLeft : toRight
+				if (ret)
+					this.side = !this.side
 				break
 			case Serving.LAST_SCORED:
 				ret = side == Side.left ? toLeft : toRight

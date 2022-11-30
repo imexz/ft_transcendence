@@ -1,18 +1,15 @@
 import { ConnectedSocket, MessageBody,  WebSocketServer } from '@nestjs/websockets';
 import { SubscribeMessage, WebSocketGateway } from '@nestjs/websockets';
-import { JwtStrategy } from 'src/auth/jwt-two/jwt.strategy';
 import { hostURL } from 'src/hostURL';
-import { RequestEnum } from 'src/request.enum';
 import { UserStatus } from '../entitys/status.enum';
 import { UsersService } from '../users.service';
-import { JwtService } from '@nestjs/jwt';
 import { Socket, Server } from 'socket.io';
 import { AuthService } from 'src/auth/auth.service';
 import { FriendsService } from './friends.service';
 import { Status } from './friend.entity';
 import User from '../entitys/user.entity';
 import { Settings } from 'src/game/game.entities/settings';
-import { forwardRef, Injectable, Inject } from '@nestjs/common';
+import { forwardRef, Inject } from '@nestjs/common';
 import { GameService } from 'src/game/game.service';
 import { GameGateway } from 'src/game/game.gateway';
 
@@ -24,8 +21,7 @@ enum RESPONSE {
 
 @WebSocketGateway({
   cors: {
-    // origin: "*",
-    origin: [hostURL + ':8080'/* , hostURL + ':3000' */],
+    origin: [hostURL + ':8080'],
     credentials: true
   }
 })
@@ -49,12 +45,12 @@ export class Gateway {
     async askUserToPlay(user: User, id: number, settings: Settings) {
       const socket = await this.usersService.getUserSocket(this.server, id)
       if (socket == undefined) {
-        console.log("gameRequest: opponent is offline");
+        console.log("gameRequest: opponent is offline")
       } else {
-        var response = {data: null as RESPONSE};
+        var response = {data: null as RESPONSE}
 
         await socket.emit('GameRequestFrontend',{ user, settings},  function ( data: RESPONSE)  {
-          console.log("GameRequestFrontend beginn");
+          console.log("GameRequestFrontend beginn")
           response.data = data
           console.log("in call back ", data)
         }
@@ -64,21 +60,24 @@ export class Gateway {
     }
 
     async responseGameRequest(socket ,data: { data: RESPONSE}, user, settings, id) {
-        console.log("start async");
+        console.log("start async")
         var i = 0
         while (data.data == undefined && i < 100) {
-          await new Promise(r => setTimeout(r, 100));
+          await new Promise(r => setTimeout(r, 100))
           i++
         }
-        console.log(data.data);
+        console.log(data.data)
         if (data.data == RESPONSE.accept) {
-          console.log("accepted response");
-
+          console.log("accepted response")
+          const opponentGame = this.gameGateway.getGame(id)
+          this.gameService.removeUserFromSpectators(id, opponentGame)
+          const opponentSocket = await this.gameGateway.findSocketOfUser(id)
+          console.log(opponentSocket.rooms)
+          opponentSocket.rooms.forEach(roomId => { if (opponentSocket.id != roomId) opponentSocket.leave(roomId) })
           const game = this.gameService.joinGameOrCreateGame( user, settings, id)
-
-          this.gameGateway.joinGameRoom(await this.gameGateway.findSocketOfUser(id), await  game)
+          this.gameGateway.joinGameRoom(opponentSocket, await  game)
           this.gameGateway.joinGameRoom(await this.gameGateway.findSocketOfUser(user.id), await  game)
-          console.log("game = ", await game);
+          console.log("game = ", await game)
         } else {
           (await this.gameGateway.findSocketOfUser(user.id)).emit('isFinished')
 					socket.emit('resetRequester')
@@ -92,8 +91,6 @@ export class Gateway {
   }
 
     async handleDisconnect(socket) {
-      // console.log("disconnected", socket.handshake);
-
       if (socket.handshake.auth != undefined)
         this.usersService.setStatus(socket.handshake.auth.id, UserStatus.OFFLINE)
     }
@@ -106,12 +103,12 @@ export class Gateway {
       console.log("Request");
 
       if(id != client.handshake.auth.id) {
-        if(await this.friendsService.findFriendShip(client.handshake.auth.id, id) == undefined){
+        if(await this.friendsService.findFriendShip(client.handshake.auth.id, id) == undefined) {
           client.handshake.auth.friendStatus = Status.requsted;
           (await this.usersService.getUserSocket(this.server, id))?.emit('Request', client.handshake.auth)
           this.friendsService.requestFriendship(client.handshake.auth.id, id)
         } else {
-        console.log("friendship alredy exist");
+        console.log("friendship alredy exist")
 
         }
       }
@@ -124,7 +121,7 @@ export class Gateway {
     @MessageBody('id') id?: number,
     @MessageBody('status') status?: Status    )
     {
-      console.log("responseFriendship", status);
+      console.log("responseFriendship", status)
 
       this.friendsService.responseFriendship(client.handshake.auth.id, id, status)
       let friend = await this.findSocketOfUser(id)

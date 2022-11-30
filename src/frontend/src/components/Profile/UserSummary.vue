@@ -41,15 +41,8 @@ import { defineComponent } from 'vue';
 import { Status } from '@/enums/models/ResponseEnum';
 import ViewGamePopup from '../Game/ViewGamePopup.vue';
 import{ UserStatus }from '@/models/user';
-import { Socket } from 'socket.io'
-import VueAxios from 'axios';
-import { API_URL } from '@/defines';
-
-
-
 import UserActionsPopup from '@/components/Profile/UserActionsPopup.vue';
 import Game from '@/models/game';
-import router from '@/router';
 
 export default defineComponent({
   created() {
@@ -76,7 +69,7 @@ export default defineComponent({
     console.log(this.user)
   }
   ,
-  props : {
+  props: {
     user: {
       type: Object,
       default: null
