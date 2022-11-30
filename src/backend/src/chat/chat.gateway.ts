@@ -77,8 +77,7 @@ export class ChatGateway {
           const data: {banned: boolean, room: chatroom} = await this.chatService.manageJoin(client.handshake.auth.id, roomId, password)
           if (data != undefined && data.banned != undefined && data.banned == false && data.room) {
             await this.addUserRooms(client)
-            client.emit('UpdateRoom', {change: changedRoom.complet, roomId: roomId, data: data.room })
-            client.to(roomId.toString()).emit('UpdateRoom', {change: changedRoom.user, roomId: roomId,  data: client.handshake.auth })
+            this.server.to(roomId.toString()).emit('UpdateRoom', {change: changedRoom.user, roomId: roomId,  data: client.handshake.auth })
             this.createSystemMessage(roomId, client.handshake.auth.username + " joined the conversation", client)
           }
           else if (data != undefined && data.banned != undefined && data.banned == true)
@@ -105,7 +104,7 @@ export class ChatGateway {
             return false
   }
 
-  @SubscribeMessage('action')
+  @SubscribeMessage('actions')
   async ban(
     @MessageBody('emiType') emiType: AdminAction,
     @MessageBody('userId') muteUserId: number,
@@ -210,7 +209,6 @@ export class ChatGateway {
   ) {
     console.log("createOrChangeRoom");
 
-    // console.log("roomName =", roomName, ",access =", access);
     if (roomName.length == 0 || access == undefined)
       return {undefined}
 
@@ -234,7 +232,8 @@ export class ChatGateway {
      this.addUserRooms(client)
     } else if (room.info == roomReturn.changed) {
       if (access != Access.private) {
-        client.broadcast.emit('UpdateRoom', {change: changedRoom.complet, roomId: room.chatroom.roomId, data: room.chatroom})
+        client.broadcast.except(room.chatroom.roomId.toString()).emit('UpdateRoom', {change: changedRoom.complet, roomId: room.chatroom.roomId, data: {roomId: room.chatroom.roomId, roomName: room.chatroom.roomName, access: room.chatroom.access}})
+        this.server.to(room.chatroom.roomId.toString()).emit('UpdateRoom', {change: changedRoom.access, roomId: room.chatroom.roomId, data: room.chatroom.access})
       } else {
         client.broadcast.emit('UpdateRoom', {change: changedRoom.access, roomId: room.chatroom.roomId, data: Access.private}) // TB maybe need some work when a room turns to private
       }

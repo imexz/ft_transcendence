@@ -30,7 +30,7 @@
       </div>
     </div>
     <div v-if="show" class="dropdownMenu">
-      <UserActionsPopup :user="user" :extraButtons="extraButtons" @action="popUpActions"/>
+      <UserActionsPopup :user="user" :extraButtons="extraButtons" @actions="popUpActions"/>
     </div>
   </div>
 </template>
@@ -77,7 +77,7 @@ export default defineComponent({
       default: []
     },
   },
-  emits: ['action'],
+  emits: ['actions'],
   methods: {
     popUpActions(emit) {
       switch(emit) {
@@ -91,8 +91,8 @@ export default defineComponent({
           this.customEmit(emit)
       }
     },
-    customEmit(emitMsg) {
-      this.$emit('action', emitMsg, this.user.id)
+    customEmit(emitMsg){
+      this.$emit('actions', emitMsg, this.user.id)
     },
     response(status: Status) {
       if(status == Status.accepted){
@@ -214,7 +214,7 @@ export default defineComponent({
   .pending {
     background-color: var(--ft_dark_purple);
   }
-  
+
 
 
 </style>

@@ -82,7 +82,9 @@ export default createStore<State>({
 
       console.log("socketGame established");
 
-      state.chat = new Chat()
+      if (state.chat === null) {
+        state.chat = new Chat()
+      }
 
       // console.log("game socket init");
       console.log(document.cookie);
@@ -191,12 +193,6 @@ export default createStore<State>({
       })
       .then(response => { commit('setFriendsList', response.data) } )
       .catch(error =>  this.dispatch('triggerToast', {mode: 'error', show: true, msg: 'Could not load Friendlist'}))
-    },
-    updateRooms({ commit }, room ) {
-      commit('addRoom', room);
-    },
-    logIn({ commit }, user) {
-      commit("logIn", user)
     },
     triggerToast({commit}, toastObj:{show: boolean, mode: string, msg: string}) {
       commit('changeToast', toastObj);

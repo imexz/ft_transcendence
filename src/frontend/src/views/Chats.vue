@@ -43,7 +43,7 @@
     <div>
 
       <div v-if="roomInfoPopUp" class="roomInfoPopUp">
-        <roomInfoPopUp :room="roomInfoData" @action="roomInfoActions"/>
+        <roomInfoPopUp :room="roomInfoData" @actions="roomInfoActions"/>
       </div>
     </div>
   </div>
@@ -112,11 +112,13 @@
           if (this.currentRoomId)
           {
             const currentRoom : Room = this.rooms.find(elem => elem.roomId == this.currentRoomId)
-            currentRoom.unreadCount = 0
-            if (currentRoom.messages.length < 1)
-              this.messages = []
-            else
-              this.messages = currentRoom.messages
+            if (currentRoom !== undefined) {
+              currentRoom.unreadCount = 0
+              if (currentRoom.messages.length < 1)
+                this.messages = []
+              else
+                this.messages = currentRoom.messages
+            }
           }
           else
             this.messages = []
@@ -161,7 +163,7 @@
                   var result: string = undefined
                   if (this.rooms[index].access == Access.protected)
                   {
-                    result = prompt("This room is protected\n password", "password") // @Tobi please rework this popup so it matches the style of our website, can be triggered by trying to join a protected room
+                    result = prompt("This room is protected\n password", "password")
                   }
 
                     console.log(result);
@@ -198,6 +200,14 @@
               break ;
             case "ban":
               this.banUser(userId, room);
+              break;
+            case "success":
+              this.toggleRoomInfo();
+              this.changeSuccess("Room changed")
+              break;
+            case "error":
+              this.toggleRoomInfo();
+              this.changeError("Room not changed")
               break;
             case "exit":
               this.toggleRoomInfo();

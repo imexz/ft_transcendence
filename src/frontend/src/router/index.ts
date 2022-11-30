@@ -4,7 +4,6 @@ import ProfileView from '@/views/ProfileView.vue';
 import ApiTestView from '@/views/ApiTestView.vue';
 import LoginView from '@/views/LoginView.vue';
 import SettingsView from '@/views/SettingsView.vue';
-import PlayView from '@/views/ProfileView.vue';
 import ScoreboardView from '@/views/Scoreboard.vue';
 import ChatView from '@/views/Chats.vue';
 import PageNotFound from '@/views/PageNotFound.vue';
@@ -18,7 +17,6 @@ const routes: Array<RouteRecordRaw> = [
     path: '/',
     name: 'me',
     props: {id : "0"},
-    // component: () => import('../views/ProfileView.vue')
     component: ProfileView
   },
   {
@@ -47,13 +45,11 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/settings',
     name: 'settings',
-    // component: () => import('../views/SettingsView.vue')
     component: SettingsView
   },
   {
     path: '/play',
     name: 'play',
-    // component: PlayView
     component: () => import('../views/PlayView.vue')
   },
   {
@@ -61,7 +57,6 @@ const routes: Array<RouteRecordRaw> = [
     name: 'playInvite',
     props: true,
     component: () => import('../views/PlayView.vue')
-    // component: PlayView
   },
   {
     path: '/scoreboard',
@@ -77,7 +72,7 @@ const routes: Array<RouteRecordRaw> = [
     name: 'NotFound',
     path: '/:pathMatch(.*)*',
     component: PageNotFound
-  }    
+  }
 ]
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
@@ -90,7 +85,6 @@ router.beforeEach(async (to) => {
 
   if (authRequired && store.state.user == null) {
     await store.dispatch('validateUser')
-    console.log("user", store.state.user)
     if (store.state.user == null)
       return false;
   }

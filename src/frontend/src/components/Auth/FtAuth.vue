@@ -1,11 +1,11 @@
 <template>
   <div>
     <div v-if="$store.state.user == null">
-      <button 
+      <button
         class="authButton"
         :class="{'linkActive': $route.name === 'login'}"
         @click="authenticate">login</button>
-        
+
     </div>
     <div v-else>
       <button
@@ -43,9 +43,10 @@ export default defineComponent({
   mounted(): void {
     this.$store.dispatch('validateUser')
     .then(ret => {
-      if (ret) { 
+      if (ret) {
         this.triggerToast('vaildated', 'success')
-      } else {
+      }
+      else {
         this.triggerToast('please log in', 'error')
       }
     }
@@ -56,7 +57,7 @@ export default defineComponent({
 </script>
 
 <style>
-  
+
   .authButton {
     --hot: var(--ft_pink);
     --cold: var(--ft_cyan);
@@ -76,7 +77,7 @@ export default defineComponent({
     color: var(--hot);
     border-color: var(--ft_hot);
   }
-  .authButton:hover {    
+  .authButton:hover {
     color: var(--dark);
     background-color: var(--cold);
   }

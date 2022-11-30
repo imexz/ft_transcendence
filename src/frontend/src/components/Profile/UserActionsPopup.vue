@@ -113,10 +113,10 @@ export default defineComponent({
       default: null
     }
   },
-  emits: ['action'],
+  emits: ['actions'],
   methods: {
     toggleDropDown() {
-      this.$emit('action', 'close')
+      this.$emit('actions', 'close')
     },
     removeFriend() {
       this.$store.state.socket.emit('Remove', {id: this.user.id})
@@ -128,7 +128,7 @@ export default defineComponent({
       this.$store.commit("addFriend", this.user)
     },
     viewProfile() {
-      this.$emit('action', 'viewProfile')
+      this.$emit('actions', 'viewProfile')
     },
     openDmPopUp(){
       this.showDm = true
@@ -146,13 +146,13 @@ export default defineComponent({
     },
     sendDm(){
       console.log(this.DMText)
-      this.$emit('action', 'close')
+      this.$emit('actions', 'close')
       this.$store.state.chat.socketChat.emit('DM', {content: this.DMText, id: this.user.id})
       this.DMText = ""
       this.closeDmPopUp()
     },
     customEmit(emitMsg) {
-      this.$emit('action', emitMsg)
+      this.$emit('actions', emitMsg)
     },
     viewGame(status){
       switch (status) {
@@ -166,7 +166,7 @@ export default defineComponent({
           method: 'GET',
           withCredentials: true,
         })
-          .then(response => { 
+          .then(response => {
             this.$router.push('/play')
           })
           .catch()
@@ -188,7 +188,7 @@ export default defineComponent({
           console.log("api return live game", res)
           if (res.data) {
             console.log("res daat")
-            
+
             this.opponentName = res.data.winner.id == this.user.id ? res.data.loser.username : res.data.winner.username
             console.log("showGame = ", this.showGame)
             this.showGame = !this.showGame
@@ -198,7 +198,7 @@ export default defineComponent({
             this.$router.push('/play/' + this.user.id)
           }
         })
-        .catch(error => { this.$emit('actions', 'error') }) 
+        .catch(error => { this.$emit('actions', 'error') })
       console.log("askForMatchOrSpectate")
     },
   },
