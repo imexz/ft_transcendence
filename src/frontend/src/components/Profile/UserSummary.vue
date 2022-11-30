@@ -41,20 +41,12 @@ import { defineComponent } from 'vue';
 import { Status } from '@/enums/models/ResponseEnum';
 import ViewGamePopup from '../Game/ViewGamePopup.vue';
 import{ UserStatus }from '@/models/user';
-import { Socket } from 'socket.io'
-import VueAxios from 'axios';
-import { API_URL } from '@/defines';
-
-
-
 import UserActionsPopup from '@/components/Profile/UserActionsPopup.vue';
 import Game from '@/models/game';
-import router from '@/router';
 
 export default defineComponent({
   created() {
-    console.log("creted user summary");
-
+    console.log("creted user summary")
   },
   components: {
     ViewGamePopup,
@@ -74,9 +66,8 @@ export default defineComponent({
   },
   mounted() {
     console.log(this.user)
-  }
-  ,
-  props : {
+  },
+  props: {
     user: {
       type: Object,
       default: null
@@ -91,19 +82,19 @@ export default defineComponent({
     popUpActions(emit) {
       switch(emit) {
         case "viewProfile":
-          this.viewProfile(this.user.id);
-          break;
+          this.viewProfile(this.user.id)
+          break
         case "close":
-          this.toggleDropdown();
-          break;
+          this.toggleDropdown()
+          break
         default:
-          this.customEmit(emit);
+          this.customEmit(emit)
       }
     },
     customEmit(emitMsg){
       this.$emit('actions', emitMsg, this.user.id)
     },
-    response(status: Status){
+    response(status: Status) {
       if(status == Status.accepted){
         this.user.friendStatus = null
       } else {
@@ -111,18 +102,18 @@ export default defineComponent({
       }
       this.$store.state.socket.emit('Response', {id: this.user.id, status: status})
     },
-    viewProfile(id: number){
+    viewProfile(id: number) {
       this.toggleDropdown()
-      this.$router.push('/profile/' + id.toString());
+      this.$router.push('/profile/' + id.toString())
     },
-    hideDropDown(e){
+    hideDropDown(e) {
       if (!this.$el.contains(e.target))
         this.toggleDropdown()
     },
     toggleDropdown() {
       if (this.show){
         window.removeEventListener('click', this.hideDropDown)
-        this.showGame = false;
+        this.showGame = false
       }
       else
         window.addEventListener('click', this.hideDropDown)

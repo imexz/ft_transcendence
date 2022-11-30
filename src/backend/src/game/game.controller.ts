@@ -13,8 +13,7 @@ export class GameController {
 	@Get()
 	@UseGuards(JwtAuthGuard)
 	@UseInterceptors(ClassSerializerInterceptor)
-	getMyMatchHistory(@Request() req)
-	{
+	getMyMatchHistory(@Request() req) {
 		return this.gameService.getMatchHistory(req.user.id)
 	}
 
@@ -24,7 +23,7 @@ export class GameController {
 	async getMatchHistory(@Param('id') id: number) {
 		if (Number.isNaN(id) || !Number.isFinite(id) || !Number.isSafeInteger(id))
 			throw new HttpException('Not Found', HttpStatus.NOT_FOUND)
-		const user = await this.usersService.getUser(id);
+		const user = await this.usersService.getUser(id)
 		if (user == null || user == undefined)
 			throw new HttpException('Not Found', HttpStatus.NOT_FOUND)
 		return this.gameService.getMatchHistory(id)
@@ -36,13 +35,12 @@ export class GameController {
 	async getGame(@Param('id') id: number) {
 		if (Number.isNaN(id) || !Number.isFinite(id) || !Number.isSafeInteger(id))
 			throw new HttpException('Not Found', HttpStatus.NOT_FOUND)
-		const user = await this.usersService.getUser(id);
+		const user = await this.usersService.getUser(id)
 		if (user == null || user == undefined)
 			throw new HttpException('Not Found', HttpStatus.NOT_FOUND)
-		console.log("getGame api", id);
+		console.log("getGame api", id)
 		const ret = this.gameService.getGame(id)
-		console.log("ret = ", ret);
-
+		console.log("ret = ", ret)
 		return ret
 	}
 
@@ -50,21 +48,15 @@ export class GameController {
 	@UseGuards(JwtAuthGuard)
 	// @UseInterceptors(ClassSerializerInterceptor) // @shackbei why is this guard disabled?
 	async viewGame(@Param('id') id: number, @Request() req) {
-		console.log("viewGame api");
+		console.log("viewGame api")
 		if (Number.isNaN(id) || !Number.isFinite(id) || !Number.isSafeInteger(id))
 			throw new HttpException('Not Found', HttpStatus.NOT_FOUND)
 		const game = await this.getGame(id)
 		if (game) {
-			console.log("usser = ", req.user);
-
+			console.log("usser = ", req.user)
 			this.gameGateway.viewRequest(req?.user?.id , game.id)
-		}
-		else
-		{
+		} else {
 			throw new HttpException('Not Found', HttpStatus.NOT_FOUND)
 		}
-
-
 	}
-
 }
