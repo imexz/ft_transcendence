@@ -64,13 +64,14 @@ export default class Chat{
           this.socketChat.on('UpdateRoom',(obj: {change: changedRoom, roomId: number, data: any }) => {
             console.log("UpdateRoom received:", obj);
 
-            let room = this.rooms?.value?.find(elem => elem.roomId == obj.roomId)
+            let room = store.state.chat.help.rooms.find(elem => elem.roomId == obj.roomId)
             if (room) {
               switch (obj.change) {
                 case changedRoom.complet:
                   let roomIndex = this.rooms?.value?.findIndex(elem => elem.roomId == obj.roomId)
                   if (roomIndex != -1) {
 
+                    this.rooms.value[roomIndex] = undefined
                     this.rooms.value[roomIndex] = new Room(obj.data)
                   }
                     this.rooms.value = [...this.rooms.value]
@@ -82,9 +83,13 @@ export default class Chat{
                   break ;
                 case changedRoom.admin:
                   this.UserToArray(obj.data, room.admins)
+                  this.rooms.value = [...this.rooms.value]
                   var index = room.users.findIndex(elem => elem.id == obj.data.id)
                   if (index != -1)
+                  {
                     this.removeUser(index, room.users)
+                    this.rooms.value = [...this.rooms.value]
+                  }
                   break;
                 case changedRoom.access:
                   if (obj.data == Access.private && room.users.findIndex(elem => elem.id == store.state.user?.id) == -1)
