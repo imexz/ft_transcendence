@@ -8,11 +8,12 @@
     </div>
     <div class="headLine" >Role: {{getRole}} </div>
     <div v-if="getRole == 'owner'">
-      <CreateRoom :roomName=room.roomName :roomAccess=room.access> </CreateRoom>
+      <CreateRoom
+      @actions="reEmitRoom" :roomName=room.roomName :roomAccess=room.access> </CreateRoom>
     </div>
     <div v-if="room.admins != undefined" class="userGroup">Admins</div>
     <div class="user" v-for="user in room?.admins">
-      <UserSummary v-if="room?.access == Access.dm && user.id != this.$store.state.user.id" :user=user :extraButtons=extraButtonsDm @action="reEmit"></UserSummary>
+      <UserSummary v-if="room?.access == Access.dm && user.id != this.$store.state.user.id" :user=user :extraButtons=extraButtonsDm @actions="reEmit"></UserSummary>
       <UserSummary v-else :user=user></UserSummary>
     </div>
     <div class="userGroup">Users</div>
@@ -21,7 +22,7 @@
         v-if="!room?.admins?.some((us: User) => us.id == user.id)"
         :user=user
         :extraButtons=extraButtons
-        @action="reEmit"></UserSummary>
+        @actions="reEmit"></UserSummary>
     </div>
   </div>
 </template>
@@ -103,10 +104,13 @@ export default defineComponent({
     }
   },
   methods: {
+    reEmitRoom(emitMsg: string) {
+      this.$emit('actions', emitMsg)
+    },
     reEmit(emiType: AdminAction, userId){
       console.log(emiType, userId);
 
-      this.$store.state.chat.socketChat.emit('action', {emiType, userId, roomId: this.room.roomId}, (type) => {
+      this.$store.state.chat.socketChat.emit('actions', {emiType, userId, roomId: this.room.roomId}, (type) => {
         console.log("return", type)
         switch (type) {
           case AdminAction.muted:
@@ -128,7 +132,7 @@ export default defineComponent({
       })
     },
     closePopUp(){
-      this.$emit('action', "exit")
+      this.$emit('actions', "exit")
     }
   },
   components: {

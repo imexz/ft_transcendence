@@ -30,7 +30,7 @@
       </div>
     </div>
     <div v-if="show" class="dropdownMenu">
-      <UserActionsPopup :user="user" :extraButtons="extraButtons" @action="popUpActions"/>
+      <UserActionsPopup :user="user" :extraButtons="extraButtons" @actions="popUpActions"/>
     </div>
   </div>
 </template>
@@ -54,7 +54,7 @@ import router from '@/router';
 export default defineComponent({
   created() {
     console.log("creted user summary");
-    
+
   },
   components: {
     ViewGamePopup,
@@ -86,7 +86,7 @@ export default defineComponent({
       default: []
     },
   },
-  emits: ['action'],
+  emits: ['actions'],
   methods: {
     popUpActions(emit) {
       switch(emit) {
@@ -101,7 +101,7 @@ export default defineComponent({
       }
     },
     customEmit(emitMsg){
-      this.$emit('action', emitMsg, this.user.id)
+      this.$emit('actions', emitMsg, this.user.id)
     },
     response(status: Status){
       if(status == Status.accepted){
@@ -223,7 +223,7 @@ export default defineComponent({
   .pending {
     background-color: var(--ft_dark_purple);
   }
-  
+
 
 
 </style>

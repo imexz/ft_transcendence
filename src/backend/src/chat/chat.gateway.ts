@@ -105,7 +105,7 @@ export class ChatGateway {
             return false
   }
 
-  @SubscribeMessage('action')
+  @SubscribeMessage('actions')
   async ban(
     @MessageBody('emiType') emiType: AdminAction,
     @MessageBody('userId') muteUserId: number,

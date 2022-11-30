@@ -70,8 +70,7 @@ export default defineComponent({
                 this.$emit('actions', 'success');
                 break;
               case roomReturn.changed:
-                console.log("success");
-                this.$emit('actions', 'change');
+                this.$emit('actions', 'success');
 
                 break;
               default:
