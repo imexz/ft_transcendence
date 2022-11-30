@@ -10,40 +10,35 @@
 </template>
 
 <script lang="ts">
-import User from '@/models/user'
 import { defineComponent } from 'vue'
 import UserSummary from '@/components/Profile/UserSummary.vue';
 import Game from '@/models/game';
-import { io, Socket } from 'socket.io-client'
-import router from '@/router';
-
-
+import { Socket } from 'socket.io-client'
 
 export default defineComponent({
   components: {
-        UserSummary
+    UserSummary
   },
   props: {
-        game: Game,
-        socket: Socket
+    game: Game,
+    socket: Socket
   },
   mounted() {
-    console.log("result: winner", this.game.winner);
-    console.log("result: loser", this.game.loser);
-    console.log("result mounted:", this.game.scoreWinner, this.game.scoreLoser);
+    console.log("result: winner", this.game.winner)
+    console.log("result: loser", this.game.loser)
+    console.log("result mounted:", this.game.scoreWinner, this.game.scoreLoser)
   },
 	unmounted() {
-		console.log("result.vue unmounted");
+		console.log("result.vue unmounted")
 	},
     methods: {
-		leaveRoom() {
-			this.socket.emit('leaveRoom')
-		},
-        newGame() {
-            console.log("newGame");
-            this.$emit('newGame')
-        },
-
+		  leaveRoom() {
+		  	this.socket.emit('leaveRoom')
+		  },
+      newGame() {
+          console.log("newGame")
+          this.$emit('newGame')
+      },
     }
 })
 </script>

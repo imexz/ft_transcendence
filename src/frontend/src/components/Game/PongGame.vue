@@ -37,34 +37,26 @@
       Field
     },
   	created() {
-  		console.log("in created");
+  		console.log("in created")
   	},
   	async mounted() {
-  		console.log("mounted");
-		  this.dataRdy = true;
+  		console.log("mounted")
+		  this.dataRdy = true
       while (!this.socket) {
-		  	  await new Promise(r => 
-          {setTimeout(r, 100)
-          console.log("wait in ponggame")}
-          
-          );
+		  	  await new Promise(r => {setTimeout(r, 100)
+          console.log("wait in ponggame")})
       }
   	},
-		async beforeUpdate() {
-  		console.log("beforeUpdate PongGame");
-      console.log("winner", this.game.winner);
-      console.log("loser", this.game.loser);
-		  console.log("leaving beforeUpdate");
-	  },
+		// async beforeUpdate() {
+	  // },
   	unmounted() {
-  	  console.log("in unmount");
+  	  console.log("in unmount")
   	},
   	methods: {
-
       prepareNewGame(){
-        console.log("newGame");
+        console.log("newGame")
         this.$emit("reset")
-      },
+      }
   	}
   })
 </script>

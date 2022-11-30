@@ -36,40 +36,38 @@
         game: null as Game | null,
         wait: false,
         socketGame: null as Socket | null,
-      };
+      }
     },
     props: {
       userId: String
     },
     async mounted() {
-      console.log("in mounted gameMenu");
+      console.log("in mounted gameMenu")
       this.socketGame = io(API_URL + "/game", {
         auth: {
           id: document.cookie
         }
       })
-      
       while (!this.socketGame) {
-		  	  await new Promise(r => {setTimeout(r, 100)
-            console.log("wait in playview");
-            
+		  	  await new Promise(r => { setTimeout(r, 100)
+            console.log("wait in playview")
           });
       }
       this.wait = false
       this.game = null
       this.initGameInfoListener()
-      console.log("view mounted");
+      console.log("view mounted")
     },
     updated() {
-      console.log("view updated");
+      console.log("view updated")
       console.log(this.userId);
-      if (this.game?.isFinished && this.userId) { //   this.game?.winner == undefined && this.game?.loser == undefined
+      if (this.game?.isFinished && this.userId) {
         this.game = null
       }
     },
     methods: {
       async setWait(){
-        console.log("setWait");
+        console.log("setWait")
         this.wait = true
       },
       viewGame (game: Game) {
@@ -89,15 +87,11 @@
 		    this.socketGame.on('isFinished', (data) => {
           this.wait = false
           if (this.game) {
-            console.log("PlayView: Winner", this.game.winner)
-            console.log("PlayView: Winner data", data.winner)
-            console.log("PlayView: Loser", this.game.loser)
-            console.log("PlayView: Loser data", data.loser)
             this.game.winner = data.winner
             this.game.loser = data.loser
             this.game.isFinished = true
           }
-		    });
+		    })
 	    },
       leaveGame() {
         this.socketGame.emit('leaveGame');

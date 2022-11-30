@@ -77,7 +77,6 @@
       </div>
     </div>
   </div>
-<!-- </div> -->
 </template>
 
 <script lang="ts">
@@ -132,12 +131,12 @@ export default defineComponent({
       this.$emit('action', 'viewProfile')
     },
     openDmPopUp(){
-      this.showDm = true;
-      this.showGame = false;
+      this.showDm = true
+      this.showGame = false
       console.log("why")
     },
     closeDmPopUp(){
-      this.showDm = false;
+      this.showDm = false
     },
     toggleDmPopUp(){
       if (this.showDm)
@@ -158,8 +157,8 @@ export default defineComponent({
     viewGame(status){
       switch (status) {
         case 'exit':
-          this.showGame = false;
-          break;
+          this.showGame = false
+          break
         case 'view':
         VueAxios({
           url: '/game/view/' + this.user.id,
@@ -177,8 +176,7 @@ export default defineComponent({
     async askForMatchOrSpectate() {
       const isSelfInvite: boolean = this.user.id === this.$store.state.user.id
       this.closeDmPopUp()
-      if (isSelfInvite) return;
-
+      if (isSelfInvite) return
 
       VueAxios({
         url: '/game/live/' + this.user.id,
@@ -187,22 +185,21 @@ export default defineComponent({
         withCredentials: true,
       })
         .then(res => {
-          console.log("api return live game", res);
+          console.log("api return live game", res)
           if (res.data) {
-            console.log("res daat");
+            console.log("res daat")
             
             this.opponentName = res.data.winner.id == this.user.id ? res.data.loser.username : res.data.winner.username
-            console.log("showGame = ", this.showGame);
+            console.log("showGame = ", this.showGame)
             this.showGame = !this.showGame
-            console.log("showGame = ", this.showGame);
-            
+            console.log("showGame = ", this.showGame)
           }
           else {
             this.$router.push('/play/' + this.user.id)
           }
         })
         .catch(error => { this.$emit('actions', 'error') }) 
-      console.log("askForMatchOrSpectate");
+      console.log("askForMatchOrSpectate")
     },
   },
 })

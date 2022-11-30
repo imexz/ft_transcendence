@@ -10,7 +10,7 @@ import Game from '@/models/game';
 
 export default defineComponent({
     data() {
-        return {
+      return {
         timestamp: Date,
         pixiApp: null,
         pixiScene: null,
@@ -52,49 +52,44 @@ export default defineComponent({
           bgColor: 0x060317,
           fgColor: 0x60fa31,
         }
-        }
+      }
     },
-    created() {
-    },
+    created() {},
     async mounted() {
       while (!this.socket) {
-        await new Promise(r => 
-        {setTimeout(r, 100)
-          console.log("wait")}
-          
-          );
-        }
-        console.log("socket", this.socket)
+        await new Promise(r => {setTimeout(r, 100)
+          console.log("wait")})
+      }
+      console.log("socket", this.socket)
         
-        this.socket.on('updateBall', this.updateBall)
-        this.socket.on('updatePaddle', this.updatePaddle)
-        this.socket.on('updateScore', this.updateScore)
-        this.initPixi();
-        this.pixiApp.ticker.add(this.updatePixi)
-      document.addEventListener('keydown', this.keyEvents, false);
-      console.log("Field mounted gameInit", this.gameInit);
+      this.socket.on('updateBall', this.updateBall)
+      this.socket.on('updatePaddle', this.updatePaddle)
+      this.socket.on('updateScore', this.updateScore)
+      this.initPixi();
+      this.pixiApp.ticker.add(this.updatePixi)
+      document.addEventListener('keydown', this.keyEvents, false)
+      console.log("Field mounted gameInit", this.gameInit)
     },
     updated() {
-      console.log("FieldView Updated");
-      
+      console.log("FieldView Updated")
     },
     unmounted() {
-        this.socket.off('updateBall')
-        this.socket.off('updatePaddle')
-        this.socket.off('updateScore')
-        document.removeEventListener('keydown', this.keyEvents, false);
-        this.pixiApp.ticker.stop()
+      this.socket.off('updateBall')
+      this.socket.off('updatePaddle')
+      this.socket.off('updateScore')
+      document.removeEventListener('keydown', this.keyEvents, false)
+      this.pixiApp.ticker.stop()
     },
     methods: {
-    isValidKey(key) {
-      return  key == "w" || key == "s" || key == "ArrowUp" || key == "ArrowDown";
-    },
-    keyEvents(event) {
-        console.log(event.key);
+      isValidKey(key) {
+        return  key == "w" || key == "s" || key == "ArrowUp" || key == "ArrowDown"
+      },
+      keyEvents(event) {
+        console.log(event.key)
         if (this.isValidKey(event.key))
           this.socket.emit('key', event.key)
-    },
-    initPixi() {
+      },
+      initPixi() {
         let canvas: HTMLElement = document.getElementById('pixi')
 		    console.log("initPixi");
         this.pixiApp = new PIXI.Application({
@@ -104,7 +99,6 @@ export default defineComponent({
           backgroundColor: this.styleData.bgColor,
           view: canvas as HTMLCanvasElement,
         })
-
         this.pixiScene = new PIXI.Graphics()
         this.pixiApp.stage.addChild(this.pixiScene)
 
@@ -116,113 +110,113 @@ export default defineComponent({
 
       },
       updatePixi(){
-        console.log("updatePixi");
-        
-        this.pixiScene.clear();
+          console.log("updatePixi")
 
-        this.pixiScene.lineStyle(2, this.styleData.fgColor)
+          this.pixiScene.clear()
 
-        //top whisker
-        this.pixiScene.moveTo(this.pixiApp.renderer.width/2 - 10, 1)
-        this.pixiScene.lineTo(this.pixiApp.renderer.width/2 + 10, 1)
+          this.pixiScene.lineStyle(2, this.styleData.fgColor)
 
-        //bottom whisker
-        this.pixiScene.moveTo(
-          this.pixiApp.renderer.width/2 - 10,
-          this.pixiApp.renderer.height - 1)
-        this.pixiScene.lineTo(
-          this.pixiApp.renderer.width/2 + 10,
-          this.pixiApp.renderer.height - 1)
+          //top whisker
+          this.pixiScene.moveTo(this.pixiApp.renderer.width/2 - 10, 1)
+          this.pixiScene.lineTo(this.pixiApp.renderer.width/2 + 10, 1)
 
-        //center line
-        this.pixiScene.moveTo(this.pixiApp.renderer.width/2, 0)
-        this.pixiScene.lineTo(this.pixiApp.renderer.width/2, this.pixiApp.renderer.height)
+          //bottom whisker
+          this.pixiScene.moveTo(
+            this.pixiApp.renderer.width/2 - 10,
+            this.pixiApp.renderer.height - 1)
+          this.pixiScene.lineTo(
+            this.pixiApp.renderer.width/2 + 10,
+            this.pixiApp.renderer.height - 1)
 
-        //left Paddle
-        this.pixiScene.lineStyle(2, this.styleData.fgColor)
-        this.pixiScene.drawRect(
-          this.gameData.paddleLeft.position.x,
-          this.gameData.paddleLeft.position.y,
-          this.gameData.paddleLeft.width,
-          this.gameData.paddleLeft.height
-        )
+          //center line
+          this.pixiScene.moveTo(this.pixiApp.renderer.width/2, 0)
+          this.pixiScene.lineTo(this.pixiApp.renderer.width/2, this.pixiApp.renderer.height)
 
-        //right Paddle
-        this.pixiScene.lineStyle(2, this.styleData.fgColor)
-        this.pixiScene.drawRect(
-          this.gameData.paddleRight.position.x,
-          this.gameData.paddleRight.position.y,
-          this.gameData.paddleRight.width,
-          this.gameData.paddleRight.height
-        )
+          //left Paddle
+          this.pixiScene.lineStyle(2, this.styleData.fgColor)
+          this.pixiScene.drawRect(
+            this.gameData.paddleLeft.position.x,
+            this.gameData.paddleLeft.position.y,
+            this.gameData.paddleLeft.width,
+            this.gameData.paddleLeft.height
+          )
 
-        //ball
-        this.pixiScene.lineStyle(2, this.styleData.fgColor)
-        this.pixiScene.beginFill(this.styleData.bgColor)
-        this.pixiScene.drawCircle(
-          this.gameData.ball.position.x,
-          this.gameData.ball.position.y,
-          this.gameData.ball.radius
-        )
-        this.pixiScene.endFill()
+          //right Paddle
+          this.pixiScene.lineStyle(2, this.styleData.fgColor)
+          this.pixiScene.drawRect(
+            this.gameData.paddleRight.position.x,
+            this.gameData.paddleRight.position.y,
+            this.gameData.paddleRight.width,
+            this.gameData.paddleRight.height
+          )
 
-        //score
-        this.pixiScore.left.text = this.gameData?.score.scoreWinner;
-        this.pixiScore.left.style = {
-          fill: this.styleData.fgColor,
-          fontFamily: 'Arial',
-          fontSize: 60,
-          align: 'center',
-        };
-        this.pixiScore.left.x =
-          this.pixiApp.renderer.width/4 - this.pixiScore.left.width/2;
-        this.pixiScore.left.y = 5;
+          //ball
+          this.pixiScene.lineStyle(2, this.styleData.fgColor)
+          this.pixiScene.beginFill(this.styleData.bgColor)
+          this.pixiScene.drawCircle(
+            this.gameData.ball.position.x,
+            this.gameData.ball.position.y,
+            this.gameData.ball.radius
+          )
+          this.pixiScene.endFill()
 
-        this.pixiScore.right.text = this.gameData?.score.scoreLoser;
-        this.pixiScore.right.style = {
-          fill: this.styleData.fgColor,
-          fontFamily: 'Arial',
-          fontSize: 60,
-          align: 'center',
-        };
-        this.pixiScore.right.x =
-          this.pixiApp.renderer.width/4 * 3 - this.pixiScore.right.width/2;
-        this.pixiScore.right.y = 5;
+          //score
+          this.pixiScore.left.text = this.gameData?.score.scoreWinner
+          this.pixiScore.left.style = {
+            fill: this.styleData.fgColor,
+            fontFamily: 'Arial',
+            fontSize: 60,
+            align: 'center',
+          }
+          this.pixiScore.left.x =
+            this.pixiApp.renderer.width/4 - this.pixiScore.left.width/2
+          this.pixiScore.left.y = 5
+
+          this.pixiScore.right.text = this.gameData?.score.scoreLoser
+          this.pixiScore.right.style = {
+            fill: this.styleData.fgColor,
+            fontFamily: 'Arial',
+            fontSize: 60,
+            align: 'center',
+          }
+          this.pixiScore.right.x =
+            this.pixiApp.renderer.width/4 * 3 - this.pixiScore.right.width/2
+          this.pixiScore.right.y = 5
       },
       updateScore(data: any) {
-        console.log(data);
-        
-        this.gameData.score = data;
-        switch(Math.max(this.gameData.score.scoreWinner, this.gameData.score.scoreLoser)) {
-          case 4:
-            this.styleData.fgColor = 0xf5ac0e
-            break;
-          case 8:
-            this.styleData.fgColor = 0xe70038
-            break;
-        }
-        if (this.isGameFinished()) {
-          this.pixiApp.ticker.stop()
-        }
+          console.log(data)
+
+          this.gameData.score = data;
+          switch(Math.max(this.gameData.score.scoreWinner, this.gameData.score.scoreLoser)) {
+            case 4:
+              this.styleData.fgColor = 0xf5ac0e
+              break
+            case 8:
+              this.styleData.fgColor = 0xe70038
+              break
+          }
+          if (this.isGameFinished()) {
+            this.pixiApp.ticker.stop()
+          }
       },
       updatePaddle(data: any) {
-        console.log(data);
-        
-        this.gameData.paddleLeft = data.paddleLeft;
-        this.gameData.paddleRight = data.paddleRight;
+          console.log(data)
+
+          this.gameData.paddleLeft = data.paddleLeft;
+          this.gameData.paddleRight = data.paddleRight;
       },
       updateBall(data: any) {
-		    if (data === undefined) {
-          console.log("data undefined");
-			    this.left = 0;
-			    this.right = 0;
-        	return;
-        }
-        this.gameData.ball = data;
+		      if (data === undefined) {
+            console.log("data undefined")
+		  	    this.left = 0
+		  	    this.right = 0
+          	return
+          }
+          this.gameData.ball = data
       },
 	    isGameFinished(): boolean {
-		    return (this.gameData.score.scoreWinner == this.gameData.score.scoreToWin ||
-                this.gameData.score.scoreLoser == this.gameData.score.scoreToWin);
+		      return (this.gameData.score.scoreWinner == this.gameData.score.scoreToWin ||
+                  this.gameData.score.scoreLoser == this.gameData.score.scoreToWin)
 	    },
     },
     props: {

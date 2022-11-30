@@ -46,8 +46,7 @@ import Game from '@/models/game';
 
 export default defineComponent({
   created() {
-    console.log("creted user summary");
-    
+    console.log("creted user summary")
   },
   components: {
     ViewGamePopup,
@@ -67,8 +66,7 @@ export default defineComponent({
   },
   mounted() {
     console.log(this.user)
-  }
-  ,
+  },
   props: {
     user: {
       type: Object,
@@ -84,19 +82,19 @@ export default defineComponent({
     popUpActions(emit) {
       switch(emit) {
         case "viewProfile":
-          this.viewProfile(this.user.id);
-          break;
+          this.viewProfile(this.user.id)
+          break
         case "close":
-          this.toggleDropdown();
-          break;
+          this.toggleDropdown()
+          break
         default:
-          this.customEmit(emit);
+          this.customEmit(emit)
       }
     },
-    customEmit(emitMsg){
+    customEmit(emitMsg) {
       this.$emit('action', emitMsg, this.user.id)
     },
-    response(status: Status){
+    response(status: Status) {
       if(status == Status.accepted){
         this.user.friendStatus = null
       } else {
@@ -104,18 +102,18 @@ export default defineComponent({
       }
       this.$store.state.socket.emit('Response', {id: this.user.id, status: status})
     },
-    viewProfile(id: number){
+    viewProfile(id: number) {
       this.toggleDropdown()
-      this.$router.push('/profile/' + id.toString());
+      this.$router.push('/profile/' + id.toString())
     },
-    hideDropDown(e){
+    hideDropDown(e) {
       if (!this.$el.contains(e.target))
         this.toggleDropdown()
     },
     toggleDropdown() {
       if (this.show){
         window.removeEventListener('click', this.hideDropDown)
-        this.showGame = false;
+        this.showGame = false
       }
       else
         window.addEventListener('click', this.hideDropDown)

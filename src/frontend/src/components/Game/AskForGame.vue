@@ -31,12 +31,12 @@ export default defineComponent({
     },
 
     methods:{
-        accept(){
+        accept() {
           this.$store.state.gameRequest.response(RESPONSE.accept)
           this.$store.state.gameRequest = null
           this.$router.push('/play')
         },
-        refuse(){
+        refuse() {
           this.$store.state.gameRequest.response(RESPONSE.refuse)
           this.$store.state.gameRequest = null
         },
