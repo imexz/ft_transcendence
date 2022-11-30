@@ -37,7 +37,7 @@ export default defineComponent({
       return {
           name: '',
           access: Access.public as Access,
-          password: '',
+          password: null,
           Access
       }
   },

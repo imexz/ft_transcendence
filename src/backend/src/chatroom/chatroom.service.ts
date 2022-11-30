@@ -19,13 +19,7 @@ export enum roomReturn {
 @Injectable()
 export class ChatroomService {
     async addRoomAdmin(room: chatroom, userId: number) {
-    console.log("addRoomAdmin");
-   var tmpRoom
-//     if(typeof room == 'number') {
-//         tmpRoom = await this.getRoomWithAdmins(room)
-//     } else {
-        tmpRoom = room
-//     }
+    var tmpRoom = room
     if (tmpRoom != undefined) {
         const user = tmpRoom.admins.find(element => element.id == userId)
         if (user == undefined) {
@@ -167,8 +161,7 @@ async createRoomInfo(roomId: number, id: any): Promise<chatroom> {
                 } else {
                     switch (ret.chatroom.access) {
                         case Access.protected:
-                            if(await bcrypt.compare(password, ret.chatroom.hash) == false) {
-                                console.log("result === false");
+                            if(password == undefined || await bcrypt.compare(password, ret.chatroom.hash) == false) {
                                 return undefined
                             }
 
@@ -304,23 +297,33 @@ async createRoomInfo(roomId: number, id: any): Promise<chatroom> {
             room.admins = [user]
             room.users = [user]
             room.access = access
-            if(access == Access.protected) {
-                this.setPasswordAndSave(password, room)
+            if(access == Access.protected && password != undefined && password != null) {
+                await this.setPasswordAndSave(password, room)
+            }
+            else if (access == Access.protected) {
+                return undefined
             }
             return {info: roomReturn.created , chatroom: await this.chatroomRepository.save(room)}
-        } else if (room.admins.find(elem => elem.id == user.id) != undefined) {
-                console.log("set room = ", Access[access]);
-                room.access = access
-                if(access == Access.protected)
-                    this.setPasswordAndSave(password, room)
-                else
-                    this.setPasswordAndSave(undefined, room)
-            return  {info: roomReturn.changed , chatroom: await this.chatroomRepository.save(room)}
-        } else {
-            console.log("addRoom goes wrong");
-
         }
-        return undefined
+        else if (room.admins.find(elem => elem.id == user.id) != undefined) {
+
+            if (access != Access.protected && room.access == access)
+                return undefined
+            room.access = access
+            if(access == Access.protected) {
+                if (password == null || password == undefined) {
+                    return undefined
+                }
+                else
+                    await this.setPasswordAndSave(password, room)
+            }
+            else
+                await this.setPasswordAndSave(undefined, room)
+            return {info: roomReturn.changed , chatroom: await this.chatroomRepository.save(room)}
+        }
+        else {
+            return undefined
+        }
     }
 
     async setPasswordAndSave(password: string, room: chatroom) {
@@ -334,7 +337,7 @@ async createRoomInfo(roomId: number, id: any): Promise<chatroom> {
                 return await this.chatroomRepository.save(room);
             })
         } else {
-            console.log("no password set");
+            return undefined
         }
     }
 }
