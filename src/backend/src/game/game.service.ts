@@ -10,21 +10,19 @@ import User from 'src/users/entitys/user.entity';
 import { UserStatus } from "../users/entitys/status.enum";
 import { GameGateway } from './game.gateway';
 import { Settings } from './game.entities/settings';
-import { BallDirObj } from './game.interfaces/balldirobj.interface';
 
 @Injectable()
 export class GameService {
-
 
 	constructor(
 		private userService: UsersService,
 		@Inject(forwardRef(() => GameGateway))
 		private gameGateway: GameGateway,
-		){}
+	){}
 
-	setup = new GameSetup;
+	setup = new GameSetup
 	gamesArr: Array<Game> = []
-	spectatorsMap = new Map<number, number>;
+	spectatorsMap = new Map<number, number>
 
 	@InjectRepository(Game)
 	private gameRepository: Repository<Game>
@@ -32,31 +30,25 @@ export class GameService {
 	getGame(user_id: number | undefined, settings?: Settings): Game {
 		const test = this.gamesArr.find((value: Game) =>  {
 			return ((value.winner?.id == user_id || value.loser?.id == user_id)
-			&&
-		((settings == undefined)
-			||
-			(settings?.enablePowerUp == value.settings?.enablePowerUp
-			&&
-			settings?.enableSlowServe == value.settings?.enableSlowServe
-			&&
-			settings?.scoreToWin == value.settings?.scoreToWin
-			&&
-			settings?.serving == value.settings?.serving))
-		)})
-			return test
-			}
-
+				&& ((settings == undefined)
+					|| (settings?.enablePowerUp == value.settings?.enablePowerUp
+						&& settings?.enableSlowServe == value.settings?.enableSlowServe
+						&& settings?.scoreToWin == value.settings?.scoreToWin
+						&& settings?.serving == value.settings?.serving))
+			)})
+		return test
+	}
 
 	addUserToSpectators(userId: number, gameId: number) {
-		this.spectatorsMap.set(userId, gameId);
+		this.spectatorsMap.set(userId, gameId)
 	}
 
 	removeUserFromSpectators(userId: number, game: Game) {
 		if (game != undefined) {
-			this.spectatorsMap.delete(userId);
-			const index = game.spectators.indexOf(userId);
+			this.spectatorsMap.delete(userId)
+			const index = game.spectators.indexOf(userId)
 			if (index > -1) {
-				game.spectators.splice(index, 1);
+				game.spectators.splice(index, 1)
 			}
 		}
 	}
@@ -67,7 +59,7 @@ export class GameService {
 	}
 
 	clearSpectatorArr(game: Game) {
-		game.spectators.length = 0;
+		game.spectators.length = 0
 	}
 
 	async joinGameOrCreateGame(user: User, settings: Settings, opponentUserId?: number): Promise<Game> {
@@ -76,7 +68,6 @@ export class GameService {
 			console.log("already in game");
 			return game
 		}
-
 		game = this.getGame(undefined, settings) // checking for first game with missing (undefined) opponent
 		if (game == undefined || opponentUserId) {
 			game = await this.createGameInstance(user.id, settings)
@@ -86,7 +77,7 @@ export class GameService {
 			if(opponentUserId != undefined) {
 				const tmpGame = this.getGame(opponentUserId)
 				if(tmpGame) {
-					this.removeGame(game);
+					this.removeGame(game)
 					return
 				}
 				const opponent = await this.userService.getUser(opponentUserId)
@@ -94,15 +85,15 @@ export class GameService {
 			}
 			this.gamesArr.push(game)
 		} else { // queue game exists, join and set user as opponent
-			console.log("joinGameOrCreateGame: set User as loser");
+			console.log("joinGameOrCreateGame: set User as loser")
 			game.loser = user
 		}
 		return game
 	}
 
 	async createGameInstance(userId: number, settings: Settings): Promise<Game> {
-		console.log('inside createGameInstance()');
-		return new Game(userId, settings);
+		console.log('inside createGameInstance()')
+		return new Game(userId, settings)
 	}
 
 	async startGame(server: Server, game: Game) {
@@ -115,120 +106,115 @@ export class GameService {
 	  }
 
 	async startEmittingGameData(server: Server, game: Game) {
-		this.userService.setStatus(game.winner.id, UserStatus.PLAYING);
-		this.userService.setStatus(game.loser.id, UserStatus.PLAYING);
+		this.userService.setStatus(game.winner.id, UserStatus.PLAYING)
+		this.userService.setStatus(game.loser.id, UserStatus.PLAYING)
 		server.to(game.id.toString()).emit('GameInfo', game)
-		console.log("startGame");
-		game.interval = setInterval(() => this.emitGameData(game, server), 16) as unknown as number;
+		console.log("startGame")
+		game.interval = setInterval(() => this.emitGameData(game, server), 16) as unknown as number
 		this.gameGateway.server.to(game.id.toString()).emit('updatePaddle', {paddleRight: game.paddleRight, paddleLeft: game.paddleLeft})
-		console.log("startGame end");
+		console.log("startGame end")
 	}
 
 	async emitGameData(game: Game, server: Server) {
 		const tmpGame: Game = await this.getData(game)
-
 		const updatedBall = {
 			position: tmpGame.ball.position,
 			radius: tmpGame.ball.radius,
 		}
-
-		server.to(game.id.toString()).emit('updateBall', updatedBall);
+		server.to(game.id.toString()).emit('updateBall', updatedBall)
 		if (tmpGame.score.scoreLeft === tmpGame.settings.scoreToWin || tmpGame.score.scoreRight === tmpGame.settings.scoreToWin) {
-			console.log("emitGameData: closeRoom");
-			this.gameGateway.closeRoom(game.id.toString());
+			console.log("emitGameData: closeRoom")
+			this.gameGateway.closeRoom(game.id.toString())
 		}
 	}
 
 	async getData(game: Game): Promise<Game | undefined> {
 		if (game == undefined) {
-			return undefined;
+			return undefined
 		}
 		this.updateBall(game)
-		this.collisionControl(game);
+		this.collisionControl(game)
 		const getPoint = this.scored(game)
 		if (getPoint != undefined){
-			this.reset(game, getPoint);
+			this.reset(game, getPoint)
 			this.gameGateway.server.to(game.id.toString()).emit('updateScore', {scoreWinner: game.score.scoreLeft, scoreLoser: game.score.scoreRight})
 		}
-		await this.isGameFinished(game);
+		await this.isGameFinished(game)
 		return game
 	}
+
 	updateBall(game: Game) {
-		game.ball.BallPostionNext()
+		game.ball.nextBallPosition()
 	}
 
 	isBallWithinPaddleRange(game: Game, paddle: Paddle): boolean {
-		return (game.ball.position.y >= paddle.position.y &&
-			game.ball.position.y <= paddle.position.y + paddle.height)
+		return (game.ball.position.y >= paddle.position.y 
+			&& game.ball.position.y <= paddle.position.y + paddle.height)
 	}
 
 	isBallAtPaddle(game: Game, paddle: Paddle): boolean {
-		let ret: boolean = false;
+		let ret: boolean = false
 		if (paddle.side == Side.left) {
-			ret = game.ball.position.x - game.ball.radius <= paddle.position.x + paddle.width;
+			ret = game.ball.position.x - game.ball.radius <= paddle.position.x + paddle.width
 		} else if (paddle.side == Side.right) {
-			ret = game.ball.position.x + game.ball.radius >= paddle.position.x;
+			ret = game.ball.position.x + game.ball.radius >= paddle.position.x
 		}
-		return ret;
+		return ret
 	}
 
 	calcAngle(game: Game, paddle: Paddle) {
-		var section: number;
+		var section: number
 
-		section = paddle.height / 8;
+		section = paddle.height / 8
 		if (this.isBallWithinPaddleRange(game, paddle)) {
-			var i: number = 1;
+			var i: number = 1
 			while (game.ball.position.y > (paddle.position.y + i * section)) {
-				i++;
+				i++
 			}
-			game.ball.direction.angle = paddle.reboundAngles[i - 1];
+			game.ball.direction.angle = paddle.reboundAngles[i - 1]
 		}
 	}
 
 	updateBallDirection(game: Game, paddle: Paddle) {
-		this.calcAngle(game, paddle);
+		this.calcAngle(game, paddle)
 		if (game.settings.enablePowerUp)
 			game.ball.direction.speed *= 1.1
-		game.ball.direction.x = game.ball.direction.speed * Math.cos(game.ball.direction.angle * (Math.PI / 180));
-		game.ball.direction.y = game.ball.direction.speed * Math.sin(game.ball.direction.angle * (Math.PI / 180));
+		game.ball.direction.x = game.ball.direction.speed * Math.cos(game.ball.direction.angle * (Math.PI / 180))
+		game.ball.direction.y = game.ball.direction.speed * Math.sin(game.ball.direction.angle * (Math.PI / 180))
 	}
 
 	collisionControl(game: Game) {
 		if (game.ball.direction.x > 0) {
-			if (this.isBallAtPaddle(game, game.paddleRight) &&
-				this.isBallWithinPaddleRange(game, game.paddleRight)) {
-					console.log("updateBallDirection right");
-
-					this.updateBallDirection(game, game.paddleRight);
-				}
+			if (this.isBallAtPaddle(game, game.paddleRight)
+				&& this.isBallWithinPaddleRange(game, game.paddleRight)) {
+					console.log("updateBallDirection right")
+					this.updateBallDirection(game, game.paddleRight)
 			}
-			else {
-				if (this.isBallAtPaddle(game, game.paddleLeft) &&
-				this.isBallWithinPaddleRange(game, game.paddleLeft)) {
-					console.log("updateBallDirection left");
-					this.updateBallDirection(game, game.paddleLeft);
+		} else {
+			if (this.isBallAtPaddle(game, game.paddleLeft) 
+				&& this.isBallWithinPaddleRange(game, game.paddleLeft)) {
+					console.log("updateBallDirection left")
+					this.updateBallDirection(game, game.paddleLeft)
 			}
 		}
 	}
 
 	scored(game: Game): Side {
-		var ret: Side = undefined;
+		var ret: Side = undefined
 		if (game.ball.position.x - game.ball.radius <= 0) {
-			game.score.scoreRight += game.score.increaseRight;
-			game.scoreLoser += game.score.increaseRight;
-			ret = Side.left;
+			game.score.scoreRight += game.score.increaseRight
+			game.scoreLoser += game.score.increaseRight
+			ret = Side.left
+		} else if (game.ball.position.x + game.ball.radius >= 640 ) {
+			game.score.scoreLeft += game.score.increaseLeft
+			game.scoreWinner += game.score.increaseLeft
+			ret = Side.right
 		}
-		else if (game.ball.position.x + game.ball.radius >= 640 ) {
-			game.score.scoreLeft += game.score.increaseLeft;
-			game.scoreWinner += game.score.increaseLeft;
-			ret = Side.right;
-		}
-		return ret;
+		return ret
 	}
 
 	reset(game: Game, getPoint: Side) {
 		game.ball.position = GameSetup.staticballPos
-		// console.log("GameSetup.staticballPos", GameSetup.staticballPos);
 		game.ball.reset()
 		game.ball.direction.newBallDir(getPoint)
 		if (game.settings.enablePowerUp) {
@@ -236,46 +222,43 @@ export class GameService {
 			game.paddleLeft.speed *= -1
 			game.paddleRight.speed *= -1
 		} else {
-			game.ball.radius = GameSetup.ballRadius;
+			game.ball.radius = GameSetup.ballRadius
 		}
-
-		// game.paddleLeft.reset()
-		// game.paddleRight.reset()
-		game.score.increaseLeft = GameSetup.scoreIncrease;
-		game.score.increaseRight = GameSetup.scoreIncrease;
+		game.score.increaseLeft = GameSetup.scoreIncrease
+		game.score.increaseRight = GameSetup.scoreIncrease
 	}
 
 	async isGameFinished(game: Game) {
 		if (game != undefined && (game.score.scoreLeft == game.settings.scoreToWin || game.score.scoreRight == game.settings.scoreToWin)) {
-			clearInterval(game.interval);
+			clearInterval(game.interval)
 			game.interval = null
-			let gameInstance: Game = this.gameRepository.create();
+			let gameInstance: Game = this.gameRepository.create()
 			if (game.scoreWinner < game.scoreLoser) {
-				const tmp: User = game.winner;
-				game.winner = game.loser;
-				game.loser = tmp;
+				const tmp: User = game.winner
+				game.winner = game.loser
+				game.loser = tmp
 			}
-			gameInstance.loser = game.loser;
-			gameInstance.winner = game.winner;
-			gameInstance.scoreWinner = game.scoreWinner;
-			gameInstance.scoreLoser = game.scoreLoser;
-			await this.gameRepository.save(gameInstance);
+			gameInstance.loser = game.loser
+			gameInstance.winner = game.winner
+			gameInstance.scoreWinner = game.scoreWinner
+			gameInstance.scoreLoser = game.scoreLoser
+			await this.gameRepository.save(gameInstance)
 			this.userService.setStatus(game.winner.id, UserStatus.ONLINE)
 			this.userService.setStatus(game.loser.id, UserStatus.ONLINE)
 			this.removeGame(game)
 			this.gameGateway.server.to(game.id.toString()).emit('isFinished')
-			console.log("game is finished");
+			console.log("game is finished")
 		}
 	}
 
 	removeGame(game: Game): boolean {
 		game.spectators.forEach(async (element: number) =>  { this.spectatorsMap.delete(element) })
-		const index = this.gamesArr.indexOf(game, 0);
+		const index = this.gamesArr.indexOf(game, 0)
 		if (index > -1) {
-			this.gamesArr.splice(index, 1);
-			return true;
+			this.gamesArr.splice(index, 1)
+			return true
 		}
-		return false;
+		return false
 	}
 
 	handleKeypress(user_id: number, key: string){
@@ -283,10 +266,10 @@ export class GameService {
 		if(game != undefined) {
 			if (key == "ArrowUp" || key == "w") {
 				this.movePaddleUp(game, this.getPlayerSide(game, user_id))
-				console.log("paddle Up");
+				console.log("paddle Up")
 			} else if (key == "ArrowDown" || key == "s") {
 				this.movePaddleDown(game, this.getPlayerSide(game, user_id))
-				console.log("paddle Down");
+				console.log("paddle Down")
 			}
 		}
 	}
@@ -304,32 +287,32 @@ export class GameService {
 	movePaddleUp(game: Game, side: Side) {
 		if (side == Side.left) {
 			if (game.paddleLeft.position.y > 0)
-				game.paddleLeft.position.y -= game.paddleLeft.speed;
+				game.paddleLeft.position.y -= game.paddleLeft.speed
 		}
 		else {
 			if (game.paddleRight.position.y > 0)
-				game.paddleRight.position.y -= game.paddleRight.speed;
+				game.paddleRight.position.y -= game.paddleRight.speed
 		}
 		this.gameGateway.server.to(game.id.toString()).emit('updatePaddle', {paddleRight: game.paddleRight, paddleLeft: game.paddleLeft})
 	}
 	movePaddleDown(game: Game, side: Side) {
 		if (side == Side.left) {
 			if (game.paddleLeft.position.y < (480 - game.paddleLeft.height))
-				game.paddleLeft.position.y += game.paddleLeft.speed;
+				game.paddleLeft.position.y += game.paddleLeft.speed
 		}
 		else {
 			if (game.paddleRight.position.y < (480 - game.paddleRight.height))
-				game.paddleRight.position.y += game.paddleRight.speed;
+				game.paddleRight.position.y += game.paddleRight.speed
 		}
 		this.gameGateway.server.to(game.id.toString()).emit('updatePaddle', {paddleRight: game.paddleRight, paddleLeft: game.paddleLeft})
 	}
 
 	async getMatchHistory(userId: number){
 		if (userId == undefined) {
-			console.log("userId == undefind");
+			console.log("userId == undefind")
 			throw new HttpException('please provide userId', HttpStatus.BAD_REQUEST)
 		}
-		console.log("userId", userId, typeof(userId));
+		console.log("userId", userId, typeof(userId))
 		return await this.gameRepository.createQueryBuilder("game")
 		// .innerJoinAndSelect("game.player", "player", "player.id = :id", { id: user.id})
 		.leftJoin('game.loser', 'tmp', 'tmp.id = :id', { id: userId as number} )
@@ -343,5 +326,4 @@ export class GameService {
 		// .select("'scoreWinner'")
 		.getMany()
 	}
-
 }
