@@ -18,7 +18,6 @@ export default class Chat{
   help = reactive({rooms: this.rooms})
 
   constructor() {
-    console.log("constructor Caht");
 
           VueAxios({
             url: 'chatroom/all',
@@ -37,7 +36,6 @@ export default class Chat{
           })
 
           this.socketChat.on('newMessage',(data) => {
-            console.log("newMessage received:");
 
             if (data.message.senderId != store.state.user.id)
             {
@@ -60,7 +58,6 @@ export default class Chat{
           })
 
           this.socketChat.on('newRoom',(data) => {
-            console.log('newRoom');
             this.addRoom(data)
           })
 
@@ -69,7 +66,6 @@ export default class Chat{
 
             let room = this.rooms?.value?.find(elem => elem.roomId == obj.roomId)
             if (room) {
-              console.log("room found");
               switch (obj.change) {
                 case changedRoom.complet:
                   let roomIndex = this.rooms?.value?.findIndex(elem => elem.roomId == obj.roomId)
@@ -77,30 +73,20 @@ export default class Chat{
 
                     this.rooms.value[roomIndex] = new Room(obj.data)
                   }
-                  // console.log("room now", room);
-                  // this.rooms.value.forEach(element => {
-                    //   if (element.roomId == room.roomId)
-                    //     element = room
-                    // });
                     this.rooms.value = [...this.rooms.value]
-                    console.log("over ride room", this.rooms.value);
-                  // console.log("complet", room);
                   break;
                 case changedRoom.user:
-                  console.log("user");
                   this.UserToArray(obj.data, room.users)
                   if (room.admins.findIndex(elem => elem.id == obj.data.id) != -1)
                     this.removeUser(index, room.admins)
                   break ;
                 case changedRoom.admin:
-                  console.log("admin");
                   this.UserToArray(obj.data, room.admins)
                   var index = room.users.findIndex(elem => elem.id == obj.data.id)
                   if (index != -1)
                     this.removeUser(index, room.users)
                   break;
                 case changedRoom.access:
-                  console.log("access", room.users, store.state.user?.id);
                   if (obj.data == Access.private && room.users.findIndex(elem => elem.id == store.state.user?.id) == -1)
                   {
                     const index = this.rooms.value.indexOf(room)
@@ -119,10 +105,6 @@ export default class Chat{
                }
              }
 
-            // if (room && room.access != Access.private)
-            //   room = new Room(data)
-            // else if (room)
-            //   room = undefined
           })
 
           this.socketChat.on("banned", (data: {roomId: number}) => {
@@ -136,11 +118,6 @@ export default class Chat{
               const msg = "You are banned from " + room.roomName;
               store.dispatch('triggerToast', {show: true, mode: 'banned', msg: msg})
             }
-
-            console.warn("YOU ARE BANNED FROM " + room.roomName);
-
-            // @Tobi show "You are banned from room.roomName" banner for this user
-
           })
 
     }
@@ -168,24 +145,15 @@ export default class Chat{
           room[i] = new Room(rooms[i])
         }
         this.rooms.value = room
-        // console.log("ROOMS: ", rooms, rooms[0] instanceof Room)
-        // console.log("this.ROOMS: ", this.rooms, this.rooms[0] instanceof Room)
       }
 
       addRoom(room: any) {
-        // this.rooms[this.rooms.length] = new Room(room)
-        console.log("adding room to store", room);
-
         this.rooms.value = [...this.rooms.value, new Room(room)]
-        // this.rooms.$set(this.rooms, this.rooms.length, new Room(room))
-        // console.log("ROOM: ", room, room instanceof Room)
-        // console.log("this.ROOMS: ", this.rooms, this.rooms[0] instanceof Room)
       }
 
       leaveRoom(roomId: number) {
         this.socketChat.emit('leave', roomId, (response) => {
           let room : Room = this.getRoomInfo(roomId)
-          console.log("RESPONSE HERE AFTER LEAVE", response);
           if (response == true) {
             if (room) {
               room.users = []

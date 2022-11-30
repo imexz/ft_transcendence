@@ -210,7 +210,6 @@ export class ChatGateway {
   ) {
     console.log("createOrChangeRoom");
 
-    // console.log("roomName =", roomName, ",access =", access);
     if (roomName.length == 0 || access == undefined)
       return {undefined}
 

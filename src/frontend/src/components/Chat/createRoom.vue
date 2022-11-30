@@ -23,9 +23,7 @@
 </template>
 
 <script lang="ts">
-import VueAxios from 'axios';
-import { API_URL } from '@/defines';
-import { ref, defineComponent } from 'vue'
+import { defineComponent } from 'vue'
 import { Access } from '@/models/room';
 
 
@@ -63,16 +61,13 @@ export default defineComponent({
       console.log("createRoom", this.roomName, this.name);
       this.$store.state.chat.socketChat.emit('createOrChangeRoom', {roomName: this.name? this.name : this.roomName, access: this.access, password: this.password},
         response => {
-          console.log("RESPONSE: ", response.info);
 
           if(response.chatroom != undefined)
           {
             switch (response.info) {
               case roomReturn.created:
                 console.log(response);
-                // console.log("rooms before dispatch", response.chatroom);
                 this.$emit('actions', 'success');
-                // this.$store.dispatch('updateRooms', response.chatroom);
                 break;
               case roomReturn.changed:
                 console.log("success");
