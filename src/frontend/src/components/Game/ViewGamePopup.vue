@@ -18,8 +18,6 @@
 </template>
 
 <script lang="ts">
-import Game from '@/models/game';
-import User from '@/models/user';
 import { defineComponent } from 'vue';
 
 export default defineComponent({
@@ -35,7 +33,6 @@ export default defineComponent({
       this.$emit('actions', 'exit')
     },
     reEmit() {
-      // console.log("COM", emitMsg)
       this.$emit('actions', "view")
     }
   }

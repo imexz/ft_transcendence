@@ -167,6 +167,7 @@ export default defineComponent({
           withCredentials: true,
         })
           .then(response => {
+            this.$emit('actions', 'actions')
             this.$router.push('/play')
           })
           .catch()
@@ -187,14 +188,14 @@ export default defineComponent({
         .then(res => {
           console.log("api return live game", res)
           if (res.data) {
-            console.log("res daat")
-
+            console.log("res data")
             this.opponentName = res.data.winner.id == this.user.id ? res.data.loser.username : res.data.winner.username
             console.log("showGame = ", this.showGame)
             this.showGame = !this.showGame
             console.log("showGame = ", this.showGame)
           }
           else {
+            this.$emit('actions', 'actions')
             this.$router.push('/play/' + this.user.id)
           }
         })

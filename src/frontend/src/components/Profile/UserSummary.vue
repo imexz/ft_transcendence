@@ -88,6 +88,7 @@ export default defineComponent({
           this.toggleDropdown()
           break
         default:
+          console.log("popUpActions customEmit", emit)
           this.customEmit(emit)
       }
     },
