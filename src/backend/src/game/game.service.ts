@@ -267,11 +267,23 @@ export class GameService {
 		const game = this.getGame(user_id)
 		if(game != undefined) {
 			if (key == "ArrowUp" || key == "w") {
-				this.movePaddleUp(game, this.getPlayerSide(game, user_id))
-				console.log("paddle Up")
+				if (game.paddleLeft.speed > 0) { // both paddles get inverted so checking just left Paddle is fine
+					console.log("paddle Up")
+					this.movePaddleUp(game, this.getPlayerSide(game, user_id))
+				}
+				else {
+					console.log("paddle Down")
+					this.movePaddleDown(game, this.getPlayerSide(game, user_id))
+				}
 			} else if (key == "ArrowDown" || key == "s") {
-				this.movePaddleDown(game, this.getPlayerSide(game, user_id))
-				console.log("paddle Down")
+				if (game.paddleLeft.speed > 0) {
+					console.log("paddle Down")
+					this.movePaddleDown(game, this.getPlayerSide(game, user_id))
+				}
+				else {
+					console.log("paddle Up")
+					this.movePaddleUp(game, this.getPlayerSide(game, user_id))
+				}
 			}
 		}
 	}
@@ -288,23 +300,23 @@ export class GameService {
 
 	movePaddleUp(game: Game, side: Side) {
 		if (side == Side.left) {
-			if (game.paddleLeft.position.y > 0)
-				game.paddleLeft.position.y -= game.paddleLeft.speed
+			if (game.paddleLeft.position.y > 0 )
+				game.paddleLeft.position.y -= Math.abs(game.paddleLeft.speed)
 		}
 		else {
-			if (game.paddleRight.position.y > 0)
-				game.paddleRight.position.y -= game.paddleRight.speed
+			if (game.paddleRight.position.y > 0 )
+				game.paddleRight.position.y -= Math.abs(game.paddleRight.speed)
 		}
 		this.gameGateway.server.to(game.id.toString()).emit('updatePaddle', {paddleRight: game.paddleRight, paddleLeft: game.paddleLeft})
 	}
 	movePaddleDown(game: Game, side: Side) {
 		if (side == Side.left) {
-			if (game.paddleLeft.position.y < (480 - game.paddleLeft.height))
-				game.paddleLeft.position.y += game.paddleLeft.speed
+			if (game.paddleLeft.position.y < (480 - game.paddleLeft.height) )
+				game.paddleLeft.position.y += Math.abs(game.paddleLeft.speed)
 		}
 		else {
 			if (game.paddleRight.position.y < (480 - game.paddleRight.height))
-				game.paddleRight.position.y += game.paddleRight.speed
+				game.paddleRight.position.y += Math.abs(game.paddleRight.speed)
 		}
 		this.gameGateway.server.to(game.id.toString()).emit('updatePaddle', {paddleRight: game.paddleRight, paddleLeft: game.paddleLeft})
 	}
