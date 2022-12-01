@@ -45,7 +45,7 @@ export default defineComponent({
   },
   methods: {
     fetchUser(){
-      let uId = (this.id != "0")?this.id:this.$store.state?.user.id
+      let uId = (this.id != "0") ? this.id : this.$store.state?.user.id
       VueAxios({
           url: '/users/find/' + uId,
           baseURL: API_URL,
@@ -57,11 +57,19 @@ export default defineComponent({
     }
   },
   mounted() {
+    console.log("this.id", this.id);
     this.fetchUser();
+    console.log("user", this.user);
+    
   },
   updated() {
-    if (this.user && ( parseInt(this.id) != this.user.id) && this.id != 0 )
+    console.log("updated this.id", this.id);
+    console.log("updated user", this.user);
+    if (this.user && (parseInt(this.id) != this.user.id) && this.user.id != this.$store.state?.user.id)
       this.fetchUser();
+    else if (this.user && ( parseInt(this.id) != this.user.id) && this.id != 0 )
+      this.fetchUser();
+    console.log("updated user after", this.user);
   }
 })
 
