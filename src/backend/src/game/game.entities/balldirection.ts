@@ -1,6 +1,6 @@
-import { Side } from "../game.entities/game.entity";
-import { Serving } from "../game.entities/settings";
-import { GameSetup } from "../game.entities/setup.entity";
+import { Side } from "./game.entity"
+import { Serving } from "./settings"
+import { GameSetup } from "./setup.entity"
 
 export class BallDirObj {
 	
@@ -40,7 +40,6 @@ export class BallDirObj {
 	}
 
 	newBallDir(side: Side){
-		console.log(this.serving)
 		do {
 			this.angle = Math.random() * 2 * Math.PI
 		}

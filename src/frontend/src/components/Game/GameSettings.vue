@@ -30,9 +30,9 @@
 		<div id="startGame">
       <h1>Start Game</h1>
       <div>
-        <div v-if="this.userId" class="startGameElem">
+        <div v-if="(this.user != null)" class="startGameElem">
           <h2>VS</h2>
-          <UserSummary :user= this.user> </UserSummary>
+          <UserSummary :user = this.user> </UserSummary>
         </div>
       </div>
       <div>
@@ -47,10 +47,8 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import PongGame from './PongGame.vue';
-import GameSettings from './GameSettings.vue'
 import { Settings } from '@/models/gameSettings';
-import { io, Socket } from 'socket.io-client'
+import { Socket } from 'socket.io-client'
 import UserSummary from '@/components/Profile/UserSummary.vue';
 import User from '@/models/user';
 import VueAxios from 'axios';
@@ -67,7 +65,8 @@ export default defineComponent({
     data() {
         return {
             settings: Settings,
-            user: User,
+            user: null as User,
+            // user: null as User,
             Serving
         }
     },
@@ -78,25 +77,24 @@ export default defineComponent({
     components: {
         UserSummary
     },
-    created() {
-        console.log("created Game Settings");
-        
-        // this.user = undefined
+
+   async created() {
+        console.log("GameSettings created")
         this.settings = new Settings()
-        // if(this.userId != undefined) {
-        //     this.fetchUser()
-        // }
-        if(this.userId != this?.user.id) {
+        console.log("userId & user",this.userId, this.user);
+        if(this.userId != this.user?.id) {
+        // if(this.user == null || this.userId != this.user?.id) {
+            // console.log("1", this.user);
             this.fetchUser()
+            // while (this.user == null) {
+		  	    //   await new Promise(r => {setTimeout(r, 10);
+            //   console.log("fetchuser wait")})
+            // }
+            // console.log("2", this.user);
         }
     },
     updated() {
-        // console.log("updated GAmeSettings");
-        
-        // console.log("userId", this.userId);
-        
-        
-        if(this.userId != this?.user.id) {
+        if(this.userId != this.user?.id) {
             this.fetchUser()
         }
     },
@@ -108,106 +106,91 @@ export default defineComponent({
                 method: 'GET',
                 withCredentials: true,
             })
+            // .then(ret => {console.log("ret.data =", ret.data); this.user = new User(ret.data)})
             .then(ret => this.user = ret.data)
             .catch(error =>  {this.dispatch('triggerToast', {mode: 'error', show: true, msg: 'Could not load User Data'})})
-            
         },
         setScoreToWin(score: number) {
-                document.getElementById("score3").classList.remove("selected");
-                document.getElementById("score5").classList.remove("selected");
-                document.getElementById("score10").classList.remove("selected");
-                document.getElementById("score15").classList.remove("selected");
-                document.getElementById("score20").classList.remove("selected");
+                document.getElementById("score3").classList.remove("selected")
+                document.getElementById("score5").classList.remove("selected")
+                document.getElementById("score10").classList.remove("selected")
+                document.getElementById("score15").classList.remove("selected")
+                document.getElementById("score20").classList.remove("selected")
                 switch (score) {
                     case 3:
-                        document.getElementById("score3").classList.add("selected");
-                        break;
+                        document.getElementById("score3").classList.add("selected")
+                        break
                     case 5:
-                        document.getElementById("score5").classList.add("selected");
-                        break;
+                        document.getElementById("score5").classList.add("selected")
+                        break
                     case 10:
-                        document.getElementById("score10").classList.add("selected");
-                        break;
+                        document.getElementById("score10").classList.add("selected")
+                        break
                     case 15:
-                        document.getElementById("score15").classList.add("selected");
-                        break;
+                        document.getElementById("score15").classList.add("selected")
+                        break
                     case 20:
-                        document.getElementById("score20").classList.add("selected");
-                        break;
+                        document.getElementById("score20").classList.add("selected")
+                        break
                 }
-                this.settings.scoreToWin = score;
-                console.log("scoreToWin set to",this.settings.scoreToWin);
+                this.settings.scoreToWin = score
+                console.log("scoreToWin set to",this.settings.scoreToWin)
                 
-            },
-            setPowerUp(isSet: boolean) {
-                document.getElementById("powerupYes").classList.remove("selected");
-                document.getElementById("powerupNo").classList.remove("selected");
-                if (isSet)
-                    document.getElementById("powerupYes").classList.add("selected");
-                else
-                    document.getElementById("powerupNo").classList.add("selected");
-                this.settings.enablePowerUp = isSet;
-            },
-            setSlowServe(isSet: boolean) {
-                document.getElementById("slowServeYes").classList.remove("selected");
-                document.getElementById("slowServeNo").classList.remove("selected");
-                if (isSet)
-                    document.getElementById("slowServeYes").classList.add("selected");
-                else
-                    document.getElementById("slowServeNo").classList.add("selected");
-                this.settings.enableSlowServe = isSet;
-            },
-            setServing(option: number) {
-                document.getElementById("lastScored").classList.remove("selected");
-                document.getElementById("alternate").classList.remove("selected");
-                document.getElementById("random").classList.remove("selected");
-                switch (option) {
-                    case Serving.ALTERNATE:
-                        document.getElementById("alternate").classList.add("selected");
-                        this.settings.serving = Serving.ALTERNATE;
-                        break;
-                    case Serving.LAST_SCORED:
-                        document.getElementById("lastScored").classList.add("selected");
-                        this.settings.serving = Serving.LAST_SCORED;
-                        break;
-                    case Serving.RANDOM:
-                        document.getElementById("random").classList.add("selected");
-                        this.settings.serving = Serving.RANDOM;
-                        break;
-                }
-            },
-            async startWait() {
-                if(this.userId != undefined) {
-                    console.log("settings", this.settings, this.user);
-                    this.socket.emit('GameRequestBackend', {settings: this.settings , id: this.userId}, (r) => {
-                        // if (r.game != undefined) {
-                        //     this.$emit('viewGame', r.game)
-                        // }
-                        if(r) {
-                            console.log("emit setWait");
-                            this.$emit('setWait')
-                        } else {
-                            this.$emit('reset')
-                        }
-                    })
-                } else {
-                    this.socket.emit('joinOrCreatGame', {settings: this.settings}, () => {
-                    });
-                    console.log("emit setWait");
-                    this.$emit('setWait')
-                }
-
-                // this.$store.state.isCustomized = this.isCustomized();
-                // this.$store.state.showGame = true;
+        },
+        setPowerUp(isSet: boolean) {
+            document.getElementById("powerupYes").classList.remove("selected")
+            document.getElementById("powerupNo").classList.remove("selected")
+            if (isSet)
+                document.getElementById("powerupYes").classList.add("selected")
+            else
+                document.getElementById("powerupNo").classList.add("selected")
+            this.settings.enablePowerUp = isSet
+        },
+        setSlowServe(isSet: boolean) {
+            document.getElementById("slowServeYes").classList.remove("selected")
+            document.getElementById("slowServeNo").classList.remove("selected")
+            if (isSet)
+                document.getElementById("slowServeYes").classList.add("selected")
+            else
+                document.getElementById("slowServeNo").classList.add("selected")
+            this.settings.enableSlowServe = isSet
+        },
+        setServing(option: number) {
+            document.getElementById("lastScored").classList.remove("selected")
+            document.getElementById("alternate").classList.remove("selected")
+            document.getElementById("random").classList.remove("selected")
+            switch (option) {
+                case Serving.ALTERNATE:
+                    document.getElementById("alternate").classList.add("selected")
+                    this.settings.serving = Serving.ALTERNATE
+                    break
+                case Serving.LAST_SCORED:
+                    document.getElementById("lastScored").classList.add("selected")
+                    this.settings.serving = Serving.LAST_SCORED
+                    break
+                case Serving.RANDOM:
+                    document.getElementById("random").classList.add("selected")
+                    this.settings.serving = Serving.RANDOM
+                    break
             }
-            // isCustomized(): boolean {
-            //     if (this.settings.scoreToWin != 10 ||
-            //         this.settings.enablePowerUp == true ||
-            //         this.settings.enableSlowServe == true ||
-            //         this.settings.serving != Serving.RANDOM
-            //         ) return true;
-            //     else return false;
-            // },
+        },
+        async startWait() {
+            if(this.userId != undefined) {
+                console.log("settings", this.settings, this.user)
+                this.socket.emit('GameRequestBackend', {settings: this.settings , id: this.userId}, (r) => {
+                    if(r) {
+                        console.log("emit setWait")
+                        this.$emit('setWait')
+                    } else {
+                        this.$emit('reset')
+                    }
+                })
+            } else {
+                this.socket.emit('joinOrCreatGame', {settings: this.settings})
+                console.log("emit setWait");
+                this.$emit('setWait')
+            }
+        }
     }
 })
 

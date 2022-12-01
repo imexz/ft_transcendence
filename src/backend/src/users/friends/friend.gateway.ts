@@ -72,17 +72,19 @@ export class Gateway {
           const opponentGame = this.gameGateway.getGame(id)
           this.gameService.removeUserFromSpectators(id, opponentGame)
           const opponentSocket = await this.gameGateway.findSocketOfUser(id)
-          console.log(opponentSocket.rooms)
-          opponentSocket.rooms.forEach(roomId => { if (opponentSocket.id != roomId) opponentSocket.leave(roomId) })
+          if (opponentSocket) {
+            console.log(opponentSocket.rooms)
+            opponentSocket.rooms.forEach(roomId => { if (opponentSocket.id != roomId) opponentSocket.leave(roomId) })
+          }
           const game = this.gameService.joinGameOrCreateGame( user, settings, id)
           this.gameGateway.joinGameRoom(opponentSocket, await  game)
           this.gameGateway.joinGameRoom(await this.gameGateway.findSocketOfUser(user.id), await  game)
           console.log("game = ", await game)
         } else {
           (await this.gameGateway.findSocketOfUser(user.id)).emit('isFinished')
-					socket.emit('resetRequester')
+          socket.emit('resetRequester')
+          console.log("ende async")
         }
-        console.log("ende async")
     }
 
 

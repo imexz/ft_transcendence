@@ -23,23 +23,12 @@ export default defineComponent({
     game: Game,
     socket: Socket
   },
-  mounted() {
-    console.log("result: winner", this.game.winner)
-    console.log("result: loser", this.game.loser)
-    console.log("result mounted:", this.game.scoreWinner, this.game.scoreLoser)
-  },
-	unmounted() {
-		console.log("result.vue unmounted")
-	},
-    methods: {
-		  leaveRoom() {
-		  	this.socket.emit('leaveRoom')
-		  },
-      newGame() {
-          console.log("newGame")
-          this.$emit('newGame')
-      },
-    }
+  methods: {
+    newGame() {
+        console.log("newGame")
+        this.$emit('newGame')
+    },
+  }
 })
 </script>
 

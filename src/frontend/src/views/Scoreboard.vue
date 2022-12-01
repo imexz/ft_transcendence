@@ -10,7 +10,7 @@
         <div class="columName" style="border-right: none;">User</div>
       </div>
       <div class="scoreList">
-        <div v-for="(user, index) in orderdUsers()" class="userEntrys">
+        <div v-for="(user, index) in orderedUsers()" class="userEntrys">
           <div class="leftElem">{{ index + 1 }}</div>
           <div class="leftElem">{{ user.winns }}</div>
           <UserSummary :user = user as User />
@@ -38,7 +38,7 @@ export default defineComponent({
         UserSummary,
     },
     methods: {
-      orderdUsers() {
+      orderedUsers() {
         return this.users.sort((n1,n2) => {
           if (n1.winns > n2.winns) {
               return -1;

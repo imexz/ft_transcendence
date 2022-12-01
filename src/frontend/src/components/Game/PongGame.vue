@@ -27,6 +27,7 @@
         fps: 0,
   		}
   	},
+    emits: ['reset'],
     props: {
       game: Game,
       socket: Socket
