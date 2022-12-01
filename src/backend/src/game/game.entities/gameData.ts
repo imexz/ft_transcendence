@@ -11,7 +11,6 @@ export class GameData {
     constructor(settings: Settings) {
         if (settings) {
             this.settings = settings
-            console.log("settings", this.settings)
             this.ball = new Ball(settings.enableSlowServe, settings.serving)
         } else {
             this.ball = new Ball(false, Serving.RANDOM)

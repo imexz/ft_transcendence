@@ -71,7 +71,6 @@ export class GameService {
 		game = this.getGame(undefined, settings) // checking for first game with missing (undefined) opponent
 		if (game == undefined || opponentUserId) {
 			game = await this.createGameInstance(user.id, settings)
-			// console.log("joinGameOrCreateGame", game.settings);
 			game.winner = user
 			// opponentUserId is set when called via Frontend::askForMatch
 			if(opponentUserId != undefined) {
@@ -217,6 +216,7 @@ export class GameService {
 		game.ball.position = GameSetup.staticballPos
 		game.ball.reset()
 		game.ball.direction.newBallDir(getPoint)
+		game.ball.direction.speed = GameSetup.ballSpeed
 		if (game.settings.enablePowerUp) {
 			game.ball.radius++
 			game.paddleLeft.speed *= -1
@@ -316,16 +316,12 @@ export class GameService {
 		}
 		console.log("userId", userId, typeof(userId))
 		return await this.gameRepository.createQueryBuilder("game")
-		// .innerJoinAndSelect("game.player", "player", "player.id = :id", { id: user.id})
 		.leftJoin('game.loser', 'tmp', 'tmp.id = :id', { id: userId as number} )
 		.leftJoin('game.winner', 'tmp1', 'tmp1.id = :idd', { idd: userId  as number})
 		.leftJoinAndSelect('game.loser', 'loser', 'loser.id != :iid', { iid: userId} )
 		.leftJoinAndSelect('game.winner', 'winner', 'winner.id != :iidd', { iidd: userId})
 		.where("game.loser.id = :te", {te: userId})
 		.orWhere("game.winner.id = :te1", {te1: userId})
-		// .innerJoinAndSelect("game.loser", "loser", "loser.id != :id", { id: user.id} )
-		// .innerJoinAndSelect("game.player", "player", "player.id != :id", { id: user.id})
-		// .select("'scoreWinner'")
 		.getMany()
 	}
 }

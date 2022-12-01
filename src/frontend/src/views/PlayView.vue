@@ -42,7 +42,6 @@
       userId: String
     },
     async mounted() {
-      console.log("in mounted gameMenu")
       this.socketGame = io(API_URL + "/game", {
         auth: {
           id: document.cookie
@@ -51,22 +50,21 @@
       while (!this.socketGame) {
 		  	  await new Promise(r => { setTimeout(r, 100)
             console.log("wait in playview")
-          });
+          })
       }
       this.wait = false
       this.game = null
       this.initGameInfoListener()
-      console.log("view mounted")
+      console.log("PlayView mounted")
     },
     updated() {
-      console.log("view updated")
-      console.log(this.userId);
+      console.log("PlayView updated")
       if (this.game?.isFinished && this.userId) {
         this.game = null
       }
     },
     methods: {
-      async setWait(){
+      async setWait() {
         console.log("setWait")
         this.wait = true
       },
@@ -81,7 +79,7 @@
           this.game.loser = game.loser
           this.game.scoreWinner = game.scoreWinner
           this.game.scoreLoser = game.scoreLoser
-          console.log("GameInfo PlayView", game)
+          console.log("PlayView on GameInfo this.game = ", game)
           
 		    });
 		    this.socketGame.on('isFinished', (data) => {
@@ -104,7 +102,7 @@
       }
     },
     unmounted() {
-      this.socketGame.disconnect();
+      this.socketGame.disconnect()
     },
     components: {
       PongGame,

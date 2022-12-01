@@ -89,7 +89,6 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			game = await this.gameService.joinGameOrCreateGame(client.handshake.auth as User, settings)
 		}
 		await this.joinGameRoom(client, game)
-		console.log("isInGame end", client.rooms)
 	}
 
   @SubscribeMessage('GameRequestBackend')

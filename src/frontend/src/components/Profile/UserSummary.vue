@@ -46,7 +46,7 @@ import Game from '@/models/game';
 
 export default defineComponent({
   created() {
-    console.log("creted user summary")
+    console.log("created user summary")
   },
   components: {
     ViewGamePopup,
@@ -88,6 +88,7 @@ export default defineComponent({
           this.toggleDropdown()
           break
         default:
+          console.log("popUpActions customEmit", emit)
           this.customEmit(emit)
       }
     },
