@@ -7,6 +7,7 @@ import User from 'src/users/entitys/user.entity';
 import chatroom, { Access } from 'src/chatroom/chatroom.entity';
 import { AdminAction } from 'src/users/entitys/admin.enum';
 import { roomReturn } from 'src/chatroom/chatroom.service';
+import { UsersService } from 'src/users/users.service'
 
 
 // interface ServerToClientEvents {
@@ -38,7 +39,8 @@ export class ChatGateway {
 
   constructor(
     private readonly chatService: ChatService,
-    private authService: AuthService
+    private authService: AuthService,
+    private readonly usersService: UsersService
     ) {}
 
   afterInit() {
@@ -58,12 +60,14 @@ export class ChatGateway {
   }
 
   async addUserRooms(client: Socket | any) {
-    const rooms = await this.chatService.getUserRooms(client.handshake.auth.id)
-    var tmp: string[] = []
-    for (let index = 0; index < rooms.length; index++) {
-      tmp.push(rooms[index].roomId.toString())
+    if (client != undefined) {
+      const rooms = await this.chatService.getUserRooms(client.handshake.auth.id)
+      var tmp: string[] = []
+      for (let index = 0; index < rooms.length; index++) {
+        tmp.push(rooms[index].roomId.toString())
+      }
+      client.join(tmp)
     }
-    client.join(tmp)
   }
 
   @SubscribeMessage('join')
@@ -284,10 +288,10 @@ export class ChatGateway {
     if(room.info == roomReturn.created) {
       const socket = await this.findSocketOfUser(id)
       const toWait = Promise.all([this.addUserRooms(client), this.addUserRooms(socket)]);
-      room.chatroom.roomName = socket?.handshake?.auth?.username
+      room.chatroom.roomName = (await this.usersService.getUser(id)).username
       client.emit('newRoom', room.chatroom)
       room.chatroom.roomName = client.handshake.auth.username
-      socket.emit('newRoom', room.chatroom)
+      socket?.emit('newRoom', room.chatroom)
       await toWait
     }
     this.createMessage(room.chatroom.roomId, content, client)
