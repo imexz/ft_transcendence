@@ -216,6 +216,7 @@ export class GameService {
 		game.ball.position = GameSetup.staticballPos
 		game.ball.reset()
 		game.ball.direction.newBallDir(getPoint)
+		game.ball.direction.speed = GameSetup.ballSpeed
 		if (game.settings.enablePowerUp) {
 			game.ball.radius++
 			game.paddleLeft.speed *= -1
