@@ -42,7 +42,6 @@ import { Status } from '@/enums/models/ResponseEnum';
 import ViewGamePopup from '../Game/ViewGamePopup.vue';
 import{ UserStatus }from '@/models/user';
 import UserActionsPopup from '@/components/Profile/UserActionsPopup.vue';
-import Game from '@/models/game';
 
 export default defineComponent({
   created() {
@@ -59,9 +58,6 @@ export default defineComponent({
       msgText: "" as string,
       Status: Status,
       UserStatus: UserStatus,
-      showGame: false as boolean,
-      game: null as Game,
-      opponentName: null as String
     }
   },
   mounted() {
@@ -112,9 +108,9 @@ export default defineComponent({
         this.toggleDropdown()
     },
     toggleDropdown() {
+      console.log("toggleDropdown");
       if (this.show){
         window.removeEventListener('click', this.hideDropDown)
-        this.showGame = false
       }
       else
         window.addEventListener('click', this.hideDropDown)

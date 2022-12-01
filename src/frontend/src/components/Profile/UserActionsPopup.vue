@@ -152,6 +152,7 @@ export default defineComponent({
       this.closeDmPopUp()
     },
     customEmit(emitMsg) {
+      // console.log(emitMsg);
       this.$emit('actions', emitMsg)
     },
     viewGame(status){
