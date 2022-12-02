@@ -13,13 +13,11 @@
 </template>
 
 <script lang="ts">
-import Game from '@/models/game';
 import { defineComponent } from 'vue';
 import UserSummary from '@/components/Profile/UserSummary.vue';
 
 export default defineComponent({
     props: {
-        // game: Game
         game: {
             type: Object,
             default: null,
@@ -27,8 +25,7 @@ export default defineComponent({
     },
   	components: {
       UserSummary
-    //   UserSummary: () => import('../Profile/UserSummary.vue')
-  	}   
+  	}
 })
 </script>
 

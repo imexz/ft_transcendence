@@ -54,24 +54,16 @@ export default defineComponent({
         }
       }
     },
-    created() {},
     async mounted() {
       while (!this.socket) {
-        await new Promise(r => {setTimeout(r, 100)
-          console.log("wait")})
+        await new Promise(r => { setTimeout(r, 100) } )
       }
-      console.log("socket", this.socket)
-        
       this.socket.on('updateBall', this.updateBall)
       this.socket.on('updatePaddle', this.updatePaddle)
       this.socket.on('updateScore', this.updateScore)
       this.initPixi();
       this.pixiApp.ticker.add(this.updatePixi)
       document.addEventListener('keydown', this.keyEvents, false)
-      console.log("Field mounted gameInit", this.gameInit)
-    },
-    updated() {
-      console.log("FieldView Updated")
     },
     unmounted() {
       this.socket.off('updateBall')
@@ -85,7 +77,6 @@ export default defineComponent({
         return  key == "w" || key == "s" || key == "ArrowUp" || key == "ArrowDown"
       },
       keyEvents(event) {
-        console.log(event.key)
         if (this.isValidKey(event.key))
           this.socket.emit('key', event.key)
       },
@@ -110,8 +101,6 @@ export default defineComponent({
 
       },
       updatePixi(){
-          console.log("updatePixi")
-
           this.pixiScene.clear()
 
           this.pixiScene.lineStyle(2, this.styleData.fgColor)
@@ -184,8 +173,6 @@ export default defineComponent({
           this.pixiScore.right.y = 5
       },
       updateScore(data: any) {
-          console.log(data)
-
           this.gameData.score = data;
           switch(Math.max(this.gameData.score.scoreWinner, this.gameData.score.scoreLoser)) {
             case 4:
@@ -200,14 +187,11 @@ export default defineComponent({
           }
       },
       updatePaddle(data: any) {
-          console.log(data)
-
           this.gameData.paddleLeft = data.paddleLeft;
           this.gameData.paddleRight = data.paddleRight;
       },
       updateBall(data: any) {
 		      if (data === undefined) {
-            console.log("data undefined")
 		  	    this.left = 0
 		  	    this.right = 0
           	return

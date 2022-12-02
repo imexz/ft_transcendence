@@ -66,7 +66,6 @@ export default defineComponent({
         return {
             settings: Settings,
             user: null as User,
-            // user: null as User,
             Serving
         }
     },
@@ -79,18 +78,9 @@ export default defineComponent({
     },
 
    async created() {
-        console.log("GameSettings created")
         this.settings = new Settings()
-        console.log("userId & user",this.userId, this.user);
         if(this.userId != this.user?.id) {
-        // if(this.user == null || this.userId != this.user?.id) {
-            // console.log("1", this.user);
             this.fetchUser()
-            // while (this.user == null) {
-		  	    //   await new Promise(r => {setTimeout(r, 10);
-            //   console.log("fetchuser wait")})
-            // }
-            // console.log("2", this.user);
         }
     },
     updated() {
@@ -106,7 +96,6 @@ export default defineComponent({
                 method: 'GET',
                 withCredentials: true,
             })
-            // .then(ret => {console.log("ret.data =", ret.data); this.user = new User(ret.data)})
             .then(ret => this.user = ret.data)
             .catch(error =>  {this.dispatch('triggerToast', {mode: 'error', show: true, msg: 'Could not load User Data'})})
         },
@@ -134,8 +123,6 @@ export default defineComponent({
                         break
                 }
                 this.settings.scoreToWin = score
-                console.log("scoreToWin set to",this.settings.scoreToWin)
-                
         },
         setPowerUp(isSet: boolean) {
             document.getElementById("powerupYes").classList.remove("selected")
@@ -176,10 +163,8 @@ export default defineComponent({
         },
         async startWait() {
             if(this.userId != undefined) {
-                console.log("settings", this.settings, this.user)
                 this.socket.emit('GameRequestBackend', {settings: this.settings , id: this.userId}, (r) => {
                     if(r) {
-                        console.log("emit setWait")
                         this.$emit('setWait')
                     } else {
                         this.$emit('reset')
@@ -187,7 +172,6 @@ export default defineComponent({
                 })
             } else {
                 this.socket.emit('joinOrCreatGame', {settings: this.settings})
-                console.log("emit setWait");
                 this.$emit('setWait')
             }
         }

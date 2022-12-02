@@ -22,10 +22,7 @@
 
   export default defineComponent({
   	data() {
-  		return {
-		    dataRdy: false,
-        fps: 0,
-  		}
+  		return { }
   	},
     emits: ['reset'],
     props: {
@@ -37,25 +34,14 @@
       Result,
       Field
     },
-  	created() {
-  		console.log("in created")
-  	},
   	async mounted() {
-  		console.log("mounted")
 		  this.dataRdy = true
       while (!this.socket) {
-		  	  await new Promise(r => {setTimeout(r, 100)
-          console.log("wait in ponggame")})
+		  	  await new Promise(r => { setTimeout(r, 100) })
       }
-  	},
-		// async beforeUpdate() {
-	  // },
-  	unmounted() {
-  	  console.log("in unmount")
   	},
   	methods: {
       prepareNewGame(){
-        console.log("newGame")
         this.$emit("reset")
       }
   	}

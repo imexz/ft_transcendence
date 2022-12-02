@@ -1,4 +1,3 @@
-
 import { createStore } from 'vuex'
 import User from '@/models/user';
 import router from '@/router';
@@ -64,8 +63,6 @@ export default createStore<State>({
   mutations: {
     logOut(state) {
       state.validated = false;
-      console.log("store logOut()");
-      // state.socketGame.emit('leaveGame')
       if (state.socket != null && state.socket != undefined) {
         state?.socket.disconnect();
         router.push('/login')
@@ -79,49 +76,33 @@ export default createStore<State>({
               id: document.cookie
           }
       })
-
-      console.log("socketGame established");
-
       if (state.chat === null) {
         state.chat = new Chat()
       }
-
-      // console.log("game socket init");
       console.log(document.cookie);
 
       state.socket.on('GameRequestFrontend',function (data, ack) {
-        console.log("GameRequestFrontend", data, ack);
         state.gameRequest = new GameRequest()
 
         state.gameRequest.user = data.user;
         state.gameRequest.settings = data.settings;
         state.gameRequest.response = ack
-
-        console.log("receive askformatch");
-        // ack({data: "weil"})
-        // state.showGame = true;
       })
       state.socket.on('resetRequester', () => {
-        console.log("receive resetRequester");
         state.gameRequest = null;
       })
       state.socket.on('NowInGame', () => {
-        console.log("receive NowInGame");
           router.push('/')
       })
       state.socket.on('Request',(data) => {
         state.friendsList?.push(data)
         state.NrFriendRequests++
-        console.log("receive  request");
       })
       state.socket.on('updateFriend', (data) => {
-        console.log("updateFriend", data);
-        console.log(state.friendsList);
         let user = state.friendsList?.find(elem => elem.id == data.id)
 
         if (user != undefined && user != null)
         {
-          console.log(user);
           if (data.status != Status.denied)
             user.friendStatus = data.status
           else

@@ -48,24 +48,19 @@
         }
       })
       while (!this.socketGame) {
-		  	  await new Promise(r => { setTimeout(r, 100)
-            console.log("wait in playview")
-          })
+		  	  await new Promise(r => { setTimeout(r, 100) })
       }
       this.wait = false
       this.game = null
       this.initGameInfoListener()
-      console.log("PlayView mounted")
     },
     updated() {
-      console.log("PlayView updated")
       if (this.game?.isFinished && this.userId) {
         this.game = null
       }
     },
     methods: {
       async setWait() {
-        console.log("setWait")
         this.wait = true
       },
       viewGame (game: Game) {
@@ -79,8 +74,6 @@
           this.game.loser = game.loser
           this.game.scoreWinner = game.scoreWinner
           this.game.scoreLoser = game.scoreLoser
-          console.log("PlayView on GameInfo this.game = ", game)
-          
 		    });
 		    this.socketGame.on('isFinished', (data) => {
           this.wait = false

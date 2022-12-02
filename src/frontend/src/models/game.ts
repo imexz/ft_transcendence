@@ -1,9 +1,6 @@
 import User from "./user";
 
 export default class Game {
-    // constructor(parameters) {
-        
-    // }
     winner: User
     loser: User
 	scoreWinner: number = 0;
