@@ -97,37 +97,31 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	@MessageBody('settings') settings: Settings,
 	@MessageBody('id') id?: number,
   ) {
-		console.log("settings", settings)
 		const clientId: number = client.handshake.auth.id
 		let game: Game | undefined = this.gameService.getGame(clientId)
 		if (game != undefined) {
-			console.log("gameRequest: client has a game. Reject request")
-			return false // client in game -> no push
+			// user has its own game
+			return false
 		} else {
-			console.log("gameRequest: client has no game")
 			game = this.gameService.getGame(id)
 			if(game == undefined) {
-				console.log("gameRequest: opponent has no game")
-				const socket = await this.gateway.askUserToPlay(client.handshake.auth as User, id, settings)
-				return true
+				// invited player is available
+				await this.gateway.askUserToPlay(client.handshake.auth as User, id, settings)
 			} else {
-				console.log("gameRequest: invited player has game. Specatating.")
+				// invited player is not available. spectating
 				client.rooms.forEach(roomId => { if (client.id != roomId) client.leave(roomId) })
 			}
 		}
-		console.log("gameRequest end")
 		return true
   }
 
   closeRoom(roomId: string) {
-	console.log("closing room", roomId)
 	this.server.in(roomId).socketsLeave(roomId)
   }
 
   // emittable bywinner  (while game is pending) and spectator
   @SubscribeMessage('leaveGame')
   async handleLeaveGame(@ConnectedSocket() client: Socket) {
-	console.log("leaveGame")
 	const clientId: number = client.handshake.auth.id
 	client.rooms.forEach(roomId => { if (client.id != roomId) client.leave(roomId) })
 	let game = this.gameService.getSpectatedGame(clientId)
@@ -149,7 +143,6 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		this.closeRoom(game.id.toString())
 		this.gameService.removeGame(game)
 	}
-	console.log("leaveGame ende")
   }
 
   async viewRequest(userId: number, gameId: number ) {

@@ -34,9 +34,6 @@ export class Game extends GameData{
 	@Column()
 	scoreLoser: number = 0
 
-	@Exclude()
-	isCustomized: boolean = false
-
 	constructor(gameid: number, settings: Settings) {
 		super(settings)
 		this.id = gameid

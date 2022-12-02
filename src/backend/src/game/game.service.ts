@@ -65,14 +65,13 @@ export class GameService {
 	async joinGameOrCreateGame(user: User, settings: Settings, opponentUserId?: number): Promise<Game> {
 		let game = this.getGame(user.id)
 		if(game != undefined) {
-			console.log("already in game");
 			return game
 		}
 		game = this.getGame(undefined, settings) // checking for first game with missing (undefined) opponent
 		if (game == undefined || opponentUserId) {
 			game = await this.createGameInstance(user.id, settings)
 			game.winner = user
-			// opponentUserId is set when called via Frontend::askForMatch
+			// opponentUserId is set when function is called via Frontend::askForMatch
 			if(opponentUserId != undefined) {
 				const tmpGame = this.getGame(opponentUserId)
 				if(tmpGame) {
@@ -84,14 +83,12 @@ export class GameService {
 			}
 			this.gamesArr.push(game)
 		} else { // queue game exists, join and set user as opponent
-			console.log("joinGameOrCreateGame: set User as loser")
 			game.loser = user
 		}
 		return game
 	}
 
 	async createGameInstance(userId: number, settings: Settings): Promise<Game> {
-		console.log('inside createGameInstance()')
 		return new Game(userId, settings)
 	}
 
@@ -108,10 +105,8 @@ export class GameService {
 		this.userService.setStatus(game.winner.id, UserStatus.PLAYING)
 		this.userService.setStatus(game.loser.id, UserStatus.PLAYING)
 		server.to(game.id.toString()).emit('GameInfo', game)
-		console.log("startGame")
 		game.interval = setInterval(() => this.emitGameData(game, server), 16) as unknown as number
 		this.gameGateway.server.to(game.id.toString()).emit('updatePaddle', {paddleRight: game.paddleRight, paddleLeft: game.paddleLeft})
-		console.log("startGame end")
 	}
 
 	async emitGameData(game: Game, server: Server) {
@@ -122,7 +117,6 @@ export class GameService {
 		}
 		server.to(game.id.toString()).emit('updateBall', updatedBall)
 		if (tmpGame.score.scoreLeft === tmpGame.settings.scoreToWin || tmpGame.score.scoreRight === tmpGame.settings.scoreToWin) {
-			console.log("emitGameData: closeRoom")
 			this.gameGateway.closeRoom(game.id.toString())
 		}
 	}
@@ -133,9 +127,9 @@ export class GameService {
 		}
 		this.updateBall(game)
 		this.collisionControl(game)
-		const getPoint = this.scored(game)
-		if (getPoint != undefined){
-			this.reset(game, getPoint)
+		const sideOfLastGoal = this.scored(game)
+		if (sideOfLastGoal != undefined){
+			this.reset(game, sideOfLastGoal)
 			this.gameGateway.server.to(game.id.toString()).emit('updateScore', {scoreWinner: game.score.scoreLeft, scoreLoser: game.score.scoreRight})
 		}
 		await this.isGameFinished(game)
@@ -186,13 +180,11 @@ export class GameService {
 		if (game.ball.direction.x > 0) {
 			if (this.isBallAtPaddle(game, game.paddleRight)
 				&& this.isBallWithinPaddleRange(game, game.paddleRight)) {
-					console.log("updateBallDirection right")
 					this.updateBallDirection(game, game.paddleRight)
 			}
 		} else {
 			if (this.isBallAtPaddle(game, game.paddleLeft) 
 				&& this.isBallWithinPaddleRange(game, game.paddleLeft)) {
-					console.log("updateBallDirection left")
 					this.updateBallDirection(game, game.paddleLeft)
 			}
 		}
@@ -212,10 +204,10 @@ export class GameService {
 		return ret
 	}
 
-	reset(game: Game, getPoint: Side) {
+	reset(game: Game, sideOfLastGoal: Side) {
 		game.ball.position = GameSetup.staticballPos
 		game.ball.reset()
-		game.ball.direction.newBallDir(getPoint)
+		game.ball.direction.newBallDir(sideOfLastGoal)
 		game.ball.direction.speed = GameSetup.ballSpeed
 		if (game.settings.enablePowerUp) {
 			game.ball.radius++
@@ -247,9 +239,6 @@ export class GameService {
 			this.userService.setStatus(game.loser.id, UserStatus.ONLINE)
 			this.removeGame(game)
 			this.gameGateway.server.to(game.id.toString()).emit('isFinished', game);
-			console.log("winner is ", game.winner);
-			console.log("loser is ", game.loser);
-			console.log("game is finished")
 		}
 	}
 
@@ -268,20 +257,16 @@ export class GameService {
 		if(game != undefined) {
 			if (key == "ArrowUp" || key == "w") {
 				if (game.paddleLeft.speed > 0) { // both paddles get inverted so checking just left Paddle is fine
-					console.log("paddle Up")
 					this.movePaddleUp(game, this.getPlayerSide(game, user_id))
 				}
 				else {
-					console.log("paddle Down")
 					this.movePaddleDown(game, this.getPlayerSide(game, user_id))
 				}
 			} else if (key == "ArrowDown" || key == "s") {
 				if (game.paddleLeft.speed > 0) {
-					console.log("paddle Down")
 					this.movePaddleDown(game, this.getPlayerSide(game, user_id))
 				}
 				else {
-					console.log("paddle Up")
 					this.movePaddleUp(game, this.getPlayerSide(game, user_id))
 				}
 			}
@@ -323,10 +308,8 @@ export class GameService {
 
 	async getMatchHistory(userId: number){
 		if (userId == undefined) {
-			console.log("userId == undefind")
 			throw new HttpException('please provide userId', HttpStatus.BAD_REQUEST)
 		}
-		console.log("userId", userId, typeof(userId))
 		return await this.gameRepository.createQueryBuilder("game")
 		.leftJoin('game.loser', 'tmp', 'tmp.id = :id', { id: userId as number} )
 		.leftJoin('game.winner', 'tmp1', 'tmp1.id = :idd', { idd: userId  as number})

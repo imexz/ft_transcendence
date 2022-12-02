@@ -11,7 +11,6 @@ import { FriendsModule } from 'src/users/friends/friends.module';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Game]), forwardRef(() => AuthModule), forwardRef(() => UsersModule), forwardRef(() => FriendsModule), JwtModule.register({
-    // imports: [HttpModule, UsersModule, PassportModule, JwtModule.register({
       secret: process.env.JWT_PASSWORD,
       signOptions: { expiresIn: '600s'}
     })],
