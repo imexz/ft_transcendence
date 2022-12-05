@@ -1,10 +1,10 @@
 
+import { Exclude } from 'class-transformer';
 import { Ball } from "./ball.entity";
+import { Side } from "./game.entity";
 import { Paddle } from "./paddle.entity";
 import { Score } from "./score.entity";
-import { Exclude } from 'class-transformer';
 import { Serving, Settings } from "./settings";
-import { Side } from "./game.entity";
 
 export class GameData {
 

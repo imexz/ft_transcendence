@@ -1,7 +1,5 @@
-import { Controller, Delete, Get, UseGuards, Request, Body, Post, HttpException, HttpStatus, UseInterceptors, ClassSerializerInterceptor} from "@nestjs/common";
+import { ClassSerializerInterceptor, Controller, Get, Request, UseGuards, UseInterceptors } from "@nestjs/common";
 import { JwtAuthGuard } from "src/auth/jwt-two/jwt-auth.guard";
-import User from "src/users/entitys/user.entity";
-import { Access } from "./chatroom.entity";
 import { ChatroomService } from "./chatroom.service";
 
 @Controller('chatroom')

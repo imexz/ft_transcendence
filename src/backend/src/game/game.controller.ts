@@ -1,8 +1,8 @@
-import { HttpException, HttpStatus, Controller, Get, UseGuards, Param, Request, UseInterceptors, ClassSerializerInterceptor} from '@nestjs/common';
-import { GameService } from './game.service';
+import { ClassSerializerInterceptor, Controller, Get, HttpException, HttpStatus, Param, Request, UseGuards, UseInterceptors } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/jwt-two/jwt-auth.guard';
-import { GameGateway } from './game.gateway';
 import { UsersService } from '../users/users.service';
+import { GameGateway } from './game.gateway';
+import { GameService } from './game.service';
 
 @Controller('game')
 export class GameController {

@@ -1,10 +1,10 @@
-import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
-import * as cookieParser from 'cookie-parser';
-import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-import 'reflect-metadata';
-import { hostURL } from './hostURL';
 import { ValidationPipe } from '@nestjs/common';
+import { NestFactory } from '@nestjs/core';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import * as cookieParser from 'cookie-parser';
+import 'reflect-metadata';
+import { AppModule } from './app.module';
+import { hostURL } from './hostURL';
 import { TimeoutInterceptor } from './timeout.interceptor';
 
 async function bootstrap() {

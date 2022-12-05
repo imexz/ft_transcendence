@@ -1,7 +1,6 @@
-import { Column, Entity, ManyToOne } from "typeorm";
-import { PrimaryGeneratedColumn } from "typeorm";
-import User from "src/users/entitys/user.entity";
 import { Exclude } from 'class-transformer';
+import User from "src/users/entitys/user.entity";
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { GameData } from "./gameData";
 import { Settings } from "./settings";
 

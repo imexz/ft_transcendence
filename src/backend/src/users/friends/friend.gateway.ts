@@ -1,17 +1,16 @@
-import { ConnectedSocket, MessageBody,  WebSocketServer } from '@nestjs/websockets';
-import { SubscribeMessage, WebSocketGateway } from '@nestjs/websockets';
+import { forwardRef, Inject } from '@nestjs/common';
+import { ConnectedSocket, MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
+import { Server, Socket } from 'socket.io';
+import { AuthService } from 'src/auth/auth.service';
+import { Settings } from 'src/game/game.entities/settings';
+import { GameGateway } from 'src/game/game.gateway';
+import { GameService } from 'src/game/game.service';
 import { hostURL } from 'src/hostURL';
 import { UserStatus } from '../entitys/status.enum';
-import { UsersService } from '../users.service';
-import { Socket, Server } from 'socket.io';
-import { AuthService } from 'src/auth/auth.service';
-import { FriendsService } from './friends.service';
-import { Status } from './friend.entity';
 import User from '../entitys/user.entity';
-import { Settings } from 'src/game/game.entities/settings';
-import { forwardRef, Inject } from '@nestjs/common';
-import { GameService } from 'src/game/game.service';
-import { GameGateway } from 'src/game/game.gateway';
+import { UsersService } from '../users.service';
+import { Status } from './friend.entity';
+import { FriendsService } from './friends.service';
 
 
 enum RESPONSE {

@@ -1,10 +1,9 @@
-import { HttpException, Body, Controller, Delete, Get, Param, Post, UseGuards, Request, UseInterceptors, ClassSerializerInterceptor } from '@nestjs/common';
-import { UsersService } from './users.service';
-import User from './entitys/user.entity';
-import { JwtAuthGuard } from '../auth/jwt-two/jwt-auth.guard';
+import { Body, ClassSerializerInterceptor, Controller, Get, HttpException, HttpStatus, Param, Post, Request, UseGuards, UseInterceptors } from '@nestjs/common';
 import { TwofaService } from 'src/twofa/twofa.service';
+import { JwtAuthGuard } from '../auth/jwt-two/jwt-auth.guard';
+import User from './entitys/user.entity';
 import { FriendsService } from './friends/friends.service';
-import { HttpStatus } from '@nestjs/common'
+import { UsersService } from './users.service';
 
 
 @Controller('users')

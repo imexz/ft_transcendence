@@ -1,21 +1,18 @@
-import { SubscribeMessage,
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import {
+	ConnectedSocket, MessageBody, OnGatewayConnection,
+	OnGatewayDisconnect, OnGatewayInit, SubscribeMessage,
 	WebSocketGateway,
-	WebSocketServer,
-	ConnectedSocket,
-	OnGatewayInit,
-	OnGatewayConnection,
-	OnGatewayDisconnect,
-	MessageBody,
+	WebSocketServer
 } from '@nestjs/websockets';
-import { GameService } from './game.service';
-import { Socket, Server } from 'socket.io';
-import { hostURL } from 'src/hostURL';
+import { Server, Socket } from 'socket.io';
 import { AuthService } from 'src/auth/auth.service';
-import { Game } from './game.entities/game.entity';
+import { hostURL } from 'src/hostURL';
 import User from 'src/users/entitys/user.entity';
-import { forwardRef, Injectable, Inject } from '@nestjs/common';
+import { Gateway } from '../users/friends/friend.gateway';
+import { Game } from './game.entities/game.entity';
 import { Settings } from './game.entities/settings';
-import {Gateway} from '../users/friends/friend.gateway'
+import { GameService } from './game.service';
 
 @WebSocketGateway({
 	namespace: 'game',

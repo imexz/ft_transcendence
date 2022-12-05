@@ -1,14 +1,10 @@
+import { HttpService } from '@nestjs/axios';
 import { Injectable, Logger } from "@nestjs/common";
 import { PassportStrategy } from "@nestjs/passport";
-import { Strategy } from "passport-42"
-import { AuthService } from "../auth.service";
-import { HttpService } from '@nestjs/axios'
-import { readFile } from 'fs';
-import { createWriteStream } from 'fs';
-import { promisify } from "util";
-import User from "../../users/entitys/user.entity";
-import { hostURL } from "../../hostURL";
+import { Strategy } from "passport-42";
 import { UserStatus } from "src/users/entitys/status.enum";
+import User from "../../users/entitys/user.entity";
+import { AuthService } from "../auth.service";
 
 
 @Injectable()

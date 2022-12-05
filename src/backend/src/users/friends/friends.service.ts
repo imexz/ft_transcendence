@@ -1,10 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { Friend, Status } from './friend.entity';
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository, FindOptionsWhere } from "typeorm";
-import { UsersService } from '../users.service';
+import { Not, Repository } from "typeorm";
 import User from '../entitys/user.entity';
-import { Not } from "typeorm"
+import { UsersService } from '../users.service';
+import { Friend, Status } from './friend.entity';
 
 
 interface friend {

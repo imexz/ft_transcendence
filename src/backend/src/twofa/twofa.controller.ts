@@ -1,9 +1,9 @@
 import { Body, Controller, Get, HttpCode, Post, Req, Res, UnauthorizedException, UseGuards } from "@nestjs/common";
 import { AuthService } from "src/auth/auth.service";
-import TwoFactorAuthenticationCodeDto from "../auth/dto/turnOnTwoFactorAuthentication.dto";
-import { JwtAuthGuard } from "src/auth/jwt-two/jwt-auth.guard";
-import { TwofaService } from "./twofa.service";
 import { Jwt2AuthGuard } from "src/auth/jwt-first/jwt2-auth.guard";
+import { JwtAuthGuard } from "src/auth/jwt-two/jwt-auth.guard";
+import TwoFactorAuthenticationCodeDto from "../auth/dto/turnOnTwoFactorAuthentication.dto";
+import { TwofaService } from "./twofa.service";
 
 
 @Controller('twofa')

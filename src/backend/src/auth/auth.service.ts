@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { UsersService } from '../users/users.service';
-import { GameService } from '../game/game.service';
 import { JwtService } from '@nestjs/jwt';
-import User from '../users/entitys/user.entity';
-import {TokenPayload} from './tokenPayload.interface';
-import { Socket, Server } from 'socket.io';
+import { Socket } from 'socket.io';
 import { UserStatus } from 'src/users/entitys/status.enum';
+import { GameService } from '../game/game.service';
+import User from '../users/entitys/user.entity';
+import { UsersService } from '../users/users.service';
 import { JwtStrategy } from './jwt-two/jwt.strategy';
+import { TokenPayload } from './tokenPayload.interface';
 
 @Injectable()
 export class AuthService {

@@ -1,15 +1,15 @@
-import { forwardRef, Inject, Injectable, HttpException, HttpStatus } from '@nestjs/common';
+import { forwardRef, HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Server } from 'socket.io';
+import User from 'src/users/entitys/user.entity';
+import { UsersService } from 'src/users/users.service';
+import { Repository } from 'typeorm';
+import { UserStatus } from "../users/entitys/status.enum";
 import { Game, Side } from './game.entities/game.entity';
 import { Paddle } from './game.entities/paddle.entity';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { Server } from 'socket.io';
-import { GameSetup } from './game.entities/setup.entity';
-import { UsersService } from 'src/users/users.service';
-import User from 'src/users/entitys/user.entity';
-import { UserStatus } from "../users/entitys/status.enum";
-import { GameGateway } from './game.gateway';
 import { Settings } from './game.entities/settings';
+import { GameSetup } from './game.entities/setup.entity';
+import { GameGateway } from './game.gateway';
 
 @Injectable()
 export class GameService {

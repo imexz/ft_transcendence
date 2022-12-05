@@ -1,13 +1,11 @@
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { forwardRef, Module } from '@nestjs/common';
-import User from './entitys/user.entity'
-import { UsersService } from './users.service';
-import { AuthModule } from '../auth/auth.module'
-import { UsersController } from './users.controller';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { TwofsModule } from 'src/twofa/twofa.module';
-import { FriendsController } from './friends/friends.controller';
-import { FriendsService } from './friends/friends.service';
+import { AuthModule } from '../auth/auth.module';
+import User from './entitys/user.entity';
 import { FriendsModule } from './friends/friends.module';
+import { UsersController } from './users.controller';
+import { UsersService } from './users.service';
 
 @Module({
 	// imports: [TypeOrmModule.forFeature([User]), forwardRef(() => AuthModule)],

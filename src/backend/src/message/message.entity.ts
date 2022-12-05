@@ -1,6 +1,6 @@
+import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import chatroom from "../chatroom/chatroom.entity";
 import User from "../users/entitys/user.entity";
-import {JoinColumn, Column, CreateDateColumn, Entity, ManyToOne, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
 export class message {

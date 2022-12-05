@@ -1,12 +1,10 @@
+import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Not } from "typeorm"
-import User from './entitys/user.entity';
-import { Injectable, HttpException, HttpStatus } from "@nestjs/common";
-import { Repository } from "typeorm";
-import { fileEntity } from "../avatar/file.entitys"
+import { Not, Repository } from "typeorm";
+import { fileEntity } from "../avatar/file.entitys";
 import { hostURL } from "../hostURL";
-import { FriendsService } from "./friends/friends.service";
 import { UserStatus } from "./entitys/status.enum";
+import User from './entitys/user.entity';
 
 @Injectable()
 export class UsersService {

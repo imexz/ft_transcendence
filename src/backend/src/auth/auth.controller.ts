@@ -1,5 +1,5 @@
-import {Redirect, Controller, Request, Get, Param, UseGuards, Delete, Res } from '@nestjs/common';
-import { LocalAuthGuard } from './42/local-auth.guard'
+import { Controller, Get, Redirect, Request, Res, UseGuards } from '@nestjs/common';
+import { LocalAuthGuard } from './42/local-auth.guard';
 import { AuthService } from './auth.service';
 //import { JwtAuthGuard } from './jwt-auth.guard';
 import { hostURL } from '../hostURL';

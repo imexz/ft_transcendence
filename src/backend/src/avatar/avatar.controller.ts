@@ -1,9 +1,7 @@
-import {  HttpException, Delete, Controller, Request, Post, Param, UseInterceptors, UploadedFile, MaxFileSizeValidator, FileTypeValidator, ParseFilePipe, Get, UseGuards, Res, StreamableFile, Header } from '@nestjs/common';
-import { Express } from 'express';
+import { Controller, Delete, FileTypeValidator, Get, Header, HttpException, HttpStatus, MaxFileSizeValidator, Param, ParseFilePipe, Post, Request, StreamableFile, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { AvatarService } from './avatar.service';
 import { JwtAuthGuard } from '../auth/jwt-two/jwt-auth.guard';
-import { HttpStatus } from '@nestjs/common'
+import { AvatarService } from './avatar.service';
 
 @Controller('avatar')
 export class AvatarController {

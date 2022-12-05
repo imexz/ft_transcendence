@@ -1,26 +1,17 @@
-import chatroom from "../../chatroom/chatroom.entity";
-import { message } from "../../message/message.entity";
-import { Entity, Column, PrimaryGeneratedColumn, JoinColumn, OneToMany, OneToOne, PrimaryColumn, ManyToMany, JoinTable, ManyToOne } from "typeorm";
-import { fileEntity } from "../../avatar/file.entitys";
 import { Exclude } from 'class-transformer';
+import { banMute } from "src/chatroom/banMute/banMute.entity";
+import { Column, Entity, JoinColumn, JoinTable, ManyToMany, OneToMany, OneToOne, PrimaryColumn } from "typeorm";
+import { fileEntity } from "../../avatar/file.entitys";
+import chatroom from "../../chatroom/chatroom.entity";
 import { Game } from '../../game/game.entities/game.entity';
+import { message } from "../../message/message.entity";
 import { Friend } from "../friends/friend.entity";
 import { UserStatus } from "./status.enum";
-import { banMute } from "src/chatroom/banMute/banMute.entity";
 
 
 
 @Entity()
 export default class User {
-	// constructor(id: number, unique_name: string, avatar_url_42intra: string, avatar: fileEntity, friends: User[]){
-	// 	this.id = id
-	// 	this.unique_name = unique_name
-	// 	this.avatar_url = avatar_url_42intra
-	// 	this.avatar_url_42intra = avatar_url_42intra
-	// 	this.avatar = avatar
-	// 	this.friends = friends
-	// }
-
 
 	constructor(partial: Partial<User>) {
 		Object.assign(this, partial);
@@ -29,8 +20,7 @@ export default class User {
 	@PrimaryColumn({unique: true})
 	id: number;
 
-	// @Column()
-	@Column({unique: true}) //finall
+	@Column({unique: true})
 	username: string;
 
 	@Column()
@@ -78,10 +68,6 @@ export default class User {
 	@JoinTable()
 	admin_of?: chatroom[];
 
-	// @ManyToMany(() => Game, (game) => game.player)
-	// @JoinTable()
-	// games?: Game[];
-
 	@OneToMany(() => Game, (game) => game.winner)
 	winns?: Game[]
 
@@ -93,16 +79,8 @@ export default class User {
 	@Column({ nullable: true })
   	twoFactorAuthenticationSecret?: string;
 
-	// @Exclude()
 	@Column({ default: false })
 	isTwoFactorAuthenticationEnabled: boolean;
-
-	// @ManyToMany(() => User, user => user.receivedRequests)
-	// @JoinTable({joinColumn: {name: 'senderId'}})
-	// sendRequest?: User[];
-
-	// @ManyToMany(() => User, user => user.sendRequest)
-	// receivedRequests?: User[];
 
 	@ManyToMany(() => User, user => user.blocked_me)
 	@JoinTable({joinColumn: {name: 'senderId'}})
