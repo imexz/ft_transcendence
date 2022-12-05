@@ -133,7 +133,7 @@ export default defineComponent({
     openDmPopUp(){
       this.showDm = true
       this.showGame = false
-      console.log("why")
+      //console.log("why")
     },
     closeDmPopUp(){
       this.showDm = false
@@ -145,7 +145,7 @@ export default defineComponent({
         this.openDmPopUp()
     },
     sendDm(){
-      console.log(this.DMText)
+      //console.log(this.DMText)
       this.$emit('actions', 'close')
       this.$store.state.chat.socketChat.emit('DM', {content: this.DMText, id: this.user.id})
       this.DMText = ""
@@ -187,13 +187,13 @@ export default defineComponent({
         withCredentials: true,
       })
         .then(res => {
-          console.log("api return live game", res)
+          //console.log("api return live game", res)
           if (res.data) {
-            console.log("res data")
+            //console.log("res data")
             this.opponentName = res.data.winner.id == this.user.id ? res.data.loser.username : res.data.winner.username
-            console.log("showGame = ", this.showGame)
+            //console.log("showGame = ", this.showGame)
             this.showGame = !this.showGame
-            console.log("showGame = ", this.showGame)
+            //console.log("showGame = ", this.showGame)
           }
           else {
             this.$emit('actions', 'actions')
@@ -201,7 +201,7 @@ export default defineComponent({
           }
         })
         .catch(error => { this.$emit('actions', 'error') })
-      console.log("askForMatchOrSpectate")
+      //console.log("askForMatchOrSpectate")
     },
   },
 })

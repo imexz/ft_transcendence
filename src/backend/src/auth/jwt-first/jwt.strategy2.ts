@@ -46,7 +46,7 @@ export class Jwt2Strategy extends PassportStrategy(Strategy, 'jwttwo') {
           return req.cookies.Authentication;
         }
         // console.log("extractJWT jwt null")
-        //   console.log(req);
+        //   //console.log(req);
 
         return;
       }

@@ -18,7 +18,7 @@ export class UsersService {
 			// .limit(10)
 			.getMany()
 
-		console.log("getTopPlayer", test);
+		//console.log(("getTopPlayer", test);
 
 		return test
 	}
@@ -74,19 +74,19 @@ export class UsersService {
 
 
 	async getUserSocket(server, id: number){
-		console.log("id = ", id);
+		//console.log(("id = ", id);
 
 		const sockets = await server.fetchSockets();
 
 		for (const socket of sockets) {
-			console.log("socket ", socket.handshake.auth);
+			//console.log(("socket ", socket.handshake.auth);
             if(socket.handshake.auth.id == id)
             {
-				console.log("found socket");
+				//console.log(("found socket");
 
               return socket
             }
-			console.log(socket.handshake.auth.id);
+			//console.log((socket.handshake.auth.id);
 
         }
 	}
@@ -115,11 +115,11 @@ export class UsersService {
 			try {
 				tmp = await this.usersRepository.save(tmp);
 				faild = false
-				console.log("try block ende");
+				//console.log(("try block ende");
 
 			}
 			catch (error) {
-				console.log("fehler in init user");
+				//console.log(("fehler in init user");
 				if (tmp.username != undefined)
 				{
 					tmp.username += "💩"
@@ -130,7 +130,7 @@ export class UsersService {
 
 		} while (faild && counter < 40);
 
-		console.log(tmp.username);
+		//console.log((tmp.username);
 
 		return tmp
 	}
@@ -167,7 +167,7 @@ export class UsersService {
 		try {
 			await this.usersRepository.save(user)
 		} catch (error) {
-			console.log(error);
+			//console.log((error);
 			throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
 		}
 		return
@@ -192,8 +192,8 @@ export class UsersService {
 	// 			this.usersRepository.save(user);
 
 	// 		} catch(exception: unknown) {
-	// 			console.log(exception)
-	// 			console.log("freind or user null");
+	// 			//console.log((exception)
+	// 			//console.log(("freind or user null");
 	// 			return null;
 	// 		}
 	// 		return;

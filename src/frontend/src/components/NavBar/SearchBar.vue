@@ -58,7 +58,7 @@ export default defineComponent({
       }
     },
     toggleSearchBar() {
-      console.log("toggleSearchBar called");
+      //console.log("toggleSearchBar called");
       
       if (!this.$store.state.validated)
         return

@@ -62,7 +62,7 @@ export default defineComponent({
   },
   methods: {
     show() {
-      console.log(this.$store.state);
+      //console.log(this.$store.state);
     },
     changeSuccess(msg: string) {
       this.$store.dispatch('triggerToast', {show: true, mode: 'success', msg: msg})

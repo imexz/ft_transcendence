@@ -82,7 +82,7 @@ export default defineComponent({
       },
       initPixi() {
         let canvas: HTMLElement = document.getElementById('pixi')
-		    console.log("initPixi");
+		    //console.log("initPixi");
         this.pixiApp = new PIXI.Application({
           width: 640,
           height: 480,

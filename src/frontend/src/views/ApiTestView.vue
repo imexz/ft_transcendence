@@ -36,7 +36,7 @@ export default defineComponent({
   methods: {
     handleSubmit(): void {
       if (this.body == ''){
-        console.log(this.body)
+        //console.log(this.body)
         VueAxios({
           url: this.url,
           baseURL: API_URL,

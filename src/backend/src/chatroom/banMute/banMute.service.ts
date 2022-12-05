@@ -40,7 +40,7 @@ export class BanMuteService {
         }
         
         async unMute(userId: number, chatroom: chatroom) {
-            console.log("===unMute===");
+            //console.log("===unMute===");
             await this.banMuteRepository.delete({
                 chatroom: {
                     roomId: chatroom.roomId

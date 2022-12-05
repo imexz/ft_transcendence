@@ -79,7 +79,7 @@ export default createStore<State>({
       if (state.chat === null) {
         state.chat = new Chat()
       }
-      console.log(document.cookie);
+      //console.log(document.cookie);
 
       state.socket.on('GameRequestFrontend',function (data, ack) {
         state.gameRequest = new GameRequest()

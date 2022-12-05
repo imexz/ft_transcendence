@@ -45,7 +45,7 @@ import UserActionsPopup from '@/components/Profile/UserActionsPopup.vue';
 
 export default defineComponent({
   created() {
-    console.log("created user summary")
+    //console.log("created user summary")
   },
   components: {
     ViewGamePopup,
@@ -61,7 +61,7 @@ export default defineComponent({
     }
   },
   mounted() {
-    console.log(this.user)
+    //console.log(this.user)
   },
   props: {
     user: {
@@ -84,7 +84,7 @@ export default defineComponent({
           this.toggleDropdown()
           break
         default:
-          console.log("popUpActions customEmit", emit)
+          //console.log("popUpActions customEmit", emit)
           this.customEmit(emit)
       }
     },
@@ -108,7 +108,7 @@ export default defineComponent({
         this.toggleDropdown()
     },
     toggleDropdown() {
-      console.log("toggleDropdown");
+      //console.log("toggleDropdown");
       if (this.show){
         window.removeEventListener('click', this.hideDropDown)
       }

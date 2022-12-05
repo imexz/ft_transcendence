@@ -23,7 +23,7 @@ export default defineComponent({
       this.$emit('actions', 'exit')
     },
     reEmit(emitMsg) {
-      console.log("COM", emitMsg)
+      //console.log("COM", emitMsg)
       this.$emit('actions', emitMsg)
     }
   }

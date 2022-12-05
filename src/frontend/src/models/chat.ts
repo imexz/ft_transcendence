@@ -53,8 +53,8 @@ export default class Chat{
               }
               room.messages = [...room.messages, new Message(data.message)]
             }
-            else
-              console.log("room for new Message not found");
+            // else
+              //console.log("room for new Message not found");
           })
 
           this.socketChat.on('newRoom',(data) => {
@@ -62,7 +62,7 @@ export default class Chat{
           })
 
           this.socketChat.on('UpdateRoom',(obj: {change: changedRoom, roomId: number, data: any }) => {
-            console.log("UpdateRoom received:", obj);
+            //console.log("UpdateRoom received:", obj);
 
             let room = store.state.chat.help.rooms.find(elem => elem.roomId == obj.roomId)
             if (room) {

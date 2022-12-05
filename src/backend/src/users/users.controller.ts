@@ -22,11 +22,11 @@ export class UsersController {
 	@UseGuards(JwtAuthGuard)
 	@UseInterceptors(ClassSerializerInterceptor)
 	async findOne(@Param('id') params: number){
-		console.log("findOne", params);
+		//console.log(("findOne", params);
 		if (Number.isNaN(params) || !Number.isFinite(params) || !Number.isSafeInteger(params))
 			throw new HttpException('Not Found', HttpStatus.NOT_FOUND)
 		const user = await this.usersService.getUser(params);
-		console.log("findOne", user);
+		//console.log(("findOne", user);
 		if (user == null || user == undefined)
 			throw new HttpException('Not Found', HttpStatus.NOT_FOUND)
 
@@ -78,9 +78,9 @@ export class UsersController {
 	@Post('update_name')
 	@UseGuards(JwtAuthGuard)
 	async update_name(@Body("name") name, @Request() req) {
-		console.log("inside update_name");
-		console.log(req.user);
-		console.log("inside update_name1");
+		//console.log(("inside update_name");
+		//console.log((req.user);
+		//console.log(("inside update_name1");
 
 		return this.usersService.updateName(req.user, name);
 	}

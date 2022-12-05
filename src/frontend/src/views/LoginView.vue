@@ -37,7 +37,7 @@ export default defineComponent({
     }
   },
   mounted() {
-    console.log("user = ", this.$store.state.user);
+    //console.log("user = ", this.$store.state.user);
   }
 })
 

@@ -42,7 +42,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   afterInit() { console.log("GameGateway: After init") }
 
   async handleConnection(@ConnectedSocket() socket: Socket) {
-	console.log("client %s connected", socket?.handshake.auth.id)
+	//console.log(("client %s connected", socket?.handshake.auth.id)
 	if(await this.authService.validateSocket(socket)) {
 		const game = this.getGame(socket.handshake.auth.id)
 			this.joinGameRoom(socket, game)
@@ -50,7 +50,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   }
 
   handleDisconnect(@ConnectedSocket() client: Socket) {
-	console.log("client %s disconnected", client?.handshake.auth?.id)
+	//console.log(("client %s disconnected", client?.handshake.auth?.id)
   }
 
   async joinGameRoom(client: Socket | any, game: Game) {

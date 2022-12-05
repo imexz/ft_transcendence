@@ -166,8 +166,8 @@
                     result = prompt("This room is protected\n password", "password")
                   }
 
-                    console.log(result);
-                    console.log("roomIdFrontend", roomId);
+                    //console.log(result);
+                    //console.log("roomIdFrontend", roomId);
 
                     this.$store.state.chat.socketChat.emit('join', {roomId: roomId, password: result}, (response)=> {
                       // console.log("room after joining", response);
@@ -245,10 +245,10 @@
 
         },
         muteUser(userId, roomId){
-          console.log("Requesting mute of:", userId, "in room:", roomId)
+          //console.log("Requesting mute of:", userId, "in room:", roomId)
         },
         banUser(userId, roomId){
-          console.log("Requesting ban of:", userId, "in room:", roomId)
+          //console.log("Requesting ban of:", userId, "in room:", roomId)
         },
         activateRoomInfo(){
           this.roomInfoPopUp = true;
@@ -268,13 +268,13 @@
           switch (action.name) {
             case 'block':
               {
-                console.log("case block");
+                //console.log("case block");
               }
 
               break;
 
             default:
-              console.log("default hit on messageActionHandler");
+              //console.log("default hit on messageActionHandler");
               break;
           }
         },

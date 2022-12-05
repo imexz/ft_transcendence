@@ -45,14 +45,14 @@ export class Gateway {
     async askUserToPlay(user: User, id: number, settings: Settings) {
       const socket = await this.usersService.getUserSocket(this.server, id)
       if (socket == undefined) {
-        console.log("gameRequest: opponent is offline")
+        //console.log("gameRequest: opponent is offline")
       } else {
         var response = {data: null as RESPONSE}
 
         await socket.emit('GameRequestFrontend',{ user, settings},  function ( data: RESPONSE)  {
-          console.log("GameRequestFrontend beginn")
+          //console.log("GameRequestFrontend beginn")
           response.data = data
-          console.log("in call back ", data)
+          //console.log("in call back ", data)
         }
         )
         this.responseGameRequest(socket, response, user, settings, id)
@@ -60,30 +60,30 @@ export class Gateway {
     }
 
     async responseGameRequest(socket ,data: { data: RESPONSE}, user, settings, id) {
-        console.log("start async")
+        //console.log("start async")
         var i = 0
         while (data.data == undefined && i < 100) {
           await new Promise(r => setTimeout(r, 100))
           i++
         }
-        console.log(data.data)
+        //console.log(data.data)
         if (data.data == RESPONSE.accept) {
-          console.log("accepted response")
+          //console.log("accepted response")
           const opponentGame = this.gameGateway.getGame(id)
           this.gameService.removeUserFromSpectators(id, opponentGame)
           const opponentSocket = await this.gameGateway.findSocketOfUser(id)
           if (opponentSocket) {
-            console.log(opponentSocket.rooms)
+            //console.log(opponentSocket.rooms)
             opponentSocket.rooms.forEach(roomId => { if (opponentSocket.id != roomId) opponentSocket.leave(roomId) })
           }
           const game = this.gameService.joinGameOrCreateGame( user, settings, id)
           this.gameGateway.joinGameRoom(opponentSocket, await  game)
           this.gameGateway.joinGameRoom(await this.gameGateway.findSocketOfUser(user.id), await  game)
-          console.log("game = ", await game)
+          //console.log("game = ", await game)
         } else {
-          (await this.gameGateway.findSocketOfUser(user.id)).emit('isFinished')
+          (await this.gameGateway.findSocketOfUser(user.id))?.emit('isFinished')
           socket.emit('resetRequester')
-          console.log("ende async")
+          //console.log("ende async")
         }
     }
 
@@ -102,7 +102,7 @@ export class Gateway {
     @ConnectedSocket() client: Socket,
     @MessageBody('id') id?: number )
     {
-      console.log("Request");
+      //console.log("Request");
 
       if(id != client.handshake.auth.id) {
         if(await this.friendsService.findFriendShip(client.handshake.auth.id, id) == undefined) {
@@ -110,7 +110,7 @@ export class Gateway {
           (await this.usersService.getUserSocket(this.server, id))?.emit('Request', client.handshake.auth)
           this.friendsService.requestFriendship(client.handshake.auth.id, id)
         } else {
-        console.log("friendship alredy exist")
+        //console.log("friendship alredy exist")
 
         }
       }
@@ -123,7 +123,7 @@ export class Gateway {
     @MessageBody('id') id?: number,
     @MessageBody('status') status?: Status    )
     {
-      console.log("responseFriendship", status)
+      //console.log("responseFriendship", status)
 
       this.friendsService.responseFriendship(client.handshake.auth.id, id, status)
       let friend = await this.findSocketOfUser(id)

@@ -56,7 +56,7 @@ export class AuthService {
 			// console.log("socket handshake1");
 			// console.log(socket.handshake.auth);
 			if(await socket.handshake.auth === undefined){
-			//   console.log("validation goes wrong");
+			//   //console.log("validation goes wrong");
 			  socket.disconnect()
 			  return false
 			} else {
@@ -69,7 +69,7 @@ export class AuthService {
 				return true
 			}
 			} catch (error) {
-			//   console.log("wrong token", error);
+			//   //console.log("wrong token", error);
 			  socket.disconnect()
 			  return false
 			}

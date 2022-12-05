@@ -60,12 +60,12 @@ export class FriendsService {
 	// }
 
 	async removeFriendship(user_id: any, friend_id: number) {
-		console.log("removeFriendship");
-		console.log(user_id, friend_id);
+		//console.log(("removeFriendship");
+		//console.log((user_id, friend_id);
 
 		const friendship = await this.findFriendShip(user_id, friend_id)
 
-		console.log(friendship);
+		//console.log((friendship);
 
 		if(friendship != null && friendship != undefined)
 			return await this.friendRepository.remove(friendship)

@@ -13,10 +13,10 @@ import chatroom, { Access } from 'src/chatroom/chatroom.entity';
 export class ChatService {
   async adminAction(action: AdminAction, roomId: number, UserId: number, adminId: number): Promise<AdminAction> {
     const room = await this.chatroomService.getRoomWithAdmins(roomId)
-    console.log("admins", room.admins, adminId);
+    //console.log("admins", room.admins, adminId);
 
     const isAdmin = room.admins.some(element => element.id === adminId );
-    console.log(isAdmin);
+    //console.log(isAdmin);
 
     if(isAdmin) {
       switch (action) {

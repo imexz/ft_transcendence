@@ -50,8 +50,8 @@ export default defineComponent({
           data: fd
         })
         .then(response => {
-          this.$emit('success', 'avatar changed'),
-          console.log("AAABBB", response.data);
+          this.$emit('success', 'avatar changed')
+          //console.log("AAABBB", response.data);
           if (response.data.includes('cdn.intra.42.fr'))
             this.$store.state.user.avatar_url = API_URL + response.data
           else
@@ -59,12 +59,12 @@ export default defineComponent({
             let date : Date = new Date()
             this.$store.state.user.avatar_url = API_URL + response.data + "?nocache=" + date.getHours() + date.getMinutes() + date.getSeconds() + date.getMilliseconds()
           }
-          console.log("done");
+          //console.log("done");
         })
 
         .catch(error => {
           this.$emit('error', 'Could not change Avatar')
-          console.log(error);
+          //console.log(error);
         })
       }
     },

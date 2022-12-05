@@ -29,17 +29,17 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
 
 	async validate(accessToken, refreshToken, profile, cb): Promise<any> {
 
-		this.logger.log("validate")
-		this.logger.log(profile.name)
+		// this.logger.log("validate")
+		// this.logger.log(profile.name)
 
 
 		var user = await this.authService.validateUser(profile.id);
 		// this.logger.log("try")
 		if(user == null){
 			// this.logger.log("catch")
-			this.logger.log(profile.id)
-			this.logger.log(profile.name.givenName)
-			this.logger.log(profile.image_url)
+			// this.logger.log(profile.id)
+			// this.logger.log(profile.name.givenName)
+			// this.logger.log(profile.image_url)
 
 			// this.logger.log(tmp)
 			var tmp: User[];
@@ -53,7 +53,7 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
 				friendStatus: null
 				})
 			// cb(err, user, err.info)
-			this.logger.log("return validate")
+			// this.logger.log("return validate")
 		}
 		return user
 	}

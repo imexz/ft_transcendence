@@ -73,11 +73,11 @@ export default defineComponent({
     }
   },
   mounted() {
-    console.log("Room in room info", this.room);
+    //console.log("Room in room info", this.room);
 
   },
   updated() {
-    console.log("updated in room info");
+    //console.log("updated in room info");
   },
   computed: {
     getRole(): string{
@@ -108,10 +108,10 @@ export default defineComponent({
       this.$emit('actions', emitMsg)
     },
     reEmit(emiType: AdminAction, userId){
-      console.log(emiType, userId);
+      //console.log(emiType, userId);
 
       this.$store.state.chat.socketChat.emit('actions', {emiType, userId, roomId: this.room.roomId}, (type) => {
-        console.log("return", type)
+        //console.log("return", type)
         switch (type) {
           case AdminAction.muted:
             this.extraButtonsDm[0].icon = "fa-solid fa-comment"
@@ -125,7 +125,7 @@ export default defineComponent({
         }
 
         if (type == AdminAction.muted) {
-          console.log("type muted")
+          //console.log("type muted")
 
         }
 

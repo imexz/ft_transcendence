@@ -128,12 +128,12 @@ async createRoomInfo(roomId: number, id: any): Promise<chatroom> {
             })
             for (let element of chatroom) {
                 if (element.users.find( elem => elem.id == user.id) != undefined && element.users.find(elem => elem.id == user1.id) != undefined) {
-                    console.log("return" );
+                    //console.log("return" );
 
                     return {info: roomReturn.changed, chatroom: element}
                 }
             }
-            console.log("dm room", chatroom);
+            //console.log("dm room", chatroom);
 
             var tmpChatroom
             tmpChatroom = await this.chatroomRepository.create()
@@ -149,7 +149,7 @@ async createRoomInfo(roomId: number, id: any): Promise<chatroom> {
     {
         if(user != null) {
             var ret: { chatroom: chatroom, bool: boolean }
-            console.log("roomId outside: ", roomId);
+            //console.log("roomId outside: ", roomId);
 
             ret = await this.findOrCreat(roomId)
 
@@ -166,7 +166,7 @@ async createRoomInfo(roomId: number, id: any): Promise<chatroom> {
                             }
 
                         default:
-                            console.log(ret.chatroom.users, user);
+                            //console.log(ret.chatroom.users, user);
 
                             if( ret.chatroom.users.findIndex(elem => elem.id == user.id) == -1 && ret.chatroom.bannedUsers.findIndex(elem => elem.id == user.id) == -1) {
                                 ret.chatroom.users.push(user)
@@ -215,7 +215,7 @@ async createRoomInfo(roomId: number, id: any): Promise<chatroom> {
                 index = room.users.findIndex(object => {
                     return object.id === user.id
                 })
-                console.log(index);
+                //console.log(index);
 
                 if(index != -1) {
                     room.users.splice(index, 1)

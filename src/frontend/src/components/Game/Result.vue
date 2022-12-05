@@ -25,7 +25,7 @@ export default defineComponent({
   },
   methods: {
     newGame() {
-        console.log("newGame")
+        //console.log("newGame")
         this.$emit('newGame')
     },
   }
