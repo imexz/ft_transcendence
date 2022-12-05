@@ -54,10 +54,10 @@ export class AuthController{
 	logout(@Request() req, @Res({ passthrough: true }) res) {
 		// console.log("logout");
 
-		res.setHeader('Set-Cookie', this.authService.getCookieWithJwtAccessToken(
-			req.user.id,
-			false,
-		) + '; Max-Age=0')
+		// res.setHeader('Set-Cookie', this.authService.getCookieWithJwtAccessToken(
+		// 	req.user.id,
+		// 	false,
+		// ) + '; Max-Age=0')
 	}
 
 	// @Get('protected')

@@ -1,0 +1,9 @@
+CLIENT_ID={{find on intra}}
+CLIENT_SECRET={{find on intra}}
+HOST={{ip address of your server}}
+CALLBACK_URL={{callback url in your intra, /auth/login/callback}}
+POSTGRES_USER=
+POSTGRES_PASSWORD=
+PGDATABASE=
+JWT_PASSWORD=
+TWO_FACTOR_AUTHENTICATION_APP_NAME=
