@@ -3,7 +3,7 @@
 # ft_transcendence
 
 This is our ft_transcendence, the last project from the common core of 42 school<br>
-The project is the result of the colaboration between [shackbei](https://github.com/shackbei), [tgrossma](https://github.com/tobbel42), [mstrantz](https://github.com/imexz), [tblaase](https://github.com/tblaase) and kprzybyl.
+The project is the result of the collaboration between [shackbei](https://github.com/shackbei), [tgrossma](https://github.com/tobbel42), [mstrantz](https://github.com/imexz), [tblaase](https://github.com/tblaase) and kprzybyl.
 
 <details>
   <summary>show result</summary>
