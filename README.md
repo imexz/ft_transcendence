@@ -4,7 +4,7 @@ This is our ft_transcendence, the last project from the common core of 42 school
 The project is the result of the colaboration between [shackbei](https://github.com/shackbei), [tgrossma](https://github.com/tobbel42), [mstrantz](https://github.com/imexz) and [tblaase](https://github.com/tblaase).
 
 
-# Contents
+## Contents
 - [Overview](#overview)
 - [Env File](#env-file)
 - [How to launch](#how-to-launch)
@@ -13,7 +13,7 @@ The project is the result of the colaboration between [shackbei](https://github.
 ## Overview
 In this project we were challanged to create a website where you can play pong and interact with other users.<br>
 For loggin into the page we had to use the [42 intra API](https://api.intra.42.fr/apidoc).<br>
-Here is some example pictures from our project:
+Here are some example pictures from our project:
 
 <details>
   <summary>show login page</summary>
@@ -28,6 +28,7 @@ Here is some example pictures from our project:
 
   ![profile](/readme_additions/profile.png)
 </details>
+
 ---
 
 <details>
@@ -92,7 +93,8 @@ Theses following variables have to be set inside the file:<br>
 - `CLIENT_ID` can be found on intra
 - `CLIENT_SECRET` can be found on intra
 - `HOST` this will be the IP-address of your server, i.e. `http://localhost`
-- `CALLBACK` this will be the same url as the callback-url in your intra, i.e. `http://localhost:3000/auth/login/callback`
+- `CALLBACK` this will be the same url as the callback-url in your intra,<br>
+    i.e. `http://localhost:3000/auth/login/callback`
 - `POSTGRES_USER` this will be the username for seting up and accessing the database
 - `POSTGRES_PASSWORD` this will be the password for the user above
 - `PGDATABASE` this will be the name of your database
@@ -100,16 +102,16 @@ Theses following variables have to be set inside the file:<br>
 - `TWO_FACTOR_AUTHENTICATION_APP_NAME` this will be name of your 2FA app
 
 
-[here](/src/backend/env_example.txt) you can find an example `.env`<br>
+[here](/src/backend/env_example.txt) you can find a template for our `.env`<br>
 
 ## How to launch
 You need:
 - Docker
-- 2gb of discspace for the Docker-Images
+- 2.5GB of discspace for the Docker-Images/Containers/Volume
 - 42Intra API Key
 
 
-Compile the program via the Makefile by using ```make``` or ```make all``` in the root directory of the repository.
+Launch our project via the Makefile by using ```make``` or ```make all``` in the root directory of the repository.
 
 
 For shutting down the server but not deleting anything use ```make down``` in the root of the repo.
