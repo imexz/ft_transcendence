@@ -31,7 +31,7 @@ export class MessageService {
     }
 
     async userAddMessageToRoom(user: User, content: string, chatroom: chatroom, system: boolean): Promise<message> {
-        if ((system || user !== undefined) && chatroom != undefined && content != undefined) {
+        if ((system || user !== undefined) && chatroom != undefined && content != undefined && content.length <= 500) {
             if (system == true)
                 user = undefined
 
