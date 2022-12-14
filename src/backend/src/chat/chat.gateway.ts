@@ -198,8 +198,9 @@ export class ChatGateway {
 
       this.server.to(roomId.toString()).emit('newMessage', {message: tmp, roomId});
       //console.log("createMessage ende");
-      return tmp;
+      return true
     } else {
+      return false
       // console.log("message == empty");
     }
   }

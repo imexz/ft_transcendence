@@ -148,7 +148,7 @@
         sendMessage({ roomId, content}) {
           this.$store.state.chat.socketChat.emit('createMessage', { roomId: roomId, content: content}, (response) =>
           {
-            if (content.length > 500 && response == undefined) {
+            if (content.length > 500 && response == false) {
               this.changeError("Message is too long")
             }
           })
