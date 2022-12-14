@@ -1,4 +1,3 @@
-![browser](/readme_additions/browser.png)
 ![header](/readme_additions/header.png)
 
 # ft_transcendence
