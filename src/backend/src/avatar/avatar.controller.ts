@@ -15,7 +15,7 @@ export class AvatarController {
     @UploadedFile(
       new ParseFilePipe({
         validators: [
-          new MaxFileSizeValidator({ maxSize: 1073741824 }),
+          new MaxFileSizeValidator({ maxSize: 5242880 }),
           new FileTypeValidator({ fileType: 'jpeg' }),
         ]
       })

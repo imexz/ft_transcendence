@@ -36,7 +36,7 @@ export default defineComponent({
       else if (this.selectedFile.type != 'image/jpeg') {
         this.$emit('error', 'wrong file type')
       }
-      else if (this.selectedFile.size > 1073741824) {
+      else if (this.selectedFile.size > 5242880) {
         this.$emit('error', 'file to big')
       }
       else {
