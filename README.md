@@ -23,6 +23,7 @@ For loggin into the page we had to use the OAuth systen of [42 intra API](https:
 The frontend had to be developed in a TypeScript framework of our choice.<br>
 The backend had to be written in NestJS.<br>
 As database we had to use PostgreSQL.<br>
+All details are listed in our [requiremnts.txt](/requirements.txt).<br>
 Here are some example pictures from our project:
 
 <details>
