@@ -1,3 +1,5 @@
+![header](/readme_additions/header.png)
+
 # ft_transcendence
 
 This is our ft_transcendence, the last project from the common core of 42 school<br>
@@ -100,9 +102,9 @@ Theses following variables have to be set inside the file:<br>
 - `HOST` this will be the IP-address of your server, i.e. `http://localhost`
 - `CALLBACK` this will be the same url as the callback-url in your intra,<br>
     i.e. `http://localhost:3000/auth/login/callback`
-- `POSTGRES_USER` this will be the username for seting up and accessing the database
+- `POSTGRES_USER` this will be the username for seting up and accessing the database (for some reason has to be the same as `PGDATABASE`)
 - `POSTGRES_PASSWORD` this will be the password for the user above
-- `PGDATABASE` this will be the name of your database
+- `PGDATABASE` this will be the name of your database (for some reason has to be the same as `POSTGRES_USER`)
 - `JWT_PASSWORD` this will be the password of your JWT-service
 - `TWO_FACTOR_AUTHENTICATION_APP_NAME` this will be name of your 2FA app
 
@@ -113,13 +115,17 @@ Theses following variables have to be set inside the file:<br>
 You need:
 - Docker
 - 2.5GB of discspace for the Docker-Images/Containers/Volume
-- 42Intra API Key
+- 42 Intra API Key
 
 
 Launch our project via the Makefile by using ```make``` or ```make all``` in the root directory of the repository.
+This takes 90 seconds here in our school, times may vary depending on the download speed.
 
 
 For shutting down the server but not deleting anything use ```make down``` in the root of the repo.
 
 
 For deleting every docker conatiner/image/volume that is currently not used, use ```make clean``` in the root of the repo.
+
+
+![footer](/readme_additions/footer.png)
