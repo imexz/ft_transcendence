@@ -19,7 +19,10 @@ The project is the result of the colaboration between [shackbei](https://github.
 
 ## Overview
 In this project we were challanged to create a website where you can play pong and interact with other users.<br>
-For loggin into the page we had to use the [42 intra API](https://api.intra.42.fr/apidoc).<br>
+For loggin into the page we had to use the OAuth systen of [42 intra API](https://api.intra.42.fr/apidoc).<br>
+The frontend had to be developed in a TypeScript framework of our choice.<br>
+The backend had to be written in NestJS.<br>
+As database we had to use PostgreSQL.<br>
 Here are some example pictures from our project:
 
 <details>
