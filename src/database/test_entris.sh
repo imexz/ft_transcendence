@@ -17,28 +17,32 @@ INSERT INTO "user" (id, username, avatar_url, avatar_url_42intra)
 VALUES (88081, 'samuel', 'https://cdn.intra.42.fr/users/cb7fb65f8df7eafcbb9047111da29cc8/jfritz.JPG', 'https://cdn.intra.42.fr/users/cb7fb65f8df7eafcbb9047111da29cc8/jfritz.JPG' );
 
 
-INSERT INTO "game" (id, "scoreLeft", "scoreRight")
-VALUES (1, 10, 5);
-INSERT INTO "user_games_game" (user_id, "gameId")
-VALUES (111952, 1);
+INSERT INTO "game" (id, "scoreWinner", "scoreLoser", "winnerId", "loserId")
+VALUES (1, 10, 5, 111952, 88081);
 
-INSERT INTO "game" (id, "scoreLeft", "scoreRight")
-VALUES (2, 10, 5);
-INSERT INTO "user_games_game" (user_id, "gameId")
-VALUES (88081, 1);
+INSERT INTO "game" (id, "scoreWinner", "scoreLoser", "winnerId", "loserId")
+VALUES (2, 10, 8, 88081, 111952);
 
-INSERT INTO "game" (id, "scoreLeft", "scoreRight")
-VALUES (3, 10, 5);
-INSERT INTO "user_games_game" (user_id, "gameId")
-VALUES (88081, 2);
+INSERT INTO "game" (id, "scoreWinner", "scoreLoser", "winnerId", "loserId")
+VALUES (3, 10, 88081, 111952);
 
-INSERT INTO "game" (id, "scoreLeft", "scoreRight")
-VALUES (4, 10, 5);
-INSERT INTO "user_games_game" (user_id, "gameId")
-VALUES (111952, 2);
+INSERT INTO "game" (id, "scoreWinner", "scoreLoser", "winnerId", "loserId")
+VALUES (4, 10, 0, 88081, 138097);
 
+INSERT INTO "game" (id, "scoreWinner", "scoreLoser", "winnerId", "loserId")
+VALUES (5, 10, 2, 86324, 138097);
 
+INSERT INTO "game" (id, "scoreWinner", "scoreLoser", "winnerId", "loserId")
+VALUES (6, 10, 1, 111952, 138097);
 
+INSERT INTO "game" (id, "scoreWinner", "scoreLoser", "winnerId", "loserId")
+VALUES (7, 10, 0, 111953, 138097);
+
+INSERT INTO "game" (id, "scoreWinner", "scoreLoser", "winnerId", "loserId")
+VALUES (8, 10, 3, 86324, 138097);
+
+INSERT INTO "game" (id, "scoreWinner", "scoreLoser", "winnerId", "loserId")
+VALUES (9, 10, 0, 86324, 111952);
 
 
 BASH_QUERY
