@@ -19,7 +19,7 @@ The project is the result of the colaboration between [shackbei](https://github.
 
 ## Overview
 In this project we were challanged to create a website where you can play pong and interact with other users.<br>
-For loggin into the page we had to use the OAuth systen of [42 intra API](https://api.intra.42.fr/apidoc).<br>
+For loggin into the page we had to use the OAuth system of [42 intra API](https://api.intra.42.fr/apidoc).<br>
 The frontend had to be developed in a TypeScript framework of our choice.<br>
 The backend had to be written in NestJS.<br>
 As database we had to use PostgreSQL.<br>
@@ -106,7 +106,7 @@ Theses following variables have to be set inside the file:<br>
 - `HOST` this will be the IP-address of your server, i.e. `http://localhost`
 - `CALLBACK` this will be the same url as the callback-url in your intra,<br>
     i.e. `http://localhost:3000/auth/login/callback`
-- `POSTGRES_USER` this will be the username for seting up and accessing the database (for some reason has to be the same as `PGDATABASE`)
+- `POSTGRES_USER` this will be the username for setting up and accessing the database (for some reason has to be the same as `PGDATABASE`)
 - `POSTGRES_PASSWORD` this will be the password for the user above
 - `PGDATABASE` this will be the name of your database (for some reason has to be the same as `POSTGRES_USER`)
 - `JWT_PASSWORD` this will be the password of your JWT-service
@@ -122,14 +122,14 @@ You need:
 - 42 Intra API Key
 
 
-Launch our project via the Makefile by using ```make``` or ```make all``` in the root directory of the repository.
+Launch our project via the [Makefile](/Makefile) by using ```make``` or ```make all``` in the root directory of the repository.
 This takes 90 seconds here in our school, times may vary depending on the download speed.
 
 
 For shutting down the server but not deleting anything use ```make down``` in the root of the repo.
 
 
-For deleting every docker conatiner/image/volume that is currently not used, use ```make clean``` in the root of the repo.
+For deleting every docker container/image/volume that is currently not used, use ```make clean``` in the root of the repo.
 
 
 ![footer](/readme_additions/footer.png)
