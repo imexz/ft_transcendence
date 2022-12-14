@@ -1,8 +1,13 @@
 # ft_transcendence
 
 This is our ft_transcendence, the last project from the common core of 42 school<br>
-The project is the result of the colaboration between [shackbei](https://github.com/shackbei), [tgrossma](https://github.com/tobbel42), [mstrantz](https://github.com/imexz) and [tblaase](https://github.com/tblaase).
+The project is the result of the colaboration between [shackbei](https://github.com/shackbei), [tgrossma](https://github.com/tobbel42), [mstrantz](https://github.com/imexz), [tblaase](https://github.com/tblaase) and kprzybyl.
 
+<details>
+  <summary>show result</summary>
+
+  ![result](/readme_additions/result.png)<br>
+</details>
 
 ## Contents
 - [Overview](#overview)
@@ -58,7 +63,7 @@ Here are some example pictures from our project:
 <details>
   <summary>show after game page</summary>
 
-![ingame](/readme_additions/after_game.png)
+![aftergame](/readme_additions/after_game.png)
 </details>
 
 ---
