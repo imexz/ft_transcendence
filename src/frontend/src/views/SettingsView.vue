@@ -2,7 +2,7 @@
   <div class="wrapper">
     <h1>Settings</h1>
     <div class="section">
-      <div class="sectionHeadline"> 
+      <div class="sectionHeadline">
         <h2>Change Username</h2>
       </div>
       <hr class="break"/>
@@ -16,21 +16,21 @@
       </div>
     </div>
     <div class="section">
-      <div class="sectionHeadline"> 
+      <div class="sectionHeadline">
         <h2>Change Avatar</h2>
       </div>
       <hr class="break"/>
       <div class="sectionContent">
         <span>
-          The image needs to be a .jpeg file and can have a maximal size of 1GB 
+          The image needs to be a .jpeg file and can have a maximal size of 5MB
         </span>
         <br/>
-        <br/>     
+        <br/>
         <ChangeUserAvatar @success="changeSuccess" @error="changeError"/>
       </div>
     </div>
     <div class="section">
-      <div class="sectionHeadline"> 
+      <div class="sectionHeadline">
         <h2>2FA</h2>
       </div>
       <hr class="break"/>
@@ -87,14 +87,14 @@ export default defineComponent({
   }
   .wrapper h1 {
     margin-bottom: 40px;
-  
+
   }
   .section {
     min-height: 15vh;
     margin-bottom: 30px;
     text-align: left;
   }
-  
+
   .sectionHeadline {
     margin-bottom: 15px;
   }
@@ -131,5 +131,5 @@ export default defineComponent({
     border-color: var(--ft_cyan);
     border-radius: 5px;
   }
- 
+
 </style>
