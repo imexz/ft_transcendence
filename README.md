@@ -5,6 +5,10 @@
 This is our ft_transcendence, the last project from the common core of 42 school<br>
 The project is the result of the collaboration between [shackbei](https://github.com/shackbei), [tgrossma](https://github.com/tobbel42), [mstrantz](https://github.com/imexz), [tblaase](https://github.com/tblaase) and kprzybyl.
 
+⚠️ This project will no longer be maintained and by now has some security issues that where not public until after we finished this project.<br>
+[Here](https://nvd.nist.gov/vuln/detail/CVE-2022-23529) you can read about CVE-2022-23529, it affects JsonWebToken <= 8.5.1.<br>
+We are using 8.5.1 which was the latest stable version available during the project.<br>
+
 <details>
   <summary>show result</summary>
 
